@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2015-03-11T10:37:07Z" product-name="decospublisher7">
+		<header/>
+		<body>
+			<trans-unit id="tx_decospublisher7_domain_model_import">
+				<source>Decos Documents Import</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_import.title">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_import.file">
+				<source>File</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_import.document_path">
+				<source>Document Path</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_import.auto_update">
+				<source>Automatic Updates</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_import.forget_on_update">
+				<source>Only Keep Last Update</source>
+			</trans-unit>
+			
+			<trans-unit id="tx_decospublisher7_domain_model_field">
+				<source>Decos Field</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_field.field_name">
+				<source>Field Name</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_field.field_name.placeholder">
+				<source>e.g. TEXT7</source>
+			</trans-unit>
+			
+			<trans-unit id="tx_decospublisher7_domain_model_itemtype">
+				<source>Decos Item Type</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_itemtype.item_type">
+				<source>Item Type</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_itemtype.item_type.placeholder">
+				<source>e.g. DOCUMENTe</source>
+			</trans-unit>
+			
+			<trans-unit id="tx_decospublisher7_domain_model_item">
+				<source>Decos Item</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_item.item_key">
+				<source>Unique Key</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_item.item_type">
+				<source>Item Type</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_item.import">
+				<source>Documents Import(s)</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_item.parent_item">
+				<source>Parent Item(s)</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_item.child_item">
+				<source>Child Item(s)</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_item.item_field">
+				<source>Metadata</source>
+			</trans-unit>
+			
+			<trans-unit id="tx_decospublisher7_domain_model_itemfield">
+				<source>Decos Metadata</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_itemfield.field_value">
+				<source>Field Data</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_itemfield.field">
+				<source>Field</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_itemfield.item">
+				<source>Decos Item</source>
+			</trans-unit>
+			
+			<trans-unit id="tx_decospublisher7_domain_model_profile">
+				<source>Decos Item Profile</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_profile.title">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_profile.file">
+				<source>File</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_profile.profile_key">
+				<source>Unique Key</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_profile.profile_field">
+				<source>Profile Fields</source>
+			</trans-unit>
+			
+			<trans-unit id="tx_decospublisher7_domain_model_profilefield">
+				<source>Decos Profile Field</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_profilefield.description">
+				<source>Field Description</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_profilefield.profile">
+				<source>Profile</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_profilefield.field">
+				<source>Field</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

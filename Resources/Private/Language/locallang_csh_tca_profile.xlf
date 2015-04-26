@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2015-03-11T10:37:07Z" product-name="decospublisher7">
+		<header/>
+		<body>
+			<trans-unit id="title.description">
+				<source>A unique title for you to identify the Decos Profile with</source>
+			</trans-unit>
+			<trans-unit id="file.description">
+				<source>Reference to the Decos Profile Export file</source>
+			</trans-unit>
+			<trans-unit id="profile_key.description">
+				<source>Profile key, which is unique to your Decos DMS instance</source>
+			</trans-unit>
+			<trans-unit id="profile_field.description">
+				<source>Profile field descriptions, holds profile-specific descriptions for any Decos Field</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

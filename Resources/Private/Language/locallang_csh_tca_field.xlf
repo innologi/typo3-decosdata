@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2015-03-11T10:37:07Z" product-name="decospublisher7">
+		<header/>
+		<body>
+			<trans-unit id="field_name.description">
+				<source>Internal field name straight out of Decos DMS. This can be anything like BOL1, SUBJECT2, TEXT3, or DATE4. These are created automatically when importing Document Items or Item Profiles.</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

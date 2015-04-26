@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2015-03-11T10:37:07Z" product-name="decospublisher7">
+		<header/>
+		<body>
+			<trans-unit id="item_type.description">
+				<source>Internal item type straight out of Decos DMS. Describes the context of an item, i.e. DOCUMENT for document-metadata, BLOB for actual file-representations, etc. These are created automatically when importing Document Items.</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

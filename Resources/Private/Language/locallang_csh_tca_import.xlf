@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2015-03-11T10:37:07Z" product-name="decospublisher7">
+		<header/>
+		<body>
+			<trans-unit id="title.description">
+				<source>A unique title for you to identify the Documents Import with</source>
+			</trans-unit>
+			<trans-unit id="file.description">
+				<source>Reference to the Documents Import Export file</source>
+			</trans-unit>
+			<trans-unit id="document_path.description">
+				<source>Leave empty unless the base location of document files is to be different from the export file! (usually not the case) You will need to provide an absolute server path to the directory location.</source>
+			</trans-unit>
+			<trans-unit id="auto_update.description">
+				<source>Include in automatic updates via the 'scheduler' update task</source>
+			</trans-unit>
+			<trans-unit id="forget_on_update.description">
+				<source>When enabled, will allow the import to only retain data from the very latest update it received. This is useful for use-cases where the import-updates provided represent the total amount of Decos DMS data to be usable by Decos Publisher for this specific import.</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

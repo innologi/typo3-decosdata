@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2015-03-11T10:37:07Z" product-name="decospublisher7">
+		<header/>
+		<body>
+			<trans-unit id="tca_wizard.edit">
+				<source>Edit selected relation-record</source>
+			</trans-unit>
+			<trans-unit id="tca_wizard.list">
+				<source>List all possible relation-records</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

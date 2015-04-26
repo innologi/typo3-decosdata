@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2015-03-11T10:37:07Z" product-name="decospublisher7">
+		<header/>
+		<body>
+			<trans-unit id="field_value.description">
+				<source>Metadata value, usually straight out of Decos DMS via import</source>
+			</trans-unit>
+			<trans-unit id="field.description">
+				<source>The Decos Field containing the field data value</source>
+			</trans-unit>
+			<trans-unit id="item.description">
+				<source>Decos Item which this metadata belongs to</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
