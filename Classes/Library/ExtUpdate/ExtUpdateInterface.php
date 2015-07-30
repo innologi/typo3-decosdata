@@ -38,6 +38,6 @@ interface ExtUpdateInterface {
 	 *
 	 * @return void
 	 */
-	protected function processUpdates();
+	public function processUpdates();
 
 }
