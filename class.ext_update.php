@@ -502,7 +502,7 @@ class ext_update extends ExtUpdateAbstract {
 		$referenceTables = array(
 			'tx_' . $this->extensionKey . '_item_import_mm' => 'uid_foreign',
 		);
-		// @TODO ___reflect the removal of properties in the import domain model and tca
+		// @TODO ___reflect the removal of properties in the import domain model and tca: documentpath @ model, auto @ all?
 		$propertyMap = array(
 			'pid' => 'pid',
 			'name' => 'title',

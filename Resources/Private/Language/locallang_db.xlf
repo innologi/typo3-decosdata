@@ -12,9 +12,6 @@
 			<trans-unit id="tx_decospublisher7_domain_model_import.file">
 				<source>File</source>
 			</trans-unit>
-			<trans-unit id="tx_decospublisher7_domain_model_import.document_path">
-				<source>Document Path</source>
-			</trans-unit>
 			<trans-unit id="tx_decospublisher7_domain_model_import.auto_update">
 				<source>Automatic Updates</source>
 			</trans-unit>

@@ -34,7 +34,7 @@ return array(
 	),
 	'types' => array(
 		'0' => array(
-			'showitem' => 'hidden, title, file, document_path, auto_update, forget_on_update,
+			'showitem' => 'hidden, title, file, auto_update, forget_on_update,
 				--div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'
 		),
 	),
@@ -95,16 +95,6 @@ return array(
 					'maxitems' => 1
 				),
 				'xml'
-			),
-		),
-		'document_path' => array(
-			'exclude' => FALSE,
-			'label' => $ll . '.document_path',
-			'config' => array(
-				'type' => 'input',
-				'size' => 80,
-				// @TODO __ required?
-				'eval' => 'trim'
 			),
 		),
 		'auto_update' => array(
