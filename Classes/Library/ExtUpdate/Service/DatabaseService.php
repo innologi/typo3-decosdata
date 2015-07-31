@@ -115,7 +115,7 @@ class DatabaseService implements SingletonInterface {
 			// then truncate is quicker and cleaner than delete
 			$this->databaseConnection->exec_TRUNCATEquery($sourceTable);
 		} else {
-			$this->databaseConnection->exec_DELETEquery(
+			$this->deleteTableRecords(
 				$sourceTable,
 				'uid IN (\'' . join('\',\'', $sourceUidArray) . '\')'
 			);
@@ -175,7 +175,7 @@ class DatabaseService implements SingletonInterface {
 					$sourceTable
 				);
 			}
-			$this->databaseConnection->exec_DELETEquery(
+			$this->deleteTableRecords(
 				$sourceTable,
 				'(' . join(') OR (', $whereArray) . ')'
 			);
@@ -330,6 +330,18 @@ class DatabaseService implements SingletonInterface {
 			);
 		}
 		return $rows;
+	}
+
+	/**
+	 * Deletes table records.
+	 *
+	 * @param string $table
+	 * @param string $where
+	 * @return integer Affected row count
+	 */
+	public function deleteTableRecords($table, $where = '') {
+		$this->databaseConnection->exec_DELETEquery($table, $where);
+		return $this->databaseConnection->sql_affected_rows();
 	}
 
 
