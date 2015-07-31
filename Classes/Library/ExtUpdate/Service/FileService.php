@@ -66,7 +66,6 @@ class FileService implements SingletonInterface {
 	 * it doesn't exist and return it.
 	 *
 	 * @param string $path
-	 * @throws Exception\NotAFile
 	 * @throws FileDoesNotExistException
 	 * @throws Exception\NotInDocumentRoot
 	 * @return \TYPO3\CMS\Core\Resource\File
