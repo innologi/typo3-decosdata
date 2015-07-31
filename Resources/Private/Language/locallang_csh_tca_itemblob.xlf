@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2015-03-11T10:37:07Z" product-name="decospublisher7">
+		<header/>
+		<body>
+			<trans-unit id="item_key.description">
+				<source>Item key, which is unique to your Decos DMS instance</source>
+			</trans-unit>
+			<trans-unit id="sequence.description">
+				<source>Sequence of the file in context of the parent item. Determines the order of files, with 1 being the most recent file. Each sequence-number is unique per item, but the extension does not enforce this.</source>
+			</trans-unit>
+			<trans-unit id="file.description">
+				<source>Reference to the actual file</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

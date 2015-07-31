@@ -21,6 +21,9 @@
 			<trans-unit id="item_field.description">
 				<source>Metadata field/data combinations, holds the metadata in any relevant field of this item</source>
 			</trans-unit>
+			<trans-unit id="item_blob.description">
+				<source>Related files, holds any file reference that is related to this item and made accessible for download/view if the plugin configuration allows it, e.g. a .pdf or .jpg</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

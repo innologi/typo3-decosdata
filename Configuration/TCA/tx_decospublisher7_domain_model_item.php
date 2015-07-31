@@ -63,12 +63,13 @@ return array(
 	),
 
 	'interface' => array(
-		'showRecordFieldList' => 'hidden, item_key, item_type, import, parent_item, child_item, item_field',
+		'showRecordFieldList' => 'hidden, item_key, item_type, import, parent_item, child_item, item_field, item_blob',
 	),
 	'types' => array(
 		'0' => array(
 			'showitem' => 'hidden, item_key, item_type, import, parent_item, child_item,
 				--div--;' . $ll . '.item_field,item_field,
+				--div--;' . $ll . '.item_blob,item_blob,
 				--div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'
 		),
 	),
@@ -160,6 +161,7 @@ return array(
 							'name' => 'wizard_edit'
 						),
 						'popup_onlyOpenIfSelected' => TRUE,
+						// @LOW ___resizable=1 ?
 						'JSopenParams' => 'height=600,width=800,status=0,menubar=0,scrollbars=1',
 					),
 				)
@@ -248,6 +250,26 @@ return array(
 				// override ctrl/label setting
 				'foreign_label' => 'field',
 				'foreign_selector' => 'field',
+				'maxitems' => 9999,
+				'appearance' => array(
+					'collapseAll' => TRUE,
+					'levelLinksPosition' => 'top',
+				),
+				'behaviour' => array(
+					'enableCascadingDelete' => TRUE,
+				)
+			),
+		),
+		'item_blob' => array(
+			'exclude' => FALSE,
+			'label' => $ll . '.item_blob',
+			'config' => array(
+				'type' => 'inline',
+				'foreign_table' => 'tx_decospublisher7_domain_model_itemblob',
+				'foreign_field' => 'item',
+				'foreign_default_sortby' => 'tx_decospublisher7_domain_model_itemblob.sequence ASC',
+				// override ctrl/label setting
+				'foreign_label' => 'sequence',
 				'maxitems' => 9999,
 				'appearance' => array(
 					'collapseAll' => TRUE,

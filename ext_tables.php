@@ -13,14 +13,11 @@ $cshPathPrefix = 'EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_csh_
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages($tablePrefix . 'import');
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages($tablePrefix . 'field');
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages($tablePrefix . 'item');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages($tablePrefix . 'itemblob');
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages($tablePrefix . 'itemfield');
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages($tablePrefix . 'itemtype');
 
 // add CSH files to TCA
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
-	$tablePrefix . 'import',
-	$cshPathPrefix . 'tca_import.xlf'
-);
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
 	$tablePrefix . 'profile',
 	$cshPathPrefix . 'tca_profile.xlf'
@@ -30,12 +27,20 @@ $cshPathPrefix = 'EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_csh_
 	$cshPathPrefix . 'tca_profilefield.xlf'
 );
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
+	$tablePrefix . 'import',
+	$cshPathPrefix . 'tca_import.xlf'
+);
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
 	$tablePrefix . 'field',
 	$cshPathPrefix . 'tca_field.xlf'
 );
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
 	$tablePrefix . 'item',
 	$cshPathPrefix . 'tca_item.xlf'
+);
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
+	$tablePrefix . 'itemblob',
+	$cshPathPrefix . 'tca_blob.xlf'
 );
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
 	$tablePrefix . 'itemfield',

@@ -36,7 +36,7 @@
 				<source>Item Type</source>
 			</trans-unit>
 			<trans-unit id="tx_decospublisher7_domain_model_itemtype.item_type.placeholder">
-				<source>e.g. DOCUMENTe</source>
+				<source>e.g. DOCUMENT</source>
 			</trans-unit>
 			
 			<trans-unit id="tx_decospublisher7_domain_model_item">
@@ -59,6 +59,25 @@
 			</trans-unit>
 			<trans-unit id="tx_decospublisher7_domain_model_item.item_field">
 				<source>Metadata</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_item.item_blob">
+				<source>Files</source>
+			</trans-unit>
+			
+			<trans-unit id="tx_decospublisher7_domain_model_itemblob">
+				<source>File Relation</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_itemblob.item_key">
+				<source>Unique Key</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_itemblob.sequence">
+				<source>Sequence</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_itemblob.file">
+				<source>File</source>
+			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_itemblob.item">
+				<source>Decos Item</source>
 			</trans-unit>
 			
 			<trans-unit id="tx_decospublisher7_domain_model_itemfield">
