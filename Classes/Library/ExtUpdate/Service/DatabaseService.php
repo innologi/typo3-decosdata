@@ -94,9 +94,7 @@ class DatabaseService implements SingletonInterface {
 		$toInsert = $this->translatePropertiesOfRows($toMigrate, $propertyMap);
 
 		// insert, note that we use $propertyMap to define the $fields parameter
-		$this->databaseConnection->exec_INSERTmultipleRows(
-			$targetTable, $propertyMap, $toInsert
-		);
+		$this->insertTableRecords($targetTable, $propertyMap, $toInsert);
 		// retrieve new uid's and combine them with original uid's
 		$startUid = $this->databaseConnection->sql_insert_id();
 		// affected_rows is not reliable when debugging (not sure if xdebug issue), so I'm using $count instead
@@ -153,9 +151,7 @@ class DatabaseService implements SingletonInterface {
 		$toInsert = $this->translatePropertiesOfRows($toMigrate, $propertyMap);
 
 		// insert, note that we use $propertyMap to define the $fields parameter
-		$this->databaseConnection->exec_INSERTmultipleRows(
-			$targetTable, $propertyMap, $toInsert
-		);
+		$this->insertTableRecords($targetTable, $propertyMap, $toInsert);
 
 		// remove the old data
 		if ($count < $limitRecords) {
@@ -306,12 +302,12 @@ class DatabaseService implements SingletonInterface {
 	 * @param string $where Note that an empty $where will return all
 	 * @param string $select Will return all columns by default
 	 * @param integer $limit Limits record count
+	 * @param string $orderBy
 	 * @return array
 	 * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Storage\Exception\SqlErrorException
 	 */
-	public function selectTableRecords($table, $where = '', $select = '*', $limit = 5000) {
+	public function selectTableRecords($table, $where = '', $select = '*', $limit = 5000, $orderBy = 'uid ASC') {
 		$groupBy = '';
-		$orderBy = 'uid ASC';
 		$rows = $this->databaseConnection->exec_SELECTgetRows(
 			$select,
 			$table,
@@ -341,6 +337,18 @@ class DatabaseService implements SingletonInterface {
 	 */
 	public function deleteTableRecords($table, $where = '') {
 		$this->databaseConnection->exec_DELETEquery($table, $where);
+		return $this->databaseConnection->sql_affected_rows();
+	}
+
+	/**
+	 * Inserts multiple rows into table.
+	 *
+	 * @param string $table
+	 * @param array $fields
+	 * @param array $values Each element is an array with values
+	 */
+	public function insertTableRecords($table, array $fields, array $values) {
+		$this->databaseConnection->exec_INSERTmultipleRows($table, $fields, $values);
 		return $this->databaseConnection->sql_affected_rows();
 	}
 
@@ -460,9 +468,7 @@ class DatabaseService implements SingletonInterface {
 
 		if (!empty($valueRows)) {
 			// insert
-			$this->databaseConnection->exec_INSERTmultipleRows(
-				$table, $properties, $valueRows
-			);
+			$this->insertTableRecords($table, $properties, $valueRows);
 			// retrieve new uid's and register them with the newly stored data
 			$uid = $this->databaseConnection->sql_insert_id();
 			foreach ($valueRows as $row) {

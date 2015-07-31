@@ -96,7 +96,8 @@ class ext_update extends ExtUpdateAbstract {
 	 * @var array
 	 */
 	protected $finishState = array(
-		'fal_itemfield' => FALSE,
+		'blob' => FALSE,
+		'fal_blob' => FALSE,
 		'fal_itemxml' => FALSE,
 		'field' => FALSE,
 		'item' => FALSE,
@@ -124,7 +125,8 @@ class ext_update extends ExtUpdateAbstract {
 		$this->migrateItemXmlMmTable();
 		$this->migrateXmlTable();
 		// then imigrate anything filepath/blob related
-		$this->migrateItemFieldToFal();
+		$this->migrateBlobToFal();
+		$this->migrateBlobs();
 		// then import items and metadata, can't really go wrong here
 		$this->migrateItemTypes();
 		$this->migrateFields();
@@ -142,7 +144,6 @@ class ext_update extends ExtUpdateAbstract {
 			$this->addFlashMessage($this->lang['updaterFinish'], $this->lang['updaterFinishTitle'], FlashMessage::OK);
 		}
 
-		// @TODO ___BLOB Conversion
 		// @TODO ___Task Migration
 	}
 
@@ -154,8 +155,8 @@ class ext_update extends ExtUpdateAbstract {
 	 * @return void
 	 */
 	protected function migrateItemTypes() {
-		// stop if prior migration haven't finished --ARTIFICIAL
-		if (!$this->finishState['fal_itemfield']) {
+		// stop if prior migration haven't finished
+		if (!$this->finishState['blob']) {
 			return;
 		}
 
@@ -193,8 +194,8 @@ class ext_update extends ExtUpdateAbstract {
 	 * @return void
 	 */
 	protected function migrateFields() {
-		// stop if prior migration haven't finished --ARTIFICIAL
-		if (!$this->finishState['fal_itemfield']) {
+		// stop if prior migration haven't finished
+		if (!$this->finishState['blob']) {
 			return;
 		}
 
@@ -231,6 +232,121 @@ class ext_update extends ExtUpdateAbstract {
 			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['field'] = TRUE;
 		}
+	}
+
+	/**
+	 * Migrate BLOB items to itemblob table.
+	 *
+	 * @return void
+	 */
+	protected function migrateBlobs() {
+		// stop if prior migrations haven't finished
+		if ( !($this->finishState['fal_blob']) ) {
+			return;
+		}
+
+		$sourceTable = 'tx_' . $this->sourceExtensionKey . '_item';
+		$sourceDataTable = 'tx_' . $this->sourceExtensionKey . '_itemfield';
+		$sourceMmTable = 'tx_' . $this->sourceExtensionKey . '_item_mm';
+		$targetTable = 'tx_' . $this->extensionKey . '_domain_model_itemblob';
+		$propertyMap = array(
+			'pid' => 'pid',
+			'item_key' => 'item_key',
+			'sequence' => 'sequence',
+			'file' => 'file',
+			'item' => 'item',
+			'tstamp' => 'tstamp',
+			'crdate' => 'crdate',
+			'cruser_id' => 'cruser_id',
+			'deleted' => 'deleted',
+			'hidden' => 'hidden',
+			'starttime' => 'starttime',
+			'endtime' => 'endtime'
+		);
+
+		// query to get all BLOB item records in correct order with all relevant properties attached
+		$select = 'it.pid AS pid,it.itemkey AS item_key,itf1.fieldvalue AS sequence,
+			itf2.fieldvalue AS file,itr.uid_foreign AS item,it.tstamp AS tstamp,
+			it.crdate AS crdate,it.cruser_id AS cruser_id,it.deleted AS deleted,
+			it.hidden AS hidden,it.starttime AS starttime,it.endtime AS endtime,
+			it.uid AS uid,UNIX_TIMESTAMP(itf3.fieldvalue) AS docdate';
+		$from = sprintf(
+			'%1$s it
+			LEFT JOIN %2$s itf1 ON (it.uid = itf1.item_id AND itf1.fieldname=\'SEQUENCE\')
+			LEFT JOIN %2$s itf2 ON (it.uid = itf2.item_id AND itf2.fieldname=\'FILEPATH\')
+			LEFT JOIN %2$s itf3 ON (it.uid = itf3.item_id AND itf3.fieldname=\'DOCUMENT_DATE\')
+			LEFT JOIN %3$s itr ON (it.uid = itr.uid_local)',
+			$sourceTable,
+			$sourceDataTable,
+			$sourceMmTable
+		);
+		$where = 'it.itemtype = \'BLOB\'';
+		$orderBy = 'item ASC,sequence ASC,docdate DESC';
+		$toMigrate = $this->databaseService->selectTableRecords($from, $where, $select, 10000, $orderBy);
+
+		// no results means we're done migrating
+		if (empty($toMigrate)) {
+			$this->addFlashMessage(
+				sprintf($this->lang['nNothing'], 'BLOB items', 'to migrate'),
+				'',
+				FlashMessage::INFO
+			);
+			$this->finishState['blob'] = TRUE;
+			return;
+		}
+
+		// first check for:
+		// - file id's not set to 0, we skip these from insert but not from delete
+		// - fields that aren't in propertyMap
+		// - missing sequences and provide them if necessary
+		$parentItem = 0;
+		$sequence = 0;
+		$toInsert = array();
+		foreach ($toMigrate as $uid => $row) {
+			if ((int) $row['file'] > 0) {
+				// it's a bit hacky, but meh, it's just a a few lines in an update script
+				unset($row['docdate']);
+				unset($row['uid']);
+				if (isset($row['sequence'])) {
+					$sequence = $row['sequence'];
+					$parentItem = (int) $row['item'];
+				} else {
+					if ($parentItem !== (int) $row['item']) {
+						// it only gets here if the entire parent-item has no blobs with a sequence set
+						$sequence = 1;
+						$parentItem = (int) $row['item'];
+					}
+					// this way, we always start with 1 or do +1 for a single parent-item
+					$row['sequence'] = $sequence++;
+				}
+
+				$toInsert[] = $row;
+			}
+		}
+
+		if (!empty($toInsert)) {
+			// insert!
+			$this->databaseService->insertTableRecords(
+				$targetTable, $propertyMap, $toInsert
+			);
+		}
+
+		// delete everything related to these items
+		$uidWhere = ' IN (\'' . join('\',\'', array_keys($toMigrate)) . '\')';
+		$deleteTables = array(
+			$sourceTable => 'uid',
+			$sourceDataTable => 'item_id',
+			$sourceMmTable => 'uid_local'
+		);
+		foreach ($deleteTables as $table => $property) {
+			$this->databaseService->deleteTableRecords($table, $property . $uidWhere);
+		}
+
+		$this->addFlashMessage(
+			sprintf($this->lang['migrateSuccess'], $targetTable, count($toInsert)),
+			'',
+			FlashMessage::OK
+		);
 	}
 
 	/**
@@ -304,11 +420,11 @@ class ext_update extends ExtUpdateAbstract {
 	}
 
 	/**
-	 * Migrate file-references from itemfield table to FAL.
+	 * Migrate file-references from BLOB to FAL.
 	 *
 	 * @return void
 	 */
-	protected function migrateItemFieldToFal() {
+	protected function migrateBlobToFal() {
 		// stop if prior migrations haven't finished --ARTIFICIAL
 		if ( !($this->finishState['itemxml']) ) {
 			return;
@@ -331,7 +447,7 @@ class ext_update extends ExtUpdateAbstract {
 				'',
 				FlashMessage::INFO
 			);
-			$this->finishState['fal_itemfield'] = TRUE;
+			$this->finishState['fal_blob'] = TRUE;
 			return;
 		}
 
@@ -383,7 +499,7 @@ class ext_update extends ExtUpdateAbstract {
 	 */
 	protected function migrateItemFieldTable() {
 		// stop if prior migration haven't finished
-		if ( !($this->finishState['field'] && $this->finishState['fal_itemfield']) ) {
+		if ( !($this->finishState['field'] && $this->finishState['blob']) ) {
 			return;
 		}
 
@@ -423,11 +539,11 @@ class ext_update extends ExtUpdateAbstract {
 	 */
 	protected function migrateItemTable() {
 		// stop if prior migrations haven't finished
-		if ( !($this->finishState['itemtype'] && $this->finishState['itemfield'] && $this->finishState['item_item_mm'] && $this->finishState['item_xml_mm']) ) {
+		if ( !($this->finishState['blob'] && $this->finishState['itemtype'] && $this->finishState['itemfield'] && $this->finishState['item_item_mm'] && $this->finishState['item_xml_mm']) ) {
 			return;
 		}
 
-		// @TODO ___reference in filehash table?
+		// @TODO ___reference in filehash table? Or are those BLOB-only? find out and see if we need to do things here or in migrateBlobs() or both!
 		$uidMap = array();
 		$sourceTable = 'tx_' . $this->sourceExtensionKey . '_item';
 		$targetTable = 'tx_' . $this->extensionKey . '_domain_model_item';
@@ -435,6 +551,7 @@ class ext_update extends ExtUpdateAbstract {
 		// this will go horribly wrong if $targetTable contained records before migration
 		$referenceTables = array(
 			'tx_' . $this->extensionKey . '_domain_model_itemfield' => 'item',
+			'tx_' . $this->extensionKey . '_domain_model_itemblob' => 'item',
 			'tx_' . $this->extensionKey . '_item_item_mm' => array(
 				'uid_local',
 				'uid_foreign',
