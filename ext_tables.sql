@@ -74,6 +74,31 @@ CREATE TABLE tx_decospublisher7_domain_model_item (
 	parent_item int(11) unsigned DEFAULT '0' NOT NULL,
 	child_item int(11) unsigned DEFAULT '0' NOT NULL,
 	item_field int(11) unsigned DEFAULT '0' NOT NULL,
+	item_blob int(11) unsigned DEFAULT '0' NOT NULL,
+
+	tstamp int(11) unsigned DEFAULT '0' NOT NULL,
+	crdate int(11) unsigned DEFAULT '0' NOT NULL,
+	cruser_id int(11) unsigned DEFAULT '0' NOT NULL,
+	deleted tinyint(4) unsigned DEFAULT '0' NOT NULL,
+	hidden tinyint(4) unsigned DEFAULT '0' NOT NULL,
+	starttime int(11) unsigned DEFAULT '0' NOT NULL,
+	endtime int(11) unsigned DEFAULT '0' NOT NULL,
+
+	PRIMARY KEY (uid),
+	KEY parent (pid)
+);
+
+#
+# Table structure for table 'tx_decospublisher7_domain_model_itemblob'
+#
+CREATE TABLE tx_decospublisher7_domain_model_itemblob (
+	uid int(11) NOT NULL auto_increment,
+	pid int(11) DEFAULT '0' NOT NULL,
+
+	item_key varchar(32) DEFAULT '' NOT NULL,
+	sequence int(11) unsigned DEFAULT '0' NOT NULL,
+	file int(11) unsigned DEFAULT '0' NOT NULL,
+	item int(11) unsigned DEFAULT '0' NOT NULL,
 
 	tstamp int(11) unsigned DEFAULT '0' NOT NULL,
 	crdate int(11) unsigned DEFAULT '0' NOT NULL,
