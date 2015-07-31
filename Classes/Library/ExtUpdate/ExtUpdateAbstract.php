@@ -24,6 +24,7 @@ namespace Innologi\Decospublisher7\Library\ExtUpdate;
 ***************************************************************/
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 /**
  * Ext Update Abstract
  *
@@ -33,7 +34,7 @@ use TYPO3\CMS\Core\Messaging\FlashMessage;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 abstract class ExtUpdateAbstract implements ExtUpdateInterface{
-
+	// @LOW ___what about a reload button?
 	/**
 	 * @var \TYPO3\CMS\Core\Messaging\FlashMessageQueue
 	 */
@@ -45,6 +46,11 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	protected $databaseService;
 
 	/**
+	 * @var \Innologi\Decospublisher7\Library\ExtUpdate\Service\FileService
+	 */
+	protected $fileService;
+
+	/**
 	 * Extension key
 	 *
 	 * @var string
@@ -52,12 +58,33 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	protected $extensionKey;
 
 	/**
-	 * If the extension updater is to take data from a different extension,
+	 * If the extension updater is to take data from a different source,
 	 * its extension key may be set here.
 	 *
 	 * @var string
 	 */
-	protected $dataExtensionKey;
+	protected $sourceExtensionKey;
+
+	/**
+	 * If the extension updater is to take data from a different source,
+	 * its minimum version may be set here.
+	 *
+	 * @var string
+	 */
+	protected $sourceExtensionVersion = '0.0.0';
+
+	/**
+	 * Static language labels => messages
+	 *
+	 * DO NOT OVERRULE!
+	 *
+	 * @var array
+	 */
+	protected $staticLang = array(
+		'extNotLoaded' => 'Source extension \'<code>%1$s</code>\' is not loaded, cannot run updater.',
+		'extIncorrectVersion' => 'Source extension \'<code>%1$s</code>\' needs to be updated to version <code>%2$s</code>.',
+		'noExtKeySet' => 'The extension updater class has no extension key set. You need to override \'$extensionKey\' in your ext_update class.'
+	);
 
 	/**
 	 * Constructor
@@ -65,20 +92,24 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	 * @return void
 	 */
 	public function __construct() {
-		if ( !isset($this->$extensionKey[0]) ) {
-			throw new \Exception('The extension updater class has no extension key set. You need to override \'$extensionKey\' in your ext_update class.');
+		if ( !isset($this->extensionKey[0]) ) {
+			throw new \Exception($this->staticLang['noExtKeySet']);
 		}
-		// generally, the data-extension is the same as the current one
-		if ( !isset($this->dataExtensionKey[0]) ) {
-			$this->dataExtensionKey = $this->extensionKey;
+		// generally, the source-extension is the same as the current one
+		if ( !isset($this->sourceExtensionKey[0]) ) {
+			$this->sourceExtensionKey = $this->extensionKey;
 		}
 
 		$this->flashMessageQueue = GeneralUtility::makeInstance(
 			'TYPO3\\CMS\\Core\\Messaging\\FlashMessageQueue',
 			'extbase.flashmessages.tx_' . $this->extensionKey . '_extupdate'
 		);
+
 		$this->databaseService = GeneralUtility::makeInstance(
 			__NAMESPACE__ . '\\Service\\DatabaseService'
+		);
+		$this->fileService = GeneralUtility::makeInstance(
+			__NAMESPACE__ . '\\Service\\FileService'
 		);
 	}
 
@@ -91,11 +122,12 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	 */
 	public function main() {
 		try {
+			$this->checkPrerequisites();
 			$this->processUpdates();
 		} catch (\Exception $e) {
 			$this->addFlashMessage(
 				$e->getMessage(),
-				'',
+				'Update failed',
 				FlashMessage::ERROR
 			);
 		}
@@ -113,6 +145,43 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	 */
 	public function access() {
 		return TRUE;
+	}
+
+	/**
+	 * Checks updater prerequisites. Throws exceptions if not met.
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
+	protected function checkPrerequisites() {
+		if ($this->extensionKey !== $this->sourceExtensionKey) {
+			// we don't use em_conf for this, because the requirement is only for
+			// the updater, not the entire extension
+
+			// is source extension is loaded?
+			if (!ExtensionManagementUtility::isLoaded($this->sourceExtensionKey)) {
+				throw new \Exception(
+					sprintf(
+						$this->staticLang['extNotLoaded'],
+						$this->sourceExtensionKey
+					)
+				);
+			}
+			// does source extension meet version requirement?
+			if (version_compare(
+				ExtensionManagementUtility::getExtensionVersion($this->sourceExtensionKey),
+				$this->sourceExtensionVersion,
+				'<'
+			)) {
+				throw new \Exception(
+					sprintf(
+						$this->staticLang['extIncorrectVersion'],
+						$this->sourceExtensionKey,
+						$this->sourceExtensionVersion
+					)
+				);
+			}
+		}
 	}
 
 	/**
