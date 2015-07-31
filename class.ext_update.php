@@ -350,7 +350,7 @@ class ext_update extends ExtUpdateAbstract {
 				$errorMessage = $e->getMessage();
 			}
 
-			if ($errorMsg !== NULL) {
+			if ($errorMessage !== NULL) {
 				$this->addFlashMessage(
 					$errorMessage . ' ' . $this->lang['falMigrateFail'] . ' ' . $this->lang['falMigrateFailDelete'],
 					sprintf($this->lang['falMigrateFailTitle'], 'Itemfield', 'id ' . $uid),
