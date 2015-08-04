@@ -30,7 +30,7 @@ return array(
 		'iconfile' => ExtensionManagementUtility::extRelPath($extKey) . 'Resources/Public/Icons/' . $table . '.gif'
 	),
 	'interface' => array(
-		'showRecordFieldList' => 'hidden, title, file, document_path, auto_update, forget_on_update',
+		'showRecordFieldList' => 'hidden, title, file, auto_update, forget_on_update',
 	),
 	'types' => array(
 		'0' => array(
