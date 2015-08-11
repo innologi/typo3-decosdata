@@ -1,0 +1,14 @@
+# Plugin configuration
+plugin.tx_decospublisher7 {
+	persistence {
+		storagePid = {$plugin.tx_decospublisher7.persistence.storagePid}
+	}
+}
+
+ # Module configuration
+module.tx_decospublisher7 {
+	# @TODO ___test if this is used
+	persistence {
+		storagePid = {$module.tx_decospublisher7.persistence.storagePid}
+	}
+}
