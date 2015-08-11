@@ -1,7 +1,6 @@
 <?php
 namespace Innologi\Decospublisher7\Domain\Model;
 /***************************************************************
- *
  *  Copyright notice
  *
  *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
@@ -26,112 +25,91 @@ namespace Innologi\Decospublisher7\Domain\Model;
  ***************************************************************/
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 /**
- * Import
+ * Import domain model
+ *
+ * @package decospublisher7
+ * @author Frenck Lutke
+ * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class Import extends AbstractEntity {
-	# @TODO go through all docs
-	# @LOW chaining on setters? be consistent about it
 
 	/**
-	 * Name
+	 * Title
 	 *
 	 * @var string
 	 * @validate NotEmpty
 	 */
-	protected $name = '';
+	protected $title;
 
 	/**
-	 * Import file path
+	 * File reference
 	 *
-	 * @var \TYPO3\CMS\Extbase\Domain\Model\FileReference
+	 * @TODO ___check if this is the correct one or \TYPO3\CMS\Extbase\Domain\Model\FileReference (also for itemblob)
+	 *
+	 * @var \TYPO3\CMS\Core\Resource\FileReference
 	 * @validate NotEmpty
 	 */
-	protected $filepath = NULL;
-
-	/**
-	 * File directory path for documents
-	 *
-	 * @var string
-	 * @validate NotEmpty
-	 */
-	protected $documentpath = '';
+	protected $file;
 
 	/**
 	 * File Hash
 	 *
 	 * @var string
 	 */
-	protected $hash = '';
+	protected $hash;
 
 	/**
 	 * Include in auto update?
 	 *
 	 * @var boolean
 	 */
-	protected $autoUpdate = FALSE;
+	protected $autoUpdate;
 
 	/**
 	 * Forget all previous content on new update
 	 *
 	 * @var boolean
 	 */
-	protected $forgetOnUpdate = FALSE;
+	protected $forgetOnUpdate;
 
 	/**
-	 * Returns the name
+	 * Returns the title
 	 *
 	 * @return string
 	 */
-	public function getName() {
-		return $this->name;
+	public function getTitle() {
+		return $this->title;
 	}
 
 	/**
-	 * Sets the name
+	 * Sets the title
 	 *
-	 * @param string $name
-	 * @return void
+	 * @param string $title
+	 * @return \Innologi\Decospublisher7\Domain\Model\Import
 	 */
-	public function setName($name) {
-		$this->name = $name;
+	public function setTitle($title) {
+		$this->title = $title;
+		return $this;
 	}
 
 	/**
-	 * Returns the filepath
+	 * Returns the file
 	 *
-	 * @return \TYPO3\CMS\Extbase\Domain\Model\FileReference $filepath
+	 * @return \TYPO3\CMS\Core\Resource\FileReference $file
 	 */
-	public function getFilepath() {
-		return $this->filepath;
+	public function getFile() {
+		return $this->file;
 	}
 
 	/**
-	 * Sets the filepath
+	 * Sets the file
 	 *
-	 * @param \TYPO3\CMS\Extbase\Domain\Model\FileReference $filepath
-	 * @return void
+	 * @param \TYPO3\CMS\Core\Resource\FileReference $file
+	 * @return \Innologi\Decospublisher7\Domain\Model\Import
 	 */
-	public function setFilepath(\TYPO3\CMS\Extbase\Domain\Model\FileReference $filepath) {
-		$this->filepath = $filepath;
-	}
-
-	/**
-	 * Returns the documentpath
-	 *
-	 * @return string
-	 */
-	public function getDocumentpath() {
-		return $this->documentpath;
-	}
-
-	/**
-	 * Sets the documentpath
-	 *
-	 * @param string $documentpath
-	 * @return void
-	 */
-	public function setDocumentpath($documentpath) {
-		$this->documentpath = $documentpath;
+	public function setFile(\TYPO3\CMS\Core\Resource\FileReference $file) {
+		$this->file = $file;
+		return $this;
 	}
 
 	/**
@@ -147,10 +125,11 @@ class Import extends AbstractEntity {
 	 * Sets the hash
 	 *
 	 * @param string $hash
-	 * @return void
+	 * @return \Innologi\Decospublisher7\Domain\Model\Import
 	 */
 	public function setHash($hash) {
 		$this->hash = $hash;
+		return $this;
 	}
 
 	/**
@@ -166,10 +145,11 @@ class Import extends AbstractEntity {
 	 * Sets the autoUpdate
 	 *
 	 * @param boolean $autoUpdate
-	 * @return void
+	 * @return \Innologi\Decospublisher7\Domain\Model\Import
 	 */
 	public function setAutoUpdate($autoUpdate) {
 		$this->autoUpdate = $autoUpdate;
+		return $this;
 	}
 
 	/**
@@ -185,10 +165,11 @@ class Import extends AbstractEntity {
 	 * Sets the forgetOnUpdate
 	 *
 	 * @param boolean $forgetOnUpdate
-	 * @return void
+	 * @return \Innologi\Decospublisher7\Domain\Model\Import
 	 */
 	public function setForgetOnUpdate($forgetOnUpdate) {
 		$this->forgetOnUpdate = $forgetOnUpdate;
+		return $this;
 	}
 
 }
