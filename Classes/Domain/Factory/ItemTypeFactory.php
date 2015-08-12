@@ -76,7 +76,7 @@ class ItemTypeFactory extends FactoryAbstract {
 	public function retrieveItemTypeObjectByItemTypeString($type) {
 		if (!isset($objectCache[$type])) {
 			/* @var $typeObject \Innologi\Decospublisher7\Domain\Model\ItemType */
-			$typeObject = $this->repository->findByItemType($type)->getFirst();
+			$typeObject = $this->repository->findOneByItemType($type);
 			if ($typeObject === NULL) {
 				$typeObject = $this->createAndStoreObject(
 					array('item_type' => $type)
