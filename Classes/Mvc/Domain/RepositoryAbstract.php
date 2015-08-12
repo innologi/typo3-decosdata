@@ -62,4 +62,17 @@ abstract class RepositoryAbstract extends Repository {
 		$this->getDatabaseConnection()->exec_INSERTquery($this->table, $data);
 		return $this->getDatabaseConnection()->sql_insert_id();
 	}
+
+	/**
+	 * Overrides storage pid for all queries.
+	 *
+	 * @param integer $storagePid
+	 * return void
+	 */
+	public function setStoragePid($storagePid) {
+		/* @var $querySettings \TYPO3\CMS\Extbase\Persistence\Generic\QuerySettingsInterface */
+		$querySettings = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\QuerySettingsInterface');
+		$querySettings->setStoragePageIds(array($storagePid));
+		$this->setDefaultQuerySettings($querySettings);
+	}
 }
