@@ -58,7 +58,7 @@ abstract class RepositoryAbstract extends Repository {
 	 * @param array $data
 	 * @return integer
 	 */
-	protected function insertRecord(array $data) {
+	public function insertRecord(array $data) {
 		$this->getDatabaseConnection()->exec_INSERTquery($this->table, $data);
 		return $this->getDatabaseConnection()->sql_insert_id();
 	}
