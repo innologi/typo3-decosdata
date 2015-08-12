@@ -47,7 +47,7 @@ class Item extends AbstractEntity {
 	 * @lazy
 	 */
 	protected $itemType;
-	// @FIX ___see if this works in eclipse
+
 	/**
 	 * Item Field
 	 *
@@ -59,7 +59,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Item Blob
 	 *
-	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\ItemBlob>
+	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage|\Innologi\Decospublisher7\Domain\Model\ItemBlob[]
 	 * @lazy
 	 */
 	protected $itemBlob;
@@ -67,7 +67,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Import
 	 *
-	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\Import>
+	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage|\Innologi\Decospublisher7\Domain\Model\Import[]
 	 * @lazy
 	 */
 	protected $import;
@@ -75,7 +75,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Parent Item
 	 *
-	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\Item>
+	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage|\Innologi\Decospublisher7\Domain\Model\Item[]
 	 * @lazy
 	 */
 	protected $parentItem;
@@ -83,7 +83,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Child Item
 	 *
-	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\Item>
+	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage|\Innologi\Decospublisher7\Domain\Model\Item[]
 	 * @lazy
 	 */
 	protected $childItem;
