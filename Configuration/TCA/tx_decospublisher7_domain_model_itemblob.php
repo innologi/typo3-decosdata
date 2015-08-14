@@ -111,7 +111,12 @@ return array(
 			'config' => ExtensionManagementUtility::getFileFieldTCAConfig(
 				'file',
 				array(
-					'maxitems' => 1
+					'maxitems' => 1,
+					'foreign_match_fields' => array(
+						'fieldname' => 'file',
+						'tablenames' => $table,
+						'table_local' => 'sys_file',
+					),
 				)
 			),
 		),
