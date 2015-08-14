@@ -35,23 +35,13 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class ItemTypeFactory extends FactoryAbstract {
 
 	/**
-	 * @var array
-	 */
-	protected $fields = array(
-		'pid' => 0,
-		'item_type' => '',
-		'crdate' => 0,
-		'tstamp' => 0
-	);
-
-	/**
 	 * @var \Innologi\Decospublisher7\Domain\Repository\ItemTypeRepository
 	 * @inject
 	 */
 	protected $repository;
 
 	/**
-	 * Creates and returns unpersisted domain object from data
+	 * Creates and returns unpersisted domain object from data.
 	 *
 	 * @param array $data field => value
 	 * @return \Innologi\Decospublisher7\Domain\Model\ItemType
@@ -59,8 +49,8 @@ class ItemTypeFactory extends FactoryAbstract {
 	public function create(array $data) {
 		/* @var $object \Innologi\Decospublisher7\Domain\Model\ItemType */
 		$object = GeneralUtility::makeInstance('Innologi\\Decospublisher7\\Domain\\Model\\ItemType');
-		$object->setPid($data['pid']);
 		$object->setItemType($data['item_type']);
+		$this->setDefaults($object, $data);
 		return $object;
 	}
 
@@ -71,16 +61,18 @@ class ItemTypeFactory extends FactoryAbstract {
 	 * - created by parameters
 	 *
 	 * @param string $type
+	 * @param boolean $autoPersist
 	 * @return \Innologi\Decospublisher7\Domain\Model\ItemType
 	 */
-	public function retrieveItemTypeObjectByItemTypeString($type) {
+	public function retrieveItemTypeObjectByItemTypeString($type, $autoPersist = FALSE) {
 		if (!isset($objectCache[$type])) {
 			/* @var $typeObject \Innologi\Decospublisher7\Domain\Model\ItemType */
 			$typeObject = $this->repository->findOneByItemType($type);
 			if ($typeObject === NULL) {
-				$typeObject = $this->createAndStoreObject(
-					array('item_type' => $type)
-				);
+				$data = array('item_type' => $type);
+				$typeObject = $autoPersist
+					? $this->createAndStoreObject($data)
+					: $this->create($data);
 			}
 			$objectCache[$type] = $typeObject;
 		}

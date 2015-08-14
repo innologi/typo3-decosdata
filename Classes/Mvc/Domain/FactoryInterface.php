@@ -34,7 +34,7 @@ namespace Innologi\Decospublisher7\Mvc\Domain;
 interface FactoryInterface {
 
 	/**
-	 * Creates, stores and returns domain object with uid
+	 * Creates, stores and returns domain object with uid.
 	 *
 	 * @param array $data
 	 * return object
@@ -42,7 +42,7 @@ interface FactoryInterface {
 	public function createAndStoreObject(array $data);
 
 	/**
-	 * Creates and returns unpersisted domain object from data
+	 * Creates and returns domain object from data.
 	 *
 	 * @param array $data field => value
 	 * @return object

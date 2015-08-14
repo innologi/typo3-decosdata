@@ -24,7 +24,6 @@ namespace Innologi\Decospublisher7\Mvc\Domain;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 /**
  * Factory Abstract
  *
@@ -35,79 +34,69 @@ use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 abstract class FactoryAbstract implements FactoryInterface,SingletonInterface {
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface
-	 */
-	protected $objectManager;
-
-	/**
 	 * @var \Innologi\Decospublisher7\Mvc\Domain\RepositoryAbstract
 	 */
 	protected $repository;
 
 	/**
-	 * @var array
+	 * @var integer
 	 */
-	protected $fields = array();
+	protected $storagePid;
 
 	/**
 	 * @var array
-	*/
+	 */
 	protected $objectCache = array();
 
 	/**
-	 * Class constructor
+	 * Sets default properties in the creation process of domain object.
 	 *
-	 * @param \TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager
+	 * @param \TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject $object
+	 * @param array $data field => value
 	 * @return void
 	 */
-	public function __construct(\TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager) {
-		// because we want objectManager in __construct, we can't rely on DI as it is always later
-		$this->objectManager = $objectManager;
-		$this->initializeDefaultFieldValues();
-	}
-
-	/**
-	 * Sets default field values for domain object to be merged with $data parameters
-	 * of other factory methods.
-	 *
-	 * @return void
-	 */
-	protected function initializeDefaultFieldValues() {
-		if (isset($this->fields['pid'])) {
-			/* @var $configurationManager \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface */
-			$configurationManager = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManagerInterface');
-			$typoscript = $configurationManager->getConfiguration(
-				ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT
-			);
-			$this->fields['pid'] = $typoscript['persistence']['storagePid'];
-			// @TODO ___test this with both plugin and module versions of storagePid
-			// @LOW ___throw exception on missing storagePid?
+	protected function setDefaults(\TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject $object, array $data) {
+		if (isset($data['pid'])) {
+			$object->setPid((int) $data['pid']);
 		}
-		if (isset($this->fields['crdate'])) {
-			$this->fields['crdate'] = $GLOBALS['EXEC_TIME'];
-		}
-		if (isset($this->fields['tstamp'])) {
-			$this->fields['tstamp'] = $GLOBALS['EXEC_TIME'];
+		if (isset($data['uid'])) {
+			$object->_setProperty('uid', (int) $data['uid']);
+			// if uid is known, we assume this is an existing and unchanged record
+			$object->_memorizeCleanState();
 		}
 	}
 
 	/**
-	 * Creates, stores and returns domain object with uid and merged
-	 * default field values
+	 * Creates, stores and returns domain object with uid.
+	 *
+	 * Because it is stored and returned clean here already, it will speed up any persistence
+	 * job handled by the persistenceManager (which is much slower) if the object remains
+	 * unmodified (especially useful for ValueObjects). Relations can still be handled by
+	 * the persistenceManager.
 	 *
 	 * @param array $data
 	 * return \TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject
 	 */
 	public function createAndStoreObject(array $data) {
-		// merges data into fields
-		$data = array_merge($this->fields, $data);
+		// prevents a configurationManager check, which speeds up a process of thousands of inserts
+		if ($this->storagePid !== NULL) {
+			$data['pid'] = $this->storagePid;
+		}
+		// $data is provided with defaults 'pid' (if not previously set) and 'uid'
+		$this->repository->insertRecord($data);
 		/* @var $object \TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject */
-		$object = $this->createObject($data);
-		$object->_setProperty(
-			'uid',
-			$this->repository->insertRecord($data)
-		);
+		$object = $this->create($data);
 		return $object;
+	}
+
+	/**
+	 * Sets Storage Pid
+	 *
+	 * @param integer $storagePid
+	 * @return void
+	 */
+	public function setStoragePid($storagePid) {
+		$this->storagePid = $storagePid;
 	}
 
 }
