@@ -44,9 +44,7 @@ class Import extends AbstractEntity {
 	/**
 	 * File reference
 	 *
-	 * @TODO ___check if this is the correct one or \TYPO3\CMS\Extbase\Domain\Model\FileReference (also for itemblob)
-	 *
-	 * @var \TYPO3\CMS\Core\Resource\FileReference
+	 * @var \TYPO3\CMS\Extbase\Domain\Model\FileReference
 	 * @validate NotEmpty
 	 */
 	protected $file;
@@ -95,7 +93,7 @@ class Import extends AbstractEntity {
 	/**
 	 * Returns the file
 	 *
-	 * @return \TYPO3\CMS\Core\Resource\FileReference $file
+	 * @return \TYPO3\CMS\Extbase\Domain\Model\FileReference $file
 	 */
 	public function getFile() {
 		return $this->file;
@@ -104,10 +102,10 @@ class Import extends AbstractEntity {
 	/**
 	 * Sets the file
 	 *
-	 * @param \TYPO3\CMS\Core\Resource\FileReference $file
+	 * @param \TYPO3\CMS\Extbase\Domain\Model\FileReference $file
 	 * @return \Innologi\Decospublisher7\Domain\Model\Import
 	 */
-	public function setFile(\TYPO3\CMS\Core\Resource\FileReference $file) {
+	public function setFile(\TYPO3\CMS\Extbase\Domain\Model\FileReference $file) {
 		$this->file = $file;
 		return $this;
 	}
