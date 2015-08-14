@@ -33,12 +33,6 @@ use Innologi\Decospublisher7\Mvc\Domain\RepositoryAbstract;
  */
 class ItemTypeRepository extends RepositoryAbstract {
 
-	// @TODO ___resolve automatically?
-	/**
-	 * @var string
-	 */
-	protected $table = 'tx_decospublisher7_domain_model_itemtype';
-
 	/**
 	 * Find by item_type value
 	 *
@@ -46,7 +40,6 @@ class ItemTypeRepository extends RepositoryAbstract {
 	 * @return \Innologi\Decospublisher7\Domain\Model\ItemType|NULL
 	 */
 	public function findOneByItemType($type) {
-		// @TODO ___check if this does not return an item type from a different pid, also hidden and deleted
 		$query = $this->createQuery();
 		return $query->matching(
 			$query->equals('item_type', $type)

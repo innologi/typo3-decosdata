@@ -39,7 +39,7 @@ abstract class RepositoryAbstract extends Repository {
 	/**
 	 * @var string
 	 */
-	protected $table;
+	protected $tableName;
 
 	/**
 	 * Returns DatabaseConnection
@@ -53,26 +53,70 @@ abstract class RepositoryAbstract extends Repository {
 	}
 
 	/**
-	 * Insert record data in repository table, and return the resulting uid.
+	 * Resolve the table name for the objectType
 	 *
-	 * @param array $data
-	 * @return integer
+	 * @return string
 	 */
-	public function insertRecord(array $data) {
-		$this->getDatabaseConnection()->exec_INSERTquery($this->table, $data);
-		return $this->getDatabaseConnection()->sql_insert_id();
+	protected function getTableName() {
+		if ($this->tableName === NULL) {
+			$parts = explode('\\',
+				ltrim($this->objectType, '\\')
+			);
+			$this->tableName = 'tx_' . strtolower(
+				implode('_',
+					// skip vendor
+					array_slice($parts, 1)
+				)
+			);
+		}
+		return $this->tableName;
 	}
 
 	/**
-	 * Overrides storage pid for all queries.
+	 * Insert record data in repository table, and add the following fields to reference:
+	 * - uid
+	 * - pid (if not set)
+	 * - crdate
+	 * - tstamp
 	 *
-	 * @param integer $storagePid
-	 * return void
+	 * Used to speed up persistence considerably of e.g. valueObjects.
+	 *
+	 * @param array &$data
+	 * @return void
 	 */
-	public function setStoragePid($storagePid) {
-		/* @var $querySettings \TYPO3\CMS\Extbase\Persistence\Generic\QuerySettingsInterface */
-		$querySettings = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\QuerySettingsInterface');
-		$querySettings->setStoragePageIds(array($storagePid));
-		$this->setDefaultQuerySettings($querySettings);
+	public function insertRecord(array &$data) {
+		if (isset($data['uid'])) {
+			// @LOW ___throw exception instead?
+			unset($data['uid']);
+		}
+		if (!isset($data['pid'])) {
+			$data['pid'] = $this->getStoragePid();
+		}
+		// set initial time values
+		$data['crdate'] = $data['tstamp'] = $GLOBALS['EXEC_TIME'];
+		// insert
+		$this->getDatabaseConnection()->exec_INSERTquery($this->getTableName(), $data);
+		// @LOW ___what about SQL errors?
+		$data['uid'] = $this->getDatabaseConnection()->sql_insert_id();
 	}
+
+	/**
+	 * Gets Storage Pid from configuration
+	 *
+	 * Used by custom database methods as a fallback. Note that this
+	 * is a slower alternative to providing the pid with the database
+	 * method directly.
+	 *
+	 * @return integer
+	 */
+	protected function getStoragePid() {
+		$frameworkConfiguration = $this->objectManager->get(
+			'TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManagerInterface'
+		)->getConfiguration(
+			ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK
+		);
+		// @LOW ___this will fail completely if multiple are set
+		return (int) $frameworkConfiguration['persistence']['storagePid'];
+	}
+
 }
