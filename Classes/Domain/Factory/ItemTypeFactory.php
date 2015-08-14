@@ -24,7 +24,6 @@ namespace Innologi\Decospublisher7\Domain\Factory;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decospublisher7\Mvc\Domain\FactoryAbstract;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * ItemType factory
  *
@@ -41,17 +40,14 @@ class ItemTypeFactory extends FactoryAbstract {
 	protected $repository;
 
 	/**
-	 * Creates and returns unpersisted domain object from data.
+	 * Sets properties of domain object
 	 *
-	 * @param array $data field => value
-	 * @return \Innologi\Decospublisher7\Domain\Model\ItemType
+	 * @param \Innologi\Decospublisher7\Domain\Model\ItemType $object
+	 * @param array $data
+	 * @return void
 	 */
-	public function create(array $data) {
-		/* @var $object \Innologi\Decospublisher7\Domain\Model\ItemType */
-		$object = GeneralUtility::makeInstance('Innologi\\Decospublisher7\\Domain\\Model\\ItemType');
+	protected function setProperties(\Innologi\Decospublisher7\Domain\Model\ItemType $object, array $data) {
 		$object->setItemType($data['item_type']);
-		$this->setDefaultProperties($object, $data);
-		return $object;
 	}
 
 	/**

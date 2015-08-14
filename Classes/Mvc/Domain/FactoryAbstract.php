@@ -24,14 +24,24 @@ namespace Innologi\Decospublisher7\Mvc\Domain;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Factory Abstract
+ *
+ * By default, you should overrule:
+ * - $repository
+ * - setProperties()
  *
  * @package decospublisher7
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-abstract class FactoryAbstract implements FactoryInterface,SingletonInterface {
+abstract class FactoryAbstract implements SingletonInterface {
+
+	/**
+	 * @var string
+	 */
+	protected $objectType;
 
 	/**
 	 * @var \Innologi\Decospublisher7\Mvc\Domain\RepositoryAbstract
@@ -47,6 +57,46 @@ abstract class FactoryAbstract implements FactoryInterface,SingletonInterface {
 	 * @var array
 	 */
 	protected $objectCache = array();
+
+	/**
+	 * Class constructor
+	 *
+	 * @return void
+	 */
+	public function __construct() {
+		$this->objectType = preg_replace(array(
+			'/\\\\Factory\\\\(?!.*\\\\Factory\\\\)/',
+			'/Factory$/'
+		), array(
+			'\\\\Model\\\\',
+			''
+		), get_class($this));
+	}
+
+	/**
+	 * Creates and returns domain object from data.
+	 *
+	 * @param array $data field => value
+	 * @return \TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject
+	 */
+	public function create(array $data) {
+		/* @var $object \TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject */
+		$object = GeneralUtility::makeInstance($this->objectType);
+		$this->setProperties($object, $data);
+		$this->setDefaultProperties($object, $data);
+		return $object;
+	}
+
+	/**
+	 * Sets properties of domain object
+	 *
+	 * @param \TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject $object
+	 * @param array $data
+	 * @return void
+	 */
+	protected function setProperties(\TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject $object, array $data) {
+		// overrule this method for setting object properties
+	}
 
 	/**
 	 * Sets default properties in the creation process of domain object.
