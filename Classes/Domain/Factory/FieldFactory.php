@@ -58,16 +58,16 @@ class FieldFactory extends FactoryAbstract {
 	 * - created by parameters
 	 *
 	 * @param string $fieldName
-	 * @param boolean $autoPersist
+	 * @param boolean $autoInsert
 	 * @return \Innologi\Decospublisher7\Domain\Model\Field
 	 */
-	public function retrieveFieldObjectByFieldName($fieldName, $autoPersist = FALSE) {
+	public function retrieveFieldObjectByFieldName($fieldName, $autoInsert = FALSE) {
 		if (!isset($objectCache[$fieldName])) {
 			/* @var $fieldObject \Innologi\Decospublisher7\Domain\Model\Field */
 			$fieldObject = $this->repository->findOneByFieldName($fieldName);
 			if ($fieldObject === NULL) {
 				$data = array('field_name' => $fieldName);
-				$fieldObject = $autoPersist
+				$fieldObject = $autoInsert
 					? $this->createAndStoreObject($data)
 					: $this->create($data);
 			}

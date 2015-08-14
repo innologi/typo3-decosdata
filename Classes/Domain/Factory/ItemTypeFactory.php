@@ -57,16 +57,16 @@ class ItemTypeFactory extends FactoryAbstract {
 	 * - created by parameters
 	 *
 	 * @param string $type
-	 * @param boolean $autoPersist
+	 * @param boolean $autoInsert
 	 * @return \Innologi\Decospublisher7\Domain\Model\ItemType
 	 */
-	public function retrieveItemTypeObjectByItemTypeString($type, $autoPersist = FALSE) {
+	public function retrieveItemTypeObjectByItemTypeString($type, $autoInsert = FALSE) {
 		if (!isset($objectCache[$type])) {
 			/* @var $typeObject \Innologi\Decospublisher7\Domain\Model\ItemType */
 			$typeObject = $this->repository->findOneByItemType($type);
 			if ($typeObject === NULL) {
 				$data = array('item_type' => $type);
-				$typeObject = $autoPersist
+				$typeObject = $autoInsert
 					? $this->createAndStoreObject($data)
 					: $this->create($data);
 			}
