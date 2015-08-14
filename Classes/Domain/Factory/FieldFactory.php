@@ -55,13 +55,16 @@ class FieldFactory extends FactoryAbstract {
 	 * Retrieve Field Object from, in this order until successful:
 	 * - local object cache
 	 * - repository
-	 * - created by parameters
+	 * - newly created by parameters
+	 *
+	 * Optionally inserts the (value)Object into the database
+	 * to relieve the much heavier persistence mechanisms.
 	 *
 	 * @param string $fieldName
 	 * @param boolean $autoInsert
 	 * @return \Innologi\Decospublisher7\Domain\Model\Field
 	 */
-	public function retrieveFieldObjectByFieldName($fieldName, $autoInsert = FALSE) {
+	public function getByFieldName($fieldName, $autoInsert = FALSE) {
 		if (!isset($objectCache[$fieldName])) {
 			/* @var $fieldObject \Innologi\Decospublisher7\Domain\Model\Field */
 			$fieldObject = $this->repository->findOneByFieldName($fieldName);

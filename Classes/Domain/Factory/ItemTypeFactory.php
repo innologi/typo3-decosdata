@@ -54,13 +54,16 @@ class ItemTypeFactory extends FactoryAbstract {
 	 * Retrieve ItemType Object from, in this order until successful:
 	 * - local object cache
 	 * - repository
-	 * - created by parameters
+	 * - newly created by parameters
+	 *
+	 * Optionally inserts the (value)Object into the database
+	 * to relieve the much heavier persistence mechanisms.
 	 *
 	 * @param string $type
 	 * @param boolean $autoInsert
 	 * @return \Innologi\Decospublisher7\Domain\Model\ItemType
 	 */
-	public function retrieveItemTypeObjectByItemTypeString($type, $autoInsert = FALSE) {
+	public function getByItemType($type, $autoInsert = FALSE) {
 		if (!isset($objectCache[$type])) {
 			/* @var $typeObject \Innologi\Decospublisher7\Domain\Model\ItemType */
 			$typeObject = $this->repository->findOneByItemType($type);
