@@ -55,7 +55,7 @@ abstract class FactoryAbstract implements FactoryInterface,SingletonInterface {
 	 * @param array $data field => value
 	 * @return void
 	 */
-	protected function setDefaults(\TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject $object, array $data) {
+	protected function setDefaultProperties(\TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject $object, array $data) {
 		if (isset($data['pid'])) {
 			$object->setPid((int) $data['pid']);
 		}

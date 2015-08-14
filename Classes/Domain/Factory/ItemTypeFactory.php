@@ -50,7 +50,7 @@ class ItemTypeFactory extends FactoryAbstract {
 		/* @var $object \Innologi\Decospublisher7\Domain\Model\ItemType */
 		$object = GeneralUtility::makeInstance('Innologi\\Decospublisher7\\Domain\\Model\\ItemType');
 		$object->setItemType($data['item_type']);
-		$this->setDefaults($object, $data);
+		$this->setDefaultProperties($object, $data);
 		return $object;
 	}
 

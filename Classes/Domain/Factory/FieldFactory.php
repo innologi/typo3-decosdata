@@ -51,7 +51,7 @@ class FieldFactory extends FactoryAbstract {
 		$object = GeneralUtility::makeInstance('Innologi\\Decospublisher7\\Domain\\Model\\Field');
 		// @LOW ___consider throwing an exception if field_name does not exist, same for other factories
 		$object->setFieldName($data['field_name']);
-		$this->setDefaults($object, $data);
+		$this->setDefaultProperties($object, $data);
 		return $object;
 	}
 
