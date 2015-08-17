@@ -37,7 +37,7 @@ class FieldRepository extends RepositoryAbstract {
 	 * Find by field_name value
 	 *
 	 * @param string $fieldName
-	 * @return \TYPO3\CMS\Extbase\Persistence\QueryResultInterface|array
+	 * @return \Innologi\Decospublisher7\Domain\Model\Field|NULL
 	 */
 	public function findOneByFieldName($fieldName) {
 		$query = $this->createQuery();
