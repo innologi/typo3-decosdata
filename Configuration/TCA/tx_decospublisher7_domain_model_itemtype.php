@@ -17,30 +17,20 @@ return array(
 		'crdate' => 'crdate',
 		'cruser_id' => 'cruser_id',
 		'delete' => 'deleted',
-		'enablecolumns' => array(
-			'disabled' => 'hidden',
-		),
+		'enablecolumns' => array(),
 		'dividers2tabs' => 1,
 		'default_sortby' => 'ORDER BY item_type ASC',
 		// @TODO __replace icon
 		'iconfile' => ExtensionManagementUtility::extRelPath($extKey) . 'Resources/Public/Icons/' . $table . '.gif'
 	),
 	'interface' => array(
-		'showRecordFieldList' => 'hidden, item_type',
+		'showRecordFieldList' => 'item_type',
 	),
 	'types' => array(
-		'0' => array('showitem' => 'hidden, item_type'),
+		'0' => array('showitem' => 'item_type'),
 	),
 	'palettes' => array(),
 	'columns' => array(
-
-		'hidden' => array(
-			'exclude' => TRUE,
-			'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.hidden',
-			'config' => array(
-				'type' => 'check',
-			),
-		),
 
 		'item_type' => array(
 			'exclude' => FALSE,
