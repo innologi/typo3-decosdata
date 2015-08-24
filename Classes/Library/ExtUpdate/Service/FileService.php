@@ -66,9 +66,9 @@ class FileService implements SingletonInterface {
 	 * it doesn't exist and return it.
 	 *
 	 * @param string $path
+	 * @return \TYPO3\CMS\Core\Resource\File
 	 * @throws \TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException
 	 * @throws Exception\NotInDocumentRoot
-	 * @return \TYPO3\CMS\Core\Resource\File
 	 */
 	public function retrieveFileObjectByPath($path) {
 		if ( !is_file($path) || !file_exists($path) ) {
@@ -84,6 +84,7 @@ class FileService implements SingletonInterface {
 		// this method creates the record if one does not yet exist
 		return $this->resourceFactory->retrieveFileOrFolderObject($path);
 	}
+	# @FIX ______we need FileReference objects instead, see importerService
 
 	/**
 	 * Returns a File Object.

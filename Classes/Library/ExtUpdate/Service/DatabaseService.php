@@ -77,8 +77,8 @@ class DatabaseService implements SingletonInterface {
 	 * @param array $propertyMap Contains sourceProperty => targetProperty mappings
 	 * @param integer $limitRecords
 	 * @param array &$uidMap Reference for storing sourceUid => targetUid mappings
-	 * @throws Exception\NoData Nothing to migrate
 	 * @return integer Affected record count
+	 * @throws Exception\NoData Nothing to migrate
 	 */
 	public function migrateTableData($sourceTable, $targetTable, array $propertyMap, $limitRecords = 5000, array &$uidMap = array()) {
 		// select all data rows to migrate, set uid as keys
@@ -132,8 +132,8 @@ class DatabaseService implements SingletonInterface {
 	 * @param string $targetTable
 	 * @param array $propertyMap Contains sourceProperty => targetProperty mappings
 	 * @param integer $limitRecords
-	 * @throws Exception\NoData Nothing to migrate
 	 * @return integer Affected record count
+	 * @throws Exception\NoData Nothing to migrate
 	 */
 	public function migrateMmTable($sourceTable, $targetTable, array $propertyMap, $limitRecords = 5000) {
 		// select all data rows to migrate
@@ -193,8 +193,8 @@ class DatabaseService implements SingletonInterface {
 	 * @param array $evaluation Contains database-evaluations used to select valid unique values
 	 * @param integer $limitRecords
 	 * @param array &$uidMap Reference for storing targetUid => array(sourceProperty => value) mappings
-	 * @throws Exception\NoData Nothing to migrate
 	 * @return integer Affected record count
+	 * @throws Exception\NoData Nothing to migrate
 	 */
 	public function createUniqueRecordsFromValues($sourceTable, $targetTable, array $propertyMap, array $evaluation = array(), $limitRecords = 10000, array &$uidMap = array()) {
 		$uniqueBy = join(',', array_keys($propertyMap));
@@ -419,8 +419,8 @@ class DatabaseService implements SingletonInterface {
 	 * @param string $table
 	 * @param array $properties sourceProperties => targetProperties
 	 * @param array $valueRows
-	 * @throws \Exception Unexpected no-match
 	 * @return array UidMap containing uid => array(property => value)
+	 * @throws \Exception Unexpected no-match
 	 */
 	protected function insertUniqueRecords($table, array $properties, array $valueRows) {
 		$uidMap = array();
