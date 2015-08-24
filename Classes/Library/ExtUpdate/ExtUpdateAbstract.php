@@ -90,6 +90,7 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	 * Constructor
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	public function __construct() {
 		if ( !isset($this->extensionKey[0]) ) {
