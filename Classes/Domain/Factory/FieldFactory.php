@@ -24,6 +24,7 @@ namespace Innologi\Decospublisher7\Domain\Factory;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decospublisher7\Mvc\Domain\FactoryAbstract;
+use Innologi\Decospublisher7\Exception\MissingObjectProperty;
 /**
  * Field factory
  *
@@ -45,9 +46,19 @@ class FieldFactory extends FactoryAbstract {
 	 * @param \Innologi\Decospublisher7\Domain\Model\Field $object
 	 * @param array $data
 	 * @return void
+	 * @throws \Innologi\Decospublisher7\Exception\MissingObjectProperty
 	 */
 	protected function setProperties(\Innologi\Decospublisher7\Domain\Model\Field $object, array $data) {
-		// @LOW ___consider throwing an exception if field_name does not exist, same for other factories
+		if (!isset($data['field_name'][0])) {
+			throw new MissingObjectProperty(
+				sprintf(
+					// @TODO ___llang
+					'Missing required property <code>%1$s</code> for <code>%2$s</code> object.',
+					'field_name',
+					'Field'
+				)
+			);
+		}
 		$object->setFieldName($data['field_name']);
 	}
 

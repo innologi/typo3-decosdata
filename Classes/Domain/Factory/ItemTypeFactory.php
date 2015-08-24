@@ -24,6 +24,7 @@ namespace Innologi\Decospublisher7\Domain\Factory;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decospublisher7\Mvc\Domain\FactoryAbstract;
+use Innologi\Decospublisher7\Exception\MissingObjectProperty;
 /**
  * ItemType factory
  *
@@ -45,8 +46,19 @@ class ItemTypeFactory extends FactoryAbstract {
 	 * @param \Innologi\Decospublisher7\Domain\Model\ItemType $object
 	 * @param array $data
 	 * @return void
+	 * @throws \Innologi\Decospublisher7\Exception\MissingObjectProperty
 	 */
 	protected function setProperties(\Innologi\Decospublisher7\Domain\Model\ItemType $object, array $data) {
+		if (!isset($data['item_type'][0])) {
+			throw new MissingObjectProperty(
+				sprintf(
+					// @TODO ___llang
+					'Missing required property <code>%1$s</code> for <code>%2$s</code> object.',
+					'item_type',
+					'ItemType'
+				)
+			);
+		}
 		$object->setItemType($data['item_type']);
 	}
 
