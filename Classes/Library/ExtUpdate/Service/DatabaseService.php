@@ -23,6 +23,7 @@ namespace Innologi\Decospublisher7\Library\ExtUpdate\Service;
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Extbase\Persistence\Generic\Storage\Exception\SqlErrorException;
 /**
  * Ext Update Database Service
@@ -173,7 +174,7 @@ class DatabaseService implements SingletonInterface {
 			}
 			$this->deleteTableRecords(
 				$sourceTable,
-				'(' . join(') OR (', $whereArray) . ')'
+				'(' . join(') ' . DatabaseConnection::OR_Constraint . ' (', $whereArray) . ')'
 			);
 		}
 
@@ -199,7 +200,7 @@ class DatabaseService implements SingletonInterface {
 		$uniqueBy = join(',', array_keys($propertyMap));
 		// select all unique propertymap combinations
 		$toInsert = $this->databaseConnection->exec_SELECTgetRows(
-			$uniqueBy, $sourceTable, join(' AND ', $evaluation), $uniqueBy, $uniqueBy, $limitRecords
+			$uniqueBy, $sourceTable, join(' ' . DatabaseConnection::AND_Constraint . ' ', $evaluation), $uniqueBy, $uniqueBy, $limitRecords
 		);
 		$count = count($toInsert);
 
@@ -407,7 +408,7 @@ class DatabaseService implements SingletonInterface {
 		foreach ($conditions as $property => $value) {
 			$where[] = $property . '=' . $this->databaseConnection->fullQuoteStr($value, $table);
 		}
-		return join(' AND ', $where);
+		return join(' ' . DatabaseConnection::AND_Constraint . ' ', $where);
 	}
 
 	/**
@@ -434,7 +435,7 @@ class DatabaseService implements SingletonInterface {
 		// select without limit
 		$matches = $this->selectTableRecords(
 			$table,
-			'(' . join(') OR (', $whereArray) . ')',
+			'(' . join(') ' . DatabaseConnection::OR_Constraint . ' (', $whereArray) . ')',
 			'*',
 			''
 		);

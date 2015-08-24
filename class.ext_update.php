@@ -397,7 +397,7 @@ class ext_update extends ExtUpdateAbstract {
 
 		$sourceTable = 'tx_' . $this->sourceExtensionKey . '_item_itemxml_mm';
 		$targetTable = 'tx_' . $this->extensionKey . '_item_import_mm';
-		// @TODO ___what about the 'current' property?
+		// @FIX ___what about the 'current' property? this is important for migrating itemblob filepaths!
 		$propertyMap = array(
 			'uid_local' => 'uid_local',
 			'uid_foreign' => 'uid_foreign',
@@ -619,7 +619,7 @@ class ext_update extends ExtUpdateAbstract {
 		$referenceTables = array(
 			'tx_' . $this->extensionKey . '_item_import_mm' => 'uid_foreign',
 		);
-		// @TODO ___reflect the removal of properties in the import domain model and tca: documentpath @ model, auto @ all?
+		// @TODO ___reflect the removal of properties in the import domain model and tca: auto @ all?
 		$propertyMap = array(
 			'pid' => 'pid',
 			'name' => 'title',
@@ -879,9 +879,11 @@ class ext_update extends ExtUpdateAbstract {
 
 		$pluginListType = $this->sourceExtensionKey . '_pi1';
 		$table = 'tt_content';
-		$where = 'deleted=0
-			AND CType=\'list\'
-			AND list_type=\'' . $pluginListType . '\'';
+		$where = implode(' ' . DatabaseConnection::AND_Constraint . ' ', array(
+			'deleted=0',
+			'CType=\'list\'',
+			'list_type=\'' . $pluginListType . '\''
+		));
 
 		$existingPlugins = $this->databaseService->selectTableRecords($table, $where);
 		if (!empty($existingPlugins)) {
