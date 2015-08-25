@@ -66,6 +66,11 @@ class ImporterTask extends AbstractTask {
 		$importerService = $objectManager->get('Innologi\\Decospublisher7\\Service\\Importer\\ImporterService');
 		$importerService->importAll();
 
+		// persist any lingering data
+		/* @var $persistenceManager \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager */
+		$persistenceManager = $objectManager->get('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager');
+		$persistenceManager->persistAll();
+
 		$errors = $importerService->getErrors();
 		if (!empty($errors)) {
 			throw new \Exception(

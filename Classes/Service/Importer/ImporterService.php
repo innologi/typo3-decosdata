@@ -90,10 +90,31 @@ class ImporterService implements SingletonInterface{
 	 * @return void
 	 */
 	public function importSingle(\Innologi\Decospublisher7\Domain\Model\Import $import) {
-		// @TODO ___check if import has changed
+		$filePath = PATH_site . $import->getFile()->getOriginalResource()->getPublicUrl();
+		if ( ($newHash = $this->getHashIfReadyForProcessing($filePath, $import->getHash())) === FALSE ) {
+			// @LOW consider throwing an exception, which when caught will register the import as notUpdated?
+			// either no file present, or the file has seen no change: no sense in continuing
+			return;
+		}
+
 		$this->parser->processImport($import);
-		// @TODO ___and what about marking the import with hash and tstamp fields!
-		#$this->importRepository->update($import);
+		// not using the File record's hash, because that one is set initially and could be updated by outside sources
+		$import->setHash($newHash);
+		// mark as processed
+		$this->importRepository->update($import);
+	}
+
+	/**
+	 * Returns hash of $filePath, only if it does not match $knownHash.
+	 * Returns boolean FALSE if file does not exist or hash matches $knownHash.
+	 *
+	 * @param string $filePath
+	 * @param string $knownHash
+	 * @return string|boolean
+	 */
+	protected function getHashIfReadyForProcessing($filePath, $knownHash) {
+		return file_exists($filePath) && ($newHash = md5_file($filePath)) !== $knownHash ? $newHash : FALSE;
+
 	}
 
 	/**
