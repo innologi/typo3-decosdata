@@ -24,6 +24,7 @@ namespace Innologi\Decospublisher7\Task;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Scheduler\Task\AbstractTask;
+use TYPO3\CMS\Core\Utility\DebugUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Extbase\Core\Bootstrap;
@@ -53,7 +54,7 @@ class ImporterTask extends AbstractTask {
 	public function execute() {
 		$bootstrap = new Bootstrap();
 		$bootstrap->initialize(array(
-			'pluginName' => 'ImporterTask',
+			'pluginName' => 'Importer',
 			'extensionName' => $this->extensionName,
 			'vendorName' => 'Innologi'
 		));
@@ -68,36 +69,12 @@ class ImporterTask extends AbstractTask {
 		$errors = $importerService->getErrors();
 		if (!empty($errors)) {
 			throw new \Exception(
-				$this->formatErrors($errors)
+				LocalizationUtility::translate('importer.errors', $this->extensionName) .
+				DebugUtility::viewArray($errors)
 			);
 		}
 
 		return TRUE;
 	}
 
-	/**
-	 * Formats error messages for display by scheduler.
-	 *
-	 * @param array $errors
-	 * @return string
-	 */
-	protected function formatErrors(array $errors) {
-		// @LOW ___consider using DebugUtility::viewArray() instead.
-		$errorMessage = array(
-			LocalizationUtility::translate('importer.errors', $this->extensionName)
-		);
-		foreach ($errors as $error) {
-			/* @var $import \Innologi\Decospublisher7\Domain\Model\Import */
-			$import = $error['import'];
-			/* @var $exception \Exception */
-			$exception = $error['exception'];
-			$errorMessage[] = sprintf(
-				'- %1$d:%2$s: %3$s',
-				$import->getUid(),
-				$import->getTitle(),
-				$exception->getMessage()
-			);
-		}
-		return join(" \n", $errorMessage);
-	}
 }

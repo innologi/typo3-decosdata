@@ -77,10 +77,7 @@ class ImporterService implements SingletonInterface{
 				$this->importSingle($import);
 			} catch (ValidationFailed $e) {
 				// register the error and move on
-				$this->errors[] = array(
-					'import' => $import,
-					'exception' => $e
-				);
+				$this->errors[$import->getUid() . ':' . $import->getTitle()] = $e->getMessage();
 			}
 			// any other exception is so serious that we have to halt the entire process anyway
 		}

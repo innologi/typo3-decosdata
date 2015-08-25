@@ -36,6 +36,6 @@ class ValidationFailed extends Exception {
 	/**
 	 * @var string
 	 */
-	protected $message = 'The file \'<code>%1$s</code>\' does not validate as an import-file.';
+	protected $message = 'The file \'%1$s\' does not validate as an import-file.';
 
 }
