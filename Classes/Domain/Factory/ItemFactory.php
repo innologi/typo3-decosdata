@@ -50,14 +50,10 @@ class ItemFactory extends FactoryAbstract {
 	 */
 	protected function setProperties(\Innologi\Decospublisher7\Domain\Model\Item $object, array $data) {
 		if (!isset($data['item_key'][0])) {
-			throw new MissingObjectProperty(
-				sprintf(
-					// @TODO ___llang
-					'Missing required property <code>%1$s</code> for <code>%2$s</code> object.',
-					'item_key',
-					'Item'
-				)
-			);
+			throw new MissingObjectProperty(array(
+				'item_key',
+				'Item'
+			));
 		}
 		$object->setItemKey($data['item_key']);
 

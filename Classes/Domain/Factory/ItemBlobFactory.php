@@ -56,14 +56,10 @@ class ItemBlobFactory extends FactoryAbstract {
 	 */
 	protected function setProperties(\Innologi\Decospublisher7\Domain\Model\ItemBlob $object, array $data) {
 		if (!isset($data['item_key'][0])) {
-			throw new MissingObjectProperty(
-				sprintf(
-					// @TODO ___llang
-					'Missing required property <code>%1$s</code> for <code>%2$s</code> object.',
-					'item_key',
-					'ItemBlob'
-				)
-			);
+			throw new MissingObjectProperty(array(
+				'item_key',
+				'ItemBlob'
+			));
 		}
 		$object->setItemKey($data['item_key']);
 

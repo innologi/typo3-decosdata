@@ -50,14 +50,10 @@ class FieldFactory extends FactoryAbstract {
 	 */
 	protected function setProperties(\Innologi\Decospublisher7\Domain\Model\Field $object, array $data) {
 		if (!isset($data['field_name'][0])) {
-			throw new MissingObjectProperty(
-				sprintf(
-					// @TODO ___llang
-					'Missing required property <code>%1$s</code> for <code>%2$s</code> object.',
-					'field_name',
-					'Field'
-				)
-			);
+			throw new MissingObjectProperty(array(
+				'field_name',
+				'Field'
+			));
 		}
 		$object->setFieldName($data['field_name']);
 	}

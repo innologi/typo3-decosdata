@@ -25,17 +25,28 @@ namespace Innologi\Decospublisher7\Exception;
  ***************************************************************/
 
 /**
- * Missing Object Property Exception
+ * Exception Class
  *
  * @package decospublisher7
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MissingObjectProperty extends Exception {
+class Exception extends \Exception {
 
 	/**
-	 * @var string
+	 * Class constructor
+	 *
+	 * @param array $messageArguments (optional)
+	 * @param string $message (optional)
+	 * @return void
 	 */
-	protected $message = 'Missing required property <code>%1$s</code> for <code>%2$s</code> object.';
+	public function __construct(array $messageArguments = NULL, $message = NULL) {
+		if ($message !== NULL) {
+			$this->message = $message;
+		}
+		if ($messageArguments !== NULL) {
+			$this->message = vsprintf($this->message, $messageArguments);
+		}
+	}
 
 }

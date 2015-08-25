@@ -50,14 +50,10 @@ class ItemTypeFactory extends FactoryAbstract {
 	 */
 	protected function setProperties(\Innologi\Decospublisher7\Domain\Model\ItemType $object, array $data) {
 		if (!isset($data['item_type'][0])) {
-			throw new MissingObjectProperty(
-				sprintf(
-					// @TODO ___llang
-					'Missing required property <code>%1$s</code> for <code>%2$s</code> object.',
-					'item_type',
-					'ItemType'
-				)
-			);
+			throw new MissingObjectProperty(array(
+				'item_type',
+				'ItemType'
+			));
 		}
 		$object->setItemType($data['item_type']);
 	}
