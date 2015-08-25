@@ -24,7 +24,6 @@ namespace Innologi\Decospublisher7\Mvc\Domain;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Factory Abstract
  *
@@ -47,6 +46,12 @@ abstract class FactoryAbstract implements SingletonInterface {
 	 * @var \Innologi\Decospublisher7\Mvc\Domain\RepositoryAbstract
 	 */
 	protected $repository;
+
+	/**
+	 * @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface
+	 * @inject
+	 */
+	protected $objectManager;
 
 	/**
 	 * @var integer
@@ -81,7 +86,7 @@ abstract class FactoryAbstract implements SingletonInterface {
 	 */
 	public function create(array $data) {
 		/* @var $object \TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject */
-		$object = GeneralUtility::makeInstance($this->objectType);
+		$object = $this->objectManager->get($this->objectType);
 		$this->setProperties($object, $data);
 		$this->setDefaultProperties($object, $data);
 		return $object;

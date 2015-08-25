@@ -23,7 +23,6 @@ namespace Innologi\Decospublisher7\Domain\Factory;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\SingletonInterface;
 use Innologi\Decospublisher7\Exception\FileException;
 /**
@@ -58,6 +57,12 @@ class FileReferenceFactory implements SingletonInterface {
 	protected $resourceFactory;
 
 	/**
+	 * @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface
+	 * @inject
+	 */
+	protected $objectManager;
+
+	/**
 	 * Creates and returns domain object from filepath.
 	 *
 	 * @param string filePath
@@ -82,7 +87,7 @@ class FileReferenceFactory implements SingletonInterface {
 	 */
 	public function create(array $data) {
 		/* @var $object \TYPO3\CMS\Extbase\Domain\Model\FileReference */
-		$object = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Domain\\Model\\FileReference');
+		$object = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Model\\FileReference');
 		$object->setOriginalResource(
 			// all you really need is an 'uid_local' key with the File uid as value for it
 			// to persist correctly. Below method will throw an exception if missing.
