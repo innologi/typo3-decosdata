@@ -1,0 +1,29 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+
+	<start>
+		<ref name="items"/>
+	</start>
+
+	<define name="items">
+		<element name="ITEMS">
+			<attribute name="TYPE" />
+			<zeroOrMore>
+				<element name="ITEM">
+					<element name="ITEM_KEY">
+						<text/>
+					</element>
+					<zeroOrMore>
+						<element>
+							<anyName/>
+							<text/>
+						</element>
+					</zeroOrMore>
+					<zeroOrMore>
+						<ref name="items"/>
+					</zeroOrMore>
+				</element>
+			</zeroOrMore>
+		</element>
+	</define>
+
+</grammar>
