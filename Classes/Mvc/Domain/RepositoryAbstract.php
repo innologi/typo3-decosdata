@@ -24,6 +24,7 @@ namespace Innologi\Decospublisher7\Mvc\Domain;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Extbase\Persistence\Repository;
+use Innologi\Decospublisher7\Exception\StaticUidInsertion;
 /**
  * General RepositoryAbstract class
  *
@@ -83,11 +84,14 @@ abstract class RepositoryAbstract extends Repository {
 	 *
 	 * @param array &$data
 	 * @return void
+	 * @throws \Innologi\Decospublisher7\Exception\StaticUidInsertion
 	 */
 	public function insertRecord(array &$data) {
 		if (isset($data['uid'])) {
-			// @LOW ___throw exception instead?
-			unset($data['uid']);
+			throw new StaticUidInsertion(array(
+				$this->getTableName(),
+				$data['uid']
+			));
 		}
 		if (!isset($data['pid'])) {
 			$data['pid'] = $this->getStoragePid();
