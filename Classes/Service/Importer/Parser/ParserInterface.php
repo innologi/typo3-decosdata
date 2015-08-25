@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Service;
+namespace Innologi\Decospublisher7\Service\Importer\Parser;
 /***************************************************************
  *  Copyright notice
  *
@@ -25,41 +25,20 @@ namespace Innologi\Decospublisher7\Service;
  ***************************************************************/
 
 /**
- * Importer Service
- *
- * Imports Decos XML Imports.
+ * Importer Parser Interface
  *
  * @package decospublisher7
+ * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
- *
  */
-class ImporterService {
-
-	# @TODO doc
+interface ParserInterface {
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Repository\ImportRepository
-	 * @inject
+	 * Processes an import for parsing.
+	 *
+	 * @param \Innologi\Decospublisher7\Domain\Model\Import $import
+	 * @return void
 	 */
-	protected $importRepository;
+	public function processImport(\Innologi\Decospublisher7\Domain\Model\Import $import);
 
-
-	public function importAll() {
-		$importCollection = $this->importRepository->findAll();
-		$this->importSelection($importCollection);
-	}
-
-	public function importSelection($importCollection) {
-		foreach ($importCollection as $import) {
-			$this->processImport($import);
-		}
-	}
-
-	public function importSingle($import) {
-		$this->processImport($import);
-	}
-
-	protected function processImport($import) {
-
-	}
 }
