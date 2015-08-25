@@ -24,6 +24,7 @@ namespace Innologi\Decospublisher7\Domain\Model;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 /**
  * Item domain model
  *
@@ -101,14 +102,12 @@ class Item extends AbstractEntity {
 	 * @return void
 	 */
 	protected function initStorageObjects() {
-		// @LOW ___below tasks count for all domain model classes!
-		// @LOW ___if we remove below task without change, we should add a use statement and alter these
-		// @LOW ___you sure we want to use the new keyword? We could always utilize GeneralUtility
-		$this->itemField = new \TYPO3\CMS\Extbase\Persistence\ObjectStorage();
-		$this->itemBlob = new \TYPO3\CMS\Extbase\Persistence\ObjectStorage();
-		$this->import = new \TYPO3\CMS\Extbase\Persistence\ObjectStorage();
-		$this->parentItem = new \TYPO3\CMS\Extbase\Persistence\ObjectStorage();
-		$this->childItem = new \TYPO3\CMS\Extbase\Persistence\ObjectStorage();
+		// as long as ObjectStorage is hardcoded throughout extbase, we can use the new keyword
+		$this->itemField = new ObjectStorage();
+		$this->itemBlob = new ObjectStorage();
+		$this->import = new ObjectStorage();
+		$this->parentItem = new ObjectStorage();
+		$this->childItem = new ObjectStorage();
 	}
 
 	/**
