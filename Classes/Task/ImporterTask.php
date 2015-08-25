@@ -25,31 +25,79 @@ namespace Innologi\Decospublisher7\Task;
  ***************************************************************/
 use TYPO3\CMS\Scheduler\Task\AbstractTask;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Extbase\Core\Bootstrap;
 /**
  * Importer Task
  *
  * Task-implementation of ImporterService
  *
  * @package decospublisher7
+ * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
- *
  */
 class ImporterTask extends AbstractTask {
 	# @TODO make the task configurable in which XML's to update, removing the auto_update check in the import table
 
 	/**
+	 * @var string
+	 */
+	protected $extensionName = 'Decospublisher7';
+
+	/**
 	 * Execute task logic
 	 *
 	 * @return boolean
+	 * @throws \Exception
 	 */
 	public function execute() {
+		$bootstrap = new Bootstrap();
+		$bootstrap->initialize(array(
+			'pluginName' => 'ImporterTask',
+			'extensionName' => $this->extensionName,
+			'vendorName' => 'Innologi'
+		));
+
 		/* @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
 		$objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 
-		/* @var $importerService \Innologi\Decospublisher7\Service\ImporterService */
-		$importerService = $objectManager->get('Innologi\\Decospublisher7\\Service\\ImporterService');
+		/* @var $importerService \Innologi\Decospublisher7\Service\Importer\ImporterService */
+		$importerService = $objectManager->get('Innologi\\Decospublisher7\\Service\\Importer\\ImporterService');
 		$importerService->importAll();
 
+		$errors = $importerService->getErrors();
+		if (!empty($errors)) {
+			throw new \Exception(
+				$this->formatErrors($errors)
+			);
+		}
+
 		return TRUE;
+	}
+
+	/**
+	 * Formats error messages for display by scheduler.
+	 *
+	 * @param array $errors
+	 * @return string
+	 */
+	protected function formatErrors(array $errors) {
+		// @LOW ___consider using DebugUtility::viewArray() instead.
+		$errorMessage = array(
+			LocalizationUtility::translate('importer.errors', $this->extensionName)
+		);
+		foreach ($errors as $error) {
+			/* @var $import \Innologi\Decospublisher7\Domain\Model\Import */
+			$import = $error['import'];
+			/* @var $exception \Exception */
+			$exception = $error['exception'];
+			$errorMessage[] = sprintf(
+				'- %1$d:%2$s: %3$s',
+				$import->getUid(),
+				$import->getTitle(),
+				$exception->getMessage()
+			);
+		}
+		return join(" \n", $errorMessage);
 	}
 }
