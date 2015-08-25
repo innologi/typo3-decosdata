@@ -9,6 +9,9 @@
 			<trans-unit id="file.description">
 				<source>Reference to the Documents Import Export file</source>
 			</trans-unit>
+			<trans-unit id="hash.description">
+				<source>Last processed file hash, used solely by the importer. Don't change this value unless you know what you're doing.</source>
+			</trans-unit>
 			<trans-unit id="auto_update.description">
 				<source>Include in automatic updates via the 'scheduler' update task</source>
 			</trans-unit>

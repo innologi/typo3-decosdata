@@ -12,6 +12,9 @@
 			<trans-unit id="tx_decospublisher7_domain_model_import.file">
 				<source>File</source>
 			</trans-unit>
+			<trans-unit id="tx_decospublisher7_domain_model_import.hash">
+				<source>File Hash</source>
+			</trans-unit>
 			<trans-unit id="tx_decospublisher7_domain_model_import.auto_update">
 				<source>Automatic Updates</source>
 			</trans-unit>
