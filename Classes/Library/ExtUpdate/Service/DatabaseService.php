@@ -24,7 +24,6 @@ namespace Innologi\Decospublisher7\Library\ExtUpdate\Service;
 ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
-use TYPO3\CMS\Extbase\Persistence\Generic\Storage\Exception\SqlErrorException;
 /**
  * Ext Update Database Service
  *
@@ -305,7 +304,7 @@ class DatabaseService implements SingletonInterface {
 	 * @param integer $limit Limits record count
 	 * @param string $orderBy
 	 * @return array
-	 * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Storage\Exception\SqlErrorException
+	 * @throws Exception\SqlError
 	 */
 	public function selectTableRecords($table, $where = '', $select = '*', $limit = 5000, $orderBy = 'uid ASC') {
 		$groupBy = '';
@@ -319,7 +318,7 @@ class DatabaseService implements SingletonInterface {
 			'uid'
 		);
 		if ($rows === NULL) {
-			throw new SqlErrorException(
+			throw new Exception\SqlError(
 				sprintf(
 					$this->lang['sqlError'],
 					$this->databaseConnection->debug_lastBuiltQuery
