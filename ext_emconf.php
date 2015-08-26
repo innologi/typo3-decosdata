@@ -12,7 +12,7 @@
 
 $EM_CONF[$_EXTKEY] = array(
 	'title' => 'Decos Data',
-	'description' => 'Import Decos XML exports locally and flexibly publish their contents.',
+	'description' => 'Import Decos XML exports locally and flexibly publish their contents. Successor to the \'decospublisher\' extension.',
 	'category' => 'plugin',
 	'author' => 'Frenck Lutke',
 	'author_email' => 'typo3@innologi.nl',
