@@ -30,11 +30,11 @@ return array(
 		'iconfile' => ExtensionManagementUtility::extRelPath($extKey) . 'Resources/Public/Icons/' . $table . '.gif'
 	),
 	'interface' => array(
-		'showRecordFieldList' => 'hidden, title, file, auto_update, forget_on_update, hash',
+		'showRecordFieldList' => 'hidden, title, file, hash, forget_on_update',
 	),
 	'types' => array(
 		'0' => array(
-			'showitem' => 'hidden, title, file, hash, auto_update, forget_on_update,
+			'showitem' => 'hidden, title, file, hash, forget_on_update,
 				--div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'
 		),
 	),
@@ -102,22 +102,6 @@ return array(
 				'xml'
 			),
 		),
-		'auto_update' => array(
-			'exclude' => FALSE,
-			'label' => $ll . '.auto_update',
-			'config' => array(
-				'type' => 'check',
-				'default' => 0
-			)
-		),
-		'forget_on_update' => array(
-			'exclude' => TRUE,
-			'label' => $ll . '.forget_on_update',
-			'config' => array(
-				'type' => 'check',
-				'default' => 0
-			)
-		),
 		'hash' => array(
 			'exclude' => TRUE,
 			'label' => $ll . '.hash',
@@ -126,6 +110,14 @@ return array(
 				'size' => 40,
 				'eval' => 'trim'
 			),
+		),
+		'forget_on_update' => array(
+			'exclude' => TRUE,
+			'label' => $ll . '.forget_on_update',
+			'config' => array(
+				'type' => 'check',
+				'default' => 0
+			)
 		),
 
 	),

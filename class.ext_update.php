@@ -144,7 +144,7 @@ class ext_update extends ExtUpdateAbstract {
 			$this->addFlashMessage($this->lang['updaterFinish'], $this->lang['updaterFinishTitle'], FlashMessage::OK);
 		}
 
-		// @TODO ___Task Migration
+		// @TODO ___Task Migration ('auto' property)
 	}
 
 
@@ -612,18 +612,15 @@ class ext_update extends ExtUpdateAbstract {
 
 		// @TODO ___reference in preprocess mm table?
 		// @TODO ___reference in importrule table?
-		// @TODO ___transfer auto_update value to task?
 		$uidMap = array();
 		$sourceTable = 'tx_' . $this->sourceExtensionKey . '_itemxml';
 		$targetTable = 'tx_' . $this->extensionKey . '_domain_model_import';
 		$referenceTables = array(
 			'tx_' . $this->extensionKey . '_item_import_mm' => 'uid_foreign',
 		);
-		// @TODO ___reflect the removal of properties in the import domain model and tca: auto @ all?
 		$propertyMap = array(
 			'pid' => 'pid',
 			'name' => 'title',
-			'auto' => 'auto_update',
 			'forget' => 'forget_on_update',
 			'md5hash' => 'hash',
 			'xmlpath' => 'file',

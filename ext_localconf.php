@@ -3,11 +3,12 @@ if (!defined ('TYPO3_MODE')) {
 	die ('Access denied.');
 }
 
+$ll = 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_be.xlf:';
+
 // add scheduler tasks
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['Innologi\\Decospublisher7\\Task\\ImporterTask'] = array(
+$TYPO3_CONF_VARS['SC_OPTIONS']['scheduler']['tasks']['Innologi\\Decospublisher7\\Task\\ImporterTask'] = array(
 	'extension'			=> $_EXTKEY,
-	// @TODO ___llang
-	'title'				=> 'Importer', #'LLL:EXT:' . $_EXTKEY . '/tasks/locallang.xml:updatetask.name',
-	'description'		=> 'Importer Descr', #'LLL:EXT:' . $_EXTKEY . '/tasks/locallang.xml:updatetask.description',
-	'additionalFields'	=> ''
+	'title'				=> $ll . 'task_importer.title',
+	'description'		=> $ll . 'task_importer.description',
+	'additionalFields'	=> 'Innologi\\Decospublisher7\\Task\\ImporterAdditionalFieldProvider'
 );

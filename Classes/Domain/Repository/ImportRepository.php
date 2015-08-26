@@ -44,4 +44,19 @@ class ImportRepository extends RepositoryAbstract {
 		return $query->execute();
 	}
 
+	/**
+	 * Returns all objects of this repository with the given UIDs,
+	 * regardless of pid.
+	 *
+	 * @param array $uidArray
+	 * @return \TYPO3\CMS\Extbase\Persistence\QueryResultInterface|array
+	 */
+	public function findInUidEverywhere(array $uidArray) {
+		$query = $this->createQuery();
+		$query->getQuerySettings()->setRespectStoragePage(FALSE);
+		return $query->matching(
+			$query->in('uid', $uidArray)
+		)->execute();
+	}
+
 }

@@ -43,7 +43,6 @@ CREATE TABLE tx_decospublisher7_domain_model_import (
 
 	title varchar(255) DEFAULT '' NOT NULL,
 	file int(11) unsigned NOT NULL default '0',
-	auto_update tinyint(1) unsigned DEFAULT '0' NOT NULL,
 	forget_on_update tinyint(1) unsigned DEFAULT '0' NOT NULL,
 	hash varchar(32) DEFAULT '' NOT NULL,
 

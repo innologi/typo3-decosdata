@@ -15,9 +15,6 @@
 			<trans-unit id="tx_decospublisher7_domain_model_import.hash">
 				<source>File Hash</source>
 			</trans-unit>
-			<trans-unit id="tx_decospublisher7_domain_model_import.auto_update">
-				<source>Automatic Updates</source>
-			</trans-unit>
 			<trans-unit id="tx_decospublisher7_domain_model_import.forget_on_update">
 				<source>Only Keep Last Update</source>
 			</trans-unit>

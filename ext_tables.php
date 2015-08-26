@@ -53,3 +53,7 @@ $cshPathPrefix = 'EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_csh_
 	$tablePrefix . 'itemtype',
 	$cshPathPrefix . 'tca_itemtype.xlf'
 );
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
+	'tx_' . $_EXTKEY . '_task_importer',
+	$cshPathPrefix . 'task_importer.xlf'
+);

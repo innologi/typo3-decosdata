@@ -9,6 +9,22 @@
 			<trans-unit id="tca_wizard.list">
 				<source>List all possible relation-records</source>
 			</trans-unit>
+			
+			<trans-unit id="task_importer.title">
+				<source>Auto-Update Imports</source>
+			</trans-unit>
+			<trans-unit id="task_importer.description">
+				<source>Will automatically process selected import records for updates provided through their XML files.</source>
+			</trans-unit>
+			<trans-unit id="task_importer.field.selectImports">
+				<source>Select imports</source>
+			</trans-unit>
+			<trans-unit id="task_importer.msg.noImportSelected">
+				<source>No import selected. Please select at least one import record.</source>
+			</trans-unit>
+			<trans-unit id="task_importer.msg.invalidImportSelected">
+				<source>The selection of imports contains invalid choices, please try again.</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

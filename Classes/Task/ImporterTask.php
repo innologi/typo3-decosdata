@@ -46,6 +46,11 @@ class ImporterTask extends AbstractTask {
 	protected $extensionName = 'Decospublisher7';
 
 	/**
+	 * @var array
+	 */
+	public $selectedImports = array();
+
+	/**
 	 * Execute task logic
 	 *
 	 * @return boolean
@@ -64,7 +69,7 @@ class ImporterTask extends AbstractTask {
 
 		/* @var $importerService \Innologi\Decospublisher7\Service\Importer\ImporterService */
 		$importerService = $objectManager->get('Innologi\\Decospublisher7\\Service\\Importer\\ImporterService');
-		$importerService->importAll();
+		$importerService->importUidSelection($this->selectedImports);
 
 		// persist any lingering data
 		/* @var $persistenceManager \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager */

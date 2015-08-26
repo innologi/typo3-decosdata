@@ -57,13 +57,6 @@ class Import extends AbstractEntity {
 	protected $hash;
 
 	/**
-	 * Include in auto update?
-	 *
-	 * @var boolean
-	 */
-	protected $autoUpdate;
-
-	/**
 	 * Forget all previous content on new update
 	 *
 	 * @var boolean
@@ -127,26 +120,6 @@ class Import extends AbstractEntity {
 	 */
 	public function setHash($hash) {
 		$this->hash = $hash;
-		return $this;
-	}
-
-	/**
-	 * Returns the autoUpdate
-	 *
-	 * @return boolean
-	 */
-	public function getAutoUpdate() {
-		return $this->autoUpdate;
-	}
-
-	/**
-	 * Sets the autoUpdate
-	 *
-	 * @param boolean $autoUpdate
-	 * @return \Innologi\Decospublisher7\Domain\Model\Import
-	 */
-	public function setAutoUpdate($autoUpdate) {
-		$this->autoUpdate = $autoUpdate;
 		return $this;
 	}
 

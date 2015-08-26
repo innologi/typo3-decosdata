@@ -65,6 +65,17 @@ class ImporterService implements SingletonInterface{
 	}
 
 	/**
+	 * Will process a selection of imports given as parameter as uid
+	 *
+	 * @param array $uidArray
+	 * @return void
+	 */
+	public function importUidSelection(array $uidArray) {
+		$importCollection = $this->importRepository->findInUidEverywhere($uidArray);
+		$this->importSelection($importCollection);
+	}
+
+	/**
 	 * Will process a selection of imports given as parameter
 	 *
 	 * @param \TYPO3\CMS\Extbase\Persistence\QueryResultInterface|array $importCollection
