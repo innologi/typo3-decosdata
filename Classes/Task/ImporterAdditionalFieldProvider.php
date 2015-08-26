@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Task;
+namespace Innologi\Decosdata\Task;
 /***************************************************************
  *  Copyright notice
  *
@@ -30,7 +30,7 @@ use TYPO3\CMS\Core\Messaging\FlashMessage;
  *
  * Provides an import selection to the task.
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -39,7 +39,7 @@ class ImporterAdditionalFieldProvider implements AdditionalFieldProviderInterfac
 	/**
 	 * @var string
 	 */
-	protected $ll = 'LLL:EXT:decospublisher7/Resources/Private/Language/locallang_be.xlf:';
+	protected $ll = 'LLL:EXT:decosdata/Resources/Private/Language/locallang_be.xlf:';
 
 	/**
 	 * Gets additional fields to render in the form to add/edit a task
@@ -71,7 +71,7 @@ class ImporterAdditionalFieldProvider implements AdditionalFieldProviderInterfac
 			$fieldId => array(
 				'code' => $fieldHtml,
 				'label' => $this->ll . 'task_importer.field.selectImports',
-				'cshKey' => 'tx_decospublisher7_task_importer',
+				'cshKey' => 'tx_decosdata_task_importer',
 				'cshLabel' => $fieldId
 			)
 		);
@@ -132,7 +132,7 @@ class ImporterAdditionalFieldProvider implements AdditionalFieldProviderInterfac
 		$databaseConnection = $GLOBALS['TYPO3_DB'];
 		return $databaseConnection->exec_SELECTgetRows(
 			'uid,pid,title',
-			'tx_decospublisher7_domain_model_import',
+			'tx_decosdata_domain_model_import',
 			'deleted=0',
 			'',
 			'title ASC',

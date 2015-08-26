@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Domain\Model;
+namespace Innologi\Decosdata\Domain\Model;
 /***************************************************************
  *  Copyright notice
  *
@@ -27,7 +27,7 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 /**
  * Import domain model
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -76,7 +76,7 @@ class Import extends AbstractEntity {
 	 * Sets the title
 	 *
 	 * @param string $title
-	 * @return \Innologi\Decospublisher7\Domain\Model\Import
+	 * @return \Innologi\Decosdata\Domain\Model\Import
 	 */
 	public function setTitle($title) {
 		$this->title = $title;
@@ -96,7 +96,7 @@ class Import extends AbstractEntity {
 	 * Sets the file
 	 *
 	 * @param \TYPO3\CMS\Extbase\Domain\Model\FileReference $file
-	 * @return \Innologi\Decospublisher7\Domain\Model\Import
+	 * @return \Innologi\Decosdata\Domain\Model\Import
 	 */
 	public function setFile(\TYPO3\CMS\Extbase\Domain\Model\FileReference $file) {
 		$this->file = $file;
@@ -116,7 +116,7 @@ class Import extends AbstractEntity {
 	 * Sets the hash
 	 *
 	 * @param string $hash
-	 * @return \Innologi\Decospublisher7\Domain\Model\Import
+	 * @return \Innologi\Decosdata\Domain\Model\Import
 	 */
 	public function setHash($hash) {
 		$this->hash = $hash;
@@ -136,7 +136,7 @@ class Import extends AbstractEntity {
 	 * Sets the forgetOnUpdate
 	 *
 	 * @param boolean $forgetOnUpdate
-	 * @return \Innologi\Decospublisher7\Domain\Model\Import
+	 * @return \Innologi\Decosdata\Domain\Model\Import
 	 */
 	public function setForgetOnUpdate($forgetOnUpdate) {
 		$this->forgetOnUpdate = $forgetOnUpdate;

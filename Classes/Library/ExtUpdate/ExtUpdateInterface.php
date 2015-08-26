@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Library\ExtUpdate;
+namespace Innologi\Decosdata\Library\ExtUpdate;
 /***************************************************************
 *  Copyright notice
 *

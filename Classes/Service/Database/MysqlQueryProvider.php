@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Service\Database;
+namespace Innologi\Decosdata\Service\Database;
 /***************************************************************
  *  Copyright notice
  *
@@ -31,7 +31,7 @@ namespace Innologi\Decospublisher7\Service\Database;
  * engine. In this case, the queries are specifially designed to utilize
  * optimized MySQL-features.
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */

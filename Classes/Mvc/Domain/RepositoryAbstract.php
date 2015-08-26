@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Mvc\Domain;
+namespace Innologi\Decosdata\Mvc\Domain;
 /***************************************************************
  *  Copyright notice
  *
@@ -24,14 +24,14 @@ namespace Innologi\Decospublisher7\Mvc\Domain;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Extbase\Persistence\Repository;
-use Innologi\Decospublisher7\Exception\StaticUidInsertion;
+use Innologi\Decosdata\Exception\StaticUidInsertion;
 /**
  * General RepositoryAbstract class
  *
  * Extends original extbase repository and adds a few extras
  * this extension uses on several occassions.
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -84,7 +84,7 @@ abstract class RepositoryAbstract extends Repository {
 	 *
 	 * @param array &$data
 	 * @return void
-	 * @throws \Innologi\Decospublisher7\Exception\StaticUidInsertion
+	 * @throws \Innologi\Decosdata\Exception\StaticUidInsertion
 	 */
 	public function insertRecord(array &$data) {
 		if (isset($data['uid'])) {

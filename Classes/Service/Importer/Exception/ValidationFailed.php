@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Service\Importer\Exception;
+namespace Innologi\Decosdata\Service\Importer\Exception;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,11 +23,11 @@ namespace Innologi\Decospublisher7\Service\Importer\Exception;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decospublisher7\Exception\Exception;
+use Innologi\Decosdata\Exception\Exception;
 /**
  * Validation failed
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */

@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Service\Importer;
+namespace Innologi\Decosdata\Service\Importer;
 /***************************************************************
  *  Copyright notice
  *
@@ -24,27 +24,27 @@ namespace Innologi\Decospublisher7\Service\Importer;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use Innologi\Decospublisher7\Service\Importer\Exception\ValidationFailed;
-use Innologi\Decospublisher7\Service\Importer\Exception\EmptyImportFile;
+use Innologi\Decosdata\Service\Importer\Exception\ValidationFailed;
+use Innologi\Decosdata\Service\Importer\Exception\EmptyImportFile;
 /**
  * Importer Service
  *
  * Imports Decos XML Imports.
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class ImporterService implements SingletonInterface{
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Repository\ImportRepository
+	 * @var \Innologi\Decosdata\Domain\Repository\ImportRepository
 	 * @inject
 	 */
 	protected $importRepository;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Service\Importer\Parser\ParserInterface
+	 * @var \Innologi\Decosdata\Service\Importer\Parser\ParserInterface
 	 * @inject
 	 */
 	protected $parser;
@@ -82,7 +82,7 @@ class ImporterService implements SingletonInterface{
 	 * @return void
 	 */
 	public function importSelection($importCollection) {
-		/* @var $import \Innologi\Decospublisher7\Domain\Model\Import */
+		/* @var $import \Innologi\Decosdata\Domain\Model\Import */
 		foreach ($importCollection as $import) {
 			try {
 				$this->importSingle($import);
@@ -97,10 +97,10 @@ class ImporterService implements SingletonInterface{
 	/**
 	 * Will process a single import
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\Import $import
+	 * @param \Innologi\Decosdata\Domain\Model\Import $import
 	 * @return void
 	 */
-	public function importSingle(\Innologi\Decospublisher7\Domain\Model\Import $import) {
+	public function importSingle(\Innologi\Decosdata\Domain\Model\Import $import) {
 		$filePath = PATH_site . $import->getFile()->getOriginalResource()->getPublicUrl();
 		if ( ($newHash = $this->getHashIfReadyForProcessing($filePath, $import->getHash())) === FALSE ) {
 			// @LOW consider throwing an exception, which when caught will register the import as notUpdated?

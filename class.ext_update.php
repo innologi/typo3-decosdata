@@ -23,14 +23,14 @@
 ***************************************************************/
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
-use Innologi\Decospublisher7\Library\ExtUpdate\ExtUpdateAbstract;
-use Innologi\Decospublisher7\Library\ExtUpdate\Service\Exception\NoData;
-use Innologi\Decospublisher7\Library\ExtUpdate\Service\Exception\FileException;
+use Innologi\Decosdata\Library\ExtUpdate\ExtUpdateAbstract;
+use Innologi\Decosdata\Library\ExtUpdate\Service\Exception\NoData;
+use Innologi\Decosdata\Library\ExtUpdate\Service\Exception\FileException;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 /**
  * Ext Update
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -41,7 +41,7 @@ class ext_update extends ExtUpdateAbstract {
 	 *
 	 * @var string
 	 */
-	protected $extensionKey = 'decospublisher7';
+	protected $extensionKey = 'decosdata';
 
 	/**
 	 * If the extension updater is to take data from a different extension,

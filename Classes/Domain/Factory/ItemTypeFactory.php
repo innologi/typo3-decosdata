@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Domain\Factory;
+namespace Innologi\Decosdata\Domain\Factory;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,19 +23,19 @@ namespace Innologi\Decospublisher7\Domain\Factory;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decospublisher7\Mvc\Domain\FactoryAbstract;
-use Innologi\Decospublisher7\Exception\MissingObjectProperty;
+use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
+use Innologi\Decosdata\Exception\MissingObjectProperty;
 /**
  * ItemType factory
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class ItemTypeFactory extends FactoryAbstract {
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Repository\ItemTypeRepository
+	 * @var \Innologi\Decosdata\Domain\Repository\ItemTypeRepository
 	 * @inject
 	 */
 	protected $repository;
@@ -43,12 +43,12 @@ class ItemTypeFactory extends FactoryAbstract {
 	/**
 	 * Sets properties of domain object
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\ItemType $object
+	 * @param \Innologi\Decosdata\Domain\Model\ItemType $object
 	 * @param array $data
 	 * @return void
-	 * @throws \Innologi\Decospublisher7\Exception\MissingObjectProperty
+	 * @throws \Innologi\Decosdata\Exception\MissingObjectProperty
 	 */
-	protected function setProperties(\Innologi\Decospublisher7\Domain\Model\ItemType $object, array $data) {
+	protected function setProperties(\Innologi\Decosdata\Domain\Model\ItemType $object, array $data) {
 		if (!isset($data['item_type'][0])) {
 			throw new MissingObjectProperty(array(
 				'item_type',
@@ -69,11 +69,11 @@ class ItemTypeFactory extends FactoryAbstract {
 	 *
 	 * @param string $type
 	 * @param boolean $autoInsert
-	 * @return \Innologi\Decospublisher7\Domain\Model\ItemType
+	 * @return \Innologi\Decosdata\Domain\Model\ItemType
 	 */
 	public function getByItemType($type, $autoInsert = FALSE) {
 		if (!isset($objectCache[$type])) {
-			/* @var $typeObject \Innologi\Decospublisher7\Domain\Model\ItemType */
+			/* @var $typeObject \Innologi\Decosdata\Domain\Model\ItemType */
 			$typeObject = $this->repository->findOneByItemType($type);
 			if ($typeObject === NULL) {
 				$data = array('item_type' => $type);

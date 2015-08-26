@@ -5,7 +5,7 @@ if (!defined('TYPO3_MODE')) {
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
-$extKey = 'decospublisher7';
+$extKey = 'decosdata';
 $table = 'tx_' . $extKey . '_domain_model_item';
 $ll = 'LLL:EXT:' . $extKey . '/Resources/Private/Language/locallang_db.xlf:' . $table;
 $llWiz = 'LLL:EXT:' . $extKey . '/Resources/Private/Language/locallang_be.xlf:tca_wizard';
@@ -128,10 +128,10 @@ return array(
 			'label' => $ll . '.item_type',
 			'config' => array(
 				'type' => 'select',
-				'foreign_table' => 'tx_decospublisher7_domain_model_itemtype',
+				'foreign_table' => 'tx_decosdata_domain_model_itemtype',
 				'foreign_table_where' => '
-					AND tx_decospublisher7_domain_model_itemtype.pid = ###CURRENT_PID###
-					ORDER BY tx_decospublisher7_domain_model_itemtype.item_type ASC',
+					AND tx_decosdata_domain_model_itemtype.pid = ###CURRENT_PID###
+					ORDER BY tx_decosdata_domain_model_itemtype.item_type ASC',
 				'minitems' => 1,
 				'maxitems' => 1,
 			),
@@ -141,11 +141,11 @@ return array(
 			'label' => $ll . '.import',
 			'config' => array(
 				'type' => 'select',
-				'foreign_table' => 'tx_decospublisher7_domain_model_import',
+				'foreign_table' => 'tx_decosdata_domain_model_import',
 				'foreign_table_where' => '
-					AND tx_decospublisher7_domain_model_import.pid = ###CURRENT_PID###
-					ORDER BY tx_decospublisher7_domain_model_import.title ASC',
-				'MM' => 'tx_decospublisher7_item_import_mm',
+					AND tx_decosdata_domain_model_import.pid = ###CURRENT_PID###
+					ORDER BY tx_decosdata_domain_model_import.title ASC',
+				'MM' => 'tx_decosdata_item_import_mm',
 				'size' => 6,
 				'autoSizeMax' => 15,
 				'maxitems' => 9999,
@@ -186,8 +186,8 @@ return array(
 					AND ' . $table . '.pid = ###CURRENT_PID###
 					AND ' . $table . '.uid IN (
 						SELECT impr1.uid_local
-						FROM tx_decospublisher7_item_import_mm impr1
-							LEFT JOIN tx_decospublisher7_item_import_mm impr2
+						FROM tx_decosdata_item_import_mm impr1
+							LEFT JOIN tx_decosdata_item_import_mm impr2
 								ON (impr1.uid_foreign = impr2.uid_foreign)
 						WHERE impr2.uid_local = ###THIS_UID###
 					)
@@ -195,7 +195,7 @@ return array(
 					AND ' . $table . '.uid > (###THIS_UID### - 10000)
 					ORDER BY ' . $table . '.uid ASC',
 				// parent = foreign
-				'MM' => 'tx_decospublisher7_item_item_mm',
+				'MM' => 'tx_decosdata_item_item_mm',
 				'size' => 10,
 				'autoSizeMax' => 30,
 				'maxitems' => 9999,
@@ -216,8 +216,8 @@ return array(
 					AND ' . $table . '.pid = ###CURRENT_PID###
 					AND ' . $table . '.uid IN (
 						SELECT impr1.uid_local
-						FROM tx_decospublisher7_item_import_mm impr1
-							LEFT JOIN tx_decospublisher7_item_import_mm impr2
+						FROM tx_decosdata_item_import_mm impr1
+							LEFT JOIN tx_decosdata_item_import_mm impr2
 								ON (impr1.uid_foreign = impr2.uid_foreign)
 						WHERE impr2.uid_local = ###THIS_UID###
 					)
@@ -225,7 +225,7 @@ return array(
 					AND ' . $table . '.uid > (###THIS_UID### - 5000)
 					ORDER BY ' . $table . '.uid DESC',
 				// child = local
-				'MM' => 'tx_decospublisher7_item_item_mm',
+				'MM' => 'tx_decosdata_item_item_mm',
 				'MM_opposite_field' => 'parent_item',
 				'size' => 10,
 				'autoSizeMax' => 30,
@@ -241,12 +241,12 @@ return array(
 			'label' => $ll . '.item_field',
 			'config' => array(
 				'type' => 'inline',
-				'foreign_table' => 'tx_decospublisher7_domain_model_itemfield',
+				'foreign_table' => 'tx_decosdata_domain_model_itemfield',
 				'foreign_field' => 'item',
 				// this can easily be circumvented, see itemfield.field TCA for solution
 				'foreign_unique' => 'field',
 				// @LOW __since these are id's now, it seems I can't sort on field.field_name anymore
-				'foreign_default_sortby' => 'tx_decospublisher7_domain_model_itemfield.field ASC',
+				'foreign_default_sortby' => 'tx_decosdata_domain_model_itemfield.field ASC',
 				// override ctrl/label setting
 				'foreign_label' => 'field',
 				'foreign_selector' => 'field',
@@ -265,9 +265,9 @@ return array(
 			'label' => $ll . '.item_blob',
 			'config' => array(
 				'type' => 'inline',
-				'foreign_table' => 'tx_decospublisher7_domain_model_itemblob',
+				'foreign_table' => 'tx_decosdata_domain_model_itemblob',
 				'foreign_field' => 'item',
-				'foreign_default_sortby' => 'tx_decospublisher7_domain_model_itemblob.sequence ASC',
+				'foreign_default_sortby' => 'tx_decosdata_domain_model_itemblob.sequence ASC',
 				// override ctrl/label setting
 				'foreign_label' => 'sequence',
 				'maxitems' => 9999,

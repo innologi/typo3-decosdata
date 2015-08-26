@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Domain\Model;
+namespace Innologi\Decosdata\Domain\Model;
 /***************************************************************
  *  Copyright notice
  *
@@ -27,7 +27,7 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 /**
  * ItemField domain model
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -43,14 +43,14 @@ class ItemField extends AbstractEntity {
 	/**
 	 * Field
 	 *
-	 * @var \Innologi\Decospublisher7\Domain\Model\Field
+	 * @var \Innologi\Decosdata\Domain\Model\Field
 	 */
 	protected $field;
 
 	/**
 	 * Item
 	 *
-	 * @var \Innologi\Decospublisher7\Domain\Model\Item
+	 * @var \Innologi\Decosdata\Domain\Model\Item
 	 */
 	protected $item;
 
@@ -67,7 +67,7 @@ class ItemField extends AbstractEntity {
 	 * Sets the value
 	 *
 	 * @param string $fieldValue
-	 * @return \Innologi\Decospublisher7\Domain\Model\ItemField
+	 * @return \Innologi\Decosdata\Domain\Model\ItemField
 	 */
 	public function setFieldValue($fieldValue) {
 		$this->fieldValue = $fieldValue;
@@ -77,7 +77,7 @@ class ItemField extends AbstractEntity {
 	/**
 	 * Returns the field
 	 *
-	 * @return \Innologi\Decospublisher7\Domain\Model\Field $field
+	 * @return \Innologi\Decosdata\Domain\Model\Field $field
 	 */
 	public function getField() {
 		return $this->field;
@@ -86,10 +86,10 @@ class ItemField extends AbstractEntity {
 	/**
 	 * Sets the field
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\Field $field
-	 * @return \Innologi\Decospublisher7\Domain\Model\ItemField
+	 * @param \Innologi\Decosdata\Domain\Model\Field $field
+	 * @return \Innologi\Decosdata\Domain\Model\ItemField
 	 */
-	public function setField(\Innologi\Decospublisher7\Domain\Model\Field $field) {
+	public function setField(\Innologi\Decosdata\Domain\Model\Field $field) {
 		$this->field = $field;
 		return $this;
 	}
@@ -97,7 +97,7 @@ class ItemField extends AbstractEntity {
 	/**
 	 * Returns the item
 	 *
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item $item
+	 * @return \Innologi\Decosdata\Domain\Model\Item $item
 	 */
 	public function getItem() {
 		return $this->item;
@@ -106,10 +106,10 @@ class ItemField extends AbstractEntity {
 	/**
 	 * Sets the item
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\Item $item
-	 * @return \Innologi\Decospublisher7\Domain\Model\ItemField
+	 * @param \Innologi\Decosdata\Domain\Model\Item $item
+	 * @return \Innologi\Decosdata\Domain\Model\ItemField
 	 */
-	public function setItem(\Innologi\Decospublisher7\Domain\Model\Item $item) {
+	public function setItem(\Innologi\Decosdata\Domain\Model\Item $item) {
 		$this->item = $item;
 		return $this;
 	}

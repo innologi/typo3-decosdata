@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Service\Database;
+namespace Innologi\Decosdata\Service\Database;
 /***************************************************************
  *  Copyright notice
  *
@@ -32,7 +32,7 @@ use TYPO3\CMS\Core\Database\DatabaseConnection;
  * functions, but which we won't use here to remain compatible. Generally,
  * you would use this class as a fallback.
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -44,7 +44,7 @@ class CompatibleQueryProvider implements QueryProviderInterface,SingletonInterfa
 	protected $databaseConnection;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Service\Database\DatabaseHelper
+	 * @var \Innologi\Decosdata\Service\Database\DatabaseHelper
 	 * @inject
 	 */
 	protected $databaseHelper;

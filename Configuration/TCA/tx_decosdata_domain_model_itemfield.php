@@ -5,7 +5,7 @@ if (!defined('TYPO3_MODE')) {
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
-$extKey = 'decospublisher7';
+$extKey = 'decosdata';
 $table = 'tx_' . $extKey . '_domain_model_itemfield';
 $ll = 'LLL:EXT:' . $extKey . '/Resources/Private/Language/locallang_db.xlf:' . $table;
 $llWiz = 'LLL:EXT:' . $extKey . '/Resources/Private/Language/locallang_be.xlf:tca_wizard';
@@ -70,20 +70,20 @@ return array(
 			'label' => $ll . '.field',
 			'config' => array(
 				'type' => 'select',
-				'foreign_table' => 'tx_decospublisher7_domain_model_field',
+				'foreign_table' => 'tx_decosdata_domain_model_field',
 				// the 2nd AND forces unique field per item
 				'foreign_table_where' => '
-					AND tx_decospublisher7_domain_model_field.pid = ###CURRENT_PID###
+					AND tx_decosdata_domain_model_field.pid = ###CURRENT_PID###
 					AND (
-						tx_decospublisher7_domain_model_field.uid NOT IN ((
+						tx_decosdata_domain_model_field.uid NOT IN ((
 							SELECT f.uid
-							FROM tx_decospublisher7_domain_model_field f,tx_decospublisher7_domain_model_itemfield itf
+							FROM tx_decosdata_domain_model_field f,tx_decosdata_domain_model_itemfield itf
 							WHERE f.uid = itf.field
 								AND itf.item=###REC_FIELD_item###
 						))
-						OR tx_decospublisher7_domain_model_field.uid = ###REC_FIELD_field###
+						OR tx_decosdata_domain_model_field.uid = ###REC_FIELD_field###
 					)
-					ORDER BY tx_decospublisher7_domain_model_field.field_name ASC',
+					ORDER BY tx_decosdata_domain_model_field.field_name ASC',
 				'minitems' => 1,
 				'maxitems' => 1,
 			),
@@ -95,15 +95,15 @@ return array(
 			'label' => $ll . '.item',
 			'config' => array(
 				'type' => 'select',
-				'foreign_table' => 'tx_decospublisher7_domain_model_item',
+				'foreign_table' => 'tx_decosdata_domain_model_item',
 				// the 2nd AND limits items to those from same import
 				'foreign_table_where' => '
-					AND tx_decospublisher7_domain_model_item.pid = ###CURRENT_PID###
+					AND tx_decosdata_domain_model_item.pid = ###CURRENT_PID###
 					AND (
-						tx_decospublisher7_domain_model_item.tstamp = ###REC_FIELD_tstamp###
-						OR tx_decospublisher7_domain_model_item.uid = ###REC_FIELD_item###
+						tx_decosdata_domain_model_item.tstamp = ###REC_FIELD_tstamp###
+						OR tx_decosdata_domain_model_item.uid = ###REC_FIELD_item###
 					)
-					ORDER BY tx_decospublisher7_domain_model_item.uid ASC',
+					ORDER BY tx_decosdata_domain_model_item.uid ASC',
 				'minitems' => 1,
 				'maxitems' => 1,
 				'wizards' => array(

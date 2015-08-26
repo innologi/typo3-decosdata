@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Task;
+namespace Innologi\Decosdata\Task;
 /***************************************************************
  *  Copyright notice
  *
@@ -33,7 +33,7 @@ use TYPO3\CMS\Extbase\Core\Bootstrap;
  *
  * Task-implementation of ImporterService
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -43,7 +43,7 @@ class ImporterTask extends AbstractTask {
 	/**
 	 * @var string
 	 */
-	protected $extensionName = 'Decospublisher7';
+	protected $extensionName = 'Decosdata';
 
 	/**
 	 * @var array
@@ -67,8 +67,8 @@ class ImporterTask extends AbstractTask {
 		/* @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
 		$objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 
-		/* @var $importerService \Innologi\Decospublisher7\Service\Importer\ImporterService */
-		$importerService = $objectManager->get('Innologi\\Decospublisher7\\Service\\Importer\\ImporterService');
+		/* @var $importerService \Innologi\Decosdata\Service\Importer\ImporterService */
+		$importerService = $objectManager->get('Innologi\\Decosdata\\Service\\Importer\\ImporterService');
 		$importerService->importUidSelection($this->selectedImports);
 
 		// persist any lingering data

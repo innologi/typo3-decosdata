@@ -1,15 +1,15 @@
 config.tx_extbase.objects {
-	Innologi\Decospublisher7\Service\Importer\Parser\ParserInterface {
-		className = Innologi\Decospublisher7\Service\Importer\Parser\OneFileStreamingParser
+	Innologi\Decosdata\Service\Importer\Parser\ParserInterface {
+		className = Innologi\Decosdata\Service\Importer\Parser\OneFileStreamingParser
 	}
-	Innologi\Decospublisher7\Service\Importer\StorageHandler\StorageHandlerInterface {
-		className = Innologi\Decospublisher7\Service\Importer\StorageHandler\ClassicStorageHandler
+	Innologi\Decosdata\Service\Importer\StorageHandler\StorageHandlerInterface {
+		className = Innologi\Decosdata\Service\Importer\StorageHandler\ClassicStorageHandler
 	}
-	Innologi\Decospublisher7\Service\Database\QueryProviderInterface {
-		className = Innologi\Decospublisher7\Service\Database\MysqlQueryProvider
+	Innologi\Decosdata\Service\Database\QueryProviderInterface {
+		className = Innologi\Decosdata\Service\Database\MysqlQueryProvider
 	}
 }
 
-module.tx_decospublisher7.importer.validation {
-	import = EXT:decospublisher7/Resources/Private/Importer/Validation/import.rng
+module.tx_decosdata.importer.validation {
+	import = EXT:decosdata/Resources/Private/Importer/Validation/import.rng
 }

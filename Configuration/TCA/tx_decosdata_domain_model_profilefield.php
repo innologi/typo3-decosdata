@@ -5,7 +5,7 @@ if (!defined('TYPO3_MODE')) {
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
-$extKey = 'decospublisher7';
+$extKey = 'decosdata';
 $table = 'tx_' . $extKey . '_domain_model_profilefield';
 $ll = 'LLL:EXT:' . $extKey . '/Resources/Private/Language/locallang_db.xlf:' . $table;
 
@@ -61,21 +61,21 @@ return array(
 			'label' => $ll . '.field',
 			'config' => array(
 				'type' => 'select',
-				'foreign_table' => 'tx_decospublisher7_domain_model_field',
+				'foreign_table' => 'tx_decosdata_domain_model_field',
 				// the 2nd AND forces unique field per profile
 				// note that this would have to be changed once language_code is supported
 				'foreign_table_where' => '
-					AND tx_decospublisher7_domain_model_field.pid = ###CURRENT_PID###
+					AND tx_decosdata_domain_model_field.pid = ###CURRENT_PID###
 					AND (
-						tx_decospublisher7_domain_model_field.uid NOT IN ((
+						tx_decosdata_domain_model_field.uid NOT IN ((
 							SELECT f.uid
-							FROM tx_decospublisher7_domain_model_field f,tx_decospublisher7_domain_model_profilefield pf
+							FROM tx_decosdata_domain_model_field f,tx_decosdata_domain_model_profilefield pf
 							WHERE f.uid = pf.field
 								AND pf.profile=###REC_FIELD_profile###
 						))
-						OR tx_decospublisher7_domain_model_field.uid = ###REC_FIELD_field###
+						OR tx_decosdata_domain_model_field.uid = ###REC_FIELD_field###
 					)
-					ORDER BY tx_decospublisher7_domain_model_field.field_name ASC',
+					ORDER BY tx_decosdata_domain_model_field.field_name ASC',
 				'minitems' => 1,
 				'maxitems' => 1,
 			),

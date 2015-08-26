@@ -1,13 +1,13 @@
-plugin.tx_decospublisher7 {
+plugin.tx_decosdata {
 	persistence {
-		# cat=plugin.tx_decospublisher7//a; type=string; label=Default storage PID
+		# cat=plugin.tx_decosdata//a; type=string; label=Default storage PID
 		storagePid =
 	}
 }
 
-module.tx_decospublisher7 {
+module.tx_decosdata {
 	persistence {
-		# cat=module.tx_decospublisher7//a; type=string; label=Default storage PID
+		# cat=module.tx_decosdata//a; type=string; label=Default storage PID
 		storagePid =
 	}
 }

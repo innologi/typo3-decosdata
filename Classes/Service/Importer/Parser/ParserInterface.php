@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Service\Importer\Parser;
+namespace Innologi\Decosdata\Service\Importer\Parser;
 /***************************************************************
  *  Copyright notice
  *
@@ -27,7 +27,7 @@ namespace Innologi\Decospublisher7\Service\Importer\Parser;
 /**
  * Importer Parser Interface
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -36,9 +36,9 @@ interface ParserInterface {
 	/**
 	 * Processes an import for parsing.
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\Import $import
+	 * @param \Innologi\Decosdata\Domain\Model\Import $import
 	 * @return void
 	 */
-	public function processImport(\Innologi\Decospublisher7\Domain\Model\Import $import);
+	public function processImport(\Innologi\Decosdata\Domain\Model\Import $import);
 
 }

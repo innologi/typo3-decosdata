@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Service\Importer\Parser;
+namespace Innologi\Decosdata\Service\Importer\Parser;
 /***************************************************************
  *  Copyright notice
  *
@@ -28,10 +28,10 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-use Innologi\Decospublisher7\Service\Importer\Exception\UnreadableImportFile;
-use Innologi\Decospublisher7\Service\Importer\Exception\UnexpectedItemStructure;
-use Innologi\Decospublisher7\Service\Importer\Exception\InvalidValidationFile;
-use Innologi\Decospublisher7\Service\Importer\Exception\ValidationFailed;
+use Innologi\Decosdata\Service\Importer\Exception\UnreadableImportFile;
+use Innologi\Decosdata\Service\Importer\Exception\UnexpectedItemStructure;
+use Innologi\Decosdata\Service\Importer\Exception\InvalidValidationFile;
+use Innologi\Decosdata\Service\Importer\Exception\ValidationFailed;
 /**
  * Importer Parser: One File Imports, Streaming Parser
  *
@@ -43,7 +43,7 @@ use Innologi\Decospublisher7\Service\Importer\Exception\ValidationFailed;
  * large memory footprint. (although a storage handler can still be
  * responsible for that)
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -56,13 +56,13 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	protected $configurationManager;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Service\Importer\StorageHandler\StorageHandlerInterface
+	 * @var \Innologi\Decosdata\Service\Importer\StorageHandler\StorageHandlerInterface
 	 * @inject
 	 */
 	protected $storageHandler;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Model\Import
+	 * @var \Innologi\Decosdata\Domain\Model\Import
 	 */
 	protected $importObject;
 
@@ -84,10 +84,10 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	/**
 	 * Processes an import for parsing.
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\Import $import
+	 * @param \Innologi\Decosdata\Domain\Model\Import $import
 	 * @return void
 	 */
-	public function processImport(\Innologi\Decospublisher7\Domain\Model\Import $import) {
+	public function processImport(\Innologi\Decosdata\Domain\Model\Import $import) {
 		$importFilePath = PATH_site . $import->getFile()->getOriginalResource()->getPublicUrl();
 		$this->baseFilePath = dirname($importFilePath);
 		$this->importObject = $import;
@@ -109,9 +109,9 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	 * @param string $importFilePath
 	 * @param string $rngFilePath
 	 * @return boolean
-	 * @throws \Innologi\Decospublisher7\Service\Importer\Exception\UnreadableImportFile
-	 * @throws \Innologi\Decospublisher7\Service\Importer\Exception\InvalidValidationFile
-	 * @throws \Innologi\Decospublisher7\Service\Importer\Exception\ValidationFailed
+	 * @throws \Innologi\Decosdata\Service\Importer\Exception\UnreadableImportFile
+	 * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidValidationFile
+	 * @throws \Innologi\Decosdata\Service\Importer\Exception\ValidationFailed
 	 */
 	protected function validateImportFile($importFilePath, $rngFilePath) {
 		$reader = new \XMLReader();
@@ -153,7 +153,7 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	 *
 	 * @param string $import
 	 * @return void
-	 * @throws \Innologi\Decospublisher7\Service\Importer\Exception\UnreadableImportFile
+	 * @throws \Innologi\Decosdata\Service\Importer\Exception\UnreadableImportFile
 	 */
 	protected function startParser($importFilePath) {
 		$reader = new \XMLReader();
@@ -213,7 +213,7 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	 * @param string $itemType
 	 * @param mixed $parentItem
 	 * @return void
-	 * @throws \Innologi\Decospublisher7\Service\Importer\Exception\UnexpectedItemStructure
+	 * @throws \Innologi\Decosdata\Service\Importer\Exception\UnexpectedItemStructure
 	 */
 	protected function parseItem(\XMLReader $reader, $itemType, $parentItem = NULL) {
 		$item = NULL;

@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Mvc\Domain;
+namespace Innologi\Decosdata\Mvc\Domain;
 /***************************************************************
  *  Copyright notice
  *
@@ -31,7 +31,7 @@ use TYPO3\CMS\Core\SingletonInterface;
  * - $repository
  * - setProperties()
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -43,7 +43,7 @@ abstract class FactoryAbstract implements SingletonInterface {
 	protected $objectType;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Mvc\Domain\RepositoryAbstract
+	 * @var \Innologi\Decosdata\Mvc\Domain\RepositoryAbstract
 	 */
 	protected $repository;
 

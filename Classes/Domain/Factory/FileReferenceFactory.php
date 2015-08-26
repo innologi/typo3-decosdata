@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Domain\Factory;
+namespace Innologi\Decosdata\Domain\Factory;
 /***************************************************************
  *  Copyright notice
  *
@@ -24,7 +24,7 @@ namespace Innologi\Decospublisher7\Domain\Factory;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use Innologi\Decospublisher7\Exception\FileException;
+use Innologi\Decosdata\Exception\FileException;
 /**
  * FileReference Domain Object factory
  *
@@ -43,7 +43,7 @@ use Innologi\Decospublisher7\Exception\FileException;
  *		)
  *	),
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -67,7 +67,7 @@ class FileReferenceFactory implements SingletonInterface {
 	 *
 	 * @param string filePath
 	 * @return \TYPO3\CMS\Extbase\Domain\Model\FileReference
-	 * @throws \Innologi\Decospublisher7\Exception\FileException
+	 * @throws \Innologi\Decosdata\Exception\FileException
 	 */
 	public function createByFilePath($filePath) {
 		$fileObject = $this->resourceFactory->retrieveFileOrFolderObject($filePath);

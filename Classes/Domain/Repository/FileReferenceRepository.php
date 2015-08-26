@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Domain\Repository;
+namespace Innologi\Decosdata\Domain\Repository;
 /***************************************************************
  *  Copyright notice
  *
@@ -26,9 +26,9 @@ namespace Innologi\Decospublisher7\Domain\Repository;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\DebugUtility;
-use Innologi\Decospublisher7\Exception\FileException;
-use Innologi\Decospublisher7\Exception\FileReferenceException;
-use Innologi\Decospublisher7\Exception\SqlError;
+use Innologi\Decosdata\Exception\FileException;
+use Innologi\Decosdata\Exception\FileReferenceException;
+use Innologi\Decosdata\Exception\SqlError;
 /**
  * File Reference repository
  *
@@ -40,7 +40,7 @@ use Innologi\Decospublisher7\Exception\SqlError;
  * is disabled or not available. Otherwise you should use the
  * FileReferenceFactory and simply persist its parentObject.
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -67,7 +67,7 @@ class FileReferenceRepository implements SingletonInterface {
 	protected $databaseConnection;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Service\Database\DatabaseHelper
+	 * @var \Innologi\Decosdata\Service\Database\DatabaseHelper
 	 * @inject
 	 */
 	protected $databaseHelper;
@@ -115,7 +115,7 @@ class FileReferenceRepository implements SingletonInterface {
 	 * @param string $foreignField
 	 * @param string $referenceUid (optional)
 	 * @return void
-	 * @throws \Innologi\Decospublisher7\Exception\FileReferenceException
+	 * @throws \Innologi\Decosdata\Exception\FileReferenceException
 	 */
 	public function addRecord($fileUid, $foreignTable, $foreignUid, $foreignField, $referenceUid = NULL) {
 		if ($referenceUid === NULL) {
@@ -164,7 +164,7 @@ class FileReferenceRepository implements SingletonInterface {
 	 * @param string $foreignField
 	 * @param string $referenceUid (optional)
 	 * @return void
-	 * @throws \Innologi\Decospublisher7\Exception\FileException
+	 * @throws \Innologi\Decosdata\Exception\FileException
 	 * @see addRecord()
 	 */
 	public function addRecordByFilePath($filePath, $foreignTable, $foreignUid, $foreignField, $referenceUid = NULL) {
@@ -224,7 +224,7 @@ class FileReferenceRepository implements SingletonInterface {
 	 * @param integer $foreignUid
 	 * @param string $foreignField
 	 * @return void
-	 * @throws \Innologi\Decospublisher7\Exception\FileException
+	 * @throws \Innologi\Decosdata\Exception\FileException
 	 * @see upsertRecord()
 	 */
 	public function upsertRecordByFilePath($filePath, $foreignTable, $foreignUid, $foreignField) {
@@ -241,7 +241,7 @@ class FileReferenceRepository implements SingletonInterface {
 	 *
 	 * @param array $data Contains field => value conditions
 	 * @return array|boolean
-	 * @throws \Innologi\Decospublisher7\Exception\SqlError
+	 * @throws \Innologi\Decosdata\Exception\SqlError
 	 */
 	public function findOneByData(array $data) {
 		$data['pid'] = $this->storagePid;

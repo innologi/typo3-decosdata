@@ -5,8 +5,8 @@ if (!defined('TYPO3_MODE')) {
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
-$extKey = 'decospublisher7';
-$table = 'tx_' . $extKey . '_domain_model_itemblob';
+$extKey = 'decosdata';
+$table = 'tx_' . $extKey . '_domain_model_import';
 $ll = 'LLL:EXT:' . $extKey . '/Resources/Private/Language/locallang_db.xlf:' . $table;
 // this won't always be up to date because of caching, but that's ok
 $today = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
@@ -14,10 +14,7 @@ $today = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
 return array(
 	'ctrl' => array(
 		'title'	=> $ll,
-		// @LOW ___ for more descriptive TCA labels, check out http://docs.typo3.org/typo3cms/TCAReference/Reference/Ctrl/Index.html#label-userfunc
-		'label' => 'sequence',
-		'label_alt' => 'item',
-		'label_alt_force' => TRUE,
+		'label' => 'title',
 		'tstamp' => 'tstamp',
 		'crdate' => 'crdate',
 		'cruser_id' => 'cruser_id',
@@ -28,20 +25,16 @@ return array(
 			'endtime' => 'endtime',
 		),
 		'dividers2tabs' => 1,
-		'hideTable' => TRUE,
-		'hideAtCopy' => TRUE,
-		'default_sortby' => 'ORDER BY uid DESC',
-		// the table is non-searchable
-		//'searchFields' => '',
+		'default_sortby' => 'ORDER BY title ASC',
+		// @TODO __replace icon
 		'iconfile' => ExtensionManagementUtility::extRelPath($extKey) . 'Resources/Public/Icons/' . $table . '.gif'
 	),
-
 	'interface' => array(
-		'showRecordFieldList' => 'hidden, item_key, sequence, file, item',
+		'showRecordFieldList' => 'hidden, title, file, hash, forget_on_update',
 	),
 	'types' => array(
 		'0' => array(
-			'showitem' => 'hidden, item_key, sequence, file,
+			'showitem' => 'hidden, title, file, hash, forget_on_update,
 				--div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'
 		),
 	),
@@ -53,7 +46,6 @@ return array(
 			'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.hidden',
 			'config' => array(
 				'type' => 'check',
-				'default' => 1
 			),
 		),
 		'starttime' => array(
@@ -85,24 +77,13 @@ return array(
 			),
 		),
 
-		'item_key' => array(
+		'title' => array(
 			'exclude' => FALSE,
-			'label' => $ll . '.item_key',
+			'label' => $ll . '.title',
 			'config' => array(
 				'type' => 'input',
 				'size' => 40,
-				'max' => 32,
-				'eval' => 'required,uniqueInPid,trim,nospace,alphanum,upper'
-			),
-		),
-		'sequence' => array(
-			'exclude' => FALSE,
-			'label' => $ll . '.sequence',
-			'config' => array(
-				'type' => 'input',
-				'size' => 40,
-				'max' => 32,
-				'eval' => 'required,int'
+				'eval' => 'required,uniqueInPid,trim'
 			),
 		),
 		'file' => array(
@@ -117,13 +98,26 @@ return array(
 						'tablenames' => $table,
 						'table_local' => 'sys_file',
 					),
-				)
+				),
+				'xml'
 			),
 		),
-		'item' => array(
+		'hash' => array(
+			'exclude' => TRUE,
+			'label' => $ll . '.hash',
 			'config' => array(
-				'type' => 'passthrough',
+				'type' => 'input',
+				'size' => 40,
+				'eval' => 'trim'
 			),
+		),
+		'forget_on_update' => array(
+			'exclude' => TRUE,
+			'label' => $ll . '.forget_on_update',
+			'config' => array(
+				'type' => 'check',
+				'default' => 0
+			)
 		),
 
 	),

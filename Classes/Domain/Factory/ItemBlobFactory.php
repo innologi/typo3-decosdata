@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Domain\Factory;
+namespace Innologi\Decosdata\Domain\Factory;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,25 +23,25 @@ namespace Innologi\Decospublisher7\Domain\Factory;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decospublisher7\Mvc\Domain\FactoryAbstract;
-use Innologi\Decospublisher7\Exception\MissingObjectProperty;
+use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
+use Innologi\Decosdata\Exception\MissingObjectProperty;
 /**
  * ItemBlob factory
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class ItemBlobFactory extends FactoryAbstract {
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Repository\ItemBlobRepository
+	 * @var \Innologi\Decosdata\Domain\Repository\ItemBlobRepository
 	 * @inject
 	 */
 	protected $repository;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Factory\FileReferenceFactory
+	 * @var \Innologi\Decosdata\Domain\Factory\FileReferenceFactory
 	 * @inject
 	 */
 	protected $fileReferenceFactory;
@@ -49,12 +49,12 @@ class ItemBlobFactory extends FactoryAbstract {
 	/**
 	 * Sets properties of domain object
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\ItemBlob $object
+	 * @param \Innologi\Decosdata\Domain\Model\ItemBlob $object
 	 * @param array $data
 	 * @return void
-	 * @throws \Innologi\Decospublisher7\Exception\MissingObjectProperty
+	 * @throws \Innologi\Decosdata\Exception\MissingObjectProperty
 	 */
-	protected function setProperties(\Innologi\Decospublisher7\Domain\Model\ItemBlob $object, array $data) {
+	protected function setProperties(\Innologi\Decosdata\Domain\Model\ItemBlob $object, array $data) {
 		if (!isset($data['item_key'][0])) {
 			throw new MissingObjectProperty(array(
 				'item_key',
@@ -88,10 +88,10 @@ class ItemBlobFactory extends FactoryAbstract {
 	 *
 	 * @param string $itemKey
 	 * @param array $data
-	 * @return \Innologi\Decospublisher7\Domain\Model\ItemBlob
+	 * @return \Innologi\Decosdata\Domain\Model\ItemBlob
 	 */
 	public function getByItemKey($itemKey, array $data = array()) {
-		/* @var $itemBlob \Innologi\Decospublisher7\Domain\Model\ItemBlob */
+		/* @var $itemBlob \Innologi\Decosdata\Domain\Model\ItemBlob */
 		$itemBlob = $this->repository->findOneByItemKey($itemKey);
 		if ($itemBlob === NULL) {
 			if (empty($data)) {

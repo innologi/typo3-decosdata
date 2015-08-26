@@ -1,7 +1,7 @@
 #
-# Table structure for table 'tx_decospublisher7_domain_model_field'
+# Table structure for table 'tx_decosdata_domain_model_field'
 #
-CREATE TABLE tx_decospublisher7_domain_model_field (
+CREATE TABLE tx_decosdata_domain_model_field (
 	uid int(11) NOT NULL auto_increment,
 	pid int(11) DEFAULT '0' NOT NULL,
 
@@ -17,9 +17,9 @@ CREATE TABLE tx_decospublisher7_domain_model_field (
 );
 
 #
-# Table structure for table 'tx_decospublisher7_domain_model_itemtype'
+# Table structure for table 'tx_decosdata_domain_model_itemtype'
 #
-CREATE TABLE tx_decospublisher7_domain_model_itemtype (
+CREATE TABLE tx_decosdata_domain_model_itemtype (
 	uid int(11) NOT NULL auto_increment,
 	pid int(11) DEFAULT '0' NOT NULL,
 
@@ -35,9 +35,9 @@ CREATE TABLE tx_decospublisher7_domain_model_itemtype (
 );
 
 #
-# Table structure for table 'tx_decospublisher7_domain_model_import'
+# Table structure for table 'tx_decosdata_domain_model_import'
 #
-CREATE TABLE tx_decospublisher7_domain_model_import (
+CREATE TABLE tx_decosdata_domain_model_import (
 	uid int(11) NOT NULL auto_increment,
 	pid int(11) DEFAULT '0' NOT NULL,
 
@@ -59,9 +59,9 @@ CREATE TABLE tx_decospublisher7_domain_model_import (
 );
 
 #
-# Table structure for table 'tx_decospublisher7_domain_model_item'
+# Table structure for table 'tx_decosdata_domain_model_item'
 #
-CREATE TABLE tx_decospublisher7_domain_model_item (
+CREATE TABLE tx_decosdata_domain_model_item (
 	uid int(11) NOT NULL auto_increment,
 	pid int(11) DEFAULT '0' NOT NULL,
 
@@ -86,9 +86,9 @@ CREATE TABLE tx_decospublisher7_domain_model_item (
 );
 
 #
-# Table structure for table 'tx_decospublisher7_domain_model_itemblob'
+# Table structure for table 'tx_decosdata_domain_model_itemblob'
 #
-CREATE TABLE tx_decospublisher7_domain_model_itemblob (
+CREATE TABLE tx_decosdata_domain_model_itemblob (
 	uid int(11) NOT NULL auto_increment,
 	pid int(11) DEFAULT '0' NOT NULL,
 
@@ -110,9 +110,9 @@ CREATE TABLE tx_decospublisher7_domain_model_itemblob (
 );
 
 #
-# Table structure for table 'tx_decospublisher7_domain_model_itemfield'
+# Table structure for table 'tx_decosdata_domain_model_itemfield'
 #
-CREATE TABLE tx_decospublisher7_domain_model_itemfield (
+CREATE TABLE tx_decosdata_domain_model_itemfield (
 	uid int(11) NOT NULL auto_increment,
 	pid int(11) DEFAULT '0' NOT NULL,
 
@@ -131,9 +131,9 @@ CREATE TABLE tx_decospublisher7_domain_model_itemfield (
 );
 
 #
-# Table structure for table 'tx_decospublisher7_domain_model_profile'
+# Table structure for table 'tx_decosdata_domain_model_profile'
 #
-CREATE TABLE tx_decospublisher7_domain_model_profile (
+CREATE TABLE tx_decosdata_domain_model_profile (
 	uid int(11) NOT NULL auto_increment,
 	pid int(11) DEFAULT '0' NOT NULL,
 
@@ -154,9 +154,9 @@ CREATE TABLE tx_decospublisher7_domain_model_profile (
 );
 
 #
-# Table structure for table 'tx_decospublisher7_domain_model_profilefield'
+# Table structure for table 'tx_decosdata_domain_model_profilefield'
 #
-CREATE TABLE tx_decospublisher7_domain_model_profilefield (
+CREATE TABLE tx_decosdata_domain_model_profilefield (
 	uid int(11) NOT NULL auto_increment,
 	pid int(11) DEFAULT '0' NOT NULL,
 
@@ -175,9 +175,9 @@ CREATE TABLE tx_decospublisher7_domain_model_profilefield (
 );
 
 #
-# Table structure for table 'tx_decospublisher7_item_import_mm'
+# Table structure for table 'tx_decosdata_item_import_mm'
 #
-CREATE TABLE tx_decospublisher7_item_import_mm (
+CREATE TABLE tx_decosdata_item_import_mm (
 	uid_local int(11) unsigned DEFAULT '0' NOT NULL,
 	uid_foreign int(11) unsigned DEFAULT '0' NOT NULL,
 	sorting int(11) unsigned DEFAULT '0' NOT NULL,
@@ -187,9 +187,9 @@ CREATE TABLE tx_decospublisher7_item_import_mm (
 );
 
 #
-# Table structure for table 'tx_decospublisher7_item_item_mm'
+# Table structure for table 'tx_decosdata_item_item_mm'
 #
-CREATE TABLE tx_decospublisher7_item_item_mm (
+CREATE TABLE tx_decosdata_item_item_mm (
 	uid_local int(11) unsigned DEFAULT '0' NOT NULL,
 	uid_foreign int(11) unsigned DEFAULT '0' NOT NULL,
 	sorting int(11) unsigned DEFAULT '0' NOT NULL,

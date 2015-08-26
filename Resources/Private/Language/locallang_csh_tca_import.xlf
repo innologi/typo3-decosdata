@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <xliff version="1.0">
-	<file source-language="en" datatype="plaintext" original="messages" date="2015-03-11T10:37:07Z" product-name="decospublisher7">
+	<file source-language="en" datatype="plaintext" original="messages" date="2015-03-11T10:37:07Z" product-name="decosdata">
 		<header/>
 		<body>
 			<trans-unit id="title.description">
@@ -13,7 +13,7 @@
 				<source>Last processed file hash, used solely by the importer. Don't change this value unless you know what you're doing.</source>
 			</trans-unit>
 			<trans-unit id="forget_on_update.description">
-				<source>When enabled, will allow the import to only retain data from the very latest update it received. This is useful for use-cases where the import-updates provided represent the total amount of Decos DMS data to be usable by Decos Publisher for this specific import.</source>
+				<source>When enabled, will allow the import to only retain data from the very latest update it received. This is useful for use-cases where the import-updates provided represent the total amount of Decos DMS data to be usable by the extension for this specific import.</source>
 			</trans-unit>
 		</body>
 	</file>

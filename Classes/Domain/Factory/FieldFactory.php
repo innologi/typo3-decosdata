@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Domain\Factory;
+namespace Innologi\Decosdata\Domain\Factory;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,19 +23,19 @@ namespace Innologi\Decospublisher7\Domain\Factory;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decospublisher7\Mvc\Domain\FactoryAbstract;
-use Innologi\Decospublisher7\Exception\MissingObjectProperty;
+use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
+use Innologi\Decosdata\Exception\MissingObjectProperty;
 /**
  * Field factory
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class FieldFactory extends FactoryAbstract {
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Repository\FieldRepository
+	 * @var \Innologi\Decosdata\Domain\Repository\FieldRepository
 	 * @inject
 	 */
 	protected $repository;
@@ -43,12 +43,12 @@ class FieldFactory extends FactoryAbstract {
 	/**
 	 * Sets properties of domain object
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\Field $object
+	 * @param \Innologi\Decosdata\Domain\Model\Field $object
 	 * @param array $data
 	 * @return void
-	 * @throws \Innologi\Decospublisher7\Exception\MissingObjectProperty
+	 * @throws \Innologi\Decosdata\Exception\MissingObjectProperty
 	 */
-	protected function setProperties(\Innologi\Decospublisher7\Domain\Model\Field $object, array $data) {
+	protected function setProperties(\Innologi\Decosdata\Domain\Model\Field $object, array $data) {
 		if (!isset($data['field_name'][0])) {
 			throw new MissingObjectProperty(array(
 				'field_name',
@@ -69,11 +69,11 @@ class FieldFactory extends FactoryAbstract {
 	 *
 	 * @param string $fieldName
 	 * @param boolean $autoInsert
-	 * @return \Innologi\Decospublisher7\Domain\Model\Field
+	 * @return \Innologi\Decosdata\Domain\Model\Field
 	 */
 	public function getByFieldName($fieldName, $autoInsert = FALSE) {
 		if (!isset($objectCache[$fieldName])) {
-			/* @var $fieldObject \Innologi\Decospublisher7\Domain\Model\Field */
+			/* @var $fieldObject \Innologi\Decosdata\Domain\Model\Field */
 			$fieldObject = $this->repository->findOneByFieldName($fieldName);
 			if ($fieldObject === NULL) {
 				$data = array('field_name' => $fieldName);

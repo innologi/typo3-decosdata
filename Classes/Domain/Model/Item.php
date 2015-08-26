@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Domain\Model;
+namespace Innologi\Decosdata\Domain\Model;
 /***************************************************************
  *  Copyright notice
  *
@@ -28,7 +28,7 @@ use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 /**
  * Item domain model
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -44,7 +44,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Item Type
 	 *
-	 * @var \Innologi\Decospublisher7\Domain\Model\ItemType
+	 * @var \Innologi\Decosdata\Domain\Model\ItemType
 	 * @lazy
 	 */
 	protected $itemType;
@@ -52,7 +52,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Item Field
 	 *
-	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\ItemField>
+	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\ItemField>
 	 * @lazy
 	 */
 	protected $itemField;
@@ -60,7 +60,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Item Blob
 	 *
-	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\ItemBlob>
+	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\ItemBlob>
 	 * @lazy
 	 */
 	protected $itemBlob;
@@ -68,7 +68,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Import
 	 *
-	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\Import>
+	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Import>
 	 * @lazy
 	 */
 	protected $import;
@@ -76,7 +76,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Parent Item
 	 *
-	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\Item>
+	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Item>
 	 * @lazy
 	 */
 	protected $parentItem;
@@ -84,7 +84,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Child Item
 	 *
-	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\Item>
+	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Item>
 	 * @lazy
 	 */
 	protected $childItem;
@@ -123,7 +123,7 @@ class Item extends AbstractEntity {
 	 * Sets the itemKey
 	 *
 	 * @param string $itemKey
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
 	public function setItemKey($itemKey) {
 		$this->itemKey = $itemKey;
@@ -133,7 +133,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Returns the itemType
 	 *
-	 * @return \Innologi\Decospublisher7\Domain\Model\ItemType $itemType
+	 * @return \Innologi\Decosdata\Domain\Model\ItemType $itemType
 	 */
 	public function getItemType() {
 		return $this->itemType;
@@ -142,10 +142,10 @@ class Item extends AbstractEntity {
 	/**
 	 * Sets the itemType
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\ItemType $itemType
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \Innologi\Decosdata\Domain\Model\ItemType $itemType
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
-	public function setItemType(\Innologi\Decospublisher7\Domain\Model\ItemType $itemType) {
+	public function setItemType(\Innologi\Decosdata\Domain\Model\ItemType $itemType) {
 		$this->itemType = $itemType;
 		return $this;
 	}
@@ -153,10 +153,10 @@ class Item extends AbstractEntity {
 	/**
 	 * Adds an ItemField
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\ItemField $itemField
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \Innologi\Decosdata\Domain\Model\ItemField $itemField
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
-	public function addItemField(\Innologi\Decospublisher7\Domain\Model\ItemField $itemField) {
+	public function addItemField(\Innologi\Decosdata\Domain\Model\ItemField $itemField) {
 		$this->itemField->attach($itemField);
 		return $this;
 	}
@@ -164,10 +164,10 @@ class Item extends AbstractEntity {
 	/**
 	 * Removes an ItemField
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\ItemField $itemField The ItemField to be removed
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \Innologi\Decosdata\Domain\Model\ItemField $itemField The ItemField to be removed
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
-	public function removeItemField(\Innologi\Decospublisher7\Domain\Model\ItemField $itemField) {
+	public function removeItemField(\Innologi\Decosdata\Domain\Model\ItemField $itemField) {
 		$this->itemField->detach($itemField);
 		return $this;
 	}
@@ -175,7 +175,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Returns the itemField
 	 *
-	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage|\Innologi\Decospublisher7\Domain\Model\ItemField[] $itemField
+	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage|\Innologi\Decosdata\Domain\Model\ItemField[] $itemField
 	 */
 	public function getItemField() {
 		return $this->itemField;
@@ -185,7 +185,7 @@ class Item extends AbstractEntity {
 	 * Sets the itemField
 	 *
 	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage $itemField
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
 	public function setItemField(\TYPO3\CMS\Extbase\Persistence\ObjectStorage $itemField) {
 		$this->itemField = $itemField;
@@ -195,10 +195,10 @@ class Item extends AbstractEntity {
 	/**
 	 * Adds an ItemBlob
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\ItemBlob $itemBlob
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \Innologi\Decosdata\Domain\Model\ItemBlob $itemBlob
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
-	public function addItemBlob(\Innologi\Decospublisher7\Domain\Model\ItemBlob $itemBlob) {
+	public function addItemBlob(\Innologi\Decosdata\Domain\Model\ItemBlob $itemBlob) {
 		$this->itemBlob->attach($itemBlob);
 		return $this;
 	}
@@ -206,10 +206,10 @@ class Item extends AbstractEntity {
 	/**
 	 * Removes an ItemBlob
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\ItemBlob $itemBlob The ItemBlob to be removed
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \Innologi\Decosdata\Domain\Model\ItemBlob $itemBlob The ItemBlob to be removed
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
-	public function removeItemBlob(\Innologi\Decospublisher7\Domain\Model\ItemBlob $itemBlob) {
+	public function removeItemBlob(\Innologi\Decosdata\Domain\Model\ItemBlob $itemBlob) {
 		$this->itemBlob->detach($itemBlob);
 		return $this;
 	}
@@ -217,7 +217,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Returns the itemBlob
 	 *
-	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\ItemBlob> $itemBlob
+	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\ItemBlob> $itemBlob
 	 */
 	public function getItemBlob() {
 		return $this->itemBlob;
@@ -226,8 +226,8 @@ class Item extends AbstractEntity {
 	/**
 	 * Sets the itemBlob
 	 *
-	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\ItemBlob> $itemBlob
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\ItemBlob> $itemBlob
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
 	public function setItemBlob(\TYPO3\CMS\Extbase\Persistence\ObjectStorage $itemBlob) {
 		$this->itemBlob = $itemBlob;
@@ -237,10 +237,10 @@ class Item extends AbstractEntity {
 	/**
 	 * Adds an Import
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\Import $import
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \Innologi\Decosdata\Domain\Model\Import $import
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
-	public function addImport(\Innologi\Decospublisher7\Domain\Model\Import $import) {
+	public function addImport(\Innologi\Decosdata\Domain\Model\Import $import) {
 		$this->import->attach($import);
 		return $this;
 	}
@@ -248,10 +248,10 @@ class Item extends AbstractEntity {
 	/**
 	 * Removes an Import
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\Import $import The Import to be removed
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \Innologi\Decosdata\Domain\Model\Import $import The Import to be removed
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
-	public function removeImport(\Innologi\Decospublisher7\Domain\Model\Import $import) {
+	public function removeImport(\Innologi\Decosdata\Domain\Model\Import $import) {
 		$this->import->detach($import);
 		return $this;
 	}
@@ -259,7 +259,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Returns the import
 	 *
-	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\Import> $import
+	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Import> $import
 	 */
 	public function getImport() {
 		return $this->import;
@@ -268,8 +268,8 @@ class Item extends AbstractEntity {
 	/**
 	 * Sets the import
 	 *
-	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\Import> $import
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Import> $import
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
 	public function setImport(\TYPO3\CMS\Extbase\Persistence\ObjectStorage $import) {
 		$this->import = $import;
@@ -279,10 +279,10 @@ class Item extends AbstractEntity {
 	/**
 	 * Adds a parentItem
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\Item $parentItem
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \Innologi\Decosdata\Domain\Model\Item $parentItem
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
-	public function addParentItem(\Innologi\Decospublisher7\Domain\Model\Item $parentItem) {
+	public function addParentItem(\Innologi\Decosdata\Domain\Model\Item $parentItem) {
 		$this->parentItem->attach($parentItem);
 		return $this;
 	}
@@ -290,10 +290,10 @@ class Item extends AbstractEntity {
 	/**
 	 * Removes a parentItem
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\Item $parentItem The Item to be removed
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \Innologi\Decosdata\Domain\Model\Item $parentItem The Item to be removed
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
-	public function removeParentItem(\Innologi\Decospublisher7\Domain\Model\Item $parentItem) {
+	public function removeParentItem(\Innologi\Decosdata\Domain\Model\Item $parentItem) {
 		$this->parentItem->detach($parentItem);
 		return $this;
 	}
@@ -301,7 +301,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Returns the parentItem
 	 *
-	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\Item> $parentItem
+	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Item> $parentItem
 	 */
 	public function getParentItem() {
 		return $this->parentItem;
@@ -310,8 +310,8 @@ class Item extends AbstractEntity {
 	/**
 	 * Sets the parentItem
 	 *
-	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\Item> $parentItem
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Item> $parentItem
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
 	public function setParentItem(\TYPO3\CMS\Extbase\Persistence\ObjectStorage $parentItem) {
 		$this->parentItem = $parentItem;
@@ -321,10 +321,10 @@ class Item extends AbstractEntity {
 	/**
 	 * Adds a childItem
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\Item $childItem
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \Innologi\Decosdata\Domain\Model\Item $childItem
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
-	public function addChildItem(\Innologi\Decospublisher7\Domain\Model\Item $childItem) {
+	public function addChildItem(\Innologi\Decosdata\Domain\Model\Item $childItem) {
 		$this->childItem->attach($childItem);
 		return $this;
 	}
@@ -332,10 +332,10 @@ class Item extends AbstractEntity {
 	/**
 	 * Removes a childItem
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\Item $childItem The Item to be removed
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \Innologi\Decosdata\Domain\Model\Item $childItem The Item to be removed
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
-	public function removeChildItem(\Innologi\Decospublisher7\Domain\Model\Item $childItem) {
+	public function removeChildItem(\Innologi\Decosdata\Domain\Model\Item $childItem) {
 		$this->childItem->detach($childItem);
 		return $this;
 	}
@@ -343,7 +343,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Returns the childItem
 	 *
-	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\Item> $childItem
+	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Item> $childItem
 	 */
 	public function getChildItem() {
 		return $this->childItem;
@@ -352,8 +352,8 @@ class Item extends AbstractEntity {
 	/**
 	 * Sets the childItem
 	 *
-	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decospublisher7\Domain\Model\Item> $childItem
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Item> $childItem
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
 	public function setChildItem(\TYPO3\CMS\Extbase\Persistence\ObjectStorage $childItem) {
 		$this->childItem = $childItem;

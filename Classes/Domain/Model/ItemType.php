@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Domain\Model;
+namespace Innologi\Decosdata\Domain\Model;
 /***************************************************************
  *  Copyright notice
  *
@@ -27,7 +27,7 @@ use \TYPO3\CMS\Extbase\DomainObject\AbstractValueObject;
 /**
  * ItemType domain model
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -54,7 +54,7 @@ class ItemType extends AbstractValueObject {
 	 * Sets the type
 	 *
 	 * @param string $itemType
-	 * @return \Innologi\Decospublisher7\Domain\Model\ItemType
+	 * @return \Innologi\Decosdata\Domain\Model\ItemType
 	 */
 	public function setItemType($itemType) {
 		$this->itemType = $itemType;

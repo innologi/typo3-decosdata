@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Service\Importer\StorageHandler;
+namespace Innologi\Decosdata\Service\Importer\StorageHandler;
 /***************************************************************
  *  Copyright notice
  *
@@ -36,7 +36,7 @@ use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
  * Its performance impact compared to the classic storage handler was measured to be
  * a factor of 3.1
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -55,49 +55,49 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	protected $persistenceManager;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Repository\ItemRepository
+	 * @var \Innologi\Decosdata\Domain\Repository\ItemRepository
 	 * @inject
 	 */
 	protected $itemRepository;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Repository\ItemFieldRepository
+	 * @var \Innologi\Decosdata\Domain\Repository\ItemFieldRepository
 	 * @inject
 	 */
 	protected $itemFieldRepository;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Repository\ItemBlobRepository
+	 * @var \Innologi\Decosdata\Domain\Repository\ItemBlobRepository
 	 * @inject
 	 */
 	protected $itemBlobRepository;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Factory\ItemFactory
+	 * @var \Innologi\Decosdata\Domain\Factory\ItemFactory
 	 * @inject
 	 */
 	protected $itemFactory;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Factory\ItemFieldFactory
+	 * @var \Innologi\Decosdata\Domain\Factory\ItemFieldFactory
 	 * @inject
 	 */
 	protected $itemFieldFactory;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Factory\ItemBlobFactory
+	 * @var \Innologi\Decosdata\Domain\Factory\ItemBlobFactory
 	 * @inject
 	 */
 	protected $itemBlobFactory;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Factory\ItemTypeFactory
+	 * @var \Innologi\Decosdata\Domain\Factory\ItemTypeFactory
 	 * @inject
 	 */
 	protected $itemTypeFactory;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Factory\FieldFactory
+	 * @var \Innologi\Decosdata\Domain\Factory\FieldFactory
 	 * @inject
 	 */
 	protected $fieldFactory;
@@ -176,10 +176,10 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * Push an item ready for commit.
 	 *
 	 * @param array $data
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
 	public function pushItem(array $data) {
-		/* @var $parentItem \Innologi\Decospublisher7\Domain\Model\Item */
+		/* @var $parentItem \Innologi\Decosdata\Domain\Model\Item */
 		$parentItem = $data['parent_item'];
 		unset($data['parent_item']);
 
@@ -207,7 +207,7 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @return void
 	 */
 	public function pushItemBlob(array $data) {
-		/* @var $parentItem \Innologi\Decospublisher7\Domain\Model\Item */
+		/* @var $parentItem \Innologi\Decosdata\Domain\Model\Item */
 		$parentItem = $data['item'];
 		unset($data['item']);
 
@@ -227,7 +227,7 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @return void
 	 */
 	public function pushItemField(array $data) {
-		/* @var $parentItem \Innologi\Decospublisher7\Domain\Model\Item */
+		/* @var $parentItem \Innologi\Decosdata\Domain\Model\Item */
 		$parentItem = $data['item'];
 		unset($data['item']);
 

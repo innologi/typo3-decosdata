@@ -5,7 +5,7 @@ if (!defined('TYPO3_MODE')) {
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
-$extKey = 'decospublisher7';
+$extKey = 'decosdata';
 $table = 'tx_' . $extKey . '_domain_model_profile';
 $ll = 'LLL:EXT:' . $extKey . '/Resources/Private/Language/locallang_db.xlf:' . $table;
 
@@ -79,12 +79,12 @@ return array(
 			'label' => $ll . '.profile_field',
 			'config' => array(
 				'type' => 'inline',
-				'foreign_table' => 'tx_decospublisher7_domain_model_profilefield',
+				'foreign_table' => 'tx_decosdata_domain_model_profilefield',
 				'foreign_field' => 'profile',
 				// this can easily be circumvented, see profilefield.field TCA for solution
 				'foreign_unique' => 'field',
 				// @LOW __since these are id's now, it seems I can't sort on field.field_name anymore
-				'foreign_default_sortby' => 'tx_decospublisher7_domain_model_profilefield.field ASC',
+				'foreign_default_sortby' => 'tx_decosdata_domain_model_profilefield.field ASC',
 				// override ctrl/label setting
 				'foreign_label' => 'field',
 				'foreign_selector' => 'field',

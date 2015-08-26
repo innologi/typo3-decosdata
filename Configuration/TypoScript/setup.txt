@@ -1,6 +1,6 @@
 # Plugin configuration
-plugin.tx_decospublisher7 {
+plugin.tx_decosdata {
 	persistence {
-		storagePid = {$plugin.tx_decospublisher7.persistence.storagePid}
+		storagePid = {$plugin.tx_decosdata.persistence.storagePid}
 	}
 }

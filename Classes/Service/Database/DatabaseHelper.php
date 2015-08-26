@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Service\Database;
+namespace Innologi\Decosdata\Service\Database;
 /***************************************************************
  *  Copyright notice
  *
@@ -25,7 +25,7 @@ namespace Innologi\Decospublisher7\Service\Database;
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
-use Innologi\Decospublisher7\Exception\SqlError;
+use Innologi\Decosdata\Exception\SqlError;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 /**
  * Database Helper
@@ -33,7 +33,7 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
  * Provides much used methods for constructing or executing database queries
  * the non-FLOW way.
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -45,7 +45,7 @@ class DatabaseHelper implements SingletonInterface {
 	protected $databaseConnection;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Service\Database\QueryProviderInterface
+	 * @var \Innologi\Decosdata\Service\Database\QueryProviderInterface
 	 * @inject
 	 */
 	protected $queryProvider;
@@ -135,7 +135,7 @@ class DatabaseHelper implements SingletonInterface {
 	 * @param string $table
 	 * @param array $data
 	 * @return integer|NULL
-	 * @throws \Innologi\Decospublisher7\Exception\SqlError
+	 * @throws \Innologi\Decosdata\Exception\SqlError
 	 */
 	public function getLastUidOfMatch($table, array $data) {
 		$row = $this->databaseConnection->exec_SELECTgetSingleRow(

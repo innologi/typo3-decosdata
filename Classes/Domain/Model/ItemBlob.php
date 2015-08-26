@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Domain\Model;
+namespace Innologi\Decosdata\Domain\Model;
 /***************************************************************
  *  Copyright notice
  *
@@ -27,7 +27,7 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 /**
  * ItemBlob domain model
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -58,7 +58,7 @@ class ItemBlob extends AbstractEntity {
 	/**
 	 * Item
 	 *
-	 * @var \Innologi\Decospublisher7\Domain\Model\Item
+	 * @var \Innologi\Decosdata\Domain\Model\Item
 	 */
 	protected $item;
 
@@ -75,7 +75,7 @@ class ItemBlob extends AbstractEntity {
 	 * Sets the itemKey
 	 *
 	 * @param string $itemKey
-	 * @return \Innologi\Decospublisher7\Domain\Model\ItemBlob
+	 * @return \Innologi\Decosdata\Domain\Model\ItemBlob
 	 */
 	public function setItemKey($itemKey) {
 		$this->itemKey = $itemKey;
@@ -95,7 +95,7 @@ class ItemBlob extends AbstractEntity {
 	 * Sets the sequence
 	 *
 	 * @param string $sequence
-	 * @return \Innologi\Decospublisher7\Domain\Model\ItemBlob
+	 * @return \Innologi\Decosdata\Domain\Model\ItemBlob
 	 */
 	public function setSequence($sequence) {
 		$this->sequence = $sequence;
@@ -115,7 +115,7 @@ class ItemBlob extends AbstractEntity {
 	 * Sets the file
 	 *
 	 * @param \TYPO3\CMS\Extbase\Domain\Model\FileReference $file
-	 * @return \Innologi\Decospublisher7\Domain\Model\ItemBlob
+	 * @return \Innologi\Decosdata\Domain\Model\ItemBlob
 	 */
 	public function setFile(\TYPO3\CMS\Extbase\Domain\Model\FileReference $file) {
 		$this->file = $file;
@@ -125,7 +125,7 @@ class ItemBlob extends AbstractEntity {
 	/**
 	 * Returns the item
 	 *
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item $item
+	 * @return \Innologi\Decosdata\Domain\Model\Item $item
 	 */
 	public function getItem() {
 		return $this->item;
@@ -134,10 +134,10 @@ class ItemBlob extends AbstractEntity {
 	/**
 	 * Sets the item
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\Item $item
-	 * @return \Innologi\Decospublisher7\Domain\Model\ItemBlob
+	 * @param \Innologi\Decosdata\Domain\Model\Item $item
+	 * @return \Innologi\Decosdata\Domain\Model\ItemBlob
 	 */
-	public function setItem(\Innologi\Decospublisher7\Domain\Model\Item $item) {
+	public function setItem(\Innologi\Decosdata\Domain\Model\Item $item) {
 		$this->item = $item;
 		return $this;
 	}

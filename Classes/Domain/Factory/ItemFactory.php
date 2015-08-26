@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Domain\Factory;
+namespace Innologi\Decosdata\Domain\Factory;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,19 +23,19 @@ namespace Innologi\Decospublisher7\Domain\Factory;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decospublisher7\Mvc\Domain\FactoryAbstract;
-use Innologi\Decospublisher7\Exception\MissingObjectProperty;
+use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
+use Innologi\Decosdata\Exception\MissingObjectProperty;
 /**
  * Item factory
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class ItemFactory extends FactoryAbstract {
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Repository\ItemRepository
+	 * @var \Innologi\Decosdata\Domain\Repository\ItemRepository
 	 * @inject
 	 */
 	protected $repository;
@@ -43,12 +43,12 @@ class ItemFactory extends FactoryAbstract {
 	/**
 	 * Sets properties of domain object
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\Item $object
+	 * @param \Innologi\Decosdata\Domain\Model\Item $object
 	 * @param array $data
 	 * @return void
-	 * @throws \Innologi\Decospublisher7\Exception\MissingObjectProperty
+	 * @throws \Innologi\Decosdata\Exception\MissingObjectProperty
 	 */
-	protected function setProperties(\Innologi\Decospublisher7\Domain\Model\Item $object, array $data) {
+	protected function setProperties(\Innologi\Decosdata\Domain\Model\Item $object, array $data) {
 		if (!isset($data['item_key'][0])) {
 			throw new MissingObjectProperty(array(
 				'item_key',
@@ -94,10 +94,10 @@ class ItemFactory extends FactoryAbstract {
 	 *
 	 * @param string $itemKey
 	 * @param array $data
-	 * @return \Innologi\Decospublisher7\Domain\Model\Item
+	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
 	public function getByItemKey($itemKey, array $data = array()) {
-		/* @var $item \Innologi\Decospublisher7\Domain\Model\Item */
+		/* @var $item \Innologi\Decosdata\Domain\Model\Item */
 		$item = $this->repository->findOneByItemKey($itemKey);
 		if ($item === NULL) {
 			if (empty($data)) {

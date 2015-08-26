@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Library\ExtUpdate;
+namespace Innologi\Decosdata\Library\ExtUpdate;
 /***************************************************************
 *  Copyright notice
 *
@@ -41,12 +41,12 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	protected $flashMessageQueue;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Library\ExtUpdate\Service\DatabaseService
+	 * @var \Innologi\Decosdata\Library\ExtUpdate\Service\DatabaseService
 	 */
 	protected $databaseService;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Library\ExtUpdate\Service\FileService
+	 * @var \Innologi\Decosdata\Library\ExtUpdate\Service\FileService
 	 */
 	protected $fileService;
 

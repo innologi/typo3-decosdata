@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Service\Importer\StorageHandler;
+namespace Innologi\Decosdata\Service\Importer\StorageHandler;
 /***************************************************************
  *  Copyright notice
  *
@@ -25,7 +25,7 @@ namespace Innologi\Decospublisher7\Service\Importer\StorageHandler;
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
-use Innologi\Decospublisher7\Exception\SqlError;
+use Innologi\Decosdata\Exception\SqlError;
 /**
  * Importer Storage Handler: Classic Edition
  *
@@ -34,7 +34,7 @@ use Innologi\Decospublisher7\Exception\SqlError;
  * update TYPO3-specific reference fields, with the exception of FileReferences.
  * However, the extension doesn't really rely on them to function properly.
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -46,13 +46,13 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	protected $databaseConnection;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Service\Database\DatabaseHelper
+	 * @var \Innologi\Decosdata\Service\Database\DatabaseHelper
 	 * @inject
 	 */
 	protected $databaseHelper;
 
 	/**
-	 * @var \Innologi\Decospublisher7\Domain\Repository\FileReferenceRepository
+	 * @var \Innologi\Decosdata\Domain\Repository\FileReferenceRepository
 	 * @inject
 	 */
 	protected $fileReferenceRepository;
@@ -116,7 +116,7 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @return integer
 	 */
 	public function pushItem(array $data) {
-		$table = 'tx_decospublisher7_domain_model_item';
+		$table = 'tx_decosdata_domain_model_item';
 		$insert = array_merge(
 			$this->propertyDefaults,
 			array(
@@ -140,15 +140,15 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 			: $this->getItemFields($uid, $insert['pid']);
 
 		// push import-relation
-		$table = 'tx_decospublisher7_item_import_mm';
-		/* @var $import \Innologi\Decospublisher7\Domain\Model\Import */
+		$table = 'tx_decosdata_item_import_mm';
+		/* @var $import \Innologi\Decosdata\Domain\Model\Import */
 		foreach ($data['import'] as $import) {
 			$this->databaseHelper->insertMmRelationIfNotExists($table, $uid, $import->getUid());
 		}
 
 		// push parent-relation
 		if ($data['parent_item'] !== NULL) {
-			$table = 'tx_decospublisher7_item_item_mm';
+			$table = 'tx_decosdata_item_item_mm';
 			$this->databaseHelper->insertMmRelationIfNotExists($table, $uid, (int) $data['parent_item']);
 		}
 
@@ -165,7 +165,7 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 		$filePath = $data['filepath'];
 		unset($data['filepath']);
 
-		$table = 'tx_decospublisher7_domain_model_itemblob';
+		$table = 'tx_decosdata_domain_model_itemblob';
 		$data = array_merge($this->propertyDefaults, $data);
 		$this->databaseHelper->execUpsertQuery($table, $data, array('pid', 'item_key'));
 		$uid = $this->databaseHelper->getLastUid();
@@ -186,7 +186,7 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @return void
 	 */
 	public function pushItemField(array $data) {
-		$table = 'tx_decospublisher7_domain_model_itemfield';
+		$table = 'tx_decosdata_domain_model_itemfield';
 		$data = array_merge($this->propertyDefaults, $data);
 		$data['field'] = $this->getFieldUid($data['field']);
 
@@ -244,7 +244,7 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	protected function getItemTypeUid($type) {
 		if (!isset($this->itemTypeCache[$type])) {
 			$this->itemTypeCache[$type] = $this->produceValueObjectUid(
-				'tx_decospublisher7_domain_model_itemtype',
+				'tx_decosdata_domain_model_itemtype',
 				array('item_type' => $type)
 			);
 		}
@@ -260,7 +260,7 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	protected function getFieldUid($field) {
 		if (!isset($this->fieldCache[$field])) {
 			$this->fieldCache[$field] = $this->produceValueObjectUid(
-				'tx_decospublisher7_domain_model_field',
+				'tx_decosdata_domain_model_field',
 				array('field_name' => $field)
 			);
 		}
@@ -299,10 +299,10 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @param integer $itemUid
 	 * @param integer $pageUid
 	 * @return array
-	 * @throws \Innologi\Decospublisher7\Exception\SqlError
+	 * @throws \Innologi\Decosdata\Exception\SqlError
 	 */
 	protected function getItemFields($itemUid, $pageUid) {
-		$table = 'tx_decospublisher7_domain_model_itemfield';
+		$table = 'tx_decosdata_domain_model_itemfield';
 		$rows = $this->databaseConnection->exec_SELECTgetRows(
 			'field, field_value',
 			$table,

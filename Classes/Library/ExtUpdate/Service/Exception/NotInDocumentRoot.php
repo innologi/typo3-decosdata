@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Library\ExtUpdate\Service\Exception;
+namespace Innologi\Decosdata\Library\ExtUpdate\Service\Exception;
 /***************************************************************
  *  Copyright notice
  *

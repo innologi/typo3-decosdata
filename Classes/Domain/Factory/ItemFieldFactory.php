@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decospublisher7\Domain\Factory;
+namespace Innologi\Decosdata\Domain\Factory;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,11 +23,11 @@ namespace Innologi\Decospublisher7\Domain\Factory;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decospublisher7\Mvc\Domain\FactoryAbstract;
+use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
 /**
  * ItemField factory
  *
- * @package decospublisher7
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -36,11 +36,11 @@ class ItemFieldFactory extends FactoryAbstract {
 	/**
 	 * Sets properties of domain object
 	 *
-	 * @param \Innologi\Decospublisher7\Domain\Model\ItemField $object
+	 * @param \Innologi\Decosdata\Domain\Model\ItemField $object
 	 * @param array $data
 	 * @return void
 	 */
-	protected function setProperties(\Innologi\Decospublisher7\Domain\Model\ItemField $object, array $data) {
+	protected function setProperties(\Innologi\Decosdata\Domain\Model\ItemField $object, array $data) {
 		if (isset($data['item'])) {
 			$object->setItem($data['item']);
 		}
