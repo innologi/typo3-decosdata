@@ -28,7 +28,8 @@ use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 /**
  * Ext Update Database Service
  *
- * Provides several file methods for common use-cases in ext-update context
+ * Provides several file methods for common use-cases in ext-update context.
+ * Note that it must be instantiated with the ObjectManager!
  *
  * @package InnologiLibs
  * @subpackage ExtUpdate
@@ -39,8 +40,15 @@ class FileService implements SingletonInterface {
 
 	/**
 	 * @var \TYPO3\CMS\Core\Resource\ResourceFactory
+	 * @inject
 	 */
 	protected $resourceFactory;
+
+	/**
+	 * @var \Innologi\Decosdata\Library\FalApi\FileReferenceRepository
+	 * @inject
+	 */
+	protected $fileReferenceRepository;
 
 	/**
 	 * Language labels => messages
@@ -51,15 +59,6 @@ class FileService implements SingletonInterface {
 		'notExist' => 'The file \'<code>%1$s</code>\' does not exist.',
 		'notDocRoot' => 'The file \'<code>%1$s</code>\' lives outside of document root \'<code>%2$s</code>\'.'
 	);
-
-	/**
-	 * Constructor
-	 *
-	 * @return void
-	 */
-	public function __construct() {
-		$this->resourceFactory = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\ResourceFactory');
-	}
 
 	/**
 	 * Retrieve an existing FAL file object, or create a new one if
@@ -84,7 +83,21 @@ class FileService implements SingletonInterface {
 		// this method creates the record if one does not yet exist
 		return $this->resourceFactory->retrieveFileOrFolderObject($path);
 	}
-	# @FIX ______we need FileReference objects instead, see importerService
+
+	/**
+	 * Sets a new file reference
+	 *
+	 * @param integer $fileUid
+	 * @param string $foreignTable
+	 * @param integer $foreignUid
+	 * @param string $foreignField
+	 * @param integer $pid
+	 * @return void
+	 */
+	public function setFileReference($fileUid, $foreignTable, $foreignUid, $foreignField, $pid) {
+		$this->fileReferenceRepository->setStoragePid($pid);
+		$this->fileReferenceRepository->addRecord($fileUid, $foreignTable, $foreignUid, $foreignField);
+	}
 
 	/**
 	 * Returns a File Object.
