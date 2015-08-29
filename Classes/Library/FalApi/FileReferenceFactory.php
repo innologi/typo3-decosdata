@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Domain\Factory;
+namespace Innologi\Decosdata\Library\FalApi;
 /***************************************************************
  *  Copyright notice
  *
@@ -24,7 +24,6 @@ namespace Innologi\Decosdata\Domain\Factory;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use Innologi\Decosdata\Exception\FileException;
 /**
  * FileReference Domain Object factory
  *
@@ -43,12 +42,12 @@ use Innologi\Decosdata\Exception\FileException;
  *		)
  *	),
  *
- * @package decosdata
+ * @package InnologiLibs
+ * @subpackage FalApi
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class FileReferenceFactory implements SingletonInterface {
-	// @LOW ___make this an InnologiLibs thing, and let extUpdate use it if possible?
 
 	/**
 	 * @var \TYPO3\CMS\Core\Resource\ResourceFactory
@@ -67,12 +66,12 @@ class FileReferenceFactory implements SingletonInterface {
 	 *
 	 * @param string filePath
 	 * @return \TYPO3\CMS\Extbase\Domain\Model\FileReference
-	 * @throws \Innologi\Decosdata\Exception\FileException
+	 * @throws Exception\FileException
 	 */
 	public function createByFilePath($filePath) {
 		$fileObject = $this->resourceFactory->retrieveFileOrFolderObject($filePath);
 		if ( !($fileObject instanceof \TYPO3\CMS\Core\Resource\File) ) {
-			throw new FileException(array($filePath));
+			throw new Exception\FileException(array($filePath));
 		}
 		return $this->create(array(
 			'uid_local' => $fileObject->getUid()

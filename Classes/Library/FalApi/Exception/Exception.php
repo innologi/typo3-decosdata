@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Exception;
+namespace Innologi\Decosdata\Library\FalApi\Exception;
 /***************************************************************
  *  Copyright notice
  *
@@ -25,17 +25,29 @@ namespace Innologi\Decosdata\Exception;
  ***************************************************************/
 
 /**
- * File Reference Exception
+ * Exception Class
  *
- * @package decosdata
+ * @package InnologiLibs
+ * @subpackage FalApi
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileReferenceException extends Exception {
+class Exception extends \Exception {
 
 	/**
-	 * @var string
+	 * Class constructor
+	 *
+	 * @param array $messageArguments (optional)
+	 * @param string $message (optional)
+	 * @return void
 	 */
-	protected $message = 'Failed to create a file reference record: %1$s';
+	public function __construct(array $messageArguments = NULL, $message = NULL) {
+		if ($message !== NULL) {
+			$this->message = $message;
+		}
+		if ($messageArguments !== NULL) {
+			$this->message = vsprintf($this->message, $messageArguments);
+		}
+	}
 
 }

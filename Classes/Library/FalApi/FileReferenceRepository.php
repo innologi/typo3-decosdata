@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Domain\Repository;
+namespace Innologi\Decosdata\Library\FalApi;
 /***************************************************************
  *  Copyright notice
  *
@@ -26,9 +26,8 @@ namespace Innologi\Decosdata\Domain\Repository;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\DebugUtility;
-use Innologi\Decosdata\Exception\FileException;
-use Innologi\Decosdata\Exception\FileReferenceException;
-use Innologi\Decosdata\Exception\SqlError;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
+
 /**
  * File Reference repository
  *
@@ -40,7 +39,8 @@ use Innologi\Decosdata\Exception\SqlError;
  * is disabled or not available. Otherwise you should use the
  * FileReferenceFactory and simply persist its parentObject.
  *
- * @package decosdata
+ * @package InnologiLibs
+ * @subpackage FalApi
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
@@ -60,17 +60,6 @@ class FileReferenceRepository implements SingletonInterface {
 	 * @var integer
 	 */
 	protected $storagePid = 0;
-
-	/**
-	 * @var \TYPO3\CMS\Core\Database\DatabaseConnection
-	 */
-	protected $databaseConnection;
-
-	/**
-	 * @var \Innologi\Decosdata\Service\Database\DatabaseHelper
-	 * @inject
-	 */
-	protected $databaseHelper;
 
 	/**
 	 * @var \TYPO3\CMS\Core\DataHandling\DataHandler
@@ -96,9 +85,7 @@ class FileReferenceRepository implements SingletonInterface {
 	 * @return void
 	 */
 	public function __construct() {
-		$this->databaseConnection = $GLOBALS['TYPO3_DB'];
-		$this->databaseConnection->store_lastBuiltQuery = TRUE;
-		// this is enough to keep our DataHandler-method-calls from failing
+		// this is enough to keep our DataHandler-method-calls from failing outside of BE
 		$this->beUser = isset($GLOBALS['BE_USER'])
 			? $GLOBALS['BE_USER']
 			: GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Authentication\\BackendUserAuthentication');
@@ -115,7 +102,7 @@ class FileReferenceRepository implements SingletonInterface {
 	 * @param string $foreignField
 	 * @param string $referenceUid (optional)
 	 * @return void
-	 * @throws \Innologi\Decosdata\Exception\FileReferenceException
+	 * @throws Exception\FileReferenceException
 	 */
 	public function addRecord($fileUid, $foreignTable, $foreignUid, $foreignField, $referenceUid = NULL) {
 		if ($referenceUid === NULL) {
@@ -144,7 +131,7 @@ class FileReferenceRepository implements SingletonInterface {
 		$this->dataHandler->start($data, array(), $this->beUser);
 		$this->dataHandler->process_datamap();
 		if ($this->dataHandler->errorLog) {
-			throw new FileReferenceException(array(
+			throw new Exception\FileReferenceException(array(
 				DebugUtility::viewArray($this->dataHandler->errorLog)
 			));
 		}
@@ -164,13 +151,13 @@ class FileReferenceRepository implements SingletonInterface {
 	 * @param string $foreignField
 	 * @param string $referenceUid (optional)
 	 * @return void
-	 * @throws \Innologi\Decosdata\Exception\FileException
+	 * @throws Exception\FileException
 	 * @see addRecord()
 	 */
 	public function addRecordByFilePath($filePath, $foreignTable, $foreignUid, $foreignField, $referenceUid = NULL) {
 		$fileObject = $this->resourceFactory->retrieveFileOrFolderObject($filePath);
 		if ( !($fileObject instanceof TYPO3\CMS\Core\Resource\File) ) {
-			throw new FileException(array($filePath));
+			throw new Exception\FileException(array($filePath));
 		}
 		$this->addRecord($fileObject->getUid(), $foreignTable, $foreignUid, $foreignField, $referenceUid);
 	}
@@ -224,13 +211,13 @@ class FileReferenceRepository implements SingletonInterface {
 	 * @param integer $foreignUid
 	 * @param string $foreignField
 	 * @return void
-	 * @throws \Innologi\Decosdata\Exception\FileException
+	 * @throws Exception\FileException
 	 * @see upsertRecord()
 	 */
 	public function upsertRecordByFilePath($filePath, $foreignTable, $foreignUid, $foreignField) {
 		$fileObject = $this->resourceFactory->retrieveFileOrFolderObject($filePath);
 		if ( !($fileObject instanceof \TYPO3\CMS\Core\Resource\File) ) {
-			throw new FileException(array($filePath));
+			throw new Exception\FileException(array($filePath));
 		}
 		$this->upsertRecord($fileObject->getUid(), $foreignTable, $foreignUid, $foreignField);
 	}
@@ -239,25 +226,35 @@ class FileReferenceRepository implements SingletonInterface {
 	 * Returns a single reference record that matches $data
 	 * conditions.
 	 *
-	 * @param array $data Contains field => value conditions
+	 * @param array $data Contains property => value conditions
 	 * @return array|boolean
-	 * @throws \Innologi\Decosdata\Exception\SqlError
+	 * @throws Exception\SqlError
 	 */
 	public function findOneByData(array $data) {
+		/* @var $databaseConnection \TYPO3\CMS\Core\Database\DatabaseConnection */
+		$databaseConnection = $GLOBALS['TYPO3_DB'];
+		$databaseConnection->store_lastBuiltQuery = TRUE;
+
 		$data['pid'] = $this->storagePid;
 		$data['deleted'] = 0;
 
-		$row = $this->databaseConnection->exec_SELECTgetSingleRow(
+		$where = array();
+		foreach ($data as $property => $value) {
+			$where[] = $property . '=' . $databaseConnection->fullQuoteStr($value, $this->referenceTable);
+		}
+		$where = empty($where) ? '' : join(' ' . DatabaseConnection::AND_Constraint . ' ', $where);
+
+		$row = $databaseConnection->exec_SELECTgetSingleRow(
 			'*',
 			$this->referenceTable,
-			$this->databaseHelper->getWhereFromConditionArray($data),
+			$where,
 			'',
 			'uid DESC'
 		);
 
 		if ($row === NULL) {
-			throw new SqlError(array(
-				$this->databaseConnection->debug_lastBuiltQuery
+			throw new Exception\SqlError(array(
+				$databaseConnection->debug_lastBuiltQuery
 			));
 		}
 		return $row;

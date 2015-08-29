@@ -41,7 +41,7 @@ class ItemBlobFactory extends FactoryAbstract {
 	protected $repository;
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Factory\FileReferenceFactory
+	 * @var \Innologi\Decosdata\Library\FalApi\FileReferenceFactory
 	 * @inject
 	 */
 	protected $fileReferenceFactory;

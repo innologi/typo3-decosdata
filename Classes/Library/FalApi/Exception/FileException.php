@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Exception;
+namespace Innologi\Decosdata\Library\FalApi\Exception;
 /***************************************************************
  *  Copyright notice
  *
@@ -27,7 +27,8 @@ namespace Innologi\Decosdata\Exception;
 /**
  * File Exception
  *
- * @package decosdata
+ * @package InnologiLibs
+ * @subpackage FalApi
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */

@@ -52,7 +52,7 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	protected $databaseHelper;
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Repository\FileReferenceRepository
+	 * @var \Innologi\Decosdata\Library\FalApi\FileReferenceRepository
 	 * @inject
 	 */
 	protected $fileReferenceRepository;
