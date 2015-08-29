@@ -100,16 +100,18 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 		if ( !isset($this->sourceExtensionKey[0]) ) {
 			$this->sourceExtensionKey = $this->extensionKey;
 		}
+		/* @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
+		$objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 
-		$this->flashMessageQueue = GeneralUtility::makeInstance(
+		$this->flashMessageQueue = $objectManager->get(
 			'TYPO3\\CMS\\Core\\Messaging\\FlashMessageQueue',
 			'extbase.flashmessages.tx_' . $this->extensionKey . '_extupdate'
 		);
 
-		$this->databaseService = GeneralUtility::makeInstance(
+		$this->databaseService = $objectManager->get(
 			__NAMESPACE__ . '\\Service\\DatabaseService'
 		);
-		$this->fileService = GeneralUtility::makeInstance(
+		$this->fileService = $objectManager->get(
 			__NAMESPACE__ . '\\Service\\FileService'
 		);
 	}
