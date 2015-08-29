@@ -27,7 +27,8 @@ use TYPO3\CMS\Core\Database\DatabaseConnection;
 /**
  * Ext Update Database Service
  *
- * Provides several database methods for common use-cases in ext-update context
+ * Provides several database methods for common use-cases in ext-update context.
+ * Note that it must be instantiated with the ObjectManager!
  *
  * @package InnologiLibs
  * @subpackage ExtUpdate
@@ -40,6 +41,21 @@ class DatabaseService implements SingletonInterface {
 	 * @var \TYPO3\CMS\Core\Database\DatabaseConnection
 	 */
 	protected $databaseConnection;
+
+	/**
+	 * @var FileService
+	 */
+	protected $fileService;
+
+	/**
+	 * @var array
+	 */
+	protected $referenceUidCache = array();
+
+	/**
+	 * @var array
+	 */
+	protected $filesForReference = array();
 
 	/**
 	 * Language labels => messages
@@ -57,16 +73,85 @@ class DatabaseService implements SingletonInterface {
 	/**
 	 * Constructor
 	 *
+	 * @param \TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager
 	 * @return void
 	 */
-	public function __construct() {
+	public function __construct(\TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager) {
 		$this->databaseConnection = $GLOBALS['TYPO3_DB'];
 		$this->databaseConnection->store_lastBuiltQuery = TRUE;
 		// @TODO ___utilize $this->databaseConnection->sql_error() ?
+
+		// not injecting it automatically, because then I have to define its namespace statically :p
+		$this->fileService = $objectManager->get(__NAMESPACE__ . '\\FileService');
 	}
 
 	/**
 	 * Migrates table data from one table to another.
+	 * Does not touch the source table data except for setting
+	 * a single reference uid property.
+	 *
+	 * Note that this only works with tables using an AUTO_INCREMENT uid,
+	 * as we rely on this property and insert_id
+	 *
+	 * @param string $sourceTable
+	 * @param string $targetTable
+	 * @param array $propertyMap Contains sourceProperty => targetProperty mappings
+	 * @param string $sourceReferenceProperty Property that will refer to new uid
+	 * @param array $evaluation
+	 * @param integer $limitRecords
+	 * @return integer Affected record count
+	 * @throws Exception\NoData Nothing to migrate
+	 */
+	public function migrateTableDataWithReferenceUid($sourceTable, $targetTable, array $propertyMap, $sourceReferenceProperty, array $evaluation = array(), $limitRecords = 10000) {
+		$evaluation[] = $sourceReferenceProperty . '=0';
+		$where = join(' ' . DatabaseConnection::AND_Constraint . ' ', $evaluation);
+		// select all data rows to migrate, set uid as keys
+		$toMigrate = $this->selectTableRecords($sourceTable, $where, '*', $limitRecords);
+		$count = count($toMigrate);
+
+		if ($count <= 0) {
+			throw new Exception\NoData(
+				sprintf($this->lang['noData'], $sourceTable)
+			);
+		}
+
+		// translate rows to insertable data according to $propertyMap
+		$fields = array();
+		$toInsert = $this->translatePropertiesOfRows($toMigrate, $propertyMap, $fields);
+
+		// insert
+		$this->insertTableRecords($targetTable, $fields, $toInsert);
+		// retrieve first new uid and use it as a starting point for the reference property
+		$i = $this->databaseConnection->sql_insert_id();
+
+		// depending on any files for reference, we either just update (much quicker), or update and set fileReferences
+		if (empty($this->filesForReference)) {
+			foreach ($toMigrate as $uid => $row) {
+				$this->updateTableRecords($sourceTable, array($sourceReferenceProperty => $i++), array('uid' => $uid));
+			}
+		} else {
+			foreach ($toMigrate as $uid => $row) {
+				$this->updateTableRecords($sourceTable, array($sourceReferenceProperty => $i), array('uid' => $uid));
+				if (isset($this->filesForReference[$uid])) {
+					$this->fileService->setFileReference(
+						$this->filesForReference[$uid]['uid'],
+						$targetTable,
+						$i++,
+						$this->filesForReference[$uid]['field'],
+						(int) $row['pid']
+					);
+				}
+			}
+			// reset
+			$this->filesForReference = array();
+		}
+
+		return $count;
+	}
+
+	/**
+	 * Migrates table data from one table to another.
+	 * Deletes source table data, putting references into the $uidMap argument.
 	 *
 	 * Note that this only works with tables using an AUTO_INCREMENT uid,
 	 * as we rely on this property and insert_id
@@ -79,7 +164,7 @@ class DatabaseService implements SingletonInterface {
 	 * @return integer Affected record count
 	 * @throws Exception\NoData Nothing to migrate
 	 */
-	public function migrateTableData($sourceTable, $targetTable, array $propertyMap, $limitRecords = 5000, array &$uidMap = array()) {
+	public function migrateTableDataAndDeleteSource($sourceTable, $targetTable, array $propertyMap, $limitRecords = 5000, array &$uidMap = array()) {
 		// select all data rows to migrate, set uid as keys
 		$toMigrate = $this->selectTableRecords($sourceTable, '', '*', $limitRecords);
 		$count = count($toMigrate);
@@ -91,10 +176,11 @@ class DatabaseService implements SingletonInterface {
 		}
 
 		// translate rows to insertable data according to $propertyMap
-		$toInsert = $this->translatePropertiesOfRows($toMigrate, $propertyMap);
+		$fields = array();
+		$toInsert = $this->translatePropertiesOfRows($toMigrate, $propertyMap, $fields);
 
-		// insert, note that we use $propertyMap to define the $fields parameter
-		$this->insertTableRecords($targetTable, $propertyMap, $toInsert);
+		// insert
+		$this->insertTableRecords($targetTable, $fields, $toInsert);
 		// retrieve new uid's and combine them with original uid's
 		$startUid = $this->databaseConnection->sql_insert_id();
 		// affected_rows is not reliable when debugging (not sure if xdebug issue), so I'm using $count instead
@@ -123,9 +209,94 @@ class DatabaseService implements SingletonInterface {
 	}
 
 	/**
+	 * Migrates MM table from one table to another by relying on
+	 * referenceUids ($localConfig['uid'] and $foreignConfig['uid']
+	 * for the new uid values.
+	 *
+	 * Does not touch the sourceTable other than setting a flag
+	 * in $sourceFlagProperty.
+	 *
+	 * Variation of migrateTableData* methods.
+	 *
+	 * @param string $sourceTable
+	 * @param string $targetTable
+	 * @param array $localConfig Local table + its new uid property
+	 * @param array $foreignConfig Foreign table + its new uid property
+	 * @param array $propertyMap Contains sourceProperty => targetProperty mappings, excluding uid-mappings
+	 * @param string $sourceFlagProperty
+	 * @param integer $limitRecords
+	 * @return integer Affected record count
+	 * @throws Exception\NoData Nothing to migrate
+	 */
+	public function migrateMmTableWithReferenceUid($sourceTable, $targetTable, array $localConfig, array $foreignConfig, array $propertyMap, $sourceFlagProperty, $limitRecords = 5000) {
+		$select = sprintf(
+			'mm.*, l.%1$s AS new_local, f.%2$s AS new_foreign',
+			$localConfig['uid'],
+			$foreignConfig['uid']
+		);
+		$from = sprintf(
+			'%1$s mm, %2$s l, %3$s f',
+			$sourceTable,
+			$localConfig['table'],
+			$foreignConfig['table']
+		);
+		$where = sprintf(
+			'mm.%3$s=0 AND f.uid=mm.uid_foreign AND l.uid=mm.uid_local AND f.%1$s > 0 AND l.%2$s > 0',
+			$localConfig['uid'],
+			$foreignConfig['uid'],
+			$sourceFlagProperty
+		);
+
+		// select all data rows to migrate
+		$toMigrate = $this->databaseConnection->exec_SELECTgetRows(
+			$select, $from, $where, '', '', $limitRecords
+		);
+		$count = count($toMigrate);
+
+		if ($count <= 0) {
+			throw new Exception\NoData(
+				sprintf($this->lang['noData'], $sourceTable)
+			);
+		}
+
+		// translate rows to insertable data according to $propertyMap
+		$propertyMap = array_merge($propertyMap, array(
+			'new_local' => 'uid_local',
+			'new_foreign' => 'uid_foreign'
+		));
+		$fields = array();
+		$toInsert = $this->translatePropertiesOfRows($toMigrate, $propertyMap, $fields);
+
+		// insert
+		$this->insertTableRecords($targetTable, $fields, $toInsert);
+
+		// create a where which only matches the original uid's
+		$whereArray = array();
+		$intersect = array(
+			'uid_local' => 1,
+			'uid_foreign' => 1
+		);
+		foreach ($toMigrate as $row) {
+			$whereArray[] = $this->getWhereFromConditionArray(
+				array_intersect_key($row, $intersect),
+				$sourceTable
+			);
+		}
+
+		// update the $sourceFlagProperty value
+		$this->databaseConnection->exec_UPDATEquery(
+			$sourceTable,
+			'(' . join(') ' . DatabaseConnection::OR_Constraint . ' (', $whereArray) . ')',
+			array($sourceFlagProperty => 1)
+		);
+
+		return $count;
+	}
+
+	/**
 	 * Migrates MM table from one table to another.
 	 *
-	 * Variation of migrateTableData()
+	 * Variation of migrateTableData* methods.
 	 *
 	 * @param string $sourceTable
 	 * @param string $targetTable
@@ -134,7 +305,7 @@ class DatabaseService implements SingletonInterface {
 	 * @return integer Affected record count
 	 * @throws Exception\NoData Nothing to migrate
 	 */
-	public function migrateMmTable($sourceTable, $targetTable, array $propertyMap, $limitRecords = 5000) {
+	public function migrateMmTableAndDeleteSource($sourceTable, $targetTable, array $propertyMap, $limitRecords = 5000) {
 		// select all data rows to migrate
 		$toMigrate = $this->databaseConnection->exec_SELECTgetRows(
 			'*', $sourceTable, '', '', '', $limitRecords
@@ -148,10 +319,11 @@ class DatabaseService implements SingletonInterface {
 		}
 
 		// translate rows to insertable data according to $propertyMap
-		$toInsert = $this->translatePropertiesOfRows($toMigrate, $propertyMap);
+		$fields = array();
+		$toInsert = $this->translatePropertiesOfRows($toMigrate, $propertyMap, $fields);
 
-		// insert, note that we use $propertyMap to define the $fields parameter
-		$this->insertTableRecords($targetTable, $propertyMap, $toInsert);
+		// insert
+		$this->insertTableRecords($targetTable, $fields, $toInsert);
 
 		// remove the old data
 		if ($count < $limitRecords) {
@@ -197,9 +369,10 @@ class DatabaseService implements SingletonInterface {
 	 */
 	public function createUniqueRecordsFromValues($sourceTable, $targetTable, array $propertyMap, array $evaluation = array(), $limitRecords = 10000, array &$uidMap = array()) {
 		$uniqueBy = join(',', array_keys($propertyMap));
+		$where = empty($evaluation) ? '' : join(' ' . DatabaseConnection::AND_Constraint . ' ', $evaluation);
 		// select all unique propertymap combinations
 		$toInsert = $this->databaseConnection->exec_SELECTgetRows(
-			$uniqueBy, $sourceTable, join(' ' . DatabaseConnection::AND_Constraint . ' ', $evaluation), $uniqueBy, $uniqueBy, $limitRecords
+			$uniqueBy, $sourceTable, $where, $uniqueBy, $uniqueBy, $limitRecords
 		);
 		$count = count($toInsert);
 
@@ -357,17 +530,23 @@ class DatabaseService implements SingletonInterface {
 	/**
 	 * Translates multiple rows' properties according to propertyMap.
 	 *
-	 * If any properties aren't found in the sourceRows,
-	 * they will be removed from the $propertyMap reference.
+	 * Providing the $fields parameter, you can retrieve a reference
+	 * of the target row field names.
 	 *
 	 * @param array $sourceRows
-	 * @param array &$propertyMap
+	 * @param array $propertyMap
+	 * @param array &$fields (optional)
 	 * @return array Target rows result
 	 */
-	protected function translatePropertiesOfRows(array $sourceRows, array &$propertyMap) {
+	protected function translatePropertiesOfRows(array $sourceRows, array $propertyMap, array &$fields = array()) {
 		$targetRows = array();
+		$latestRow = NULL;
 		foreach ($sourceRows as $row) {
-			$targetRows[] = $this->translatePropertiesOfRow($row, $propertyMap);
+			$latestRow = $this->translatePropertiesOfRow($row, $propertyMap);
+			$targetRows[] = $latestRow;
+		}
+		if ($latestRow !== NULL) {
+			$fields = array_keys($latestRow);
 		}
 		return $targetRows;
 	}
@@ -378,6 +557,11 @@ class DatabaseService implements SingletonInterface {
 	 * If any properties aren't found in the sourceRow,
 	 * they will be removed from the $propertyMap reference.
 	 *
+	 * When a $targetProperty is an array instead of a string, this
+	 * indicates a special configuration for said property:
+	 * - valueReference: the value is to be stored in its own table and is to be replaced by a reference uid
+	 * - fileReference: the value is a file uid, and will be skipped here but stored as a settable FileReference
+	 *
 	 * @param array $sourceRow
 	 * @param array &$propertyMap
 	 * @return array Target row result
@@ -386,7 +570,36 @@ class DatabaseService implements SingletonInterface {
 		$targetRow = array();
 		foreach ($propertyMap as $sourceProperty => $targetProperty) {
 			if (isset($sourceRow[$sourceProperty])) {
-				$targetRow[$targetProperty] = $sourceRow[$sourceProperty];
+				if (!is_array($targetProperty)) {
+					// normal translation
+					$targetRow[$targetProperty] = $sourceRow[$sourceProperty];
+				} else {
+					// special config
+					if (isset($targetProperty['valueReference'])) {
+						// valueReferences are usually for unique valueObjects for which you want the reference uid
+						// or vice versa. In the latter case, the value must already exist, because an insert cannot
+						// possibly generate your expected value unless you provide it already, which defeats the
+						// purpose of trying to retrieve it
+						$valueReference = $targetProperty['valueReference'];
+						if (!isset($this->referenceUidCache[$valueReference['foreignTable']][$sourceRow[$sourceProperty]])) {
+							$this->referenceUidCache[$valueReference['foreignTable']][$sourceRow[$sourceProperty]] = $this->getReferenceUid(
+								$valueReference,
+								$sourceRow[$sourceProperty],
+								$sourceRow
+							);
+						}
+						// note that the source value will be replaced in target with its new reference uid, effectively creating a 1:N relation
+						$targetRow[$valueReference['targetProperty']] = $this->referenceUidCache[$valueReference['foreignTable']][$sourceRow[$sourceProperty]];
+					} elseif (isset($targetProperty['fileReference']) && (int) $sourceRow[$sourceProperty] > 0) {
+						// fileReferences are file uid's to be set in relation to the targetRow
+						$fileReference = $targetProperty['fileReference'];
+						$this->filesForReference[$sourceRow['uid']] = array(
+							'uid' => (int) $sourceRow[$sourceProperty],
+							'field' => $fileReference['targetProperty']
+						);
+						// note that it currently stores nothing in targetRow
+					}
+				}
 			} else {
 				// prevents it being iterated over for every row
 				unset($propertyMap[$sourceProperty]);
@@ -396,7 +609,56 @@ class DatabaseService implements SingletonInterface {
 	}
 
 	/**
+	 * Returns the property reference uid either directly from database or
+	 * by inserting it first.
+	 *
+	 * $propertyConfig needs to contain the following elements:
+	 * - foreignTable
+	 * - foreignField
+	 * - valueField
+	 * .. may contain additional elements:
+	 * - uniqueBy
+	 *
+	 * @param array $propertyConfig
+	 * @param string $value
+	 * @param array $sourceRow
+	 * @return integer
+	 */
+	protected function getReferenceUid(array $propertyConfig, $value, array $sourceRow) {
+		// @TODO ___throw exception if $propertyConfig misses configuration fields
+		$values = array(
+			$propertyConfig['valueField'] => $value,
+		);
+		if (isset($propertyConfig['uniqueBy'])) {
+			foreach ($propertyConfig['uniqueBy'] as $uniqueBy) {
+				$values[$uniqueBy] = $sourceRow[$uniqueBy];
+			}
+		}
+
+		$row = $this->databaseConnection->exec_SELECTgetSingleRow(
+			$propertyConfig['foreignField'],
+			$propertyConfig['foreignTable'],
+			$this->getWhereFromConditionArray($values, $propertyConfig['foreignTable']),
+			'',
+			'uid DESC'
+		);
+		if ($row === FALSE) {
+			$this->databaseConnection->exec_INSERTquery($propertyConfig['foreignTable'], $values);
+			$uid = $this->databaseConnection->sql_insert_id();
+		} elseif (isset($row[$propertyConfig['foreignField']])) {
+			$uid = $row[$propertyConfig['foreignField']];
+		} else {
+			// @TODO ___throw exception
+		}
+
+		return $uid;
+	}
+
+	/**
 	 * Creates a where string from a condition array
+	 *
+	 * Note that a condition value can hold special configuration if given
+	 * as array instead of string
 	 *
 	 * @param array $conditions Contains property => value combinations
 	 * @param string $table Table from which the conditions originate
@@ -405,7 +667,50 @@ class DatabaseService implements SingletonInterface {
 	protected function getWhereFromConditionArray(array $conditions, $table = NULL) {
 		$where = array();
 		foreach ($conditions as $property => $value) {
-			$where[] = $property . '=' . $this->databaseConnection->fullQuoteStr($value, $table);
+			$operator = '=%1$s';
+			if (!is_array($value)) {
+				$value = $this->databaseConnection->fullQuoteStr($value, $table);
+			} else {
+				$noQuote = FALSE;
+				// process value array recursively
+				while (is_array($value)) {
+					if (isset($value['value'])) {
+						// if $value contains 'value', it is capable of providing
+						// a bit of configuration
+						if (isset($value['operator'])) {
+							// e.g. ' IN (%1$s)' or ' NOT IN (%1$s)' or '!=%1$s', etc.
+							$operator = $value['operator'];
+						}
+						if (isset($value['no_quote'])) {
+							// setting no_quote can be useful when providing a string value
+							// or array with strings already processed by e.g. fullQuoteStr().
+							$noQuote = (bool) $value['no_quote'];
+						}
+						if ( is_array($value['value']) || $noQuote ) {
+							$value = $value['value'];
+						} else {
+							// effectively ends the recursive while loop
+							$value = $this->databaseConnection->fullQuoteStr($value['value'], $table);
+						}
+					} else {
+						// if $value is an array but no value subelement exists, we assume
+						// the array consists solely of values that should be joined as a string,
+						// ending the recursive while loop
+						$vArray = array();
+						if ($noQuote) {
+							foreach ($value['value'] as $v) {
+								$vArray[] = $v;
+							}
+						} else {
+							foreach ($value['value'] as $v) {
+								$vArray[] = $this->databaseConnection->fullQuoteStr($v, $table);
+							}
+						}
+						$value = join(',', $vArray);
+					}
+				}
+			}
+			$where[] = $property . sprintf($operator, $value);
 		}
 		return join(' ' . DatabaseConnection::AND_Constraint . ' ', $where);
 	}
