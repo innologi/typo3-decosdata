@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Domain\Repository;
+namespace Innologi\Decosdata\Service\Option\Query;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,41 +23,31 @@ namespace Innologi\Decosdata\Domain\Repository;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
+use \Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
 /**
- * Item domain repository
+ * DateConversion option
+ *
+ * Converts a date content field through the MySQL function DATE_FORMAT().
+ * @see https://dev.mysql.com/doc/refman/5.5/en/date-and-time-functions.html#function_date-format
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemRepository extends RepositoryAbstract {
+class DateConversion extends OptionAbstract {
+	// @TODO ___see if the mixed input argument still needs to be supported now that we can apply options per field
 
 	/**
-	 * Finds items with query object and returns the result as a raw array
-	 *
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query $queryObj
-	 * @return array
+	 * {@inheritDoc}
+	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
 	 */
-	public function findWithQueryObject(\Innologi\Decosdata\Service\QueryBuilder\Query $queryObj) {
-		$query = $this->createQuery();
-		/* @var $query \TYPO3\CMS\Extbase\Persistence\Generic\Query */
-		return $query->statement(
-			$queryObj->getQuery(), $queryObj->getParameters()
-		)->execute(TRUE);
-	}
+	public function alterQueryField(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
+		if (!isset($args['format'])) {
+			// @TODO ___throw exception.. or should it be optional?
+		}
 
-	/**
-	 * Finds one item by its unique (per pid) itemkey.
-	 *
-	 * @param string $itemKey
-	 * @return \Innologi\Decosdata\Domain\Model\Item|NULL
-	 */
-	public function findOneByItemKey($itemKey) {
-		$query = $this->createQuery();
-		return $query->matching(
-			$query->equals('itemKey', $itemKey)
-		)->execute()->getFirst();
+		$queryConfiguration['SELECT']['wrap'][] = 'DATE_FORMAT(|, ?)';
+		$queryConfiguration['PARAMETER']['SELECT'][] = $args['format'];
 	}
 
 }

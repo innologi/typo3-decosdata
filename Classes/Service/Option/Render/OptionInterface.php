@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Domain\Repository;
+namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,41 +23,24 @@ namespace Innologi\Decosdata\Domain\Repository;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
+use Innologi\Decosdata\Service\Option\RenderOptionService;
 /**
- * Item domain repository
+ * Render Option Interface
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemRepository extends RepositoryAbstract {
+interface OptionInterface {
 
 	/**
-	 * Finds items with query object and returns the result as a raw array
+	 * Alters $content.
 	 *
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query $queryObj
-	 * @return array
+	 * @param array $args
+	 * @param string &$content
+	 * @param \Innologi\Decosdata\Service\Option\RenderOptionService $service
+	 * @return void
 	 */
-	public function findWithQueryObject(\Innologi\Decosdata\Service\QueryBuilder\Query $queryObj) {
-		$query = $this->createQuery();
-		/* @var $query \TYPO3\CMS\Extbase\Persistence\Generic\Query */
-		return $query->statement(
-			$queryObj->getQuery(), $queryObj->getParameters()
-		)->execute(TRUE);
-	}
-
-	/**
-	 * Finds one item by its unique (per pid) itemkey.
-	 *
-	 * @param string $itemKey
-	 * @return \Innologi\Decosdata\Domain\Model\Item|NULL
-	 */
-	public function findOneByItemKey($itemKey) {
-		$query = $this->createQuery();
-		return $query->matching(
-			$query->equals('itemKey', $itemKey)
-		)->execute()->getFirst();
-	}
+	public function alterContentValue(array $args, &$content, RenderOptionService $service);
 
 }

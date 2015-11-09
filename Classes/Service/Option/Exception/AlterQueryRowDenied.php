@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Domain\Repository;
+namespace Innologi\Decosdata\Service\Option\Exception;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,41 +23,20 @@ namespace Innologi\Decosdata\Domain\Repository;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
+
 /**
- * Item domain repository
+ * AlterQueryRowDenied Exception
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemRepository extends RepositoryAbstract {
-
+class AlterQueryRowDenied extends OptionException {
+	// @TODO ___once you've finalized configurations, you should check if "row-level" is still correctly named
+	// @TODO ___test errorhandling with these
 	/**
-	 * Finds items with query object and returns the result as a raw array
-	 *
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query $queryObj
-	 * @return array
+	 * @var string
 	 */
-	public function findWithQueryObject(\Innologi\Decosdata\Service\QueryBuilder\Query $queryObj) {
-		$query = $this->createQuery();
-		/* @var $query \TYPO3\CMS\Extbase\Persistence\Generic\Query */
-		return $query->statement(
-			$queryObj->getQuery(), $queryObj->getParameters()
-		)->execute(TRUE);
-	}
-
-	/**
-	 * Finds one item by its unique (per pid) itemkey.
-	 *
-	 * @param string $itemKey
-	 * @return \Innologi\Decosdata\Domain\Model\Item|NULL
-	 */
-	public function findOneByItemKey($itemKey) {
-		$query = $this->createQuery();
-		return $query->matching(
-			$query->equals('itemKey', $itemKey)
-		)->execute()->getFirst();
-	}
+	protected $message = 'Query Option Configuration Error: Applying %1$s on the row-level is not supported.';
 
 }

@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Domain\Repository;
+namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,41 +23,56 @@ namespace Innologi\Decosdata\Domain\Repository;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 /**
- * Item domain repository
+ * Abstract File Option class
+ *
+ * Offers some basic file-related methods for use by RenderOptions,
+ * that can be inherited by extending this abstract.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemRepository extends RepositoryAbstract {
+abstract class FileOptionAbstract implements OptionInterface {
 
 	/**
-	 * Finds items with query object and returns the result as a raw array
-	 *
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query $queryObj
-	 * @return array
+	 * @var \TYPO3\CMS\Core\Resource\ResourceFactory
+	 * @inject
 	 */
-	public function findWithQueryObject(\Innologi\Decosdata\Service\QueryBuilder\Query $queryObj) {
-		$query = $this->createQuery();
-		/* @var $query \TYPO3\CMS\Extbase\Persistence\Generic\Query */
-		return $query->statement(
-			$queryObj->getQuery(), $queryObj->getParameters()
-		)->execute(TRUE);
+	protected $resourceFactory;
+
+	/**
+	 * @var integer
+	 */
+	protected $fileUid;
+
+	/**
+	 * Returns whether the argument is a file handle
+	 *
+	 * @param string $fileHandle
+	 * @return boolean
+	 */
+	protected function isFileHandle($fileHandle) {
+		if (strpos($fileHandle, 'file:') === 0) {
+			$parts = explode(':', $fileHandle, 2);
+			if (is_numeric($parts[1])) {
+				$this->fileUid = (int) $parts[1];
+				return TRUE;
+			}
+		}
+		return FALSE;
 	}
 
 	/**
-	 * Finds one item by its unique (per pid) itemkey.
+	 * Returns File Object
 	 *
-	 * @param string $itemKey
-	 * @return \Innologi\Decosdata\Domain\Model\Item|NULL
+	 * @param integer $fileUid
+	 * @return \TYPO3\CMS\Core\Resource\File
 	 */
-	public function findOneByItemKey($itemKey) {
-		$query = $this->createQuery();
-		return $query->matching(
-			$query->equals('itemKey', $itemKey)
-		)->execute()->getFirst();
+	protected function getFileObject($fileUid) {
+		// @TODO ___note that if the file somehow can't be retrieved, we get exceptions, so be on the lookout
+		return $this->resourceFactory->getFileObject($fileUid);
 	}
 
 }

@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Domain\Repository;
+namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,41 +23,34 @@ namespace Innologi\Decosdata\Domain\Repository;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
+use Innologi\Decosdata\Service\Option\RenderOptionService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
- * Item domain repository
+ * File Size option
+ *
+ * Renders the filesize of the content, if content represents a valid file.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemRepository extends RepositoryAbstract {
+class FileSize extends FileOptionAbstract {
 
 	/**
-	 * Finds items with query object and returns the result as a raw array
-	 *
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query $queryObj
-	 * @return array
+	 * {@inheritDoc}
+	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
-	public function findWithQueryObject(\Innologi\Decosdata\Service\QueryBuilder\Query $queryObj) {
-		$query = $this->createQuery();
-		/* @var $query \TYPO3\CMS\Extbase\Persistence\Generic\Query */
-		return $query->statement(
-			$queryObj->getQuery(), $queryObj->getParameters()
-		)->execute(TRUE);
-	}
+	public function alterContentValue(array $args, &$content, RenderOptionService $service) {
+		if ( !$this->isFileHandle($service->getOriginalContent()) ) {
+			return;
+		}
 
-	/**
-	 * Finds one item by its unique (per pid) itemkey.
-	 *
-	 * @param string $itemKey
-	 * @return \Innologi\Decosdata\Domain\Model\Item|NULL
-	 */
-	public function findOneByItemKey($itemKey) {
-		$query = $this->createQuery();
-		return $query->matching(
-			$query->equals('itemKey', $itemKey)
-		)->execute()->getFirst();
+		$content = GeneralUtility::formatSize(
+			$this->getFileObject($this->fileUid)->getSize(),
+			// @TODO ___get default format from typoscript?
+			// @LOW ___support formatting argument?
+			'b|kb|MB|GB|TB'
+		);
 	}
 
 }

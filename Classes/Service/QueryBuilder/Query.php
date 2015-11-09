@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Domain\Repository;
+namespace Innologi\Decosdata\Service\QueryBuilder;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,41 +23,76 @@ namespace Innologi\Decosdata\Domain\Repository;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
+
 /**
- * Item domain repository
+ * Query Object
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemRepository extends RepositoryAbstract {
+class Query {
 
 	/**
-	 * Finds items with query object and returns the result as a raw array
-	 *
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query $queryObj
-	 * @return array
+	 * @var string
 	 */
-	public function findWithQueryObject(\Innologi\Decosdata\Service\QueryBuilder\Query $queryObj) {
-		$query = $this->createQuery();
-		/* @var $query \TYPO3\CMS\Extbase\Persistence\Generic\Query */
-		return $query->statement(
-			$queryObj->getQuery(), $queryObj->getParameters()
-		)->execute(TRUE);
+	protected $query;
+
+	/**
+	 * @var array
+	 */
+	protected $parameters;
+
+	/**
+	 * Class constructor
+	 *
+	 * @param string $query
+	 * @param array $parameters
+	 * @return void
+	 */
+	public function __construct($query = '', array $parameters = array()) {
+		$this->query = $query;
+		$this->parameters = $parameters;
 	}
 
 	/**
-	 * Finds one item by its unique (per pid) itemkey.
+	 * Return query
 	 *
-	 * @param string $itemKey
-	 * @return \Innologi\Decosdata\Domain\Model\Item|NULL
+	 * @return string
 	 */
-	public function findOneByItemKey($itemKey) {
-		$query = $this->createQuery();
-		return $query->matching(
-			$query->equals('itemKey', $itemKey)
-		)->execute()->getFirst();
+	public function getQuery() {
+		return $this->query;
+	}
+
+	/**
+	 * Sets query
+	 *
+	 * @param string $query
+	 * @return Query
+	 */
+	public function setQuery($query) {
+		$this->query = $query;
+		return $this;
+	}
+
+	/**
+	 * Returns parameters
+	 *
+	 * @return array
+	 */
+	public function getParameters() {
+		return $this->parameters;
+	}
+
+	/**
+	 * Sets parameters
+	 *
+	 * @param array $parameters
+	 * @return Query
+	 */
+	public function setParameters(array $parameters) {
+		$this->parameters = $parameters;
+		return $this;
 	}
 
 }

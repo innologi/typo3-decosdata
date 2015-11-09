@@ -1,9 +1,29 @@
+{namespace d=Innologi\Decosdata\ViewHelpers}
 <f:layout name="Default" />
 
 <f:section name="main">
 
 <f:flashMessages renderMode="div" />
 
-<f:debug>{items}</f:debug>
+<f:debug>{query}</f:debug>
+<f:debug>{configuration}</f:debug>
+<!-- @TODO ___correct table html? tbody, summary, scope and whatnot? -->
+
+<table>
+
+<tr>
+	<f:for each="{configuration.contentField}" as="column">
+		<th>{column.title}</th>
+	</f:for>
+</tr>
+<f:for each="{items}" as="item">
+	<tr class="item-{item.itemID}">
+		<d:item.for configuration="{configuration.contentField}" item="{item}" contentAs="content" configAs="contentConfig">
+			<td>{content -> d:content.render(configuration: contentConfig)}</td>
+		</d:item.for>
+	</tr>
+</f:for>
+
+</table>
 
 </f:section>
