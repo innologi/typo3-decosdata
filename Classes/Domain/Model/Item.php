@@ -217,7 +217,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Returns the itemBlob
 	 *
-	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\ItemBlob> $itemBlob
+	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage|\Innologi\Decosdata\Domain\Model\ItemBlob[] $itemBlob
 	 */
 	public function getItemBlob() {
 		return $this->itemBlob;
@@ -226,7 +226,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Sets the itemBlob
 	 *
-	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\ItemBlob> $itemBlob
+	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage $itemBlob
 	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
 	public function setItemBlob(\TYPO3\CMS\Extbase\Persistence\ObjectStorage $itemBlob) {
@@ -259,7 +259,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Returns the import
 	 *
-	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Import> $import
+	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage|\Innologi\Decosdata\Domain\Model\Import[] $import
 	 */
 	public function getImport() {
 		return $this->import;
@@ -268,7 +268,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Sets the import
 	 *
-	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Import> $import
+	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage $import
 	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
 	public function setImport(\TYPO3\CMS\Extbase\Persistence\ObjectStorage $import) {
@@ -301,7 +301,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Returns the parentItem
 	 *
-	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Item> $parentItem
+	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage|\Innologi\Decosdata\Domain\Model\Item[] $parentItem
 	 */
 	public function getParentItem() {
 		return $this->parentItem;
@@ -310,7 +310,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Sets the parentItem
 	 *
-	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Item> $parentItem
+	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage $parentItem
 	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
 	public function setParentItem(\TYPO3\CMS\Extbase\Persistence\ObjectStorage $parentItem) {
@@ -343,7 +343,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Returns the childItem
 	 *
-	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Item> $childItem
+	 * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage|\Innologi\Decosdata\Domain\Model\Item[] $childItem
 	 */
 	public function getChildItem() {
 		return $this->childItem;
@@ -352,7 +352,7 @@ class Item extends AbstractEntity {
 	/**
 	 * Sets the childItem
 	 *
-	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Item> $childItem
+	 * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage $childItem
 	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
 	public function setChildItem(\TYPO3\CMS\Extbase\Persistence\ObjectStorage $childItem) {
