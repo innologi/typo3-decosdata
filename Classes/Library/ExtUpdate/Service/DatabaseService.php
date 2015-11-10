@@ -623,6 +623,7 @@ class DatabaseService implements SingletonInterface {
 	 * @param string $value
 	 * @param array $sourceRow
 	 * @return integer
+	 * @throws Exception\SqlError
 	 */
 	protected function getReferenceUid(array $propertyConfig, $value, array $sourceRow) {
 		// @TODO ___throw exception if $propertyConfig misses configuration fields
@@ -648,7 +649,12 @@ class DatabaseService implements SingletonInterface {
 		} elseif (isset($row[$propertyConfig['foreignField']])) {
 			$uid = $row[$propertyConfig['foreignField']];
 		} else {
-			// @TODO ___throw exception
+			throw new Exception\SqlError(
+				sprintf(
+					$this->lang['sqlError'],
+					$this->databaseConnection->debug_lastBuiltQuery
+				)
+			);
 		}
 
 		return $uid;
