@@ -54,10 +54,9 @@ class ItemController extends ActionController {
 		),
 		'level' => array(
 			1 => array(
-				'pageBrowser' => array(
-					'type' => 'normal',
-					'maxPages' => 30,
-					'rowsPerPage' => '50'
+				'paginate' => array(
+					'pageLimit' => 30,
+					'perPageLimit' => '50'
 				),
 				'itemType' => array(
 					2
