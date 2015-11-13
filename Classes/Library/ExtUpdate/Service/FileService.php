@@ -24,6 +24,7 @@ namespace Innologi\Decosdata\Library\ExtUpdate\Service;
 ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
+use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 /**
  * Ext Update Database Service
  *
