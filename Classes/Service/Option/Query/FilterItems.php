@@ -87,17 +87,17 @@ class FilterItems extends OptionAbstract {
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
 	 */
-	public function alterQueryColumn(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
+	/*public function alterQueryColumn(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
 		$this->initialize($args);
 
 		// @FIX _FUCK, hoe benader je nu de select alias? (wordt nog niet gebruikt)
-	}
+	}*/
 
 	/**
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
 	 */
-	public function alterQueryRow(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
+	/*public function alterQueryRow(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
 		$this->initialize($args);
 		// @FIX _outdated @ SELECT[alias] and queryAdd/parameterAdd (wordt nog niet gebruikt)
 		$counter = 0;
@@ -149,6 +149,6 @@ class FilterItems extends OptionAbstract {
 			}
 
 		}
-	}
+	}*/
 
 }
