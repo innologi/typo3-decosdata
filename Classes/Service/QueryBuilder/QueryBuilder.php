@@ -61,6 +61,12 @@ class QueryBuilder {
 	protected $optionService;
 
 	/**
+	 * @var \Innologi\Decosdata\Service\QueryBuilder\PaginateService
+	 * @inject
+	 */
+	protected $paginateService;
+
+	/**
 	 * @var array
 	 */
 	protected $queryParts = array();
@@ -225,6 +231,10 @@ class QueryBuilder {
 		}
 
 		$this->queryConfigurator->transformConfiguration($queryConfiguration, $this->queryParts, $this->parameterParts);
+		if ($publicationConfig['paginate']) {
+			$this->paginateService->paginateQuery($publicationConfig['paginate'], $this->queryParts, $this->parameterParts);
+		}
+
 
 		return $this->build();
 	}
