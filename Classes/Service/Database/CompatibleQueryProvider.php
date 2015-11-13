@@ -82,7 +82,7 @@ class CompatibleQueryProvider implements QueryProviderInterface,SingletonInterfa
 		if ($uid === NULL) {
 			$query = $this->databaseConnection->INSERTquery($table, $data);
 		} else {
-			if ($updateParameters['crdate']) {
+			if ($data['crdate']) {
 				// we never want to update the crdate property value
 				unset($data['crdate']);
 			}
