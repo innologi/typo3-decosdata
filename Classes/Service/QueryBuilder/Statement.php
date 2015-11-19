@@ -32,6 +32,8 @@ use TYPO3\CMS\Core\Database\PreparedStatement;
  * - by offering a method to retrieve the query directly for logging
  * and debugging purposes.
  *
+ * - by adding workarounds for PHP MySQLi bugs during step-debugging
+ *
  * - by adding support for arrays. Although I can supply a statement
  * through Extbase Repositories by string, which offers support for
  * array parameters, this was deprecated since 6.2 if using parameters.
@@ -41,7 +43,7 @@ use TYPO3\CMS\Core\Database\PreparedStatement;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class Statement extends PreparedStatement {
-
+	// @LOW _consider moving this class and its factory to its own namespace: it's not really part of the QueryBuilder, although it is used by it as a possible result
 	/**
 	 * Returns query
 	 *
@@ -50,6 +52,26 @@ class Statement extends PreparedStatement {
 	public function getQuery() {
 		// @TODO _how to return a query that has its parameters replaced?
 		return $this->query;
+	}
+
+
+
+	/**
+	 * Bug in MySQLi PHP driver causes an issue when step-debugging around statement->close(). Doing an unset() lets us work around the issue.
+	 *
+	 * @return void
+	 * @see https://stackoverflow.com/questions/25377030/mysqli-xdebug-breakpoint-after-closing-statment-result-in-many-warnings
+	 * @see http://bugs.xdebug.org/view.php?id=900
+	 * @see http://bugs.xdebug.org/view.php?id=1071
+	 * @see https://bugs.php.net/bug.php?id=63486
+	 * @see https://bugs.php.net/bug.php?id=60778
+	 *
+	 * Similar issue with statement->affected_rows we noticed creating migration/importer, also only when step-debugging.
+	 * @see https://bugs.php.net/bug.php?id=67348
+	 */
+	public function free() {
+		$this->statement->close();
+		unset($this->statement);
 	}
 
 
