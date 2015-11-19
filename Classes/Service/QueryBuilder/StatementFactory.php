@@ -116,11 +116,26 @@ class StatementFactory implements SingletonInterface {
 			// NULL prevents potential filesorts through GROUP BY sorting, when no ORDER BY was given
 			$query .= "\n" . 'ORDER BY NULL';
 		}
-		if (isset($queryParts['LIMIT'][0])) {
-			$query .= "\n" . 'LIMIT ' . $queryParts['LIMIT'];
+		# @LOW _this is a temporary interface until the relevant FIX task in PaginateService is completed
+		#if (isset($queryParts['LIMIT'][0])) {
+		#	$query .= "\n" . 'LIMIT ' . $queryParts['LIMIT'];
+		#}
+		if ($this->limit !== NULL) {
+			$query .= "\n" . 'LIMIT ' . $this->limit;
+			if ($this->offset !== NULL) {
+				$query .= ' OFFSET ' . $this->offset;
+			}
 		}
-
+		####################
 		return $query;
+	}
+
+	# @LOW _this is a temporary interface until the relevant FIX task in PaginateService is completed
+	protected $limit;
+	protected $offset;
+	public function setLimit($limit = NULL, $offset = NULL) {
+		$this->limit = $limit;
+		$this->offset = $offset;
 	}
 
 }

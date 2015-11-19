@@ -105,7 +105,18 @@ class Query extends QueryIterator implements QueryInterface {
 	public function createStatement() {
 		/** @var $statementFactory \Innologi\Decosdata\Service\QueryBuilder\StatementFactory */
 		$statementFactory = $this->objectManager->get(StatementFactory::class);
+		# @LOW _this is a temporary interface until the relevant FIX task in PaginateService is completed
+		$statementFactory->setLimit($this->limit, $this->offset);
+		##################
 		return $statementFactory->createFromQuery($this);
+	}
+
+	# @LOW _this is a temporary interface until the relevant FIX task in PaginateService is completed
+	protected $limit;
+	protected $offset;
+	public function setLimit($limit = NULL, $offset = NULL) {
+		$this->limit = $limit;
+		$this->offset = $offset;
 	}
 
 }

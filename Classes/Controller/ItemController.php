@@ -56,7 +56,7 @@ class ItemController extends ActionController {
 			1 => array(
 				'paginate' => array(
 					'pageLimit' => 30,
-					'perPageLimit' => '50'
+					'perPageLimit' => 50,
 				),
 				'itemType' => array(
 					2
@@ -176,17 +176,18 @@ class ItemController extends ActionController {
 	 */
 	public function listAction() {
 		$level = 1;
+		$activeConfiguration = $this->piConf['level'][$level];
+		$activeConfiguration['paginate']['currentPage'] = 2;
 		// @TODO ___do we force a single query method, or do we allow a choice set by configuration?
 		// @FIX ________add pagebrowser config.. via widget? or better via querybuilder?
 		// @TODO _rename?
 		$items = $this->itemRepository->findWithStatement(
 			($statement = $this->queryBuilder->buildListQuery(
-				$this->piConf['level'][$level], $this->piConf['import']
+				$activeConfiguration, $this->piConf['import']
 			)->createStatement())
 		);
 
-		$this->view->assign('configuration', $this->piConf['level'][$level]);
-		$this->view->assign('contentFieldCount', count($this->piConf['level'][$level]['contentField']));
+		$this->view->assign('configuration', $activeConfiguration);
 		$this->view->assign('items', $items);
 		// @TODO ___remove
 		$this->view->assign('query', $statement->getQuery());

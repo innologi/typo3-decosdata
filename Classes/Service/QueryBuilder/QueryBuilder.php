@@ -61,6 +61,7 @@ class QueryBuilder {
 
 	/**
 	 * @var \Innologi\Decosdata\Service\QueryBuilder\PaginateService
+	 * @inject
 	 */
 	protected $paginateService;
 
@@ -138,7 +139,7 @@ class QueryBuilder {
 		}
 
 		if (isset($configuration['paginate'])) {
-			#$this->paginateService->paginateQuery($configuration['paginate'], $query);
+			$this->paginateService->paginateQuery($configuration['paginate'], $query);
 		}
 
 
