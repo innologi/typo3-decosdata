@@ -23,7 +23,7 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Exception;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Exception\Exception;
+
 /**
  * MissingConfigurationProperty Exception
  *
