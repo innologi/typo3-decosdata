@@ -121,7 +121,7 @@ class RenderOptionService extends OptionServiceAbstract {
 			$string
 		);
 	}
-
+	// @LOW ___if the service becomes a singleton, we could do away with the need to pass $this
 	/**
 	 * Processes an array of render-options by calling the contained alterValue()
 	 * methods and passing the content reference and renderer object to it.
@@ -135,23 +135,6 @@ class RenderOptionService extends OptionServiceAbstract {
 		foreach ($options as $option) {
 			$this->executeOption('alterContentValue', $option, $content, $this);
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @return \Innologi\Decosdata\Service\Option\Render\OptionInterface
-	 * @see \Innologi\Decosdata\Service\Option\OptionServiceAbstract::resolveOptionClass()
-	 * @throws Exception\InvalidOptionClass
-	 */
-	protected function resolveOptionClass($className) {
-		$object = parent::resolveOptionClass($className);
-		if ( !($object instanceof Render\OptionInterface) ) {
-			throw new Exception\InvalidOptionClass(1448552552, array(
-				// since $object was retrieved via objectManager, we're not sure if $object Class === $className
-				get_class($object), Render\OptionInterface::class
-			));
-		}
-		return $object;
 	}
 
 }

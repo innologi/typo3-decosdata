@@ -77,20 +77,4 @@ class QueryOptionService extends OptionServiceAbstract {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @return \Innologi\Decosdata\Service\Option\Query\OptionInterface
-	 * @see \Innologi\Decosdata\Service\Option\OptionServiceAbstract::resolveOptionClass()
-	 * @throws Exception\InvalidOptionClass
-	 */
-	protected function resolveOptionClass($className) {
-		$object = parent::resolveOptionClass($className);
-		if ( !($object instanceof Query\OptionInterface) ) {
-			throw new Exception\InvalidOptionClass(1448552519, array(
-				// since $object was retrieved via objectManager, we're not sure if $object Class === $className
-				get_class($object), Query\OptionInterface::class
-			));
-		}
-		return $object;
-	}
 }

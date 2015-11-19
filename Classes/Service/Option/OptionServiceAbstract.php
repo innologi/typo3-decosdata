@@ -96,16 +96,23 @@ abstract class OptionServiceAbstract {
 	 *
 	 * @param string $className
 	 * @return object
-	 * @throws \Innologi\Decosdata\Service\Option\Exception\MissingOptionClass
+	 * @throws Exception\MissingOptionClass
 	 */
 	protected function resolveOptionClass($className) {
 		if (strpos($className, '\\') === FALSE) {
-			$className = $this->optionNamespace. '\\' . $className;
+			$className = $this->optionNamespace . '\\' . $className;
 		}
 		if (!class_exists($className)) {
 			throw new Exception\MissingOptionClass(1448552497, array($className));
 		}
 		$object = $this->objectManager->get($className);
+		$interfaceClassName = $this->optionNamespace . '\\OptionInterface';
+		if ( !is_subclass_of($object, $interfaceClassName) ) {
+			throw new Exception\InvalidOptionClass(array(
+				// since $object was retrieved via objectManager, we're not sure if $object Class === $className
+				get_class($object), $interfaceClassName
+			));
+		}
 		return $object;
 	}
 }
