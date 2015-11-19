@@ -23,7 +23,7 @@ namespace Innologi\Decosdata\Service\Option;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface;
 /**
  * Query Option Service
  *
@@ -35,49 +35,45 @@ use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
  */
 class QueryOptionService extends OptionServiceAbstract {
 
-	// @TODO ___check to see if we really need a $queryBuilder reference in any option class, once we're finished. Because it doesn't seem like it, since we use $queryConfiguration
 	/**
 	 * Processes an array of field-options by calling the contained alterQueryField()
-	 * methods and passing a queryConfiguration reference and queryBuilder object to it.
+	 * methods and passing the necessary arguments to it.
 	 *
 	 * @param array $options
-	 * @param array &$queryConfiguration
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\QueryBuilder $queryBuilder
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface $configuration
 	 * @return void
 	 */
-	public function processFieldOptions(array $options, array &$queryConfiguration, QueryBuilder $queryBuilder) {
-		foreach ($options as $option) {
-			$this->executeOption('alterQueryField', $option, $queryConfiguration, $queryBuilder);
+	public function processFieldOptions(array $options, QueryInterface $configuration) {
+		foreach ($options as $index => $option) {
+			$this->executeOption('alterQueryField', $option, $configuration, $index);
 		}
 	}
 
 	/**
 	 * Processes an array of column-options by calling the contained alterQueryColumn()
-	 * methods and passing a queryConfiguration reference and queryBuilder object to it.
+	 * methods and passing the necessary arguments to it.
 	 *
 	 * @param array $options
-	 * @param array &$queryConfiguration
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\QueryBuilder $queryBuilder
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface $configuration
 	 * @return void
 	 */
-	public function processColumnOptions(array $options, array &$queryConfiguration, QueryBuilder $queryBuilder) {
-		foreach ($options as $option) {
-			$this->executeOption('alterQueryColumn', $option, $queryConfiguration, $queryBuilder);
+	public function processColumnOptions(array $options, QueryInterface $configuration) {
+		foreach ($options as $index => $option) {
+			$this->executeOption('alterQueryColumn', $option, $configuration, $index);
 		}
 	}
 
 	/**
 	 * Processes an array of row-options by calling the contained alterQueryRow()
-	 * methods and passing a queryConfiguration reference and queryBuilder object to it.
+	 * methods and passing the necessary arguments to it.
 	 *
 	 * @param array $options
-	 * @param array &$queryConfiguration
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\QueryBuilder $queryBuilder
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface $configuration
 	 * @return void
 	 */
-	public function processRowOptions(array $options, array &$queryConfiguration, QueryBuilder $queryBuilder) {
-		foreach ($options as $option) {
-			$this->executeOption('alterQueryRow', $option, $queryConfiguration, $queryBuilder);
+	public function processRowOptions(array $options, QueryInterface $configuration) {
+		foreach ($options as $index => $option) {
+			$this->executeOption('alterQueryRow', $option, $configuration, $index);
 		}
 	}
 

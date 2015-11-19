@@ -23,7 +23,9 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 /**
  * Query Option Interface
  *
@@ -34,36 +36,36 @@ use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
 interface OptionInterface {
 
 	/**
-	 * Alters query through $queryConfiguration reference and $queryBuilder instance
-	 * on the field level. Influences a specific column field.
+	 * Alters query through $queryField on the field level.
+	 * Influences a specific column field.
 	 *
 	 * @param array $args
-	 * @param array &$queryConfiguration
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\QueryBuilder $queryBuilder
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\QueryField $queryField
+	 * @param integer $optionIndex
 	 * @return void
 	 */
-	public function alterQueryField(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder);
+	public function alterQueryField(array $args, QueryField $queryField, $optionIndex);
 
 	/**
-	 * Alters query through $queryConfiguration reference and $queryBuilder instance
-	 * on the column level. Influences all fields of a column.
+	 * Alters query through $queryContent on the column level.
+	 * Influences all fields of a column.
 	 *
 	 * @param array $args
-	 * @param array &$queryConfiguration
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\QueryBuilder $queryBuilder
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent $queryContent
+	 * @param integer $optionIndex
 	 * @return void
 	 */
-	public function alterQueryColumn(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder);
+	public function alterQueryColumn(array $args, QueryContent $queryContent, $optionIndex);
 
 	/**
-	 * Alters query through $queryConfiguration reference and $queryBuilder instance
-	 * on the row level. Influences the entire row of columns.
+	 * Alters query through $query on the row level.
+	 * Influences the entire row of columns.
 	 *
 	 * @param array $args
-	 * @param array &$queryConfiguration
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\QueryBuilder $queryBuilder
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Query $query
+	 * @param integer $optionIndex
 	 * @return void
 	 */
-	public function alterQueryRow(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder);
+	public function alterQueryRow(array $args, Query $query, $optionIndex);
 
 }

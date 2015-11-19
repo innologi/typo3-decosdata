@@ -23,8 +23,8 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
 /**
  * FilterItems option
  *
@@ -36,14 +36,13 @@ use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
  */
 class FilterItems extends OptionAbstract {
 	// @TODO ___can we include the quick filters?
-	// @TODO ___init() method if they all start the same
 	// @TODO ___base FilterSubItem(?) on this one, see if we can create an abstract on which both rely
 
 	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\QueryConfigurator
+	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
 	 * @inject
 	 */
-	protected $queryConfigurator;
+	protected $constraintFactory;
 
 	/**
 	 * Initializes public methods by providing shared logic
@@ -65,41 +64,48 @@ class FilterItems extends OptionAbstract {
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
 	 */
-	public function alterQueryField(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
+	public function alterQueryField(array $args, QueryField $queryField, $optionIndex) {
 		$this->initialize($args);
+		$id = $queryField->getId() . 'filteritems' . $optionIndex;
+
+		$select = $queryField->getSelect();
 
 		$conditions = array();
 		foreach ($args['filters'] as $filter) {
-			$conditions[] = $this->queryConfigurator->provideWhereConditionSafe(
-				$queryConfiguration['SELECT']['field'], $filter['operator'], $filter['value'], $queryConfiguration['PARAMETER']['WHERE']
+			// @TODO ___how do we determine if this one is safe or unsafe? In QueryConfigurator? By property? HOWWW??
+			$conditions[] = $this->constraintFactory->createConstraintByValue(
+				$select->getField(),
+				$select->getTableAlias(),
+				$filter['operator'],
+				$filter['value']
 			);
 		}
 
 		if (count($conditions) > 1) {
-			$constraintType = isset($args['matchAll']) && (bool) $args['matchAll'] ? 'AND' : 'OR';
-			$conditions = array($constraintType => $conditions);
+			$logic = isset($args['matchAll']) && (bool) $args['matchAll'] ? 'AND' : 'OR';
+			$constraint = $this->constraintFactory->createConstraintCollection($logic, $conditions);
+		} else {
+			$constraint = $conditions[0];
 		}
 
-		$queryConfiguration['WHERE'][] = $conditions;
+		$queryField->getWhere()->addConstraint($id, $constraint);
 	}
-	// @TODO _doc
+
 	/**
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
 	 */
 	/*public function alterQueryColumn(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
 		$this->initialize($args);
-
-		// @FIX _FUCK, hoe benader je nu de select alias? (wordt nog niet gebruikt)
 	}*/
 
 	/**
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
 	 */
-	/*public function alterQueryRow(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
+	/*public function alterQueryRow(array $args, Query $configuration, $optionIndex) {
 		$this->initialize($args);
-		// @FIX _outdated @ SELECT[alias] and queryAdd/parameterAdd (wordt nog niet gebruikt)
+
 		$counter = 0;
 		$addedFields = array();
 		$constraintType = isset($args['matchAll']) && (bool) $args['matchAll'] ? 'AND' : 'OR';
@@ -117,6 +123,52 @@ class FilterItems extends OptionAbstract {
 
 			} elseif (isset($filter['field'])) {
 				// @FIX _this doesn't work if the above matchAll is FALSE, think this through
+				// this order is important, because $this->resolveComparisonValue() will add a second parameter
+				$queryConfiguration->addParameter(':filter-items-row', $filter['field']);
+				$queryConfiguration->addQueryFrom(
+					$this->queryConfigurator->provideFrom(
+						'tx_decosdata_domain_model_itemfield', 'filter'.$counter, 'INNER',
+						array(
+							'item/=/it/uid',
+							'field/=/:filter-items-row',
+							'field_value/'.$filter['operator'].'/'.$filter['value']
+						)
+					)
+				);
+
+				#array(
+				#	'localField' => 'field_value',
+				#	'operator' => $this->resolveOperator($filter),
+				#	'value' => $this->resolveComparisonValue($filter, 'FROM')
+				#)
+
+			} else {
+				// @TODO _throw exception
+			}
+		}
+	}*/
+
+	/**
+	 * {@inheritDoc}
+	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
+	 */
+	/*public function alterQueryRow(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
+		$this->initialize($args);
+		$counter = 0;
+		$addedFields = array();
+		$constraintType = isset($args['matchAll']) && (bool) $args['matchAll'] ? 'AND' : 'OR';
+		foreach ($args['filters'] as $filter) {
+			if (isset($filter['contentField'])) {
+				$fieldId = $filter['contentField'];
+				if (!isset($queryConfiguration[$fieldId][0]['SELECT']['alias'])) {
+				}
+				$queryConfiguration[$fieldId][]['WHERE'][] = array(
+					'field' => $queryConfiguration[$filter['contentField']][0]['SELECT']['alias'],
+					'operator' => $this->resolveOperator($filter),
+					'value' => $this->resolveComparisonValue($filter, 'WHERE')
+				);
+
+			} elseif (isset($filter['field'])) {
 				// this order is important, because $this->resolveComparisonValue() will add a second parameter
 				$this->parameterAdd['FROM'][] = $filter['field'];
 				$this->queryAdd['FROM'][] = array(
@@ -145,7 +197,6 @@ class FilterItems extends OptionAbstract {
 				);
 
 			} else {
-				// @TODO _throw exception
 			}
 
 		}

@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Domain\Repository;
+namespace Innologi\Decosdata\Service\QueryBuilder\Query;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,42 +23,46 @@ namespace Innologi\Decosdata\Domain\Repository;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
-use Innologi\Decosdata\Service\QueryBuilder\Statement;
+
 /**
- * Item domain repository
+ * Query object interface
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemRepository extends RepositoryAbstract {
+interface QueryInterface {
 
 	/**
-	 * Finds items with query object and returns the result as a raw array
+	 * Gets parameters
 	 *
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Statement $statement
 	 * @return array
 	 */
-	public function findWithStatement(Statement $statement) {
-		$query = $this->createQuery();
-		/* @var $query \TYPO3\CMS\Extbase\Persistence\Generic\Query */
-		return $query->statement(
-			$statement
-		)->execute(TRUE);
-	}
+	public function getParameters();
 
 	/**
-	 * Finds one item by its unique (per pid) itemkey.
+	 * Sets parameters
 	 *
-	 * @param string $itemKey
-	 * @return \Innologi\Decosdata\Domain\Model\Item|NULL
+	 * @param array $parameters
+	 * @return $this
 	 */
-	public function findOneByItemKey($itemKey) {
-		$query = $this->createQuery();
-		return $query->matching(
-			$query->equals('itemKey', $itemKey)
-		)->execute()->getFirst();
-	}
+	public function setParameters(array $parameters);
+
+	/**
+	 * Adds a parameter
+	 *
+	 * @param string $key
+	 * @param string $value
+	 * @return $this
+	 */
+	public function addParameter($key, $value);
+
+	/**
+	 * Removes a parameter
+	 *
+	 * @param string $key
+	 * @return $this
+	 */
+	public function removeParameter($key);
 
 }

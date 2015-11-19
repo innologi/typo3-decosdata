@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Service\QueryBuilder;
+namespace Innologi\Decosdata\Service\QueryBuilder\Query;
 /***************************************************************
  *  Copyright notice
  *
@@ -25,74 +25,41 @@ namespace Innologi\Decosdata\Service\QueryBuilder;
  ***************************************************************/
 
 /**
- * Query Object
+ * Query object iterator abstract
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class Query {
-
-	/**
-	 * @var string
-	 */
-	protected $query;
+abstract class QueryIterator implements \Iterator {
 
 	/**
 	 * @var array
 	 */
-	protected $parameters;
+	protected $children = array();
 
-	/**
-	 * Class constructor
-	 *
-	 * @param string $query
-	 * @param array $parameters
-	 * @return void
-	 */
-	public function __construct($query = '', array $parameters = array()) {
-		$this->query = $query;
-		$this->parameters = $parameters;
+	/**************************
+	 * Iterator implementation
+	 **************************/
+
+	public function current () {
+		return current($this->children);
 	}
 
-	/**
-	 * Return query
-	 *
-	 * @return string
-	 */
-	public function getQuery() {
-		return $this->query;
+	public function next () {
+		return next($this->children);
 	}
 
-	/**
-	 * Sets query
-	 *
-	 * @param string $query
-	 * @return Query
-	 */
-	public function setQuery($query) {
-		$this->query = $query;
-		return $this;
+	public function key () {
+		return key($this->children);
 	}
 
-	/**
-	 * Returns parameters
-	 *
-	 * @return array
-	 */
-	public function getParameters() {
-		return $this->parameters;
+	public function valid () {
+		return current($this->children) !== FALSE;
 	}
 
-	/**
-	 * Sets parameters
-	 *
-	 * @param array $parameters
-	 * @return Query
-	 */
-	public function setParameters(array $parameters) {
-		$this->parameters = $parameters;
-		return $this;
+	public function rewind () {
+		reset($this->children);
 	}
 
 }

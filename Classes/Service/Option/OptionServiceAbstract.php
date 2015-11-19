@@ -23,8 +23,7 @@ namespace Innologi\Decosdata\Service\Option;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\Option\Exception\MissingOption;
-use Innologi\Decosdata\Service\Option\Exception\MissingOptionClass;
+
 /**
  * Option Service Abstract
  *
@@ -62,20 +61,20 @@ abstract class OptionServiceAbstract {
 	public function __construct() {
 		$this->optionNamespace = str_replace('OptionService', '', get_class($this));
 	}
-
+	// @TODO ___debug to see if this is still a valid construction now that Query uses objects as $value
 	/**
 	 * Executes the given optionMethod on the requested option.
 	 *
 	 * @param string $optionMethod
 	 * @param array $option
 	 * @param mixed &$value
-	 * @param object $parentObject
+	 * @param mixed $helperVar
 	 * @return void
-	 * @throws \Innologi\Decosdata\Service\Option\Exception\MissingOption
+	 * @throws Exception\MissingOption
 	 */
-	protected function executeOption($optionMethod, array $option, &$value, $parentObject) {
+	protected function executeOption($optionMethod, array $option, &$value, $helperVar) {
 		if ( !isset($option['option']) ) {
-			throw new MissingOption(1448552481);
+			throw new Exception\MissingOption(1448552481);
 		}
 		if ( !isset($option['args']) ) {
 			$option['args'] = array();
@@ -86,7 +85,7 @@ abstract class OptionServiceAbstract {
 		}
 		call_user_func_array(
 			array($this->objectCache[$className], $optionMethod),
-			array($option['args'], &$value, $parentObject)
+			array($option['args'], &$value, $helperVar)
 		);
 	}
 
@@ -104,7 +103,7 @@ abstract class OptionServiceAbstract {
 			$className = $this->optionNamespace. '\\' . $className;
 		}
 		if (!class_exists($className)) {
-			throw new MissingOptionClass(1448552497, array($className));
+			throw new Exception\MissingOptionClass(1448552497, array($className));
 		}
 		$object = $this->objectManager->get($className);
 		return $object;

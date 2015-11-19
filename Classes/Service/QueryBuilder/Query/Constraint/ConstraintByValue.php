@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Domain\Repository;
+namespace Innologi\Decosdata\Service\QueryBuilder\Query\Constraint;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,42 +23,56 @@ namespace Innologi\Decosdata\Domain\Repository;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
-use Innologi\Decosdata\Service\QueryBuilder\Statement;
+
 /**
- * Item domain repository
+ * Constraint By Value
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemRepository extends RepositoryAbstract {
+class ConstraintByValue extends ConstraintAbstract {
 
 	/**
-	 * Finds items with query object and returns the result as a raw array
-	 *
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Statement $statement
-	 * @return array
+	 * @var mixed
 	 */
-	public function findWithStatement(Statement $statement) {
-		$query = $this->createQuery();
-		/* @var $query \TYPO3\CMS\Extbase\Persistence\Generic\Query */
-		return $query->statement(
-			$statement
-		)->execute(TRUE);
+	protected $value;
+
+	/**
+	 * Class constructor
+	 *
+	 * @param string $localField
+	 * @param string $localAlias
+	 * @param string $operator
+	 * @param mixed $value
+	 * @return $this
+	 */
+	public function __construct($localField, $localAlias, $operator, $value) {
+		$this->localField = $localField;
+		$this->localAlias = $localAlias;
+		$this->operator = $operator;
+		$this->value = $value;
+		return $this;
 	}
 
 	/**
-	 * Finds one item by its unique (per pid) itemkey.
+	 * Returns value
 	 *
-	 * @param string $itemKey
-	 * @return \Innologi\Decosdata\Domain\Model\Item|NULL
+	 * @return mixed
 	 */
-	public function findOneByItemKey($itemKey) {
-		$query = $this->createQuery();
-		return $query->matching(
-			$query->equals('itemKey', $itemKey)
-		)->execute()->getFirst();
+	public function getValue() {
+		return $this->value;
+	}
+
+	/**
+	 * Sets value
+	 *
+	 * @param mixed $value
+	 * @return $this
+	 */
+	public function setValue($value) {
+		$this->value = $value;
+		return $this;
 	}
 
 }

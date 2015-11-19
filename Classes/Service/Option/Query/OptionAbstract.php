@@ -23,10 +23,12 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
 use Innologi\Decosdata\Service\Option\Exception\AlterQueryFieldDenied;
 use Innologi\Decosdata\Service\Option\Exception\AlterQueryColumnDenied;
 use Innologi\Decosdata\Service\Option\Exception\AlterQueryRowDenied;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 /**
  * Query Option Abstract
  *
@@ -41,7 +43,7 @@ abstract class OptionAbstract implements OptionInterface {
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
 	 * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryFieldDenied
 	 */
-	public function alterQueryField(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
+	public function alterQueryField(array $args, QueryField $queryField, $optionIndex) {
 		throw new AlterQueryFieldDenied(1448551244, array(get_class($this)));
 	}
 
@@ -50,7 +52,7 @@ abstract class OptionAbstract implements OptionInterface {
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
 	 * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryColumnDenied
 	 */
-	public function alterQueryColumn(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
+	public function alterQueryColumn(array $args, QueryContent $queryContent, $optionIndex) {
 		throw new AlterQueryColumnDenied(1448551259, array(get_class($this)));
 	}
 
@@ -59,7 +61,7 @@ abstract class OptionAbstract implements OptionInterface {
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
 	 * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryRowDenied
 	 */
-	public function alterQueryRow(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
+	public function alterQueryRow(array $args, Query $query, $optionIndex) {
 		throw new AlterQueryRowDenied(1448551286, array(get_class($this)));
 	}
 

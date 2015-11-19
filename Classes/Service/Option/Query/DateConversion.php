@@ -23,7 +23,7 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use \Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
 /**
  * DateConversion option
  *
@@ -41,13 +41,15 @@ class DateConversion extends OptionAbstract {
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
 	 */
-	public function alterQueryField(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
+	public function alterQueryField(array $args, QueryField $queryField, $optionIndex) {
 		if (!isset($args['format'])) {
 			// @TODO ___throw exception.. or should it be optional?
 		}
 
-		$queryConfiguration['SELECT']['wrap'][] = 'DATE_FORMAT(|, ?)';
-		$queryConfiguration['PARAMETER']['SELECT'][] = $args['format'];
+		$id = $queryField->getId() . 'dateconversion' . $optionIndex;
+		$parameterKey = ':' . $id;
+		$queryField->getSelect()->addWrap($id, 'DATE_FORMAT(|, ' . $parameterKey . ')');
+		$queryField->addParameter($parameterKey, $args['format']);
 	}
 
 }

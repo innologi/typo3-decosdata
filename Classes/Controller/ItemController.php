@@ -177,18 +177,18 @@ class ItemController extends ActionController {
 	public function listAction() {
 		$level = 1;
 		// @TODO ___do we force a single query method, or do we allow a choice set by configuration?
-		// @FIX // __________add pagebrowser config.. via widget? or better via querybuilder?
-		$query = $this->queryBuilder->buildListQuery(
-			$this->piConf['level'][$level], $this->piConf['import']
-		);
-		$items = $this->itemRepository->findWithQueryObject(
-			$query
+		// @FIX ________add pagebrowser config.. via widget? or better via querybuilder?
+		// @TODO _rename?
+		$items = $this->itemRepository->findWithStatement(
+			($statement = $this->queryBuilder->buildListQuery(
+				$this->piConf['level'][$level], $this->piConf['import']
+			)->createStatement())
 		);
 
 		$this->view->assign('configuration', $this->piConf['level'][$level]);
 		$this->view->assign('contentFieldCount', count($this->piConf['level'][$level]['contentField']));
 		$this->view->assign('items', $items);
 		// @TODO ___remove
-		$this->view->assign('query', $query);
+		$this->view->assign('query', $statement->getQuery());
 	}
 }

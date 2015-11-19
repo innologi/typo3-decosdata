@@ -24,18 +24,24 @@ namespace Innologi\Decosdata\Service\QueryBuilder;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Part\Select;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Part\From;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintInterface;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintCollection;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintByValue;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintByField;
 /**
  * Query Configurator
  *
- * Provides methods to process, to transform, or to provide default
- * Query configurations.
+ * Provides methods to transform Query objects to Query Parts.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class QueryConfigurator implements SingletonInterface {
-	// @TODO ____SELECT and WHERE's 'field' element is inconsistent with 'FROM's constraint; this is confusing
 	// @LOW _lots of hardcoded SQL keywords that should be provided by query provider class from database service
 	/**
 	 * @var array
@@ -68,120 +74,13 @@ class QueryConfigurator implements SingletonInterface {
 	protected $defaultOperator = '=';
 
 	/**
-	 * Provide FROM queryConfiguration.
+	 * Transforms a Query object to actual SQL Query Parts.
 	 *
-	 * $constraints elements should be strings formatted as:
-	 * - when compared to foreign field:
-	 * 		localField/operator/foreignAlias/foreignField
-	 * - when compared to value or function:
-	 * 		localField/operator/value
-	 *
-	 * @param string $table
-	 * @param string $alias
-	 * @param string $joinType
-	 * @param array $constraints
-	 * @param boolean $matchAll
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Query $query
 	 * @return array
 	 */
-	public function provideFrom($table, $alias = '', $joinType = '', array $constraints = array(), $matchAll = TRUE) {
-		$from = array(
-			'table' => $table
-		);
-		if (isset($alias[0])) {
-			$from['alias'] = $alias;
-		}
-		if (isset($joinType[0])) {
-			$from['joinType'] = $joinType;
-			if (!empty($constraints)) {
-				$from['constraints'] = array();
-				foreach ($constraints as $constraint) {
-					list($localField, $operator, $var1, $var2) = explode('/', $constraint, 4);
-					$c = array(
-						'localField' => $localField,
-						'operator' => $operator
-					);
-					// note the distinction being made only if $var2 exists
-					if (isset($var2)) {
-						$c['foreignAlias'] = $var1;
-						$c['foreignField'] = $var2;
-					} else {
-						$c['value'] = $var1;
-					}
-					$from['constraints'][] = $c;
-				}
-				$from['matchAll'] = $matchAll;
-			}
-		}
-		return $from;
-	}
-
-	/**
-	 * Provide WHERE condition configuration. This variant assumes no checks are needed
-	 * on the operator and value, and is therefore faster than provideWhereSafe().
-	 * Should only be used with hardcoded or previously verified argument values.
-	 *
-	 * Note that it only returns a single WHERE condition, you have to provide further
-	 * logic for WHERE configuration yourself, for now.
-	 *
-	 * @param string $field
-	 * @param string $operator
-	 * @param string $value
-	 * @return array
-	 * @see QueryConfigurator::provideWhereConditionSafe()
-	 */
-	public function provideWhereConditionUnsafe($field, $operator, $value) {
-		return array(
-			'field' => $field,
-			'operator' => $operator,
-			'value' => $value
-		);
-	}
-
-	/**
-	 * Provide WHERE condition configuration. This variant checks if operator is
-	 * supported and if value needs treatment for parameterization, before passing
-	 * them along to provideWhereUnsafe(). This variant is useful for constraints
-	 * that contain user-input.
-	 *
-	 * There are no checks on $field, because it should NEVER be derived from
-	 * user-input.
-	 *
-	 * If the $parameters reference did not previously exist, it will afterwards
-	 * if parameterization is applied.
-	 *
-	 * Note that it only returns a single WHERE condition, you have to provide further
-	 * logic for WHERE configuration yourself, for now.
-	 *
-	 * @param string $field
-	 * @param string $operator
-	 * @param string $value
-	 * @param array $parameters
-	 * @return array
-	 * @see QueryConfigurator::provideWhereConditionUnsafe()
-	 * @see QueryConfigurator::resolveComparisonValue()
-	 */
-	public function provideWhereConditionSafe($field, $operator, $value, &$parameters) {
-		if (!is_array($parameters)) {
-			$parameters = array();
-		}
-		return $this->provideWhereConditionUnsafe(
-			$field,
-			$this->resolveOperator($operator),
-			$this->resolveComparisonValue($value, $parameters)
-		);
-	}
-
-	/**
-	 * Transforms a valid queryConfiguration to actual SQL into &$queryParts and &$parameterParts.
-	 * Both references can be used to form a Query object.
-	 *
-	 * @param array $queryConfiguration
-	 * @param array &$queryParts
-	 * @param array &$parameterParts
-	 * @return void
-	 */
-	public function transformConfiguration(array $queryConfiguration, array &$queryParts, array &$parameterParts) {
-		$qParts = array();
+	public function transformConfiguration(Query $query) {
+		$queryParts = array();
 		$glue = array(
 			'SELECT' => ',',
 			'FROM' => "\n",
@@ -190,91 +89,101 @@ class QueryConfigurator implements SingletonInterface {
 			'ORDERBY' => ','
 		);
 
-		// Query configurations are separated by IDs that represent their content field.
-		// This effectively gives us control to alter specific configuration parts from other
-		// parts (e.g. options), and to impose the order given by the content configuration.
-		foreach ($queryConfiguration as $id => $subConfiguration) {
-			$select = array();
-			foreach ($subConfiguration as $parts) {
-				foreach ($parts as $part => $partConfig) {
-					switch ($part) {
-						case 'SELECT':
-							$select[] = $this->transformSelect($partConfig);
-							break;
-						case 'FROM':
-							// multiple from configurations per id possible
-							foreach ($partConfig as $fromConfig) {
-								$qParts[$part][] = $this->transformFrom($fromConfig);
-							}
-							break;
-						case 'WHERE':
-							$qParts[$part][] = $this->transformWhere($partConfig);
-							break;
-						case 'GROUPBY':
-							$qParts[$part][$partConfig['priority']] = $id;
-							break;
-						case 'ORDERBY':
-							$qParts[$part][$partConfig['priority']] = $this->transformOrderBy($partConfig, $id);
-							break;
-						case 'PARAMETER':
-							foreach ($partConfig as $subPart => $parameters) {
-								$parameterParts[$subPart] = array_merge($parameterParts[$subPart], $parameters);
-							}
-					}
+		// Query consists of QueryContent with an ID that represents content alias.
+		// This object-approach effectively gives us control to alter specific configuration parts from
+		// other parts (e.g. options), and to impose a specific order of parts before I'm left to fiddle
+		// with hacky string manipulation as was the case in tx_decospublisher.
+
+		/** @var $queryContent \Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent */
+		foreach ($query as $id => $queryContent) {
+			$concatSelect = array();
+			/** @var $queryField \Innologi\Decosdata\Service\QueryBuilder\Query\QueryField */
+			foreach ($queryContent as $queryField) {
+				// @LOW ___this doesn't look right, I have dedicated methods which should isolate everything pertaining to the object, but I still have to check specific values before executing them
+				$select = $queryField->getSelect();
+				if ($select->getField() !== NULL) {
+					$concatSelect[] = $this->transformSelect($select);
+				}
+				$fromArray = $queryField->getFrom();
+				foreach ($fromArray as $from) {
+					$queryParts['FROM'][] = $this->transformFrom($from);
+				}
+				$where = $queryField->getWhere();
+				if ($where->getConstraint() !== NULL) {
+					$queryParts['WHERE'][] = $this->transformConstraint($where->getConstraint(), 'WHERE');
 				}
 			}
 
 			// applies concatting SELECT per id, to form a single alias per content field
-			if (!empty($select)) {
-				$qParts['SELECT'][] = $this->concatSelect($select, $id);
+			if (!empty($concatSelect)) {
+				$queryParts['SELECT'][] = $this->concatSelect($concatSelect, $id);
+			}
+
+			$groupBy = $queryContent->getGroupBy();
+			if ($groupBy->getPriority() !== NULL) {
+				$queryParts['GROUPBY'][$groupBy->getPriority()] = $id;
+			}
+			$orderBy = $queryContent->getOrderBy();
+			if ($orderBy->getPriority() !== NULL) {
+				$queryParts['ORDERBY'][$orderBy->getPriority()] = $this->transformOrderBy($orderBy, $id);
 			}
 		}
 
 		// these are stored by priority, so we can determine the order by sorting on key
-		if (isset($qParts['GROUPBY'])) {
-			ksort($qParts['GROUPBY']);
+		if (isset($queryParts['GROUPBY'])) {
+			ksort($queryParts['GROUPBY']);
 		}
-		if (isset($qParts['ORDERBY'])) {
-			ksort($qParts['ORDERBY']);
+		if (isset($queryParts['ORDERBY'])) {
+			ksort($queryParts['ORDERBY']);
 		}
 
 		// joins all parts' elements to part strings
-		foreach ($qParts as $part => $q) {
-			if (!isset($queryParts[$part])) {
-				$queryParts[$part] = '';
+		foreach ($queryParts as $part => $q) {
+			$queryParts[$part] = join($glue[$part], $q);
 			}
-			$queryParts[$part] .= join($glue[$part], $q);
-		}
+
+		return $queryParts;
 	}
 
 	/**
-	 * Transform a SELECT configuration
+	 * Transform a SELECT object
 	 *
 	 * - Requires 'field' element
+	 * - Requires 'tableAlias' element
 	 * - Supports 'wrap' element containing pipe-character "|"
 	 *
-	 * @param array $configuration
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Part\Select $select
 	 * @return string
 	 * @throws Exception\MissingConfigurationProperty
 	 */
-	protected function transformSelect(array $configuration) {
-		if (!isset($configuration['field'])) {
+	protected function transformSelect(Select $select) {
+		$field = $select->getField();
+		if (!isset($field[0])) {
 			throw new Exception\MissingConfigurationProperty(1448552576, array(
-				'SELECT', 'field', json_encode($configuration)
+				'SELECT', 'field', json_encode($select)
 			));
 		}
 
-		if (isset($configuration['wrap'])) {
-			foreach($configuration['wrap'] as $wrap) {
-				$configuration['field'] = str_replace('|', $configuration['field'], $wrap);
-			}
+		$tableAlias = $select->getTableAlias();
+		if (!isset($tableAlias[0])) {
+			throw new Exception\MissingConfigurationProperty(1448622360, array(
+				'SELECT', 'tableAlias', json_encode($select)
+			));
 		}
-		$select = $configuration['field'];
-		return $select;
+
+		$string = $tableAlias . '.' . $field;
+
+		$wrapArray = $select->getWrap();
+		foreach ($wrapArray as $wrap) {
+			$string = str_replace('|', $string, $wrap);
+		}
+
+		return $string;
 	}
 
 	/**
-	 * Concats a select string to form a single alias for one or more select fields.
+	 * Joins multiple SELECT fields under a single alias
+	 * through concat mysql function(s).
 	 *
 	 * @param array $select
 	 * @param string $alias
@@ -288,137 +197,112 @@ class QueryConfigurator implements SingletonInterface {
 	}
 
 	/**
-	 * Transforms a FROM configuration. Note that each configuration
-	 * can refer to only a single 'table', even though e.g. MySQL supports
-	 * multiple per JOIN and decospublisher did this too. This is by design,
+	 * Transforms a FROM object. Note that each configuration can refer
+	 * to only a single 'table', even though e.g. MySQL supports multiple
+	 * per JOIN and tx_decospublisher did this too. This is by design,
 	 * to reduce configuration complexity. Just provide multiple FROM
 	 * configurations if there are multiple tables to be joined.
 	 *
 	 * - Requires 'table' element
 	 * - Supports 'joinType' element
 	 * - Supports 'alias' element
-	 * - Supports 'constraints' array and optional 'matchAll' boolean
+	 * - Supports a 'constraint'
 	 *
-	 * A contraints element array:
-	 * - Requires 'localField' element
-	 * - Requires 'operator' element
-	 * - Requires either a 'value' element or 'foreignAlias' + 'foreignField' elements
-	 *
-	 * @param array $configuration
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Part\From $from
 	 * @return string
 	 * @throws Exception\MissingConfigurationProperty
 	 * @throws Exception\UnsupportedFeatureType
 	 */
-	protected function transformFrom(array $configuration) {
-		if (!isset($configuration['table'])) {
+	protected function transformFrom(From $from) {
+		$string = $from->getTable();
+		if (!isset($string[0])) {
 			throw new Exception\MissingConfigurationProperty(1448552598, array(
-				'FROM', 'table', json_encode($configuration)
+				'FROM', 'table', json_encode($from)
 			));
 		}
 
-		$from = $configuration['table'];
-		if (isset($configuration['alias'])) {
-			$from .= ' ' . $configuration['alias'];
-		} else {
-			// fallback for constraints below
-			$configuration['alias'] = $configuration['table'];
+		$alias = $from->getAlias();
+		if (isset($alias[0])) {
+			$string .= ' ' . $alias;
 		}
 
-		if (isset($configuration['joinType'])) {
-			if (!in_array($configuration['joinType'], $this->supportedJoins, TRUE)) {
+		$joinType = $from->getJoinType();
+		if ($joinType !== NULL) {
+			if (!in_array($joinType, $this->supportedJoins, TRUE)) {
 				throw new Exception\UnsupportedFeatureType(1448552612, array(
-					'TABLE JOIN TYPE', $configuration['joinType'], join('/', $this->supportedJoins)
+					'TABLE JOIN TYPE', $joinType, join('/', $this->supportedJoins)
 				));
 			}
-			$from = $configuration['joinType'] . ' JOIN ' . $from;
-
-			// constraints are applied on a join, otherwise they're ignored
-			if (isset($configuration['constraints'])) {
-				$constraintType = isset($configuration['matchAll']) && (bool) $configuration['matchAll'] ? 'AND' : 'OR';
-				$on = array();
-				foreach ($configuration['constraints'] as $constraint) {
-					if ( !(isset($constraint['localField']) && isset($constraint['operator'])) ) {
-						throw new Exception\MissingConfigurationProperty(1448552629, array(
-							'FROM', 'constraint.localField/operator', json_encode($configuration)
-						));
-					}
-					$c = $configuration['alias'] . '.' . $constraint['localField'] . ' ' . $constraint['operator'] . ' ';
-					if (isset($constraint['value'])) {
-						$c .= $constraint['value'];
-					} elseif (isset($constraint['foreignAlias']) && isset($constraint['foreignField'])) {
-						$c .= $constraint['foreignAlias'] . '.' . $constraint['foreignField'];
-					} else {
-						throw new Exception\MissingConfigurationProperty(1448552652, array(
-							'FROM', 'constraint.foreignAlias/foreignField/value', json_encode($configuration)
-						));
-					}
-					$on[] = $c;
-				}
-				$from .= ' ON (' . join(' ' . $constraintType . ' ', $on) . ')';
+			$string = $joinType . ' JOIN ' . $string;
+			$constraint = $from->getConstraint();
+			// constraints are only applied on a join, otherwise they're ignored
+			if ($constraint !== NULL) {
+				$string .= ' ON ' . $this->transformConstraint($constraint, 'FROM');
 			}
 		}
 
-		return $from;
+		return $string;
 	}
 
 	/**
-	 * Transforms a WHERE configuration recursively.
+	 * Transforms a Constraint object. Constraints can be part of:
+	 * - a FROM object
+	 * - a WHERE object
+	 * - a ConstraintCollection object
 	 *
-	 * Examples of supported $conditions structures:
-	 *
-	 * 1) (AND =>) array(
-	 * 		array(
-	 * 			'field' => 'field',
-	 * 			'operator' => '=',
-	 * 			'value' => '?'
-	 * 		)
-	 * 	)
-	 * 2) (AND =>) array(
-	 * 		array(
-	 * 			OR => array(
-	 * 				array(field/operator/value),
-	 * 				array(
-	 * 					AND => array(
-	 * 						array(field/operator/value),
-	 * 						array(field/operator/value)
-	 *					)
-	 * 				)
-	 * 			)
-	 * 		)
-	 * 	)
-	 *
-	 * @param array $conditions
-	 * @param string $logic AND or OR
-	 * @return string
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintInterface $constraint
+	 * @param string $queryPart
 	 * @throws Exception\UnsupportedFeatureType
 	 * @throws Exception\MissingConfigurationProperty
+	 * @return string
 	 */
-	protected function transformWhere(array $conditions, $logic = 'AND') {
+	protected function transformConstraint(ConstraintInterface $constraint, $queryPart = '') {
+		if ($constraint instanceof ConstraintCollection) {
+			$logic = $constraint->getLogic();
 		if (!in_array($logic, $this->supportedLogic, TRUE)) {
+			// @LOW _this doesn't really clarify anything if I don't know which piece of configuration is the cause..
 			throw new Exception\UnsupportedFeatureType(1448552681, array(
 				'LOGICAL OPERATOR', $logic, join('/', $this->supportedLogic)
 			));
 		}
-
-		// $conditions is always multi-dimensional!
-		$where = array();
-		foreach ($conditions as $configuration) {
-			// $configuration contains a field/operator/value
-			if (count($configuration) > 1) {
-				if ( !(isset($configuration['field']) && isset($configuration['operator']) && isset($configuration['value'])) ) {
-					throw new Exception\MissingConfigurationProperty(1448552699, array(
-						'WHERE', 'field/operator/value', json_encode($conditions)
-					));
-				}
-				// @TODO ___is this safe enough? provideWhereConditionSafe() handles some validation, but shouldn't it be done from here instead? Also, how would we verify field?
-				$where[] = $configuration['field'] . ' ' . $configuration['operator'] . ' ' . $configuration['value'];
-			// .. or it contains a single new conditions array with AND/OR key for the next recursion
-			} else {
-				$where[] = '(' . $this->transformWhere(current($configuration), key($configuration)) . ')';
+			$parts = array();
+			// a collection requires recursive use of this method
+			foreach ($constraint as $subConstraint) {
+				$parts[] = $this->transformConstraint($subConstraint);
 			}
+			return '(' . join(' ' . $logic . ' ', $parts) . ')';
 		}
 
-		return join(' ' . $logic . ' ', $where);
+		$localField = $constraint->getLocalField();
+		if ( !isset($localField[0]) ) {
+			throw new Exception\MissingConfigurationProperty(1448552629, array(
+				$queryPart, 'constraint.localField', json_encode($constraint)
+			));
+		}
+		$localAlias = $constraint->getLocalAlias();
+		if ( !isset($localAlias[0]) ) {
+			throw new Exception\MissingConfigurationProperty(1448552652, array(
+				$queryPart, 'constraint.localAlias', json_encode($constraint)
+			));
+		}
+		$operator = $constraint->getOperator();
+		if ( !isset($operator[0]) ) {
+			throw new Exception\MissingConfigurationProperty(1448552699, array(
+				$queryPart, 'constraint.operator', json_encode($constraint)
+			));
+		}
+				
+		// @TODO ___is this safe enough? provideWhereConditionSafe() handles some validation, but shouldn't it be done from here instead? Also, how would we verify field?
+		// @TODO ___this isn't really safe if an option allows to provide any of these fields, is it?
+		$string = $localAlias . '.' . $localField . ' ' . $operator . ' ';
+		if ($constraint instanceof ConstraintByValue) {
+			// @LOW ___check value? is this really the place? Can't we have some uniform validation class?
+			return $string . $constraint->getValue();
+			}
+		if ($constraint instanceof ConstraintByField) {
+			// @LOW ___check value? is this really the place? Can't we have some uniform validation class?
+			return $string . $constraint->getForeignAlias() . '.' . $constraint->getForeignField();
+		}
 	}
 
 	/**
@@ -428,31 +312,34 @@ class QueryConfigurator implements SingletonInterface {
 	 * - Requires 'priority' element
 	 * - Supports 'sort' element to set order
 	 *
-	 * @param array $configuration
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy $orderBy
 	 * @param string $alias
 	 * @return string
 	 * @throws Exception\MissingConfigurationProperty
 	 * @throws Exception\UnsupportedFeatureType
 	 */
-	protected function transformOrderBy(array $configuration, $alias) {
-		if (!isset($configuration['priority'])) {
+	protected function transformOrderBy(OrderBy $orderBy, $alias) {
+		// @LOW _of course, this doesn't make sense since we don't get here if it is NULL.. except the outside check needs to be replaced by different logic
+		if ($orderBy->getPriority() === NULL) {
 			throw new Exception\MissingConfigurationProperty(1448552721, array(
-				'ORDERBY', 'priority', json_encode($configuration)
+				'ORDERBY', 'priority', json_encode($orderBy)
 			));
 		}
 
-		$orderBy = $alias;
-		if (isset($configuration['sort'])) {
-			if (!in_array($configuration['sort'], $this->supportedSorting, TRUE)) {
+		$string = $alias;
+		$sortOrder = $orderBy->getSortOrder();
+		if ($sortOrder !== NULL) {
+			if (!in_array($sortOrder, $this->supportedSorting, TRUE)) {
 				throw new Exception\UnsupportedFeatureType(1448552741, array(
-					'SORTING ORDER', $configuration['sort'], join('/', $this->supportedSorting)
+					'SORTING ORDER', $sortOrder, join('/', $this->supportedSorting)
 				));
 			}
-			$orderBy .= ' ' . $configuration['sort'];
+			$string .= ' ' . $sortOrder;
 		}
-		return $orderBy;
+		return $string;
 	}
 
+	// @TODO __how, or rather WHERE to use these best?
 	/**
 	 * Resolves an operator for queryConfiguration.
 	 *
