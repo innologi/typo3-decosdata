@@ -77,6 +77,7 @@ class QueryBuilder {
 	 * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Query
 	 */
 	public function buildListQuery(array $configuration, array $import) {
+		/** @var $query \Innologi\Decosdata\Service\QueryBuilder\Query\Query */
 		$query = $this->objectManager->get(Query::class);
 
 		// init query config
@@ -87,7 +88,6 @@ class QueryBuilder {
 			->setField('uid')
 			->setTableAlias('it');
 		$queryField->createFrom('item', 'tx_decosdata_domain_model_item', 'it');
-
 
 		// add xml_id-condition if configured
 		if (!empty($import)) {
@@ -138,10 +138,17 @@ class QueryBuilder {
 			$this->optionService->processRowOptions($configuration['queryOptions'], $query);
 		}
 
+		// apply pagination settings
 		if (isset($configuration['paginate'])) {
-			$this->paginateService->paginateQuery($configuration['paginate'], $query);
+			$this->paginateService->configurePagination($configuration['paginate'], $query->createStatement());
+			if ($this->paginateService->isReady()) {
+				# @LOW _this is a temporary interface until the relevant FIX task in PaginateService is completed
+				$query->setLimit(
+					$this->paginateService->getLimit(),
+					$this->paginateService->getOffset()
+				);
+			}
 		}
-
 
 		return $query;
 	}

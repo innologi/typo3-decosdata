@@ -24,7 +24,8 @@ namespace Innologi\Decosdata\Service\QueryBuilder;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
+use TYPO3\CMS\Core\Database\PreparedStatement;
+use Innologi\Decosdata\Exception\PaginationError;
 /**
  * Pagination Service
  *
@@ -53,6 +54,16 @@ class PaginateService implements SingletonInterface {
 	protected $pageCount = 1;
 
 	/**
+	 * @var integer
+	 */
+	protected $limit;
+
+	/**
+	 * @var integer
+	 */
+	protected $offset;
+
+	/**
 	 * Returns current page number
 	 *
 	 * @return integer
@@ -71,32 +82,67 @@ class PaginateService implements SingletonInterface {
 	}
 
 	/**
+	 * Returns per page limit, e.g. for use in query LIMIT
+	 *
+	 * @return integer
+	 */
+	public function getLimit() {
+		return $this->limit;
+	}
+
+	/**
+	 * Returns offset for current page, e.g. for use in query LIMIT ... OFFSET
+	 *
+	 * @return integer
+	 */
+	public function getOffset() {
+		return $this->offset;
+	}
+
+	/**
+	 * Confirms whether the service was successfully configured and is applicable
+	 *
+	 * Note that this also returns FALSE when there was only 1 page, so not ready !== error
+	 *
+	 * @return boolean
+	 */
+	public function isReady() {
+		return $this->offset !== NULL;
+	}
+
+	/**
 	 * Paginate a Query object
 	 *
 	 * @param array $configuration
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Query $query
+	 * @param \TYPO3\CMS\Core\Database\PreparedStatement $statement
 	 * @return void
+	 * @throws \Innologi\Decosdata\Exception\PaginationError
 	 */
-	public function paginateQuery(array $configuration, Query $query) {
+	public function configurePagination(array $configuration, PreparedStatement $statement) {
 		if ( isset($configuration['type']) && !in_array($configuration['type'], $this->supportedTypes, TRUE) ) {
-			// @TODO throw exception
+			throw new PaginationError(array(
+				'type', $configuration['type'], join('/', $this->supportedTypes)
+			));
 		}
+		// invalidate any previous configuration
+		$this->offset = NULL;
+
 		switch ($configuration['type']) {
 			#case 'yearly':
-				#$this->paginateQueryYearly($configuration, $query);
+				#$this->configureYearly($configuration, $query);
 				#break;
 			default:
-				$this->paginateQueryDefault($configuration, $query);
+				$this->configureDefault($configuration, $statement);
 		}
 	}
 
 	// @TODO _finish this one
-	protected function paginateQueryYearly(array $configuration, Query $query) {
+	#protected function configureYearly(array $configuration, PreparedStatement $statement) {
 		/*
 		 * regex used to prevent mysql warnings and errors at fields that have
 		 * no consistent date values
 		 */
-		$regex = '^[0-9]{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])';
+		/*$regex = '^[0-9]{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])';
 		// secure parameters for query expansion
 		$dateField = $GLOBALS['TYPO3_DB']->fullQuoteStr($configuration['dateField'], NULL);
 		$offsetYear = $configuration['offsetYear'];
@@ -140,37 +186,44 @@ class PaginateService implements SingletonInterface {
 							AND IF(itf_pbYear.fieldvalue REGEXP (\'' . $regex . '\'),YEAR(itf_pbYear.fieldvalue)=' . $val . ',FALSE)';
 			}
 		}
-	}
+	}*/
 
-	protected function paginateQueryDefault(array $configuration, Query $query) {
-		if ( !(isset($configuration['pageLimit']) && isset($configuration['perPageLimit'])) ) {
-			// @TODO ___throw exception
-		}
-
+	/**
+	 * Configures a default pagination
+	 *
+	 * @param array $configuration
+	 * @param \TYPO3\CMS\Core\Database\PreparedStatement $statement
+	 * @throws \Innologi\Decosdata\Exception\PaginationError
+	 */
+	protected function configureDefault(array $configuration, PreparedStatement $statement) {
 		// @TODO ___use or clean up override
 		// perPageLimit override through GET var
 		/*$overrideVar = $this->controller->getPerPageLimitOverride();
-		 if ($overrideVar !== FALSE && isset($pBrowserConfArray['perPageLimitChoice'][$overrideVar])) {
-		 $pBrowserConfArray['perPageLimit'] = $pBrowserConfArray['perPageLimitChoice'][$overrideVar];
-		 }*/
-
-		// only continue on valid amount of rows per page
+		if ($overrideVar !== FALSE && isset($pBrowserConfArray['perPageLimitChoice'][$overrideVar])) {
+		$pBrowserConfArray['perPageLimit'] = $pBrowserConfArray['perPageLimitChoice'][$overrideVar];
+		}*/
+		// check for valid configuration values first
 		$perPageLimit = $configuration['perPageLimit'];
-		if ($perPageLimit <= 0) {
-			// @TODO ___throw exception
+		if ($perPageLimit === NULL || $perPageLimit <= 0) {
+			throw new PaginationError(array(
+				'perPageLimit', $configuration['perPageLimit'], 20
+			));
 		}
 		$pageLimit = $configuration['pageLimit'];
-		if ($pageLimit <= 0) {
-			// @TODO ___throw exception
+		if ($pageLimit === NULL || $pageLimit <= 0) {
+			throw new PaginationError(array(
+				'pageLimit', $configuration['pageLimit'], 100
+			));
 		}
 
+		// set currentPage if > 1
 		if (isset($configuration['currentPage']) && $configuration['currentPage'] > 1) {
 			$this->currentPage = $configuration['currentPage'];
 		}
 
 		// calculate page amount, and only continue if more than 1
 
-		// @FIX ___note that createStatement() will happen more than once in a single request, and that each time will result
+		// @FIX ___note that Query->createStatement() will happen more than once in a single request, and that each time will result
 		// in the same workload. So we need to cache it on at least one level, e.g. locally. If useful, even query cache could
 		// be applied here. Note that this would mean we can't add LIMIT .. OFFSET to $query without invalidating said cache!
 		// So we have to be smart with caching the $queryParts that QueryConfigurator results into, and adding LIMIT there,
@@ -178,14 +231,13 @@ class PaginateService implements SingletonInterface {
 		// until we sort out what the definitive method is going to be. It might be smart to wait until all options have been
 		// migrated to decosdata, so that we can see if any option needs to be able to alter LIMIT through $query.
 		// ALSO: can LIMIT be provided as parameter?
-		$preparedStatement = $query->createStatement();
 
 		// @TODO ___execute() may return FALSE on error, we need to catch that
 		// @TODO ___we might want a service that does Statement interaction for us, also in the repository.
 		// Using our own service for the latter may reduce overhead caused by extbase (repository->query->statement() is an extbase construct anyway, not a FLOW backport)
-		$preparedStatement->execute();
-		$numRows = $preparedStatement->rowCount();
-		$preparedStatement->free();
+		$statement->execute();
+		$numRows = $statement->rowCount();
+		$statement->free();
 
 		// @TODO ___clean up or use
 		#$this->totalRows = $numRows;
@@ -196,19 +248,16 @@ class PaginateService implements SingletonInterface {
 				$pages = $pageLimit;
 			}
 
-			// set Limit on Query object
-			$offset = $perPageLimit * ($this->currentPage - 1);
-			# @LOW _this is a temporary interface until the relevant FIX task in PaginateService is completed
-			$query->setLimit($perPageLimit, $offset);
+			// set definitive values
+			$this->pageCount = $pages;
+			$this->limit = $perPageLimit;
+			$this->offset = $perPageLimit * ($this->currentPage - 1);
 		}
 
 		// if current page nr exceeds page amount, replace it with last page nr
 		if ($this->currentPage > $pages) {
 			$this->currentPage = $pages;
 		}
-
-		// set definitive number of pages
-		$this->pageCount = $pages;
 	}
 
 }

@@ -24,6 +24,7 @@ namespace Innologi\Decosdata\ViewHelpers;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
+use Innologi\Decosdata\Exception\PaginationError;
 // @LOW ___use \TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface ?
 /**
  * PageBrowser ViewHelper
@@ -52,13 +53,13 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 	 * @return void
 	 */
 	public function __construct() {
-		$this->registerArgument('partial', 'string', 'Dedicated partial template.', FALSE, 'ViewHelpers/PageBrowser');
-		$this->registerArgument('scalingStart', 'integer', 'Scaling starts if this many pages are present. 0 disables scaling', FALSE, '21');
+		$this->registerArgument('partial', 'string', 'Dedicated partial template override.', FALSE, 'ViewHelpers/PageBrowser');
+		$this->registerArgument('startScalingAtPageCount', 'integer', 'Scaling starts if this many pages are present. 0 disables scaling', FALSE, '21');
 		$this->registerArgument('scalingFormat', 'string', 'Scaling reduces size of a pagebrowser if it has way too many pages. {BeforeScaled}|{BeforeCurrent}|{AfterCurrent}|{AfterScaled}.', FALSE, '1|4|4|1');
 		$this->registerArgument('insertAbove', 'boolean', 'Renders pagebrowser above content.', FALSE, TRUE);
 		$this->registerArgument('insertBelow', 'boolean', 'Renders pagebrowser below content.', FALSE, TRUE);
 		$this->registerArgument('renderAlways', 'boolean', 'Renders pagebrowser even if there is only one page.', FALSE, FALSE);
-		$this->registerArgument('pageLimit', 'integer', 'Artificial page limit. Only affects displayed pages, as pagination values have already been processed.');
+		$this->registerArgument('pageLimit', 'integer', 'Artificial page limit. Only affects displayed pages, as pagination values have already been applied to Query.');
 	}
 
 	/**
@@ -68,19 +69,14 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 	 */
 	public function render() {
 		$pageBrowser = '';
-		$pageCount = $this->paginateService->getPageCount();
-		// artificially override page count if the argument was set lower than actual page count
-		if (isset($this->arguments['pageLimit']) && $this->arguments['pageLimit'] < $pageCount) {
-			$pageCount = $this->arguments['pageLimit'];
-		}
 
-		// render pagebrowser only if more than 1 page or if set to always render
-		if ($pageCount > 1 || $this->arguments['renderAlways']) {
+		// render pagebrowser only if it was properly configured or if renderAlways was set
+		if ($this->paginateService->isReady() || $this->arguments['renderAlways']) {
 			// render a specific partial that exists for this sole purpose
 			$pageBrowser = $this->viewHelperVariableContainer->getView()->renderPartial(
 				$this->arguments['partial'],
 				NULL,
-				$this->buildConfiguration($pageCount)
+				$this->buildConfiguration()
 			);
 		}
 
@@ -90,11 +86,19 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 	/**
 	 * Build pagebrowser template configuration arguments
 	 *
-	 * @param integer $pageCount
 	 * @return array
+	 * @throws \Innologi\Decosdata\Exception\PaginationError
 	 */
-	protected function buildConfiguration($pageCount = 1) {
+	protected function buildConfiguration() {
+		// these are valid regardless if pageService is ready
 		$currentPage = $this->paginateService->getCurrentPage();
+		$pageCount = $this->paginateService->getPageCount();
+
+		// artificially override page count if the argument was set lower than actual page count
+		if (isset($this->arguments['pageLimit']) && $this->arguments['pageLimit'] < $pageCount) {
+			$pageCount = $this->arguments['pageLimit'];
+		}
+
 		$configuration = array(
 			'currentPage' => $currentPage,
 			'pages' => array()
@@ -104,7 +108,9 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 		if ($this->arguments['scalingStart'] && $pageCount >= $this->arguments['scalingStart']) {
 			$scaleParts = explode('|', $this->arguments['scalingFormat']);
 			if (count($scaleParts) !== 4) {
-				// @TODO ___throw exception
+				throw new PaginationError(array(
+					'ViewHelper.scalingFormat', $this->arguments['scalingFormat'], '1|4|4|1'
+				));
 			}
 		} else {
 			// if scaling is not applied, set values that will result in a pagebrowser without scaling
