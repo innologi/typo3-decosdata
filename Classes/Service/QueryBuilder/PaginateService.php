@@ -36,13 +36,47 @@ use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class PaginateService implements SingletonInterface {
-
+	// @LOW _consider moving this class to Service namespace
 	/**
 	 * @var array
 	 */
 	protected $supportedTypes = array('default', 'yearly');
 
-	// @TODO ___doc
+	/**
+	 * @var integer
+	 */
+	protected $currentPage = 1;
+
+	/**
+	 * @var integer
+	 */
+	protected $pageCount = 1;
+
+	/**
+	 * Returns current page number
+	 *
+	 * @return integer
+	 */
+	public function getCurrentPage() {
+		return $this->currentPage;
+	}
+
+	/**
+	 * Returns page count
+	 *
+	 * @return integer
+	 */
+	public function getPageCount() {
+		return $this->pageCount;
+	}
+
+	/**
+	 * Paginate a Query object
+	 *
+	 * @param array $configuration
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Query $query
+	 * @return void
+	 */
 	public function paginateQuery(array $configuration, Query $query) {
 		if ( isset($configuration['type']) && !in_array($configuration['type'], $this->supportedTypes, TRUE) ) {
 			// @TODO throw exception
@@ -121,17 +155,17 @@ class PaginateService implements SingletonInterface {
 		 }*/
 
 		// only continue on valid amount of rows per page
-		$perPageLimit = (int) $configuration['perPageLimit'];
+		$perPageLimit = $configuration['perPageLimit'];
 		if ($perPageLimit <= 0) {
 			// @TODO ___throw exception
 		}
-		$pageLimit = (int) $configuration['pageLimit'];
+		$pageLimit = $configuration['pageLimit'];
 		if ($pageLimit <= 0) {
 			// @TODO ___throw exception
 		}
-		$currentPage = (int) $configuration['currentPage'];
-		if ($currentPage <= 0) {
-			// @TODO ___throw exception
+
+		if (isset($configuration['currentPage']) && $configuration['currentPage'] > 1) {
+			$this->currentPage = $configuration['currentPage'];
 		}
 
 		// calculate page amount, and only continue if more than 1
@@ -158,20 +192,23 @@ class PaginateService implements SingletonInterface {
 		$pages = (int) ceil($numRows / $perPageLimit);
 		if ($pages > 1) {
 			// if the page amount exceeds the allowed limit, set it to the limit
-			if ($pageLimit > 0 && $pages > $pageLimit) {
+			if ($pages > $pageLimit) {
 				$pages = $pageLimit;
 			}
-			// if current page nr exceeds page amount, replace it with last page nr
-			if ($currentPage > $pages) {
-				$currentPage = $pages;
-			}
-			// finally, set the remaining parameters and limit the query
-			// @TODO ___clean up or use
-			#$pBrowserConfArray['truePageCount'] = $pages;
-			$offset = $perPageLimit * ($currentPage - 1);
+
+			// set Limit on Query object
+			$offset = $perPageLimit * ($this->currentPage - 1);
 			# @LOW _this is a temporary interface until the relevant FIX task in PaginateService is completed
 			$query->setLimit($perPageLimit, $offset);
 		}
+
+		// if current page nr exceeds page amount, replace it with last page nr
+		if ($this->currentPage > $pages) {
+			$this->currentPage = $pages;
+		}
+
+		// set definitive number of pages
+		$this->pageCount = $pages;
 	}
 
 }

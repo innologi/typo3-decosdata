@@ -9,8 +9,8 @@
 <f:debug>{configuration}</f:debug>
 <!-- @TODO ___correct table html? tbody, summary, scope and whatnot? -->
 
+<d:pageBrowser>
 <table>
-
 <tr>
 	<f:for each="{configuration.contentField}" as="column">
 		<th>{column.title}</th>
@@ -23,7 +23,7 @@
 		</d:item.for>
 	</tr>
 </f:for>
-
 </table>
+</d:pageBrowser>
 
 </f:section>

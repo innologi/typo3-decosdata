@@ -1,0 +1,38 @@
+<ul class="pagebrowser">
+	<!--  @TODO ___what about link titles? -->
+	<f:if condition="{previousPage}">
+		<li class="previous">
+			<f:link.action arguments="{page: previousPage}" addQueryString="TRUE">previous</f:link.action>
+		</li>
+	</f:if>
+	<f:if condition="{pages.beforeScaled}">
+		<f:render section="pagenumbers" arguments="{pages: pages.beforeScaled}" />
+		<li>.....</li>
+	</f:if>
+	<f:if condition="{pages.beforeCurrent}">
+		<f:render section="pagenumbers" arguments="{pages: pages.beforeCurrent}" />
+	</f:if>
+	<li class="current">
+		{currentPage}
+	</li>
+	<f:if condition="{pages.afterCurrent}">
+		<f:render section="pagenumbers" arguments="{pages: pages.afterCurrent}" />
+	</f:if>
+	<f:if condition="{pages.afterScaled}">
+		<li>.....</li>
+		<f:render section="pagenumbers" arguments="{pages: pages.afterScaled}" />
+	</f:if>
+	<f:if condition="{nextPage}">
+		<li class="next">
+			<f:link.action arguments="{page: nextPage}" addQueryString="TRUE">next</f:link.action>
+		</li>
+	</f:if>
+</ul>
+
+<f:section name="pagenumbers">
+<f:for each="{pages}" as="page">
+	<li>
+		<f:link.action arguments="{page: page}" addQueryString="TRUE">{page}</f:link.action>
+	</li>
+</f:for>
+</f:section>
