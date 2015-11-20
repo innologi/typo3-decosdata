@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Service\QueryBuilder;
+namespace Innologi\Decosdata\Service;
 /***************************************************************
  *  Copyright notice
  *
@@ -29,15 +29,15 @@ use Innologi\Decosdata\Exception\PaginationError;
 /**
  * Pagination Service
  *
- * Provides the pagination of queries, and holds several key variables
- * for any pagebrowser to be displayed afterwards.
+ * Provides the pagination information for any configuration/Statement combination.
+ * Holds several key variables for any pagebrowser to be displayed afterwards.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class PaginateService implements SingletonInterface {
-	// @LOW _consider moving this class to Service namespace
+
 	/**
 	 * @var array
 	 */

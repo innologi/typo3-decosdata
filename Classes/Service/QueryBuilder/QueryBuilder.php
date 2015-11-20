@@ -60,7 +60,7 @@ class QueryBuilder {
 	protected $optionService;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\PaginateService
+	 * @var \Innologi\Decosdata\Service\PaginateService
 	 * @inject
 	 */
 	protected $paginateService;

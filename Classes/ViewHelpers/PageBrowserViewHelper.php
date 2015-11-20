@@ -42,7 +42,7 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 	// @LOW _argumentsToBeExcludedFromQueryString="{0:'tx_decosdata_publish[page]'}" on page 1 links?
 
 	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\PaginateService
+	 * @var \Innologi\Decosdata\Service\PaginateService
 	 * @inject
 	 */
 	protected $paginateService;
