@@ -1,6 +1,16 @@
 # Plugin configuration
 plugin.tx_decosdata {
+	view {
+		templateRootPaths.0 = EXT:decosdata/Resources/Private/Templates/
+		templateRootPaths.1 = {$plugin.tx_decosdata.view.templateRootPath}
+		partialRootPaths.0 = EXT:decosdata/Resources/Private/Partials/
+		partialRootPaths.1 = {$plugin.tx_decosdata.view.partialRootPath}
+		layoutRootPaths.0 = EXT:decosdata/Resources/Private/Layouts/
+		layoutRootPaths.1 = {$plugin.tx_decosdata.view.layoutRootPath}
+	}
+	
 	persistence {
 		storagePid = {$plugin.tx_decosdata.persistence.storagePid}
 	}
+	
 }

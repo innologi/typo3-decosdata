@@ -1,4 +1,12 @@
 plugin.tx_decosdata {
+	view {
+		# cat=plugin.tx_decosdata/file; type=string; label=Override Templates path (FE)
+		templateRootPath =
+		# cat=plugin.tx_decosdata/file; type=string; label=Override Partials path (FE)
+		partialRootPath =
+		# cat=plugin.tx_decosdata/file; type=string; label=Override Layouts path (FE)
+		layoutRootPath =
+	}
 	persistence {
 		# cat=plugin.tx_decosdata//a; type=string; label=Default storage PID
 		storagePid =
