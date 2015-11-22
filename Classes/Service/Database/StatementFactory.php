@@ -25,14 +25,12 @@ namespace Innologi\Decosdata\Service\Database;
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Exception\MissingQueryPart;
 /**
  * Statement Factory
  *
  * Enables easy creation of Statement objects from QueryParts and parameters.
- * Note that this class does NOT validate SQL syntax. Creating from a
- * Query will provide some validation through QueryConfigurator.
+ * Note that this class does NOT validate SQL syntax.
  *
  * Query parts are expected to contain the following elements:
  * - SELECT
@@ -54,12 +52,6 @@ use Innologi\Decosdata\Exception\MissingQueryPart;
 class StatementFactory implements SingletonInterface {
 
 	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\QueryConfigurator
-	 * @inject
-	 */
-	protected $queryConfigurator;
-
-	/**
 	 * Creates a Statement object
 	 *
 	 * @param array $queryParts
@@ -75,20 +67,6 @@ class StatementFactory implements SingletonInterface {
 		);
 		$statement->bindValues($parameters);
 		return $statement;
-	}
-
-	/**
-	 * Creates a Statement object from a Query.
-	 *
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Query $query
-	 * @return Statement
-	 */
-	public function createFromQuery(Query $query) {
-		// @FIX _______move this to Query class?
-		return $this->create(
-			$this->queryConfigurator->transformConfiguration($query),
-			$query->getParameters()
-		);
 	}
 
 	/**
