@@ -24,7 +24,7 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Innologi\Decosdata\Service\QueryBuilder\StatementFactory;
+use Innologi\Decosdata\Service\Database\StatementFactory;
 /**
  * Query object
  *
@@ -100,10 +100,10 @@ class Query extends QueryIterator implements QueryInterface {
 	/**
 	 * Build a Statement object from this Query object
 	 *
-	 * @return \Innologi\Decosdata\Service\QueryBuilder\Statement
+	 * @return \Innologi\Decosdata\Service\Database\Statement
 	 */
 	public function createStatement() {
-		/** @var $statementFactory \Innologi\Decosdata\Service\QueryBuilder\StatementFactory */
+		/** @var $statementFactory \Innologi\Decosdata\Service\Database\StatementFactory */
 		$statementFactory = $this->objectManager->get(StatementFactory::class);
 		# @LOW _this is a temporary interface until the relevant FIX task in PaginateService is completed
 		$statementFactory->setLimit($this->limit, $this->offset);

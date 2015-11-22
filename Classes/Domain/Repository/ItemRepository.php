@@ -24,7 +24,7 @@ namespace Innologi\Decosdata\Domain\Repository;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
-use Innologi\Decosdata\Service\QueryBuilder\Statement;
+use Innologi\Decosdata\Service\Database\Statement;
 /**
  * Item domain repository
  *
@@ -37,7 +37,7 @@ class ItemRepository extends RepositoryAbstract {
 	/**
 	 * Finds items with query object and returns the result as a raw array
 	 *
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Statement $statement
+	 * @param \Innologi\Decosdata\Service\Database\Statement $statement
 	 * @return array
 	 */
 	public function findWithStatement(Statement $statement) {

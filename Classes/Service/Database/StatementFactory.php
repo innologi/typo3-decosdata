@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Service\QueryBuilder;
+namespace Innologi\Decosdata\Service\Database;
 /***************************************************************
  *  Copyright notice
  *
@@ -26,6 +26,7 @@ namespace Innologi\Decosdata\Service\QueryBuilder;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
+use Innologi\Decosdata\Exception\MissingQueryPart;
 /**
  * Statement Factory
  *
@@ -83,6 +84,7 @@ class StatementFactory implements SingletonInterface {
 	 * @return Statement
 	 */
 	public function createFromQuery(Query $query) {
+		// @FIX _______move this to Query class?
 		return $this->create(
 			$this->queryConfigurator->transformConfiguration($query),
 			$query->getParameters()
@@ -94,11 +96,11 @@ class StatementFactory implements SingletonInterface {
 	 *
 	 * @param array $queryParts
 	 * @return string
-	 * @throws Exception\MissingQueryPart
+	 * @throws \Innologi\Decosdata\Exception\MissingQueryPart
 	 */
 	protected function mergeQueryParts(array $queryParts) {
 		if ( !(isset($queryParts['SELECT'][0]) && isset($queryParts['FROM'][0])) ) {
-			throw new Exception\MissingQueryPart(array('SELECT, FROM'));
+			throw new MissingQueryPart(array('SELECT, FROM', json_encode($queryParts)));
 		}
 
 		$query = 'SELECT ' . $queryParts['SELECT'] . "\n" .

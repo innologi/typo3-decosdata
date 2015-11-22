@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Service\QueryBuilder;
+namespace Innologi\Decosdata\Service\Database;
 /***************************************************************
  *  Copyright notice
  *
@@ -43,7 +43,7 @@ use TYPO3\CMS\Core\Database\PreparedStatement;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class Statement extends PreparedStatement {
-	// @LOW _consider moving this class and its factory to its own namespace: it's not really part of the QueryBuilder, although it is used by it as a possible result
+
 	/**
 	 * Returns query
 	 *
