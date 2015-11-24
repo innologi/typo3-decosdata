@@ -1,33 +1,58 @@
-<ul class="pagebrowser">
-	<!--  @TODO ___what about link titles? -->
-	<f:if condition="{previousPage}">
+<!-- @TODO ___llang -->
+<f:if condition="{renderAbove}">
+	<div class="pagebrowser pagebrowser-top">
+		<f:render section="pagebrowser" arguments="{configuration: pageBrowser}" />
+		<f:if condition="{includeResultCountAbove}">
+			<div class="resultcount">Total amount of results: {resultCount}</div>
+		</f:if>
+	</div>
+</f:if>
+
+<f:format.raw>{content}</f:format.raw>
+
+<f:if condition="{renderBelow}">
+	<div class="pagebrowser pagebrowser-bottom">
+		<f:if condition="{includeResultCountBelow}">
+			<div class="resultcount">Total amount of results: {resultCount}</div>
+		</f:if>
+		<!-- @LOW _how about a caching render VH, that uses a singleton to store/retrieve output per partial+section+arguments hash? It can extend f:render and refer mostly to parent::render -->
+		<f:render section="pagebrowser" arguments="{configuration: pageBrowser}" />
+	</div>
+</f:if>
+
+
+<!-- @TODO ___what about link titles? -->
+<f:section name="pagebrowser">
+<ul class="pagebrowser-navigation">
+	<f:if condition="{configuration.previousPage}">
 		<li class="previous">
-			<f:link.action arguments="{page: previousPage}" addQueryString="TRUE">previous</f:link.action>
+			<f:link.action arguments="{page: configuration.previousPage}" addQueryString="TRUE">previous</f:link.action>
 		</li>
 	</f:if>
-	<f:if condition="{pages.beforeScaled}">
-		<f:render section="pagenumbers" arguments="{pages: pages.beforeScaled}" />
+	<f:if condition="{configuration.pages.beforeScaled}">
+		<f:render section="pagenumbers" arguments="{pages: configuration.pages.beforeScaled}" />
 		<li>.....</li>
 	</f:if>
-	<f:if condition="{pages.beforeCurrent}">
-		<f:render section="pagenumbers" arguments="{pages: pages.beforeCurrent}" />
+	<f:if condition="{configuration.pages.beforeCurrent}">
+		<f:render section="pagenumbers" arguments="{pages: configuration.pages.beforeCurrent}" />
 	</f:if>
 	<li class="current">
-		{currentPage}
+		{configuration.currentPage}
 	</li>
-	<f:if condition="{pages.afterCurrent}">
-		<f:render section="pagenumbers" arguments="{pages: pages.afterCurrent}" />
+	<f:if condition="{configuration.pages.afterCurrent}">
+		<f:render section="pagenumbers" arguments="{pages: configuration.pages.afterCurrent}" />
 	</f:if>
-	<f:if condition="{pages.afterScaled}">
+	<f:if condition="{configuration.pages.afterScaled}">
 		<li>.....</li>
-		<f:render section="pagenumbers" arguments="{pages: pages.afterScaled}" />
+		<f:render section="pagenumbers" arguments="{pages: configuration.pages.afterScaled}" />
 	</f:if>
-	<f:if condition="{nextPage}">
+	<f:if condition="{configuration.nextPage}">
 		<li class="next">
-			<f:link.action arguments="{page: nextPage}" addQueryString="TRUE">next</f:link.action>
+			<f:link.action arguments="{page: configuration.nextPage}" addQueryString="TRUE">next</f:link.action>
 		</li>
 	</f:if>
 </ul>
+</f:section>
 
 <f:section name="pagenumbers">
 <f:for each="{pages}" as="page">

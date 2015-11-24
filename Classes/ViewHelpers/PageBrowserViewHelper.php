@@ -56,8 +56,10 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 		$this->registerArgument('partial', 'string', 'Dedicated partial template override.', FALSE, 'ViewHelpers/PageBrowser');
 		$this->registerArgument('startScalingAtPageCount', 'integer', 'Scaling starts if this many pages are present. 0 disables scaling', FALSE, '21');
 		$this->registerArgument('scalingFormat', 'string', 'Scaling reduces size of a pagebrowser if it has way too many pages. {BeforeScaled}|{BeforeCurrent}|{AfterCurrent}|{AfterScaled}.', FALSE, '1|4|4|1');
-		$this->registerArgument('insertAbove', 'boolean', 'Renders pagebrowser above content.', FALSE, TRUE);
-		$this->registerArgument('insertBelow', 'boolean', 'Renders pagebrowser below content.', FALSE, TRUE);
+		$this->registerArgument('renderAbove', 'boolean', 'Renders pagebrowser above content.', FALSE, TRUE);
+		$this->registerArgument('renderBelow', 'boolean', 'Renders pagebrowser below content.', FALSE, TRUE);
+		$this->registerArgument('includeResultCountAbove', 'boolean', 'Includes total amount of results with pagebrowser rendered above content.', FALSE, TRUE);
+		$this->registerArgument('includeResultCountBelow', 'boolean', 'Includes total amount of results with pagebrowser rendered below content.', FALSE, FALSE);
 		$this->registerArgument('renderAlways', 'boolean', 'Renders pagebrowser even if there is only one page.', FALSE, FALSE);
 		$this->registerArgument('pageLimit', 'integer', 'Artificial page limit. Only affects displayed pages, as pagination values have already been applied to Query.');
 	}
@@ -68,19 +70,25 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 	 * @return string
 	 */
 	public function render() {
-		$pageBrowser = '';
-
 		// render pagebrowser only if it was properly configured or if renderAlways was set
-		if ($this->paginateService->isReady() || $this->arguments['renderAlways']) {
-			// render a specific partial that exists for this sole purpose
-			$pageBrowser = $this->viewHelperVariableContainer->getView()->renderPartial(
-				$this->arguments['partial'],
-				NULL,
-				$this->buildConfiguration()
-			);
+		if ( !($this->paginateService->isReady() || $this->arguments['renderAlways']) ) {
+			return $this->renderChildren();
 		}
 
-		return ($this->arguments['insertAbove'] ? $pageBrowser : '') . $this->renderChildren() . ($this->arguments['insertBelow'] ? $pageBrowser : '');
+		// render a specific partial that exists for this sole purpose
+		return $this->viewHelperVariableContainer->getView()->renderPartial(
+			$this->arguments['partial'],
+			NULL,
+			array(
+				'renderAbove' => $this->arguments['renderAbove'],
+				'renderBelow' => $this->arguments['renderBelow'],
+				'includeResultCountAbove' => $this->arguments['includeResultCountAbove'],
+				'includeResultCountBelow' => $this->arguments['includeResultCountBelow'],
+				'resultCount' => $this->paginateService->getResultCount(),
+				'pageBrowser' => $this->buildPageBrowserConfiguration(),
+				'content' => $this->renderChildren()
+			)
+		);
 	}
 
 	/**
@@ -89,7 +97,7 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 	 * @return array
 	 * @throws \Innologi\Decosdata\Exception\PaginationError
 	 */
-	protected function buildConfiguration() {
+	protected function buildPageBrowserConfiguration() {
 		// these are valid regardless if pageService is ready
 		$currentPage = $this->paginateService->getCurrentPage();
 		$pageCount = $this->paginateService->getPageCount();
@@ -116,8 +124,8 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 			// if scaling is not applied, set values that will result in a pagebrowser without scaling
 			$scaleParts = array(
 				0 => 0,
-				1 => $currentPage-1,
-				2 => $pageCount-$currentPage,
+				1 => $currentPage - 1,
+				2 => $pageCount - $currentPage,
 				3 => 0
 			);
 		}

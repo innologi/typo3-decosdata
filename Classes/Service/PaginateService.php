@@ -56,6 +56,11 @@ class PaginateService implements SingletonInterface {
 	/**
 	 * @var integer
 	 */
+	protected $resultCount;
+
+	/**
+	 * @var integer
+	 */
 	protected $limit;
 
 	/**
@@ -79,6 +84,15 @@ class PaginateService implements SingletonInterface {
 	 */
 	public function getPageCount() {
 		return $this->pageCount;
+	}
+
+	/**
+	 * Returns total result count
+	 *
+	 * @return integer
+	 */
+	public function getResultCount() {
+		return $this->resultCount;
 	}
 
 	/**
@@ -239,8 +253,9 @@ class PaginateService implements SingletonInterface {
 		$numRows = $statement->rowCount();
 		$statement->free();
 
-		// @TODO ___clean up or use
-		#$this->totalRows = $numRows;
+		// store count
+		$this->resultCount = $numRows;
+
 		$pages = (int) ceil($numRows / $perPageLimit);
 		if ($pages > 1) {
 			// if the page amount exceeds the allowed limit, set it to the limit
