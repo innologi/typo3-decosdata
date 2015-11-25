@@ -86,6 +86,8 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 				'includeResultCountBelow' => $this->arguments['includeResultCountBelow'],
 				'resultCount' => $this->paginateService->getResultCount(),
 				'pageBrowser' => $this->buildPageBrowserConfiguration(),
+				// requires the use of format.raw VH, which costs us ~1.6 ms on average, but keeps us
+				// from using a marker like ###CONTENT### with str_replace, which can easily be fooled
 				'content' => $this->renderChildren()
 			)
 		);

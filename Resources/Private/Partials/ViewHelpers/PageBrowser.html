@@ -1,9 +1,10 @@
+{namespace d=Innologi\Decosdata\ViewHelpers}
 <!-- @TODO ___llang -->
 <f:if condition="{renderAbove}">
 	<div class="pagebrowser pagebrowser-top">
-		<f:render section="pagebrowser" arguments="{configuration: pageBrowser}" />
+		<d:render section="pagebrowser" arguments="{configuration: pageBrowser}" />
 		<f:if condition="{includeResultCountAbove}">
-			<div class="resultcount">Total amount of results: {resultCount}</div>
+			<d:render section="resultcount" arguments="{resultCount: resultCount}" />
 		</f:if>
 	</div>
 </f:if>
@@ -13,10 +14,9 @@
 <f:if condition="{renderBelow}">
 	<div class="pagebrowser pagebrowser-bottom">
 		<f:if condition="{includeResultCountBelow}">
-			<div class="resultcount">Total amount of results: {resultCount}</div>
+			<d:render section="resultcount" arguments="{resultCount: resultCount}" />
 		</f:if>
-		<!-- @LOW _how about a caching render VH, that uses a singleton to store/retrieve output per partial+section+arguments hash? It can extend f:render and refer mostly to parent::render -->
-		<f:render section="pagebrowser" arguments="{configuration: pageBrowser}" />
+		<d:render section="pagebrowser" arguments="{configuration: pageBrowser}" />
 	</div>
 </f:if>
 
@@ -60,4 +60,8 @@
 		<f:link.action arguments="{page: page}" addQueryString="TRUE">{page}</f:link.action>
 	</li>
 </f:for>
+</f:section>
+
+<f:section name="resultcount">
+<div class="resultcount">Total amount of results: {resultCount}</div>
 </f:section>
