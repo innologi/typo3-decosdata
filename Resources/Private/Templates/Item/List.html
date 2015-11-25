@@ -7,22 +7,25 @@
 
 <f:debug>{query}</f:debug>
 <f:debug>{configuration}</f:debug>
-<!-- @TODO ___correct table html? tbody, summary, scope and whatnot? -->
 
 <d:pageBrowser>
 <table>
-<tr>
-	<f:for each="{configuration.contentField}" as="column">
-		<th>{column.title}</th>
-	</f:for>
-</tr>
-<f:for each="{items}" as="item">
-	<tr class="item-{item.itemID}">
-		<d:item.for configuration="{configuration.contentField}" item="{item}" contentAs="content" configAs="contentConfig">
-			<td>{content -> d:content.render(configuration: contentConfig)}</td>
-		</d:item.for>
-	</tr>
-</f:for>
+	<thead>
+		<tr>
+			<f:for each="{configuration.contentField}" as="column">
+				<th scope="col">{column.title}</th>
+			</f:for>
+		</tr>
+	</thead>
+	<tbody>
+		<f:for each="{items}" as="item">
+			<tr class="item-{item.itemID}">
+				<d:item.for configuration="{configuration.contentField}" item="{item}" contentAs="content" configAs="contentConfig">
+					<td>{content -> d:content.render(configuration: contentConfig)}</td>
+				</d:item.for>
+			</tr>
+		</f:for>
+	</tbody>
 </table>
 </d:pageBrowser>
 
