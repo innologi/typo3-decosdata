@@ -33,10 +33,10 @@ namespace Innologi\Decosdata\Library\FalApi\Exception;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class FileException extends Exception {
-
+	// @FIX ___So I had this exception, but it is thrown @ 4 different places. Now adding a unique $code per throw WOULD come in handy, because it would identify the exact throw immediately
 	/**
 	 * @var string
 	 */
-	protected $message = 'Failed to create a file record from \'<code>%1$s</code>\'';
+	protected $message = 'Failed to create a file record from \'%1$s\'';
 
 }

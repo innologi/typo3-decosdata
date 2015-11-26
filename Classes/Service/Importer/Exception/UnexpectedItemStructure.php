@@ -36,6 +36,6 @@ class UnexpectedItemStructure extends ValidationFailed {
 	/**
 	 * @var string
 	 */
-	protected $message = 'The import-file contains an item with a <code>%1$s</code> field prior to its identifying <code>ITEM_KEY</code> field.';
+	protected $message = 'The import-file contains an item with a \'%1$s\' field prior to its identifying \'ITEM_KEY\' field.';
 
 }

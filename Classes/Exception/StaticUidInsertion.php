@@ -36,6 +36,6 @@ class StaticUidInsertion extends Exception {
 	/**
 	 * @var string
 	 */
-	protected $message = 'It is not allowed to insert a record into table \'<code>%1$s</code>\' with a static uid of \'<code>%2$d</code>\'. The uid is determined automatically after transaction.';
+	protected $message = 'It is not allowed to insert a record into table \'%1$s\' with a static uid of \'%2$d\'. The uid is determined automatically after transaction.';
 
 }
