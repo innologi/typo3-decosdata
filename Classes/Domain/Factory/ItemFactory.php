@@ -50,7 +50,7 @@ class ItemFactory extends FactoryAbstract {
 	 */
 	protected function setProperties(\Innologi\Decosdata\Domain\Model\Item $object, array $data) {
 		if (!isset($data['item_key'][0])) {
-			throw new MissingObjectProperty(array(
+			throw new MissingObjectProperty(1448549909, array(
 				'item_key',
 				'Item'
 			));

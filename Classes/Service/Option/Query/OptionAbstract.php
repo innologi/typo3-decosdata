@@ -42,7 +42,7 @@ abstract class OptionAbstract implements OptionInterface {
 	 * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryFieldDenied
 	 */
 	public function alterQueryField(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
-		throw new AlterQueryFieldDenied(array(get_class($this)));
+		throw new AlterQueryFieldDenied(1448551244, array(get_class($this)));
 	}
 
 	/**
@@ -51,7 +51,7 @@ abstract class OptionAbstract implements OptionInterface {
 	 * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryColumnDenied
 	 */
 	public function alterQueryColumn(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
-		throw new AlterQueryColumnDenied(array(get_class($this)));
+		throw new AlterQueryColumnDenied(1448551259, array(get_class($this)));
 	}
 
 	/**
@@ -60,7 +60,7 @@ abstract class OptionAbstract implements OptionInterface {
 	 * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryRowDenied
 	 */
 	public function alterQueryRow(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
-		throw new AlterQueryRowDenied(array(get_class($this)));
+		throw new AlterQueryRowDenied(1448551286, array(get_class($this)));
 	}
 
 }

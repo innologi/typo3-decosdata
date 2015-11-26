@@ -259,7 +259,7 @@ class QueryConfigurator implements SingletonInterface {
 	 */
 	protected function transformSelect(array $configuration) {
 		if (!isset($configuration['field'])) {
-			throw new Exception\MissingConfigurationProperty(array(
+			throw new Exception\MissingConfigurationProperty(1448552576, array(
 				'SELECT', 'field', json_encode($configuration)
 			));
 		}
@@ -311,7 +311,7 @@ class QueryConfigurator implements SingletonInterface {
 	 */
 	protected function transformFrom(array $configuration) {
 		if (!isset($configuration['table'])) {
-			throw new Exception\MissingConfigurationProperty(array(
+			throw new Exception\MissingConfigurationProperty(1448552598, array(
 				'FROM', 'table', json_encode($configuration)
 			));
 		}
@@ -326,7 +326,7 @@ class QueryConfigurator implements SingletonInterface {
 
 		if (isset($configuration['joinType'])) {
 			if (!in_array($configuration['joinType'], $this->supportedJoins, TRUE)) {
-				throw new Exception\UnsupportedFeatureType(array(
+				throw new Exception\UnsupportedFeatureType(1448552612, array(
 					'TABLE JOIN TYPE', $configuration['joinType'], join('/', $this->supportedJoins)
 				));
 			}
@@ -338,7 +338,7 @@ class QueryConfigurator implements SingletonInterface {
 				$on = array();
 				foreach ($configuration['constraints'] as $constraint) {
 					if ( !(isset($constraint['localField']) && isset($constraint['operator'])) ) {
-						throw new Exception\MissingConfigurationProperty(array(
+						throw new Exception\MissingConfigurationProperty(1448552629, array(
 							'FROM', 'constraint.localField/operator', json_encode($configuration)
 						));
 					}
@@ -348,7 +348,7 @@ class QueryConfigurator implements SingletonInterface {
 					} elseif (isset($constraint['foreignAlias']) && isset($constraint['foreignField'])) {
 						$c .= $constraint['foreignAlias'] . '.' . $constraint['foreignField'];
 					} else {
-						throw new Exception\MissingConfigurationProperty(array(
+						throw new Exception\MissingConfigurationProperty(1448552652, array(
 							'FROM', 'constraint.foreignAlias/foreignField/value', json_encode($configuration)
 						));
 					}
@@ -395,7 +395,7 @@ class QueryConfigurator implements SingletonInterface {
 	 */
 	protected function transformWhere(array $conditions, $logic = 'AND') {
 		if (!in_array($logic, $this->supportedLogic, TRUE)) {
-			throw new Exception\UnsupportedFeatureType(array(
+			throw new Exception\UnsupportedFeatureType(1448552681, array(
 				'LOGICAL OPERATOR', $logic, join('/', $this->supportedLogic)
 			));
 		}
@@ -406,7 +406,7 @@ class QueryConfigurator implements SingletonInterface {
 			// $configuration contains a field/operator/value
 			if (count($configuration) > 1) {
 				if ( !(isset($configuration['field']) && isset($configuration['operator']) && isset($configuration['value'])) ) {
-					throw new Exception\MissingConfigurationProperty(array(
+					throw new Exception\MissingConfigurationProperty(1448552699, array(
 						'WHERE', 'field/operator/value', json_encode($conditions)
 					));
 				}
@@ -436,7 +436,7 @@ class QueryConfigurator implements SingletonInterface {
 	 */
 	protected function transformOrderBy(array $configuration, $alias) {
 		if (!isset($configuration['priority'])) {
-			throw new Exception\MissingConfigurationProperty(array(
+			throw new Exception\MissingConfigurationProperty(1448552721, array(
 				'ORDERBY', 'priority', json_encode($configuration)
 			));
 		}
@@ -444,7 +444,7 @@ class QueryConfigurator implements SingletonInterface {
 		$orderBy = $alias;
 		if (isset($configuration['sort'])) {
 			if (!in_array($configuration['sort'], $this->supportedSorting, TRUE)) {
-				throw new Exception\UnsupportedFeatureType(array(
+				throw new Exception\UnsupportedFeatureType(1448552741, array(
 					'SORTING ORDER', $configuration['sort'], join('/', $this->supportedSorting)
 				));
 			}
@@ -468,7 +468,7 @@ class QueryConfigurator implements SingletonInterface {
 		$operators = explode(' ', strtoupper($operator));
 		foreach ($operators as $operator) {
 			if (!in_array($operator, $this->supportedOperators, TRUE)) {
-				throw new Exception\UnsupportedFeatureType(array(
+				throw new Exception\UnsupportedFeatureType(1448552756, array(
 					'COMPARISON OPERATOR', $operator, join('/', $this->supportedOperators)
 				));
 			}
@@ -488,7 +488,7 @@ class QueryConfigurator implements SingletonInterface {
 	 */
 	protected function resolveComparisonValue($value, array &$parameters) {
 		if ($value === NULL) {
-			throw new Exception\CannotResolveComparisonValue();
+			throw new Exception\CannotResolveComparisonValue(1448552781);
 		}
 
 		$value = strtoupper($value);

@@ -25,18 +25,18 @@ namespace Innologi\Decosdata\Library\ExtUpdate\Service\Exception;
  ***************************************************************/
 
 /**
- * SQL Error Exception
+ * Uid Reference Overlap Exception
  *
  * @package InnologiLibs
  * @subpackage ExtUpdate
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class SqlError extends DatabaseException {
+class UidReferenceOverlap extends Exception {
 
 	/**
 	 * @var string
 	 */
-	protected $message = 'The following database query produced an unknown error: <pre>%1$s</pre>';
+	protected $message = 'Automatic migration completely failed due to uid-reference-overlapping. You will have to start over completely by reverting a database/table backup, or remove all data and re-import all Decos data manually. Possible reason: imports were updated or TCA records were created before migration was complete. (Table: %1$s, Property: %2$s, Source: %3$s, Target: %4$s)';
 
 }

@@ -36,6 +36,6 @@ class InvalidValidationFile extends Exception {
 	/**
 	 * @var string
 	 */
-	protected $message = 'Invalid Validation File: %1$s';
+	protected $message = 'Invalid Validation File: the path \'%1$s\' is either not a file, unreadable, or of an unexpected format.';
 
 }

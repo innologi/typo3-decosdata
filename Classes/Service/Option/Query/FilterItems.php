@@ -55,7 +55,7 @@ class FilterItems extends OptionAbstract {
 	protected function initialize(array $args) {
 		if (!isset($args['filters'])) {
 			// @TODO ___test this
-			throw new MissingArgument(array(self::class, 'filters'));
+			throw new MissingArgument(1448551220, array(self::class, 'filters'));
 		}
 	}
 

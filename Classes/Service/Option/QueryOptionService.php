@@ -90,7 +90,7 @@ class QueryOptionService extends OptionServiceAbstract {
 	protected function resolveOptionClass($className) {
 		$object = parent::resolveOptionClass($className);
 		if ( !($object instanceof Query\OptionInterface) ) {
-			throw new Exception\InvalidOptionClass(array(
+			throw new Exception\InvalidOptionClass(1448552519, array(
 				// since $object was retrieved via objectManager, we're not sure if $object Class === $className
 				get_class($object), Query\OptionInterface::class
 			));

@@ -25,18 +25,18 @@ namespace Innologi\Decosdata\Library\ExtUpdate\Service\Exception;
  ***************************************************************/
 
 /**
- * SQL Error Exception
+ * No Unique Data Exception
  *
  * @package InnologiLibs
  * @subpackage ExtUpdate
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class SqlError extends DatabaseException {
+class NoUniqueData extends NoData {
 
 	/**
 	 * @var string
 	 */
-	protected $message = 'The following database query produced an unknown error: <pre>%1$s</pre>';
+	protected $message = 'No \'%1$s\' records to create.';
 
 }

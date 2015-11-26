@@ -24,10 +24,10 @@ namespace Innologi\Decosdata\Task;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Scheduler\Task\AbstractTask;
-use TYPO3\CMS\Core\Utility\DebugUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Extbase\Core\Bootstrap;
+use Innologi\Decosdata\Utility\DebugUtility;
 /**
  * Importer Task
  *
@@ -79,8 +79,8 @@ class ImporterTask extends AbstractTask {
 		$errors = $importerService->getErrors();
 		if (!empty($errors)) {
 			throw new \Exception(
-				LocalizationUtility::translate('importer.errors', $this->extensionName) .
-				DebugUtility::viewArray($errors)
+				'<pre>' . LocalizationUtility::translate('importer.errors', $this->extensionName) .
+				DebugUtility::formatArray($errors) . '</pre>'
 			);
 		}
 

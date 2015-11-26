@@ -146,7 +146,7 @@ class RenderOptionService extends OptionServiceAbstract {
 	protected function resolveOptionClass($className) {
 		$object = parent::resolveOptionClass($className);
 		if ( !($object instanceof Render\OptionInterface) ) {
-			throw new Exception\InvalidOptionClass(array(
+			throw new Exception\InvalidOptionClass(1448552552, array(
 				// since $object was retrieved via objectManager, we're not sure if $object Class === $className
 				get_class($object), Render\OptionInterface::class
 			));

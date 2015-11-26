@@ -28,6 +28,7 @@ use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
 use Innologi\Decosdata\Library\FalApi\Exception\FileException;
 use Innologi\Decosdata\Exception\MissingObjectProperty;
+use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
 /**
  * Importer Storage Handler: Extbase Edition
  *
@@ -180,27 +181,34 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 *
 	 * @param array $data
 	 * @return \Innologi\Decosdata\Domain\Model\Item
+	 * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItem
 	 */
 	public function pushItem(array $data) {
-		/* @var $parentItem \Innologi\Decosdata\Domain\Model\Item */
-		$parentItem = $data['parent_item'];
-		unset($data['parent_item']);
+		try {
+			/* @var $parentItem \Innologi\Decosdata\Domain\Model\Item */
+			$parentItem = $data['parent_item'];
+			unset($data['parent_item']);
 
-		$data['item_type'] = $this->itemTypeFactory->getByItemType($data['item_type'], TRUE);
-		$item = $this->itemFactory->getByItemKey($data['item_key'], $data);
+			$data['item_type'] = $this->itemTypeFactory->getByItemType($data['item_type'], TRUE);
+			$item = $this->itemFactory->getByItemKey($data['item_key'], $data);
 
-		if ($item->_isNew()) {
-			if ($parentItem !== NULL) {
-				// adds item with parent/child item relations set when $parentItem is persisted
-				$parentItem->addChildItem($item);
+			if ($item->_isNew()) {
+				if ($parentItem !== NULL) {
+					// adds item with parent/child item relations set when $parentItem is persisted
+					$parentItem->addChildItem($item);
+				} else {
+					$this->itemRepository->add($item);
+				}
 			} else {
-				$this->itemRepository->add($item);
+				$this->itemRepository->update($item);
 			}
-		} else {
-			$this->itemRepository->update($item);
-		}
 
-		return $item;
+			return $item;
+		} catch (MissingObjectProperty $e) {
+			throw new InvalidItem($e->getCode(), array(
+				$data['item_key'], $e->getMessage()
+			));
+		}
 	}
 
 	/**
@@ -214,7 +222,7 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 		try {
 			if (!isset($data['filepath'][0])) {
 				// filepath missing
-				throw new FileException(array('NULL'));
+				throw new FileException(1448551092, array('NULL'));
 			}
 
 			/* @var $parentItem \Innologi\Decosdata\Domain\Model\Item */
@@ -230,7 +238,11 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 			}
 		} catch (FileException $e) {
 			// if there is no correct file, there is no valid item blob
-			throw new InvalidItemBlob(array(
+			throw new InvalidItemBlob($e->getCode(), array(
+				$data['item_key'], $e->getMessage()
+			));
+		} catch (MissingObjectProperty $e) {
+			throw new InvalidItemBlob($e->getCode(), array(
 				$data['item_key'], $e->getMessage()
 			));
 		}

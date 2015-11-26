@@ -131,7 +131,7 @@ class FileReferenceRepository implements SingletonInterface {
 		$this->dataHandler->start($data, array(), $this->beUser);
 		$this->dataHandler->process_datamap();
 		if ($this->dataHandler->errorLog) {
-			throw new Exception\FileReferenceException(array(
+			throw new Exception\FileReferenceException(1448550062, array(
 				DebugUtility::viewArray($this->dataHandler->errorLog)
 			));
 		}
@@ -157,7 +157,7 @@ class FileReferenceRepository implements SingletonInterface {
 	public function addRecordByFilePath($filePath, $foreignTable, $foreignUid, $foreignField, $referenceUid = NULL) {
 		$fileObject = $this->resourceFactory->retrieveFileOrFolderObject($filePath);
 		if ( !($fileObject instanceof TYPO3\CMS\Core\Resource\File) ) {
-			throw new Exception\FileException(array($filePath));
+			throw new Exception\FileException(1448550118, array($filePath));
 		}
 		$this->addRecord($fileObject->getUid(), $foreignTable, $foreignUid, $foreignField, $referenceUid);
 	}
@@ -217,7 +217,7 @@ class FileReferenceRepository implements SingletonInterface {
 	public function upsertRecordByFilePath($filePath, $foreignTable, $foreignUid, $foreignField) {
 		$fileObject = $this->resourceFactory->retrieveFileOrFolderObject($filePath);
 		if ( !($fileObject instanceof \TYPO3\CMS\Core\Resource\File) ) {
-			throw new Exception\FileException(array($filePath));
+			throw new Exception\FileException(1448550330, array($filePath));
 		}
 		$this->upsertRecord($fileObject->getUid(), $foreignTable, $foreignUid, $foreignField);
 	}
@@ -253,7 +253,7 @@ class FileReferenceRepository implements SingletonInterface {
 		);
 
 		if ($row === NULL) {
-			throw new Exception\SqlError(array(
+			throw new Exception\SqlError(1448550356, array(
 				$databaseConnection->debug_lastBuiltQuery
 			));
 		}

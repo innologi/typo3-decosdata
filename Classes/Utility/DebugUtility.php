@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Library\ExtUpdate\Service\Exception;
+namespace Innologi\Decosdata\Utility;
 /***************************************************************
  *  Copyright notice
  *
@@ -25,18 +25,40 @@ namespace Innologi\Decosdata\Library\ExtUpdate\Service\Exception;
  ***************************************************************/
 
 /**
- * SQL Error Exception
+ * Debug Utility class
  *
- * @package InnologiLibs
- * @subpackage ExtUpdate
+ * Provides some static methods for debugging purposes.
+ *
+ * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class SqlError extends DatabaseException {
+class DebugUtility {
+	// @TODO ___find any other use of the original DebugUtility, and replace it with this one
+	/**
+	 * Formats array values on new lines in a single string
+	 *
+	 * @param array $array
+	 * @return string
+	 */
+	public static function formatArrayValues(array $array) {
+		$output = "\n- " . join(", \n- ", $array);
+		return $output;
+	}
 
 	/**
-	 * @var string
+	 * Formats array key => value pairs on new lines in a single string
+	 *
+	 * @param array $array
+	 * @return string
 	 */
-	protected $message = 'The following database query produced an unknown error: <pre>%1$s</pre>';
+	public static function formatArray(array $array) {
+		$temp = array();
+		foreach ($array as $key => $value) {
+			$temp[] = $key . " \n" . $value;
+		}
+		$output = "\n" . join(" \n\n", $temp);
+		return $output;
+	}
 
 }

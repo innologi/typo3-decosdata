@@ -32,6 +32,6 @@ namespace Innologi\Decosdata\Library\ExtUpdate\Service\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileException extends \Exception {
+class FileException extends Exception {
 
 }

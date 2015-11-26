@@ -27,7 +27,7 @@ use TYPO3\CMS\Core\SingletonInterface;
 use Innologi\Decosdata\Exception\SqlError;
 use Innologi\Decosdata\Library\FalApi\Exception\FileException;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
-use Innologi\Decosdata\Exception\MissingObjectProperty;
+use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
 /**
  * Importer Storage Handler: Classic Edition
  *
@@ -116,14 +116,14 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 *
 	 * @param array $data
 	 * @return integer
-	 * @throws \Innologi\Decosdata\Exception\MissingObjectProperty
+	 * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItem
 	 */
 	public function pushItem(array $data) {
 		if (!isset($data['item_key'][0])) {
 			// item key is empty
-			throw new MissingObjectProperty(array(
-				'item_key',
-				'ItemBlob'
+			throw new InvalidItem(1448550839, array(
+				'NULL',
+				'no item_key'
 			));
 		}
 
@@ -172,21 +172,20 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @param array $data
 	 * @return void
 	 * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob
-	 * @throws \Innologi\Decosdata\Exception\MissingObjectProperty
 	 */
 	public function pushItemBlob(array $data) {
 		if (!isset($data['item_key'][0])) {
 			// item key is empty
-			throw new MissingObjectProperty(array(
-				'item_key',
-				'ItemBlob'
+			throw new InvalidItemBlob(1448550925, array(
+				'NULL',
+				'no item_key'
 			));
 		}
 
 		try {
 			if (!isset($data['filepath'][0])) {
 				// filepath missing
-				throw new FileException(array('NULL'));
+				throw new FileException(1448550944, array('NULL'));
 			}
 
 			$filePath = $data['filepath'];
@@ -206,7 +205,7 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 			$this->pushFileReference($filePath, $table, $uid, 'file');
 		} catch (FileException $e) {
 			// if there is no correct file, there is no valid item blob
-			throw new InvalidItemBlob(array(
+			throw new InvalidItemBlob($e->getCode(), array(
 				$data['item_key'], $e->getMessage()
 			));
 		}
@@ -352,7 +351,7 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 		);
 
 		if ($rows === NULL) {
-			throw new SqlError(array(
+			throw new SqlError(1448551035, array(
 				$this->databaseConnection->debug_lastBuiltQuery
 			));
 		}

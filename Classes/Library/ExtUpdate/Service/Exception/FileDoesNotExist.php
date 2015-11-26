@@ -25,18 +25,18 @@ namespace Innologi\Decosdata\Library\ExtUpdate\Service\Exception;
  ***************************************************************/
 
 /**
- * SQL Error Exception
+ * File Does Not Exist Exception
  *
  * @package InnologiLibs
  * @subpackage ExtUpdate
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class SqlError extends DatabaseException {
+class FileDoesNotExist extends FileException {
 
 	/**
 	 * @var string
 	 */
-	protected $message = 'The following database query produced an unknown error: <pre>%1$s</pre>';
+	protected $message = 'The file \'%1$s\' does not exist.';
 
 }

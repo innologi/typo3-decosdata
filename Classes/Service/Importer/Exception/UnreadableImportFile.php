@@ -36,6 +36,6 @@ class UnreadableImportFile extends ValidationFailed {
 	/**
 	 * @var string
 	 */
-	protected $message = 'Unreadable Import File: %1$s';
+	protected $message = 'Unreadable Import File: the path \'%1$s\' is either not a file, unreadable, or of an unexpected format.';
 
 }

@@ -54,7 +54,7 @@ class Wrapper implements OptionInterface {
 	public function alterContentValue(array $args, &$content, RenderOptionService $service) {
 		$wrap = array();
 		if (!isset($args['wrap'][0])) {
-			throw new MissingArgument(array(self::class, 'wrap'));
+			throw new MissingArgument(1448551326, array(self::class, 'wrap'));
 		}
 		$args['wrap'] = $service->processInlineOptions($args['wrap']);
 		// note that by choosing to first process inline options, they can never return

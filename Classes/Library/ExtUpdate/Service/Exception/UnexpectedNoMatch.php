@@ -25,18 +25,18 @@ namespace Innologi\Decosdata\Library\ExtUpdate\Service\Exception;
  ***************************************************************/
 
 /**
- * SQL Error Exception
+ * Unexpected NoMatch Exception
  *
  * @package InnologiLibs
  * @subpackage ExtUpdate
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class SqlError extends DatabaseException {
+class UnexpectedNoMatch extends Exception {
 
 	/**
 	 * @var string
 	 */
-	protected $message = 'The following database query produced an unknown error: <pre>%1$s</pre>';
+	protected $message = 'The following values for \'%1$s\' should match but do not: %2$s';
 
 }

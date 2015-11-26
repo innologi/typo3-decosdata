@@ -34,4 +34,9 @@ namespace Innologi\Decosdata\Library\ExtUpdate\Service\Exception;
  */
 class NoData extends DatabaseException {
 
+	/**
+	 * @var string
+	 */
+	protected $message = 'No \'%1$s\' records to migrate.';
+
 }

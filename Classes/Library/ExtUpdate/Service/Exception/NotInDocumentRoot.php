@@ -34,4 +34,9 @@ namespace Innologi\Decosdata\Library\ExtUpdate\Service\Exception;
  */
 class NotInDocumentRoot extends FileException {
 
+	/**
+	 * @var string
+	 */
+	protected $message = 'The file \'%1$s\' lives outside of document root \'%2$s\'.';
+
 }

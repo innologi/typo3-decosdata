@@ -56,7 +56,7 @@ class ItemBlobFactory extends FactoryAbstract {
 	 */
 	protected function setProperties(\Innologi\Decosdata\Domain\Model\ItemBlob $object, array $data) {
 		if (!isset($data['item_key'][0])) {
-			throw new MissingObjectProperty(array(
+			throw new MissingObjectProperty(1448549890, array(
 				'item_key',
 				'ItemBlob'
 			));
@@ -70,6 +70,7 @@ class ItemBlobFactory extends FactoryAbstract {
 
 		// regular data
 		if (isset($data['sequence'])) {
+			// LOW _____don't we rely on sequence?
 			$object->setSequence($data['sequence']);
 		}
 		if (isset($data['file'])) {

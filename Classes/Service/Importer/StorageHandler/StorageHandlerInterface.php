@@ -49,6 +49,7 @@ interface StorageHandlerInterface {
 	 *
 	 * @param array $data
 	 * @return mixed
+	 * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItem
 	 */
 	public function pushItem(array $data);
 
@@ -57,6 +58,7 @@ interface StorageHandlerInterface {
 	 *
 	 * @param array $data
 	 * @return void
+	 * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob
 	 */
 	public function pushItemBlob(array $data);
 

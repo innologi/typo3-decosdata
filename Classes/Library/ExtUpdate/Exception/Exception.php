@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Library\ExtUpdate\Service\Exception;
+namespace Innologi\Decosdata\Library\ExtUpdate\Exception;
 /***************************************************************
  *  Copyright notice
  *
@@ -25,18 +25,40 @@ namespace Innologi\Decosdata\Library\ExtUpdate\Service\Exception;
  ***************************************************************/
 
 /**
- * SQL Error Exception
+ * Exception Class
  *
  * @package InnologiLibs
  * @subpackage ExtUpdate
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class SqlError extends DatabaseException {
+class Exception extends \Exception {
 
 	/**
-	 * @var string
+	 * Class constructor
+	 *
+	 * @param integer $code (optional)
+	 * @param array $messageArguments (optional)
+	 * @param string $message (optional)
+	 * @return void
 	 */
-	protected $message = 'The following database query produced an unknown error: <pre>%1$s</pre>';
+	public function __construct($code = NULL, array $messageArguments = NULL, $message = NULL) {
+		$this->code = $code;
+		if ($message !== NULL) {
+			$this->message = $message;
+		}
+		if ($messageArguments !== NULL) {
+			$this->message = vsprintf($this->message, $messageArguments);
+		}
+	}
+
+	/**
+	 * Return error message formatted, prepended with code
+	 *
+	 * @return string
+	 */
+	public function getFormattedErrorMessage() {
+		return '[' . $this->code . '] ' . $this->message;
+	}
 
 }

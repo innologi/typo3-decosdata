@@ -26,7 +26,6 @@ namespace Innologi\Decosdata\Service\Database;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use Innologi\Decosdata\Exception\SqlError;
-use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 /**
  * Database Helper
  *
@@ -147,7 +146,7 @@ class DatabaseHelper implements SingletonInterface {
 		);
 
 		if ($row === NULL) {
-			throw new SqlError(NULL, array(
+			throw new SqlError(1448550406, array(
 				$this->databaseConnection->debug_lastBuiltQuery
 			));
 		}

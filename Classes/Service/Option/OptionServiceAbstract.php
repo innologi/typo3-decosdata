@@ -75,7 +75,7 @@ abstract class OptionServiceAbstract {
 	 */
 	protected function executeOption($optionMethod, array $option, &$value, $parentObject) {
 		if ( !isset($option['option']) ) {
-			throw new MissingOption();
+			throw new MissingOption(1448552481);
 		}
 		if ( !isset($option['args']) ) {
 			$option['args'] = array();
@@ -104,7 +104,7 @@ abstract class OptionServiceAbstract {
 			$className = $this->optionNamespace. '\\' . $className;
 		}
 		if (!class_exists($className)) {
-			throw new MissingOptionClass(array($className));
+			throw new MissingOptionClass(1448552497, array($className));
 		}
 		$object = $this->objectManager->get($className);
 		return $object;

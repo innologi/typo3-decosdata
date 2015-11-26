@@ -24,7 +24,7 @@ namespace Innologi\Decosdata\Service\Importer;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\DebugUtility;
+use Innologi\Decosdata\Utility\DebugUtility;
 /**
  * Importer Service
  *
@@ -87,7 +87,7 @@ class ImporterService implements SingletonInterface{
 				$this->importSingle($import);
 			} catch (Exception\ImporterError $e) {
 				// register the error and move on
-				$this->errors[$import->getUid() . ':' . $import->getTitle()] = $e->getMessage();
+				$this->errors[$import->getUid() . ':' . $import->getTitle()] = $e->getFormattedErrorMessage();
 			}
 			// any other exception is so serious that we have to halt the entire process anyway
 		}
@@ -117,7 +117,9 @@ class ImporterService implements SingletonInterface{
 		// parsing errors throw an exception afterwards
 		$errors = $this->parser->getErrors();
 		if (!empty($errors)) {
-			throw new Exception\ImporterError(array(DebugUtility::viewArray($errors)), '%1$s');
+			throw new Exception\ImporterError(
+				1448551145, NULL, DebugUtility::formatArrayValues($errors)
+			);
 		}
 	}
 

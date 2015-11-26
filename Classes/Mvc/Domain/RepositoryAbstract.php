@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\Mvc\Domain;
  ***************************************************************/
 use TYPO3\CMS\Extbase\Persistence\Repository;
 use Innologi\Decosdata\Exception\StaticUidInsertion;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 /**
  * General RepositoryAbstract class
  *
@@ -88,7 +89,7 @@ abstract class RepositoryAbstract extends Repository {
 	 */
 	public function insertRecord(array &$data) {
 		if (isset($data['uid'])) {
-			throw new StaticUidInsertion(array(
+			throw new StaticUidInsertion(1448550380, array(
 				$this->getTableName(),
 				$data['uid']
 			));

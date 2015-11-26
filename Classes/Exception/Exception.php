@@ -36,17 +36,28 @@ class Exception extends \Exception {
 	/**
 	 * Class constructor
 	 *
+	 * @param integer $code (optional)
 	 * @param array $messageArguments (optional)
 	 * @param string $message (optional)
 	 * @return void
 	 */
-	public function __construct(array $messageArguments = NULL, $message = NULL) {
+	public function __construct($code = NULL, array $messageArguments = NULL, $message = NULL) {
+		$this->code = $code;
 		if ($message !== NULL) {
 			$this->message = $message;
 		}
 		if ($messageArguments !== NULL) {
 			$this->message = vsprintf($this->message, $messageArguments);
 		}
+	}
+
+	/**
+	 * Return error message formatted, prepended with code
+	 *
+	 * @return string
+	 */
+	public function getFormattedErrorMessage() {
+		return '[' . $this->code . '] ' . $this->message;
 	}
 
 }

@@ -23,8 +23,7 @@ namespace Innologi\Decosdata\Library\ExtUpdate\Service;
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
+use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 /**
  * Ext Update Database Service
  *
@@ -51,37 +50,27 @@ class FileService implements SingletonInterface {
 	protected $fileReferenceRepository;
 
 	/**
-	 * Language labels => messages
-	 *
-	 * @var array
-	 */
-	protected $lang = array(
-		'notExist' => 'The file \'<code>%1$s</code>\' does not exist.',
-		'notDocRoot' => 'The file \'<code>%1$s</code>\' lives outside of document root \'<code>%2$s</code>\'.'
-	);
-
-	/**
 	 * Retrieve an existing FAL file object, or create a new one if
 	 * it doesn't exist and return it.
 	 *
 	 * @param string $path
 	 * @return \TYPO3\CMS\Core\Resource\File
-	 * @throws \TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException
+	 * @throws Exception\FileDoesNotExist
 	 * @throws Exception\NotInDocumentRoot
 	 */
 	public function retrieveFileObjectByPath($path) {
-		if ( !is_file($path) || !file_exists($path) ) {
-			throw new FileDoesNotExistException(
-				sprintf($this->lang['notExist'], $path)
-			);
+		try {
+			if ( !is_file($path) || !file_exists($path) ) {
+				throw new ResourceDoesNotExistException();
+			}
+			if (strpos($path, PATH_site) !== 0) {
+				throw new Exception\NotInDocumentRoot(1448613689, array($path, PATH_site));
+			}
+			// this method creates the record if one does not yet exist
+			return $this->resourceFactory->retrieveFileOrFolderObject($path);
+		} catch (ResourceDoesNotExistException $e) {
+			throw new Exception\FileDoesNotExist(1448614638, array($path));
 		}
-		if (strpos($path, PATH_site) !== 0) {
-			throw new Exception\NotInDocumentRoot(
-				sprintf($this->lang['notDocRoot'], $path, PATH_site)
-			);
-		}
-		// this method creates the record if one does not yet exist
-		return $this->resourceFactory->retrieveFileOrFolderObject($path);
 	}
 
 	/**

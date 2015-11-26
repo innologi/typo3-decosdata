@@ -31,6 +31,7 @@ use Innologi\Decosdata\Service\Importer\Exception\UnexpectedItemStructure;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidValidationFile;
 use Innologi\Decosdata\Service\Importer\Exception\ValidationFailed;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
+use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
 /**
  * Importer Parser: One File Imports, Streaming Parser
  *
@@ -69,16 +70,6 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	 * @var string
 	 */
 	protected $baseFilePath;
-
-	/**
-	 * Exception message strings I don't immediately plan on putting in llang files
-	 *
-	 * @var array
-	 */
-	protected $lang = array(
-		'UnreadablePath' => 'The path \'%1$s\' is either not a file, unreadable, or of an unexpected format.',
-		'ValidationFailedUnknown' => 'Validation error in %1$s: %2$s'
-	);
 
 	/**
 	 * @var array
@@ -121,20 +112,16 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 		$reader = new \XMLReader();
 		try {
 			if (!@$reader->open($importFilePath)) {
-				throw new UnreadableImportFile(array(
-					sprintf($this->lang['UnreadablePath'], $importFilePath)
-				));
+				throw new UnreadableImportFile(1448550537, array($importFilePath));
 			}
 			if (!@$reader->setRelaxNGSchema($rngFilePath)) {
-				throw new InvalidValidationFile(array(
-					sprintf($this->lang['UnreadablePath'], $rngFilePath)
-				));
+				throw new InvalidValidationFile(1448550611, array($rngFilePath));
 			}
 
 			// skip through the entire import file
 			while ($reader->next());
 			if (!$reader->isValid()) {
-				throw new ValidationFailed(array($importFilePath));
+				throw new ValidationFailed(1448550637, array($importFilePath));
 			}
 		} catch (ValidationFailed $e) {
 			throw $e;
@@ -143,10 +130,10 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 			throw $e;
 		} catch (\Exception $e) {
 			// pass it on as a ValidationFailed exception
-			throw new ValidationFailed(array(
+			throw new ValidationFailed(1448550696, array(
 				$importFilePath,
 				$e->getMessage()
-			), $this->lang['ValidationFailedUnknown']);
+			), 'Validation error in %1$s: %2$s');
 		} finally {
 			$reader->close();
 		}
@@ -162,9 +149,7 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	protected function startParser($importFilePath) {
 		$reader = new \XMLReader();
 		if ( !$reader->open($importFilePath) ) {
-			throw new UnreadableImportFile(array(
-				sprintf($this->lang['UnreadablePath'], $importFilePath)
-			));
+			throw new UnreadableImportFile(1448550742, array($importFilePath));
 		}
 
 		// place cursor at the first (ITEMS) node
@@ -199,14 +184,18 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 					try {
 						$this->parseItemBlob($reader, $parentItem);
 					} catch (InvalidItemBlob $e) {
-						$this->errors[] = $e->getMessage();
+						$this->errors[] = $e->getFormattedErrorMessage();
 					}
 				}
 				break;
 			default:
 				// for every other Item node
 				while (($reader->nodeType === \XMLReader::ELEMENT || $reader->read()) && $itemDepth === $reader->depth) {
-					$this->parseItem($reader, $type, $parentItem);
+					try {
+						$this->parseItem($reader, $type, $parentItem);
+					} catch (InvalidItem $e) {
+						$this->errors[] = $e->getFormattedErrorMessage();
+					}
 				}
 		}
 	}
@@ -245,7 +234,7 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 					break;
 				case 'ITEMS':
 					if ($item === NULL) {
-						throw new UnexpectedItemStructure(array($fieldName));
+						throw new UnexpectedItemStructure(1448550765, array($fieldName));
 					}
 					// recursive call to run through child ITEMS-node and its subsequent children
 					$this->parseItems($reader, $item);
@@ -254,7 +243,7 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 				default:
 					if ($item === NULL) {
 						// @LOW if this ever becomes an issue, I should consider storing fields + values in an array first
-						throw new UnexpectedItemStructure(array($fieldName));
+						throw new UnexpectedItemStructure(1448550787, array($fieldName));
 					}
 					$this->storageHandler->pushItemField(array(
 						'item' => $item,

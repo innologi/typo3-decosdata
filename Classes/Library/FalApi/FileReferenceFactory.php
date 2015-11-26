@@ -71,7 +71,7 @@ class FileReferenceFactory implements SingletonInterface {
 	public function createByFilePath($filePath) {
 		$fileObject = $this->resourceFactory->retrieveFileOrFolderObject($filePath);
 		if ( !($fileObject instanceof \TYPO3\CMS\Core\Resource\File) ) {
-			throw new Exception\FileException(array($filePath));
+			throw new Exception\FileException(1448550039, array($filePath));
 		}
 		return $this->create(array(
 			'uid_local' => $fileObject->getUid()

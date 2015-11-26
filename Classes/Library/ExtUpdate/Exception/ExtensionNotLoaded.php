@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Library\ExtUpdate\Service\Exception;
+namespace Innologi\Decosdata\Library\ExtUpdate\Exception;
 /***************************************************************
  *  Copyright notice
  *
@@ -25,18 +25,18 @@ namespace Innologi\Decosdata\Library\ExtUpdate\Service\Exception;
  ***************************************************************/
 
 /**
- * SQL Error Exception
+ * Extension Not Loaded Exception
  *
  * @package InnologiLibs
  * @subpackage ExtUpdate
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class SqlError extends DatabaseException {
+class ExtensionNotLoaded extends Exception {
 
 	/**
 	 * @var string
 	 */
-	protected $message = 'The following database query produced an unknown error: <pre>%1$s</pre>';
+	protected $message = 'Source extension \'%1$s\' is not loaded, cannot run updater.';
 
 }

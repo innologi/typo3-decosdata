@@ -58,19 +58,6 @@ class DatabaseService implements SingletonInterface {
 	protected $filesForReference = array();
 
 	/**
-	 * Language labels => messages
-	 *
-	 * @var array
-	 */
-	protected $lang = array(
-		'noData' => 'No \'<code>%1$s</code>\' records to migrate.',
-		'noUniqueData' => 'No \'<code>%1$s</code>\' records to create.',
-		'sqlError' => 'The following database query produced an unknown error: <pre>%1$s</pre>',
-		'target>source' => 'Automatic migration completely failed due to uid-reference-overlapping. You will have to start over completely by reverting a database/table backup, or remove all data and re-import all Decos data manually. Possible reason: imports were updated or TCA records were created before migration was complete. (Table: %1$s, Property: %2$s, Source: %3$s, Target: %4$s)',
-		'unexpectedNoMatch' => 'The following values for \'<code>%1$s</code>\' should match but do not: <code>%2$s</code>'
-	);
-
-	/**
 	 * Constructor
 	 *
 	 * @param \TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager
@@ -110,9 +97,7 @@ class DatabaseService implements SingletonInterface {
 		$count = count($toMigrate);
 
 		if ($count <= 0) {
-			throw new Exception\NoData(
-				sprintf($this->lang['noData'], $sourceTable)
-			);
+			throw new Exception\NoData(1448612998, array($sourceTable));
 		}
 
 		// translate rows to insertable data according to $propertyMap
@@ -170,9 +155,7 @@ class DatabaseService implements SingletonInterface {
 		$count = count($toMigrate);
 
 		if ($count <= 0) {
-			throw new Exception\NoData(
-				sprintf($this->lang['noData'], $sourceTable)
-			);
+			throw new Exception\NoData(1448613031, array($sourceTable));
 		}
 
 		// translate rows to insertable data according to $propertyMap
@@ -254,9 +237,7 @@ class DatabaseService implements SingletonInterface {
 		$count = count($toMigrate);
 
 		if ($count <= 0) {
-			throw new Exception\NoData(
-				sprintf($this->lang['noData'], $sourceTable)
-			);
+			throw new Exception\NoData(1448613061, array($sourceTable));
 		}
 
 		// translate rows to insertable data according to $propertyMap
@@ -313,9 +294,7 @@ class DatabaseService implements SingletonInterface {
 		$count = count($toMigrate);
 
 		if ($count <= 0) {
-			throw new Exception\NoData(
-				sprintf($this->lang['noData'], $sourceTable)
-			);
+			throw new Exception\NoData(1448613107, array($sourceTable));
 		}
 
 		// translate rows to insertable data according to $propertyMap
@@ -365,7 +344,7 @@ class DatabaseService implements SingletonInterface {
 	 * @param integer $limitRecords
 	 * @param array &$uidMap Reference for storing targetUid => array(sourceProperty => value) mappings
 	 * @return integer Affected record count
-	 * @throws Exception\NoData Nothing to migrate
+	 * @throws Exception\NoUniqueData Nothing to migrate
 	 */
 	public function createUniqueRecordsFromValues($sourceTable, $targetTable, array $propertyMap, array $evaluation = array(), $limitRecords = 10000, array &$uidMap = array()) {
 		$uniqueBy = join(',', array_keys($propertyMap));
@@ -377,9 +356,7 @@ class DatabaseService implements SingletonInterface {
 		$count = count($toInsert);
 
 		if ($count <= 0) {
-			throw new Exception\NoData(
-				sprintf($this->lang['noUniqueData'], $targetTable)
-			);
+			throw new Exception\NoUniqueData(1448613241, array($targetTable));
 		}
 
 		// find already existing matches
@@ -423,22 +400,16 @@ class DatabaseService implements SingletonInterface {
 	 * @param array $valueMap sourceValue => targetValue
 	 * @param boolean $strictlyUidReferences
 	 * @return integer Affected record count
-	 * @throws \Exception
+	 * @throws Exception\UidReferenceOverlap
 	 */
 	public function updatePropertyBySourceValue($table, $property, array $valueMap, $strictlyUidReferences = FALSE) {
 		$count = 0;
 		foreach ($valueMap as $sourceValue => $targetValue) {
 			if ($strictlyUidReferences && (int) $targetValue > (int) $sourceValue) {
-				// throwing a normal exception to stop updating entirely
-				throw new \Exception(
-					sprintf(
-						$this->lang['target>source'],
-						$table,
-						$property,
-						$sourceValue,
-						$targetValue
-					)
-				);
+				// stops updating/migrating entirely
+				throw new Exception\UidReferenceOverlap(1448615606, array(
+					$table, $property, $sourceValue, $targetValue
+				));
 			}
 
 			$values = array(
@@ -491,12 +462,9 @@ class DatabaseService implements SingletonInterface {
 			'uid'
 		);
 		if ($rows === NULL) {
-			throw new Exception\SqlError(
-				sprintf(
-					$this->lang['sqlError'],
-					$this->databaseConnection->debug_lastBuiltQuery
-				)
-			);
+			throw new Exception\SqlError(1448613438, array(
+				$this->databaseConnection->debug_lastBuiltQuery
+			));
 		}
 		return $rows;
 	}
@@ -649,12 +617,9 @@ class DatabaseService implements SingletonInterface {
 		} elseif (isset($row[$propertyConfig['foreignField']])) {
 			$uid = $row[$propertyConfig['foreignField']];
 		} else {
-			throw new Exception\SqlError(
-				sprintf(
-					$this->lang['sqlError'],
-					$this->databaseConnection->debug_lastBuiltQuery
-				)
-			);
+			throw new Exception\SqlError(1448613495, array(
+				$this->databaseConnection->debug_lastBuiltQuery
+			));
 		}
 
 		return $uid;
@@ -730,7 +695,7 @@ class DatabaseService implements SingletonInterface {
 	 * @param array $properties sourceProperties => targetProperties
 	 * @param array $valueRows
 	 * @return array UidMap containing uid => array(property => value)
-	 * @throws \Exception Unexpected no-match
+	 * @throws Exception\UnexpectedNoMatch
 	 */
 	protected function insertUniqueRecords($table, array $properties, array $valueRows) {
 		$uidMap = array();
@@ -765,9 +730,7 @@ class DatabaseService implements SingletonInterface {
 				$index = join('|', $row);
 				$indexHashed = md5($index);
 				if (!isset($trimmedValues[$indexHashed])) {
-					throw new \Exception(
-						sprintf($this->lang['unexpectedNoMatch'], $table, $index)
-					);
+					throw new Exception\UnexpectedNoMatch(1448615948, array($table, $index));
 				}
 				unset($trimmedValues[$indexHashed]);
 				// register the known values with their uid already

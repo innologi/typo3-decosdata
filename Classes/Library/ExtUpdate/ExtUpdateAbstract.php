@@ -74,27 +74,14 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	protected $sourceExtensionVersion = '0.0.0';
 
 	/**
-	 * Static language labels => messages
-	 *
-	 * DO NOT OVERRULE!
-	 *
-	 * @var array
-	 */
-	protected $staticLang = array(
-		'extNotLoaded' => 'Source extension \'<code>%1$s</code>\' is not loaded, cannot run updater.',
-		'extIncorrectVersion' => 'Source extension \'<code>%1$s</code>\' needs to be updated to version <code>%2$s</code>.',
-		'noExtKeySet' => 'The extension updater class has no extension key set. You need to override \'$extensionKey\' in your ext_update class.'
-	);
-
-	/**
 	 * Constructor
 	 *
 	 * @return void
-	 * @throws \Exception
+	 * @throws Exception\NoExtkeySet
 	 */
 	public function __construct() {
 		if ( !isset($this->extensionKey[0]) ) {
-			throw new \Exception($this->staticLang['noExtKeySet']);
+			throw new Exception\NoExtkeySet(1448616492);
 		}
 		// generally, the source-extension is the same as the current one
 		if ( !isset($this->sourceExtensionKey[0]) ) {
@@ -127,6 +114,12 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 		try {
 			$this->checkPrerequisites();
 			$this->processUpdates();
+		} catch (Exception\Exception $e) {
+			$this->addFlashMessage(
+				$e->getFormattedErrorMessage(),
+				'Update failed',
+				FlashMessage::ERROR
+			);
 		} catch (\Exception $e) {
 			$this->addFlashMessage(
 				$e->getMessage(),
@@ -154,7 +147,8 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	 * Checks updater prerequisites. Throws exceptions if not met.
 	 *
 	 * @return void
-	 * @throws \Exception
+	 * @throws Exception\ExtensionNotLoaded
+	 * @throws Exception\IncorrectExtensionVersion
 	 */
 	protected function checkPrerequisites() {
 		if ($this->extensionKey !== $this->sourceExtensionKey) {
@@ -163,12 +157,7 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 
 			// is source extension is loaded?
 			if (!ExtensionManagementUtility::isLoaded($this->sourceExtensionKey)) {
-				throw new \Exception(
-					sprintf(
-						$this->staticLang['extNotLoaded'],
-						$this->sourceExtensionKey
-					)
-				);
+				throw new Exception\ExtensionNotLoaded(1448616650, array($this->sourceExtensionKey));
 			}
 			// does source extension meet version requirement?
 			if (version_compare(
@@ -176,13 +165,9 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 				$this->sourceExtensionVersion,
 				'<'
 			)) {
-				throw new \Exception(
-					sprintf(
-						$this->staticLang['extIncorrectVersion'],
-						$this->sourceExtensionKey,
-						$this->sourceExtensionVersion
-					)
-				);
+				throw new Exception\IncorrectExtensionVersion(1448616744, array(
+					$this->sourceExtensionKey, $this->sourceExtensionVersion
+				));
 			}
 		}
 	}

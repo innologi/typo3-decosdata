@@ -36,6 +36,6 @@ class InvalidItemBlob extends ItemParsingError {
 	/**
 	 * @var string
 	 */
-	protected $message = 'Could not parse ItemBlob \'%1$s\': %2$s';
+	protected $message = 'Could not parse itemblob \'%1$s\': %2$s';
 
 }

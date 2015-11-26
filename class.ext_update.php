@@ -21,12 +21,10 @@
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use Innologi\Decosdata\Library\ExtUpdate\ExtUpdateAbstract;
 use Innologi\Decosdata\Library\ExtUpdate\Service\Exception\NoData;
 use Innologi\Decosdata\Library\ExtUpdate\Service\Exception\FileException;
-use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 /**
  * Ext Update
@@ -183,10 +181,8 @@ class ext_update extends ExtUpdateAbstract {
 						)
 					);
 					$count++;
-				} catch (ResourceDoesNotExistException $e) {
-					$errorMessage = $e->getMessage();
 				} catch (FileException $e) {
-					$errorMessage = $e->getMessage();
+					$errorMessage = $e->getFormattedErrorMessage();
 				}
 
 				if ($errorMessage !== NULL) {
@@ -357,7 +353,7 @@ class ext_update extends ExtUpdateAbstract {
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
+			$this->addFlashMessage($e->getFormattedErrorMessage(), '', FlashMessage::INFO);
 			$this->finishState['itemxml'] = TRUE;
 		}
 	}
@@ -406,10 +402,8 @@ class ext_update extends ExtUpdateAbstract {
 				$file = $this->fileService->retrieveFileObjectByPath($row['filepath']);
 				$updateValues = array('migrated_file' => $file->getUid());
 				$count++;
-			} catch (ResourceDoesNotExistException $e) {
-				$errorMessage = $e->getMessage();
 			} catch (FileException $e) {
-				$errorMessage = $e->getMessage();
+				$errorMessage = $e->getFormattedErrorMessage();
 			}
 
 			if ($errorMessage !== NULL) {
@@ -491,7 +485,7 @@ class ext_update extends ExtUpdateAbstract {
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
+			$this->addFlashMessage($e->getFormattedErrorMessage(), '', FlashMessage::INFO);
 			$this->finishState['item'] = TRUE;
 		}
 	}
@@ -695,7 +689,7 @@ class ext_update extends ExtUpdateAbstract {
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
+			$this->addFlashMessage($e->getFormattedErrorMessage(), '', FlashMessage::INFO);
 			$this->finishState['itemfield'] = TRUE;
 		}
 	}
@@ -733,7 +727,7 @@ class ext_update extends ExtUpdateAbstract {
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
+			$this->addFlashMessage($e->getFormattedErrorMessage(), '', FlashMessage::INFO);
 			$this->finishState['item_item_mm'] = TRUE;
 		}
 	}
@@ -773,7 +767,7 @@ class ext_update extends ExtUpdateAbstract {
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
+			$this->addFlashMessage($e->getFormattedErrorMessage(), '', FlashMessage::INFO);
 			$this->finishState['item_xml_mm'] = TRUE;
 		}
 	}

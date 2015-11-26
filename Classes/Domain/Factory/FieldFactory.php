@@ -50,7 +50,7 @@ class FieldFactory extends FactoryAbstract {
 	 */
 	protected function setProperties(\Innologi\Decosdata\Domain\Model\Field $object, array $data) {
 		if (!isset($data['field_name'][0])) {
-			throw new MissingObjectProperty(array(
+			throw new MissingObjectProperty(1448549862, array(
 				'field_name',
 				'Field'
 			));
