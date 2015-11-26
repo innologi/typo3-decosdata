@@ -24,8 +24,7 @@ namespace Innologi\Decosdata\Service\Importer;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use Innologi\Decosdata\Service\Importer\Exception\ValidationFailed;
-use Innologi\Decosdata\Service\Importer\Exception\EmptyImportFile;
+use TYPO3\CMS\Core\Utility\DebugUtility;
 /**
  * Importer Service
  *
@@ -86,7 +85,7 @@ class ImporterService implements SingletonInterface{
 		foreach ($importCollection as $import) {
 			try {
 				$this->importSingle($import);
-			} catch (ValidationFailed $e) {
+			} catch (Exception\ImporterError $e) {
 				// register the error and move on
 				$this->errors[$import->getUid() . ':' . $import->getTitle()] = $e->getMessage();
 			}
@@ -99,6 +98,7 @@ class ImporterService implements SingletonInterface{
 	 *
 	 * @param \Innologi\Decosdata\Domain\Model\Import $import
 	 * @return void
+	 * @throws
 	 */
 	public function importSingle(\Innologi\Decosdata\Domain\Model\Import $import) {
 		$filePath = PATH_site . $import->getFile()->getOriginalResource()->getPublicUrl();
@@ -113,6 +113,12 @@ class ImporterService implements SingletonInterface{
 		$import->setHash($newHash);
 		// mark as processed
 		$this->importRepository->update($import);
+
+		// parsing errors throw an exception afterwards
+		$errors = $this->parser->getErrors();
+		if (!empty($errors)) {
+			throw new Exception\ImporterError(array(DebugUtility::viewArray($errors)), '%1$s');
+		}
 	}
 
 	/**

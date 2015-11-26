@@ -25,6 +25,9 @@ namespace Innologi\Decosdata\Service\Importer\StorageHandler;
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
+use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
+use Innologi\Decosdata\Library\FalApi\Exception\FileException;
+use Innologi\Decosdata\Exception\MissingObjectProperty;
 /**
  * Importer Storage Handler: Extbase Edition
  *
@@ -205,18 +208,31 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 *
 	 * @param array $data
 	 * @return void
+	 * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob
 	 */
 	public function pushItemBlob(array $data) {
-		/* @var $parentItem \Innologi\Decosdata\Domain\Model\Item */
-		$parentItem = $data['item'];
-		unset($data['item']);
+		try {
+			if (!isset($data['filepath'][0])) {
+				// filepath missing
+				throw new FileException(array('NULL'));
+			}
 
-		$itemBlob = $this->itemBlobFactory->getByItemKey($data['item_key'], $data);
-		if ($itemBlob->_isNew()) {
-			// adds blob with item-relation when $parentItem is persisted
-			$parentItem->addItemBlob($itemBlob);
-		} else {
-			$this->itemBlobRepository->update($itemBlob);
+			/* @var $parentItem \Innologi\Decosdata\Domain\Model\Item */
+			$parentItem = $data['item'];
+			unset($data['item']);
+
+			$itemBlob = $this->itemBlobFactory->getByItemKey($data['item_key'], $data);
+			if ($itemBlob->_isNew()) {
+				// adds blob with item-relation when $parentItem is persisted
+				$parentItem->addItemBlob($itemBlob);
+			} else {
+				$this->itemBlobRepository->update($itemBlob);
+			}
+		} catch (FileException $e) {
+			// if there is no correct file, there is no valid item blob
+			throw new InvalidItemBlob(array(
+				$data['item_key'], $e->getMessage()
+			));
 		}
 	}
 

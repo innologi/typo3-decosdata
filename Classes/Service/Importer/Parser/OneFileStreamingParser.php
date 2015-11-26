@@ -25,13 +25,12 @@ namespace Innologi\Decosdata\Service\Importer\Parser;
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use Innologi\Decosdata\Service\Importer\Exception\UnreadableImportFile;
 use Innologi\Decosdata\Service\Importer\Exception\UnexpectedItemStructure;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidValidationFile;
 use Innologi\Decosdata\Service\Importer\Exception\ValidationFailed;
+use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
 /**
  * Importer Parser: One File Imports, Streaming Parser
  *
@@ -80,6 +79,11 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 		'UnreadablePath' => 'The path \'%1$s\' is either not a file, unreadable, or of an unexpected format.',
 		'ValidationFailedUnknown' => 'Validation error in %1$s: %2$s'
 	);
+
+	/**
+	 * @var array
+	 */
+	protected $errors = array();
 
 	/**
 	 * Processes an import for parsing.
@@ -192,7 +196,11 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 			case 'BLOB':
 				// for each ItemBlob node
 				while (($reader->nodeType === \XMLReader::ELEMENT || $reader->read()) && $itemDepth === $reader->depth) {
-					$this->parseItemBlob($reader, $parentItem);
+					try {
+						$this->parseItemBlob($reader, $parentItem);
+					} catch (InvalidItemBlob $e) {
+						$this->errors[] = $e->getMessage();
+					}
 				}
 				break;
 			default:
@@ -323,4 +331,14 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 		$value = trim($value);
 		return isset($value[0]) ? $value : NULL;
 	}
+
+	/**
+	 * Returns any parsing errors
+	 *
+	 * @return array
+	 */
+	public function getErrors() {
+		return $this->errors;
+	}
+
 }

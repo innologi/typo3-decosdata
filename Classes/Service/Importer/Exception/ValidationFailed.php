@@ -23,7 +23,7 @@ namespace Innologi\Decosdata\Service\Importer\Exception;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Exception\Exception;
+
 /**
  * Validation failed
  *
@@ -31,7 +31,7 @@ use Innologi\Decosdata\Exception\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ValidationFailed extends Exception {
+class ValidationFailed extends ImporterError {
 
 	/**
 	 * @var string

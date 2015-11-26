@@ -24,8 +24,10 @@ namespace Innologi\Decosdata\Service\Importer\StorageHandler;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use Innologi\Decosdata\Exception\SqlError;
+use Innologi\Decosdata\Library\FalApi\Exception\FileException;
+use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
+use Innologi\Decosdata\Exception\MissingObjectProperty;
 /**
  * Importer Storage Handler: Classic Edition
  *
@@ -114,8 +116,17 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 *
 	 * @param array $data
 	 * @return integer
+	 * @throws \Innologi\Decosdata\Exception\MissingObjectProperty
 	 */
 	public function pushItem(array $data) {
+		if (!isset($data['item_key'][0])) {
+			// item key is empty
+			throw new MissingObjectProperty(array(
+				'item_key',
+				'ItemBlob'
+			));
+		}
+
 		$table = 'tx_decosdata_domain_model_item';
 		$insert = array_merge(
 			$this->propertyDefaults,
@@ -160,23 +171,45 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 *
 	 * @param array $data
 	 * @return void
+	 * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob
+	 * @throws \Innologi\Decosdata\Exception\MissingObjectProperty
 	 */
 	public function pushItemBlob(array $data) {
-		$filePath = $data['filepath'];
-		unset($data['filepath']);
-
-		$table = 'tx_decosdata_domain_model_itemblob';
-		$data = array_merge($this->propertyDefaults, $data);
-		$this->databaseHelper->execUpsertQuery($table, $data, array('pid', 'item_key'));
-		$uid = $this->databaseHelper->getLastUid();
-		if ($uid === NULL) {
-			$uid = $this->databaseHelper->getLastUidOfMatch($table, array(
-				'pid' => $data['pid'],
-				'item_key' => $data['item_key']
+		if (!isset($data['item_key'][0])) {
+			// item key is empty
+			throw new MissingObjectProperty(array(
+				'item_key',
+				'ItemBlob'
 			));
 		}
 
-		$this->pushFileReference($filePath, $table, $uid, 'file');
+		try {
+			if (!isset($data['filepath'][0])) {
+				// filepath missing
+				throw new FileException(array('NULL'));
+			}
+
+			$filePath = $data['filepath'];
+			unset($data['filepath']);
+
+			$table = 'tx_decosdata_domain_model_itemblob';
+			$data = array_merge($this->propertyDefaults, $data);
+			$this->databaseHelper->execUpsertQuery($table, $data, array('pid', 'item_key'));
+			$uid = $this->databaseHelper->getLastUid();
+			if ($uid === NULL) {
+				$uid = $this->databaseHelper->getLastUidOfMatch($table, array(
+					'pid' => $data['pid'],
+					'item_key' => $data['item_key']
+				));
+			}
+			// @TODO ___note that we can get an exception here, after upsert. So we have to take in account that itemblobs could exist in DB without a file reference
+			$this->pushFileReference($filePath, $table, $uid, 'file');
+		} catch (FileException $e) {
+			// if there is no correct file, there is no valid item blob
+			throw new InvalidItemBlob(array(
+				$data['item_key'], $e->getMessage()
+			));
+		}
 	}
 
 	/**

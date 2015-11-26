@@ -36,6 +36,6 @@ class MissingObjectProperty extends Exception {
 	/**
 	 * @var string
 	 */
-	protected $message = 'Missing required property <code>%1$s</code> for <code>%2$s</code> object.';
+	protected $message = 'Missing required property \'%1$s\' for \'%2$s\' object.';
 
 }

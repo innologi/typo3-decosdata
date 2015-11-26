@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Service\Importer\Parser;
+namespace Innologi\Decosdata\Service\Importer\Exception;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,29 +23,19 @@ namespace Innologi\Decosdata\Service\Importer\Parser;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use Innologi\Decosdata\Exception\Exception;
 /**
- * Importer Parser Interface
+ * Item Parsing Error
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-interface ParserInterface {
+class ItemParsingError extends Exception {
 
 	/**
-	 * Processes an import for parsing.
-	 *
-	 * @param \Innologi\Decosdata\Domain\Model\Import $import
-	 * @return void
+	 * @var string
 	 */
-	public function processImport(\Innologi\Decosdata\Domain\Model\Import $import);
-
-	/**
-	 * Returns any parsing errors
-	 *
-	 * @return array
-	 */
-	public function getErrors();
+	protected $message = 'Could not parse item \'%1$s\'';
 
 }
