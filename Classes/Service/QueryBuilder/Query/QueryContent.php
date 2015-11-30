@@ -111,16 +111,17 @@ class QueryContent extends QueryIterator implements QueryInterface {
 	}
 
 	/**
-	 * Creates Query Field Object, adds it and returns it.
+	 * Returns Query Field object. If it does not exist yet, it is created.
 	 *
 	 * @param string $subId
 	 * @return QueryField
 	 */
-	public function createField($subId) {
+	public function getField($subId) {
 		$id = $this->id . $subId;
-		$object = GeneralUtility::makeInstance(QueryField::class, $id, $this);
-		$this->children[$id] = $object;
-		return $object;
+		if (!isset($this->children[$id])) {
+			$this->children[$id] = GeneralUtility::makeInstance(QueryField::class, $id, $this);
+		}
+		return $this->children[$id];
 	}
 
 

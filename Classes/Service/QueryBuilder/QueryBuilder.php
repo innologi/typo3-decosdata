@@ -81,13 +81,16 @@ class QueryBuilder {
 		$query = $this->objectManager->get(Query::class);
 
 		// init query config
-		$queryContent = $query->createContent('itemID');
-		$queryContent->getGroupBy()->setPriority(0);
-		$queryField = $queryContent->createField('');
-		$queryField->getSelect()
-			->setField('uid')
-			->setTableAlias('it');
-		$queryField->createFrom('item', 'tx_decosdata_domain_model_item', 'it');
+		$queryContent = $query->getContent('itemID');
+		$queryField = $queryContent->getField('');
+		// @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
+		if (!isset($configuration['relation']['noItemId'])) {
+			$queryContent->getGroupBy()->setPriority(0);
+			$queryField->getSelect()
+				->setField('uid')
+				->setTableAlias('it');
+		}
+		$queryField->getFrom('item', 'tx_decosdata_domain_model_item', 'it');
 
 		// add xml_id-condition if configured
 		if (!empty($import)) {
@@ -95,7 +98,7 @@ class QueryBuilder {
 			 * making this an INNER rather than LEFT JOIN with WHERE, will allow the eq_ref
 			 * join-type to use only index (also uses where if NULL-values are possible)
 			 */
-			$queryField->createFrom('import', 'tx_decosdata_item_import_mm', 'xmm')
+			$queryField->getFrom('import', 'tx_decosdata_item_import_mm', 'xmm')
 				->setJoinType('INNER')
 				->setConstraint(
 					$this->constraintFactory->createConstraintAnd(array(
@@ -127,7 +130,7 @@ class QueryBuilder {
 				$this->addContentField(
 					$index,
 					$contentConfiguration,
-					$query->createContent('content' . $index)
+					$query->getContent('content' . $index)
 				);
 			}
 		}
@@ -175,11 +178,11 @@ class QueryBuilder {
 					$tableAlias = 'itf' . $index . 's' . $subIndex;
 					$parameterKey = ':' . $tableAlias . 'field';
 					// @TODO ___move to method? wait to see if it really used elsewhere
-					$queryField = $queryContent->createField('field' . $subIndex);
+					$queryField = $queryContent->getField('field' . $subIndex);
 					$queryField->getSelect()
 						->setField('field_value')
 						->setTableAlias($tableAlias);
-					$queryField->createFrom(0, 'tx_decosdata_domain_model_itemfield', $tableAlias)
+					$queryField->getFrom(0, 'tx_decosdata_domain_model_itemfield', $tableAlias)
 						->setJoinType('LEFT')
 						->setConstraint(
 							$this->constraintFactory->createConstraintAnd(array(
@@ -199,16 +202,16 @@ class QueryBuilder {
 					$blobAlias2 = 'itb' . $index . 's1';
 					$blobTable = 'tx_decosdata_domain_model_itemblob';
 
-					$queryField = $queryContent->createField('blob' . $subIndex);
+					$queryField = $queryContent->getField('blob' . $subIndex);
 					// the main join to the blob table
-					$queryField->createFrom(0, $blobTable, $blobAlias1)
+					$queryField->getFrom('blob1', $blobTable, $blobAlias1)
 						->setJoinType('LEFT')
 						->setConstraint(
 							$this->constraintFactory->createConstraintByField('item', $blobAlias1, '=', 'uid', 'it')
 						);
 					// a second join is necessary for a maximum-groupwise comparison to always retrieve the latest file
 						// maximum-groupwise is performance-wise much preferred over subqueries
-					$queryField->createFrom(1, $blobTable, $blobAlias2)
+					$queryField->getFrom('blob2', $blobTable, $blobAlias2)
 						->setJoinType('LEFT')
 						->setConstraint(
 							$this->constraintFactory->createConstraintAnd(array(
@@ -227,7 +230,7 @@ class QueryBuilder {
 						->setTableAlias($fileAlias)
 							// @TODO ___what happens here if we don't have a file uid? do we get a 'file:' ?
 						->addWrap('file', 'CONCAT(\'file:\',|)');
-					$queryField->createFrom(2, 'sys_file_reference', $fileAlias)
+					$queryField->getFrom('fileref', 'sys_file_reference', $fileAlias)
 						->setJoinType('LEFT')
 						->setConstraint(
 							$this->constraintFactory->createConstraintAnd(array(

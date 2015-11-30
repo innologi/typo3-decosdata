@@ -87,15 +87,16 @@ class Query extends QueryIterator implements QueryInterface {
 	}
 
 	/**
-	 * Creates Query Content Object, adds it and returns it.
+	 * Returns Query Content object. If it does not exist yet, it is created.
 	 *
 	 * @param string $id
 	 * @return QueryContent
 	 */
-	public function createContent($id) {
-		$object = GeneralUtility::makeInstance(QueryContent::class, $id, $this);
-		$this->children[$id] = $object;
-		return $object;
+	public function getContent($id) {
+		if (!isset($this->children[$id])) {
+			$this->children[$id] = GeneralUtility::makeInstance(QueryContent::class, $id, $this);
+		}
+		return $this->children[$id];
 	}
 
 	/**
