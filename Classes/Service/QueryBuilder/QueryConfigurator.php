@@ -61,17 +61,22 @@ class QueryConfigurator implements SingletonInterface {
 	/**
 	 * @var array
 	 */
-	protected $specialValues = array('?', 'NULL', 'NOW()');
+	protected $specialValues = array('NULL', 'NOW()');
 
 	/**
 	 * @var array
 	 */
-	protected $supportedOperators = array('=', '<', '>', '<=', '>=', '<>', '!=', '<=>', 'IS', 'NOT', 'REGEXP', 'RLIKE', 'LIKE');
+	protected $supportedOperators = array('=', '<', '>', '<=', '>=', '<>', '!=', '<=>', 'IS', 'NOT', 'REGEXP', 'RLIKE', 'LIKE', 'IN');
 
 	/**
-	 * @var string
+	 * @var array
 	 */
-	protected $defaultOperator = '=';
+	protected $addParameters = array();
+
+	/**
+	 * @var integer
+	 */
+	protected $parameterCount = 0;
 
 	/**
 	 * Transforms a Query object to actual SQL Query Parts.
@@ -88,6 +93,7 @@ class QueryConfigurator implements SingletonInterface {
 			'GROUPBY' => ',',
 			'ORDERBY' => ','
 		);
+		$this->addParameters = array();
 
 		// Query consists of QueryContent with an ID that represents content alias.
 		// This object-approach effectively gives us control to alter specific configuration parts from
@@ -104,7 +110,7 @@ class QueryConfigurator implements SingletonInterface {
 				if ($select->getField() !== NULL) {
 					$concatSelect[] = $this->transformSelect($select);
 				}
-				$fromArray = $queryField->getFrom();
+				$fromArray = $queryField->getFromAll();
 				foreach ($fromArray as $from) {
 					$queryParts['FROM'][] = $this->transformFrom($from);
 				}
@@ -132,15 +138,30 @@ class QueryConfigurator implements SingletonInterface {
 		// these are stored by priority, so we can determine the order by sorting on key
 		if (isset($queryParts['GROUPBY'])) {
 			ksort($queryParts['GROUPBY']);
+		} else {
+			/*
+			 * If no group by, then we'll prevent duplicates by using the DISTINCT keyword.
+			 * There are MANY cases where either a DISTINCT is required (on import/mm joins),
+			 * or the effort to exclude it automatically has no effect on the item-join.
+			 * (ORDER BY/GROUP BY/pagebrowser all result in 'use temporary/filesort')
+			 */
+			$queryParts['SELECT'][0] = 'DISTINCT ' . $queryParts['SELECT'][0];
 		}
 		if (isset($queryParts['ORDERBY'])) {
 			ksort($queryParts['ORDERBY']);
 		}
 
+		// add parameter:values that were not yet parameterized
+		if (!empty($this->addParameters)) {
+			foreach ($this->addParameters as $key => $value) {
+				$query->addParameter($key, $value);
+			}
+		}
+
 		// joins all parts' elements to part strings
 		foreach ($queryParts as $part => $q) {
 			$queryParts[$part] = join($glue[$part], $q);
-			}
+		}
 
 		return $queryParts;
 	}
@@ -259,12 +280,12 @@ class QueryConfigurator implements SingletonInterface {
 	protected function transformConstraint(ConstraintInterface $constraint, $queryPart = '') {
 		if ($constraint instanceof ConstraintCollection) {
 			$logic = $constraint->getLogic();
-		if (!in_array($logic, $this->supportedLogic, TRUE)) {
-			// @LOW _this doesn't really clarify anything if I don't know which piece of configuration is the cause..
-			throw new Exception\UnsupportedFeatureType(1448552681, array(
-				'LOGICAL OPERATOR', $logic, join('/', $this->supportedLogic)
-			));
-		}
+			if (!in_array($logic, $this->supportedLogic, TRUE)) {
+				// @LOW _this doesn't really clarify anything if I don't know which piece of configuration is the cause..
+				throw new Exception\UnsupportedFeatureType(1448552681, array(
+					'LOGICAL OPERATOR', $logic, join('/', $this->supportedLogic)
+				));
+			}
 			$parts = array();
 			// a collection requires recursive use of this method
 			foreach ($constraint as $subConstraint) {
@@ -273,6 +294,7 @@ class QueryConfigurator implements SingletonInterface {
 			return '(' . join(' ' . $logic . ' ', $parts) . ')';
 		}
 
+		// @LOW should these be validated? as well as foreign field and alias? they're not provided from user-input, but still..
 		$localField = $constraint->getLocalField();
 		if ( !isset($localField[0]) ) {
 			throw new Exception\MissingConfigurationProperty(1448552629, array(
@@ -285,22 +307,13 @@ class QueryConfigurator implements SingletonInterface {
 				$queryPart, 'constraint.localAlias', json_encode($constraint)
 			));
 		}
-		$operator = $constraint->getOperator();
-		if ( !isset($operator[0]) ) {
-			throw new Exception\MissingConfigurationProperty(1448552699, array(
-				$queryPart, 'constraint.operator', json_encode($constraint)
-			));
-		}
-				
-		// @TODO ___is this safe enough? provideWhereConditionSafe() handles some validation, but shouldn't it be done from here instead? Also, how would we verify field?
-		// @TODO ___this isn't really safe if an option allows to provide any of these fields, is it?
+		$operator = $this->resolveOperator($constraint->getOperator());
+
 		$string = $localAlias . '.' . $localField . ' ' . $operator . ' ';
 		if ($constraint instanceof ConstraintByValue) {
-			// @LOW ___check value? is this really the place? Can't we have some uniform validation class?
-			return $string . $constraint->getValue();
-			}
+			return $string . $this->resolveConstraintValue($constraint->getValue());
+		}
 		if ($constraint instanceof ConstraintByField) {
-			// @LOW ___check value? is this really the place? Can't we have some uniform validation class?
 			return $string . $constraint->getForeignAlias() . '.' . $constraint->getForeignField();
 		}
 	}
@@ -339,17 +352,17 @@ class QueryConfigurator implements SingletonInterface {
 		return $string;
 	}
 
-	// @TODO __how, or rather WHERE to use these best?
 	/**
 	 * Resolves an operator for queryConfiguration.
 	 *
-	 * @param string $operator (optional)
+	 * @param string $operator
 	 * @return string
+	 * @throws Exception\CannotResolveOperator
 	 * @throws Exception\UnsupportedFeatureType
 	 */
-	protected function resolveOperator($operator = NULL) {
-		if ($operator === NULL) {
-			return $this->defaultOperator;
+	protected function resolveOperator($operator) {
+		if ( !isset($operator[0]) ) {
+			throw new Exception\CannotResolveOperator(1448552699);
 		}
 
 		$operators = explode(' ', strtoupper($operator));
@@ -364,26 +377,32 @@ class QueryConfigurator implements SingletonInterface {
 	}
 
 	/**
-	 * Resolves a comparison value for queryConfiguration, parameterizing
-	 * it if not in the special value list. (in which case it returns ? and
-	 * provides $parameters with the actual value)
+	 * Resolves a constraint value. If the value is not already a parameter
+	 * or a special value, it will be replaced by a parameter, while the actual
+	 * value will be set in the $addParameters array.
 	 *
 	 * @param string $value
-	 * @param array &$parameters
 	 * @return string
-	 * @throws Exception\CannotResolveComparisonValue
+	 * @throws Exception\CannotResolveConstraintValue
 	 */
-	protected function resolveComparisonValue($value, array &$parameters) {
+	protected function resolveConstraintValue($value) {
 		if ($value === NULL) {
-			throw new Exception\CannotResolveComparisonValue(1448552781);
+			throw new Exception\CannotResolveConstraintValue(1448552781);
 		}
 
-		$value = strtoupper($value);
-		if (in_array($value, $this->specialValues, TRUE)) {
-			return $value;
+		// if not already a parameter
+		if ($value[0] !== ':') {
+			$specialValue = strtoupper($value);
+			if (in_array($specialValue, $this->specialValues, TRUE)) {
+				// special values can be function-names or e.g. NULL
+				return $specialValue;
+			}
+			// not a special value or a parameter, means it needs to converted to one
+			$parameterKey = ':AutoConstraintParameter' . $this->parameterCount++;
+			$this->addParameters[$parameterKey] = $value;
+			return $parameterKey;
 		}
 
-		$parameters[] = $value;
-		return '?';
+		return $value;
 	}
 }

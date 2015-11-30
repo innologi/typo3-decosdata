@@ -25,17 +25,17 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Exception;
  ***************************************************************/
 
 /**
- * CannotResolveComparisonValue Exception
+ * CannotResolveOperator Exception
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class CannotResolveComparisonValue extends ConfigurationError {
+class CannotResolveOperator extends ConfigurationError {
 
 	/**
 	 * @var string
 	 */
-	protected $message = 'Query Builder Error: A comparison value is expected but was not given due to misconfiguration.';
+	protected $message = 'Query Builder Error: An operator is expected but was not given due to misconfiguration.';
 
 }
