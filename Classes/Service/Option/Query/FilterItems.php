@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\Service\Option\Query;
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 /**
  * FilterItems option
  *
@@ -59,6 +60,20 @@ class FilterItems extends OptionAbstract {
 	}
 
 	/**
+	 *
+	 * @param array $filter
+	 * @throws \Innologi\Decosdata\Service\Option\Exception\MissingArgument
+	 */
+	protected function initializeFilter(array $filter) {
+		if (!isset($filter['operator'])) {
+			throw new MissingArgument(1448897878, array(self::class, 'filters.operator'));
+		}
+		if (!isset($filter['value'])) {
+			throw new MissingArgument(1448897891, array(self::class, 'filters.value'));
+		}
+	}
+
+	/**
 	 * Filter is applied on current field configuration.
 	 *
 	 * {@inheritDoc}
@@ -69,10 +84,9 @@ class FilterItems extends OptionAbstract {
 		$id = $queryField->getId() . 'filteritems' . $optionIndex;
 
 		$select = $queryField->getSelect();
-
 		$conditions = array();
 		foreach ($args['filters'] as $filter) {
-			// @TODO ___how do we determine if this one is safe or unsafe? In QueryConfigurator? By property? HOWWW??
+			$this->initializeFilter($filter);
 			$conditions[] = $this->constraintFactory->createConstraintByValue(
 				$select->getField(),
 				$select->getTableAlias(),
@@ -81,6 +95,7 @@ class FilterItems extends OptionAbstract {
 			);
 		}
 
+		$constraint = NULL;
 		if (count($conditions) > 1) {
 			$logic = isset($args['matchAll']) && (bool) $args['matchAll'] ? 'AND' : 'OR';
 			$constraint = $this->constraintFactory->createConstraintCollection($logic, $conditions);
@@ -97,23 +112,10 @@ class FilterItems extends OptionAbstract {
 	 */
 	/*public function alterQueryColumn(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
 		$this->initialize($args);
-	}*/
 
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
-	 */
-	/*public function alterQueryRow(array $args, Query $configuration, $optionIndex) {
-		$this->initialize($args);
-
-		$counter = 0;
-		$addedFields = array();
-		$constraintType = isset($args['matchAll']) && (bool) $args['matchAll'] ? 'AND' : 'OR';
-		foreach ($args['filters'] as $filter) {
-			if (isset($filter['contentField'])) {
 				$fieldId = $filter['contentField'];
 				if (!isset($queryConfiguration[$fieldId][0]['SELECT']['alias'])) {
-					// @TODO _throw exception
+
 				}
 				$queryConfiguration[$fieldId][]['WHERE'][] = array(
 					'field' => $queryConfiguration[$filter['contentField']][0]['SELECT']['alias'],
@@ -121,85 +123,61 @@ class FilterItems extends OptionAbstract {
 					'value' => $this->resolveComparisonValue($filter, 'WHERE')
 				);
 
-			} elseif (isset($filter['field'])) {
-				// @FIX _this doesn't work if the above matchAll is FALSE, think this through
-				// this order is important, because $this->resolveComparisonValue() will add a second parameter
-				$queryConfiguration->addParameter(':filter-items-row', $filter['field']);
-				$queryConfiguration->addQueryFrom(
-					$this->queryConfigurator->provideFrom(
-						'tx_decosdata_domain_model_itemfield', 'filter'.$counter, 'INNER',
-						array(
-							'item/=/it/uid',
-							'field/=/:filter-items-row',
-							'field_value/'.$filter['operator'].'/'.$filter['value']
-						)
-					)
-				);
-
-				#array(
-				#	'localField' => 'field_value',
-				#	'operator' => $this->resolveOperator($filter),
-				#	'value' => $this->resolveComparisonValue($filter, 'FROM')
-				#)
-
-			} else {
-				// @TODO _throw exception
-			}
-		}
 	}*/
 
 	/**
+	 * Filter can be applied on any field.
+	 *
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
 	 */
-	/*public function alterQueryRow(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
+	public function alterQueryRow(array $args, Query $query, $optionIndex) {
 		$this->initialize($args);
-		$counter = 0;
-		$addedFields = array();
-		$constraintType = isset($args['matchAll']) && (bool) $args['matchAll'] ? 'AND' : 'OR';
+		$id = 'filteritems';
+		$table = 'tx_decosdata_domain_model_itemfield';
+
+		// note that by $id, we'll always use the same field, this way
+		// we can add multiple conditions on the same FROM join if a
+		// field is checked on multiple values
+		$queryField = $query->getContent($id)->getField('');
+		$conditions = array();
 		foreach ($args['filters'] as $filter) {
-			if (isset($filter['contentField'])) {
-				$fieldId = $filter['contentField'];
-				if (!isset($queryConfiguration[$fieldId][0]['SELECT']['alias'])) {
-				}
-				$queryConfiguration[$fieldId][]['WHERE'][] = array(
-					'field' => $queryConfiguration[$filter['contentField']][0]['SELECT']['alias'],
-					'operator' => $this->resolveOperator($filter),
-					'value' => $this->resolveComparisonValue($filter, 'WHERE')
+			$this->initializeFilter($filter);
+			if (!isset($filter['field'])) {
+				throw new MissingArgument(1448898010, array(self::class, 'filters.field'));
+			}
+			$alias = $id . $filter['field'];
+			// identify the join by the field, so we don't create redundant joins
+			$from = $queryField->getFrom($filter['field'], $table, $alias);
+			if ($from->getJoinType() === NULL) {
+				// initialize join if it did not exist yet
+				$parameterKey = ':' . $alias;
+				$from->setJoinType('LEFT')->setConstraint(
+					$this->constraintFactory->createConstraintAnd(array(
+						'item' => $this->constraintFactory->createConstraintByField('item', $alias, '=', 'uid', 'it'),
+						'field' => $this->constraintFactory->createConstraintByValue('field', $alias, '=', $parameterKey)
+					))
 				);
-
-			} elseif (isset($filter['field'])) {
-				// this order is important, because $this->resolveComparisonValue() will add a second parameter
-				$this->parameterAdd['FROM'][] = $filter['field'];
-				$this->queryAdd['FROM'][] = array(
-					'joinType' => 'INNER',
-					'table' => 'tx_decosdata_domain_model_itemfield',
-					'alias' => 'filter' . $counter,
-					'constraints' => array(
-						array(
-							'localField' => 'item',
-							'operator' => '=',
-							'foreignAlias' => 'it',
-							'foreignField' => 'uid'
-						),
-						array(
-							'localField' => 'field',
-							'operator' => '=',
-							'value' => '?'
-						),
-						array(
-							'localField' => 'field_value',
-							'operator' => $this->resolveOperator($filter),
-							'value' => $this->resolveComparisonValue($filter, 'FROM')
-						)
-					),
-					'matchAll' => TRUE
-				);
-
-			} else {
+				$query->addParameter($parameterKey, $filter['field']);
 			}
 
+			$conditions[] = $this->constraintFactory->createConstraintByValue(
+				'field_value',
+				$alias,
+				$filter['operator'],
+				$filter['value']
+			);
 		}
-	}*/
+
+		$constraint = NULL;
+		if (count($conditions) > 1) {
+			$logic = isset($args['matchAll']) && (bool) $args['matchAll'] ? 'AND' : 'OR';
+			$constraint = $this->constraintFactory->createConstraintCollection($logic, $conditions);
+		} else {
+			$constraint = $conditions[0];
+		}
+
+		$queryField->getWhere()->addConstraint($optionIndex, $constraint);
+	}
 
 }
