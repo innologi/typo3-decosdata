@@ -112,6 +112,19 @@ class ConstraintCollection implements ConstraintInterface, \Iterator {
 
 
 
+	/**
+	 * Ensures proper cloning of object properties
+	 *
+	 * @return void
+	 */
+	public function __clone() {
+		foreach ($this->constraints as &$constraint) {
+			$constraint = clone $constraint;
+		}
+	}
+
+
+
 	/**************************
 	 * Iterator implementation
 	 **************************/

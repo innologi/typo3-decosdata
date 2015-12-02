@@ -45,7 +45,7 @@ class QueryContent extends QueryIterator implements QueryInterface {
 	/**
 	 * @var string
 	 */
-	protected $title;
+	protected $id;
 
 	/**
 	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy
@@ -69,26 +69,6 @@ class QueryContent extends QueryIterator implements QueryInterface {
 		$this->parent = $parent;
 		$this->orderBy = GeneralUtility::makeInstance(OrderBy::class);
 		$this->groupBy = GeneralUtility::makeInstance(GroupBy::class);
-		return $this;
-	}
-
-	/**
-	 * Returns title
-	 *
-	 * @return string
-	 */
-	public function getTitle() {
-		return $this->title;
-	}
-
-	/**
-	 * Sets title
-	 *
-	 * @param string $title
-	 * @return $this
-	 */
-	public function setTitle($title) {
-		$this->title = $title;
 		return $this;
 	}
 
@@ -122,6 +102,15 @@ class QueryContent extends QueryIterator implements QueryInterface {
 			$this->children[$id] = GeneralUtility::makeInstance(QueryField::class, $id, $this);
 		}
 		return $this->children[$id];
+	}
+
+	/**
+	 * Returns id
+	 *
+	 * @return string
+	 */
+	public function getId() {
+		return $this->id;
 	}
 
 
@@ -160,4 +149,16 @@ class QueryContent extends QueryIterator implements QueryInterface {
 		return $this;
 	}
 
+
+
+	/**
+	 * Ensures proper cloning of object properties
+	 *
+	 * @return void
+	 */
+	public function __clone() {
+		parent::__clone();
+		$this->orderBy = clone $this->orderBy;
+		$this->groupBy = clone $this->groupBy;
+	}
 }

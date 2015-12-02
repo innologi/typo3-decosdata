@@ -180,4 +180,19 @@ class QueryField implements QueryInterface {
 		return $this;
 	}
 
+
+
+	/**
+	 * Ensures proper cloning of object properties
+	 *
+	 * @return void
+	 */
+	public function __clone() {
+		$this->select = clone $this->select;
+		$this->where = clone $this->where;
+		$this->orderBy = clone $this->orderBy;
+		foreach ($this->from as &$from) {
+			$from = clone $from;
+		}
+	}
 }

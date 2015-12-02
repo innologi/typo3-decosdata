@@ -38,6 +38,20 @@ abstract class QueryIterator implements \Iterator {
 	 */
 	protected $children = array();
 
+
+
+	/**
+	 * Ensures proper cloning of object properties
+	 *
+	 * @return void
+	 */
+	public function __clone() {
+		foreach ($this->children as &$child) {
+			$child = clone $child;
+			$child->setParent($this);
+		}
+	}
+
 	/**************************
 	 * Iterator implementation
 	 **************************/

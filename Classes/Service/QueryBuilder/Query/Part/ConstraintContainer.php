@@ -113,4 +113,14 @@ abstract class ConstraintContainer {
 		return $this->constraintFactory;
 	}
 
+
+
+	/**
+	 * Ensures proper cloning of object properties
+	 *
+	 * @return void
+	 */
+	public function __clone() {
+		$this->constraint = clone $this->constraint;
+	}
 }
