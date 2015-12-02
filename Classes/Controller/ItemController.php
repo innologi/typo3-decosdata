@@ -70,6 +70,9 @@ class ItemController extends ActionController {
 	 * @return void
 	 */
 	protected function initializePluginConfiguration() {
+		$pid = (int) $GLOBALS['TSFE']->id;
+		// extdev: regelgeving actief
+		if ($pid === 11) {
 		$this->pluginConfiguration = array(
 			'import' => array(
 				2
@@ -88,6 +91,7 @@ class ItemController extends ActionController {
 							'title' => 'Naam Regelgeving',
 							'content' => array(
 								array(
+									// TEXT9
 									'field' => 16,
 								)
 							),
@@ -100,6 +104,7 @@ class ItemController extends ActionController {
 							'title' => 'Datum Inwerkingtreding',
 							'content' => array(
 								array(
+									// DATE5
 									'field' => 23,
 									'queryOptions' => array(
 										array(
@@ -136,6 +141,7 @@ class ItemController extends ActionController {
 							'title' => 'Datum Intrekking',
 							'content' => array(
 								array(
+									// DATE6
 									'field' => 19,
 									'queryOptions' => array(
 										array(
@@ -189,14 +195,92 @@ class ItemController extends ActionController {
 				)
 			)
 		);
+		} elseif ($pid === 18) {
+		// extdev BIS
+		$this->pluginConfiguration = array(
+			'import' => array(
+				3
+			),
+			'level' => array(
+				1 => array(
+					'paginate' => array(
+						'pageLimit' => 20,
+						'perPageLimit' => 20,
+					),
+					'itemType' => array(
+						1
+					),
+					// @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
+					'relation' => array(
+						'noItemId' => TRUE
+					),
+					'contentField' => array(
+						1 => array(
+							'title' => 'Vergaderingen',
+							'content' => array(
+								array(
+									// SUBJECT1
+									'field' => 5,
+								)
+							),
+							'renderOptions' => array(
+								array(
+									// @FIX ___next up is the equivalent of a filterView which knows to look for this value in SUBJECT1
+									'option' => 'LinkLevel',
+									'args' => array(
+										'level' => 2
+									)
+								)
+							),
+							'order' => array(
+								'sort' => 'ASC',
+								'priority' => 10
+							)
+						)
+					),
+					'queryOptions' => array(
+						array(
+							'option' => 'FilterItems',
+							'args' => array(
+								'filters' => array(
+									array(
+										'value' => 'vergaderdossiers',
+										'operator' => '=',
+										// BOOKMARK
+										'field' => 2
+									),
+									array(
+										'value' => '1',
+										'operator' => '=',
+										// BOL3
+										'field' => 27
+									)
+								),
+								'matchAll' => TRUE
+							)
+						)
+					)
+				)
+			)
+		);
+		}
 	}
 
 	/**
-	 * Initializes request parameters shared by all actions
+	 * Initializes and validates request parameters shared by all actions
 	 *
 	 * @return void
 	 */
 	protected function initializeSharedArguments() {
+		if ($this->request->hasArgument('level')) {
+			// set current level
+			$this->level = (int) $this->request->getArgument('level');
+			if ($this->request->hasArgument('_' . $this->level)) {
+				$levelParameter = $this->request->getArgument('_' . $this->level);
+			}
+		}
+		// @LOW ___will probably require some validation to see if provided level exists in available configuration
+		// @LOW _consider that said check could throw an exception, and that we could then apply an override somewhere that catches it to produce a 404? (or just generate a flash message, which I think we've done in another extbase ext)
 		if ($this->request->hasArgument('page')) {
 			// a valid page-parameter will set current page in configuration
 			$this->pluginConfiguration['level'][$this->level]['paginate']['currentPage'] = (int) $this->request->getArgument('page');
@@ -209,7 +293,6 @@ class ItemController extends ActionController {
 	 * @return void
 	 */
 	public function listAction() {
-		// @TODO ___will probably require some validation in initializeSharedArguments() to see if provided level exists in available configuration
 		$activeConfiguration = $this->pluginConfiguration['level'][$this->level];
 		$items = $this->itemRepository->findWithStatement(
 			($statement = $this->queryBuilder->buildListQuery(
