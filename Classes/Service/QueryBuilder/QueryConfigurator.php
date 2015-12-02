@@ -118,6 +118,10 @@ class QueryConfigurator implements SingletonInterface {
 				if ($where->getConstraint() !== NULL) {
 					$queryParts['WHERE'][] = $this->transformConstraint($where->getConstraint(), 'WHERE');
 				}
+				$orderBy = $queryField->getOrderBy();
+				if ($orderBy->getPriority() !== NULL) {
+					$queryParts['ORDERBY'][$orderBy->getPriority()] = $this->transformOrderBy($orderBy);
+				}
 			}
 
 			// applies concatting SELECT per id, to form a single alias per content field
@@ -324,14 +328,15 @@ class QueryConfigurator implements SingletonInterface {
 	 *
 	 * - Requires 'priority' element
 	 * - Supports 'sort' element to set order
+	 * - Requires either a 'field' and 'tableAlias' parameter OR a $fieldSubstitute parameter
 	 *
 	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy $orderBy
-	 * @param string $alias
+	 * @param string $fieldSubstitute
 	 * @return string
 	 * @throws Exception\MissingConfigurationProperty
 	 * @throws Exception\UnsupportedFeatureType
 	 */
-	protected function transformOrderBy(OrderBy $orderBy, $alias) {
+	protected function transformOrderBy(OrderBy $orderBy, $fieldSubstitute = NULL) {
 		// @LOW _of course, this doesn't make sense since we don't get here if it is NULL.. except the outside check needs to be replaced by different logic
 		if ($orderBy->getPriority() === NULL) {
 			throw new Exception\MissingConfigurationProperty(1448552721, array(
@@ -339,7 +344,25 @@ class QueryConfigurator implements SingletonInterface {
 			));
 		}
 
-		$string = $alias;
+		$string = NULL;
+		if ($fieldSubstitute !== NULL) {
+			$string = $fieldSubstitute;
+		} else {
+			$tableAlias = $orderBy->getTableAlias();
+			if (!isset($tableAlias[0])) {
+				throw new Exception\MissingConfigurationProperty(1449052643, array(
+					'ORDERBY', 'tableAlias', json_encode($orderBy)
+				));
+			}
+			$field = $orderBy->getField();
+			if (!isset($field[0])) {
+				throw new Exception\MissingConfigurationProperty(1449052657, array(
+					'ORDERBY', 'field', json_encode($orderBy)
+				));
+			}
+			$string = $tableAlias . '.' . $field;
+		}
+
 		$sortOrder = $orderBy->getSortOrder();
 		if ($sortOrder !== NULL) {
 			if (!in_array($sortOrder, $this->supportedSorting, TRUE)) {

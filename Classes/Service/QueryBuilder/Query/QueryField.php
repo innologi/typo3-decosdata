@@ -27,6 +27,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Part\Select;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Part\Where;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Part\From;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy;
 /**
  * Query Content Field object
  *
@@ -64,6 +65,11 @@ class QueryField implements QueryInterface {
 	protected $where;
 
 	/**
+	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy
+	 */
+	protected $orderBy;
+
+	/**
 	 * Class constructor
 	 *
 	 * @param string $id
@@ -75,6 +81,7 @@ class QueryField implements QueryInterface {
 		$this->parent = $parent;
 		$this->select = GeneralUtility::makeInstance(Select::class);
 		$this->where = GeneralUtility::makeInstance(Where::class);
+		$this->orderBy = GeneralUtility::makeInstance(OrderBy::class);
 		return $this;
 	}
 
@@ -118,6 +125,15 @@ class QueryField implements QueryInterface {
 	 */
 	public function getWhere() {
 		return $this->where;
+	}
+
+	/**
+	 * Returns OrderBy object
+	 *
+	 * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy
+	 */
+	public function getOrderBy() {
+		return $this->orderBy;
 	}
 
 	/**

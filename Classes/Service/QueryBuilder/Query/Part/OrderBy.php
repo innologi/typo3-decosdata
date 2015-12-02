@@ -39,6 +39,16 @@ class OrderBy extends PriorityContainer {
 	protected $sortOrder;
 
 	/**
+	 * @var string
+	 */
+	protected $tableAlias;
+
+	/**
+	 * @var string
+	 */
+	protected $field;
+
+	/**
 	 * Returns Sort Order
 	 *
 	 * @return string
@@ -55,6 +65,46 @@ class OrderBy extends PriorityContainer {
 	 */
 	public function setSortOrder($sortOrder) {
 		$this->sortOrder = $sortOrder;
+		return $this;
+	}
+
+	/**
+	 * Returns Table Alias
+	 *
+	 * @return string
+	 */
+	public function getTableAlias() {
+		return $this->tableAlias;
+	}
+
+	/**
+	 * Sets Table Alias
+	 *
+	 * @param string $tableAlias
+	 * @return $this
+	 */
+	public function setTableAlias($tableAlias) {
+		$this->tableAlias = $tableAlias;
+		return $this;
+	}
+
+	/**
+	 * Returns field
+	 *
+	 * @return string
+	 */
+	public function getField() {
+		return $this->field;
+	}
+
+	/**
+	 * Sets field
+	 *
+	 * @param string $field
+	 * @return $this
+	 */
+	public function setField($field) {
+		$this->field = $field;
 		return $this;
 	}
 

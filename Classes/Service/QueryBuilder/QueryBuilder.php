@@ -173,6 +173,8 @@ class QueryBuilder {
 
 			// @TODO ___so how is group concat going to work? also check how options will handle that
 			foreach ($configuration['content'] as $subIndex => $contentConfiguration) {
+				$queryField = NULL;
+
 				// add field: these contain metadata strings provided as is by Decos export
 				if (isset($contentConfiguration['field'])) {
 					$tableAlias = 'itf' . $index . 's' . $subIndex;
@@ -192,7 +194,7 @@ class QueryBuilder {
 						);
 					$queryContent->addParameter($parameterKey, $contentConfiguration['field']);
 				}
-
+				// @LOW ___can we have both a field and blob in the same content? no right? because this should be an if/else then
 				// add blob: these contain file references, thus will result in file:uid
 				if (isset($contentConfiguration['blob'])) {
 					// @LOW _if we ever are to support multiple files in a single content, these aliases will conflict
@@ -241,9 +243,15 @@ class QueryBuilder {
 					$queryContent->addParameter($parameterKey, $blobTable);
 				}
 
-				/*if (isset($contentConfig['order'])) {
-					// @LOW add ordering by field?
-				}*/
+				// apply sorting on field
+				if (isset($contentConfiguration['order']) && $queryField !== NULL) {
+					$select = $queryField->getSelect();
+					$queryField->getOrderBy()
+						->setTableAlias($select->getTableAlias())
+						->setField($select->getField())
+						->setPriority($contentConfiguration['order']['priority'])
+						->setSortOrder($contentConfiguration['order']['sort']);
+				}
 
 				// apply field-wide query options
 				if (isset($contentConfiguration['queryOptions'])) {
