@@ -48,8 +48,14 @@ class LinkLevel implements OptionInterface {
 
 		$uriBuilder = $service->getControllerContext()->getUriBuilder();
 		// @TODO ___test if this should be urlencode, or rawurlencode, or.. whatever
-		$uri = $uriBuilder->reset()->uriFor(NULL, array('level' => $args['level'], '_2' => rawurlencode($linkValue)));
-		// @TODO ___title and or other parameters? in tx_decospublisher, a title could be set through an argument, which would expand the query to include the field containing the title
+		// @LOW _if we just read the latest _ argument, can't we derive level from there, so we can get rid of the level arg? we have to be sure that it's not read anywhere else
+		// @LOW _see if addQueryStringMethod is of any use to us
+		$uri = $uriBuilder->reset()
+			->setAddQueryString(TRUE)
+			// @LOW _if we support a page argument per level, we could maintain current and previous levels through arguments. Another option would be the session
+			->setArgumentsToBeExcludedFromQueryString(array('tx_decosdata_publish[page]'))
+			->uriFor(NULL, array('level' => $args['level'], '_' . $args['level'] => rawurlencode($linkValue)));
+		// @TODO ___title and or other attributes? in tx_decospublisher, a title could be set through an argument, which would expand the query to include the field containing the title
 		$content = '<a href="' . $uri . '">' . $content . '</a>';
 	}
 
