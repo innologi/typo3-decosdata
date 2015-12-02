@@ -26,6 +26,7 @@ namespace Innologi\Decosdata\Service\Option\Query;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * FilterItems option
  *
@@ -53,23 +54,32 @@ class FilterItems extends OptionAbstract {
 	 * @throws \Innologi\Decosdata\Service\Option\Exception\MissingArgument
 	 */
 	protected function initialize(array $args) {
-		if (!isset($args['filters'])) {
+		if (!isset($args['filters'][0])) {
 			// @TODO ___test this
 			throw new MissingArgument(1448551220, array(self::class, 'filters'));
 		}
 	}
 
 	/**
+	 * Initializes filter
 	 *
-	 * @param array $filter
+	 * @param array &$filter
+	 * @return void
 	 * @throws \Innologi\Decosdata\Service\Option\Exception\MissingArgument
 	 */
-	protected function initializeFilter(array $filter) {
-		if (!isset($filter['operator'])) {
+	protected function initializeFilter(array &$filter) {
+		if (!isset($filter['operator'][0])) {
 			throw new MissingArgument(1448897878, array(self::class, 'filters.operator'));
 		}
-		if (!isset($filter['value'])) {
-			throw new MissingArgument(1448897891, array(self::class, 'filters.value'));
+		if (!isset($filter['value'][0])) {
+			if (!isset($filter['parameter'][0])) {
+				throw new MissingArgument(1448897891, array(self::class, 'filters.value/parameter'));
+			}
+			// @LOW ___add support for other extension parameters?
+			// @TODO ___not validated. shouldn't we get it from controller/request or something? that way we can keep validation on a single location
+			$param = GeneralUtility::_GP('tx_decosdata_publish');
+			$filter['value'] = rawurldecode($param[$filter['parameter']]);
+			// @TODO ___throw exception if it does not exist?
 		}
 	}
 
@@ -143,7 +153,7 @@ class FilterItems extends OptionAbstract {
 		$conditions = array();
 		foreach ($args['filters'] as $filter) {
 			$this->initializeFilter($filter);
-			if (!isset($filter['field'])) {
+			if ( !(isset($filter['field']) && is_int($filter['field'])) ) {
 				throw new MissingArgument(1448898010, array(self::class, 'filters.field'));
 			}
 			$alias = $id . $filter['field'];

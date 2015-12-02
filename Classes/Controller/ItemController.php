@@ -225,7 +225,6 @@ class ItemController extends ActionController {
 							),
 							'renderOptions' => array(
 								array(
-									// @FIX ___next up is the equivalent of a filterView which knows to look for this value in SUBJECT1
 									'option' => 'LinkLevel',
 									'args' => array(
 										'level' => 2
@@ -243,6 +242,79 @@ class ItemController extends ActionController {
 							'option' => 'FilterItems',
 							'args' => array(
 								'filters' => array(
+									array(
+										'value' => 'vergaderdossiers',
+										'operator' => '=',
+										// BOOKMARK
+										'field' => 2
+									),
+									array(
+										'value' => '1',
+										'operator' => '=',
+										// BOL3
+										'field' => 27
+									)
+								),
+								'matchAll' => TRUE
+							)
+						)
+					)
+				),
+				2 => array(
+					'paginate' => array(
+						'pageLimit' => 20,
+						'perPageLimit' => 20,
+						// @FIX ___years, field DATE1
+					),
+					'itemType' => array(
+						1
+					),
+					'relation' => array(
+						'noItemId' => TRUE,
+					),
+					'contentField' => array(
+						1 => array(
+							'title' => 'Vergaderdatum',
+							'content' => array(
+								array(
+									// DATE1
+									'field' => 20,
+									'order' => array(
+										'sort' => 'DESC',
+										'priority' => 10
+									),
+									'queryOptions' => array(
+										array(
+											'option' => 'DateConversion',
+											'args' => array(
+												'format' => '%d-%m-%Y'
+											)
+										)
+									)
+								)
+							),
+							'renderOptions' => array(
+								array(
+									'option' => 'LinkLevel',
+									'args' => array(
+										'level' => 3
+									)
+								)
+							),
+						)
+					),
+					'queryOptions' => array(
+						array(
+							'option' => 'FilterItems',
+							'args' => array(
+								'filters' => array(
+									// perfect replacement for filterView! using what is already there :D
+									array(
+										'parameter' => '_2',
+										'operator' => '=',
+										// SUBJECT1
+										'field' => 5
+									),
 									array(
 										'value' => 'vergaderdossiers',
 										'operator' => '=',
