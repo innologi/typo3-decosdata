@@ -24,6 +24,7 @@ namespace Innologi\Decosdata\Service\Option;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\ViewHelpers\Content\RenderViewHelper;
+use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 /**
  * Render Option Service
  *
@@ -34,6 +35,11 @@ use Innologi\Decosdata\ViewHelpers\Content\RenderViewHelper;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class RenderOptionService extends OptionServiceAbstract {
+
+	/**
+	 * @var \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext
+	 */
+	protected $controllerContext;
 
 	/**
 	 * @var string
@@ -62,6 +68,26 @@ class RenderOptionService extends OptionServiceAbstract {
 		parent::__construct();
 		// PHP < 5.6 does not support concatenation in above variable declarations, hence:
 		$this->patternInline = sprintf($this->patternInline, $this->patternArgumentInline);
+	}
+
+	/**
+	 * Returns controller context
+	 *
+	 * @return \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext
+	 */
+	public function getControllerContext() {
+		return $this->controllerContext;
+	}
+
+	/**
+	 * Sets controller context
+	 *
+	 * @param \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext $controllerContext
+	 * @return $this
+	 */
+	public function setControllerContext(ControllerContext $controllerContext) {
+		$this->controllerContext = $controllerContext;
+		return $this;
 	}
 
 	/**
