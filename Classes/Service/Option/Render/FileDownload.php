@@ -23,7 +23,6 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 /**
  * File Download option
