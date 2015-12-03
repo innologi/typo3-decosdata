@@ -40,12 +40,18 @@ use Innologi\Decosdata\Exception\PaginationError;
  */
 class PageBrowserViewHelper extends AbstractViewHelper {
 	// @LOW _argumentsToBeExcludedFromQueryString="{0:'tx_decosdata_publish[page]'}" on page 1 links?
+	// @TODO ___what about link titles?
 
 	/**
 	 * @var \Innologi\Decosdata\Service\PaginateService
 	 * @inject
 	 */
 	protected $paginateService;
+
+	/**
+	 * @var array
+	 */
+	protected $pageLabelMap;
 
 	/**
 	 * Class constructor
@@ -70,8 +76,8 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 	 * @return string
 	 */
 	public function render() {
-		// render pagebrowser only if it was properly configured or if renderAlways was set
-		if ( !($this->paginateService->isReady() || $this->arguments['renderAlways']) ) {
+		// render pagebrowser only if active or if renderAlways was set
+		if ( !($this->paginateService->isActive() || $this->arguments['renderAlways']) ) {
 			return $this->renderChildren();
 		}
 
@@ -101,6 +107,7 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 	 */
 	protected function buildPageBrowserConfiguration() {
 		// these are valid regardless if pageService is ready
+		$this->pageLabelMap = $this->paginateService->getPageLabelMap();
 		$currentPage = $this->paginateService->getCurrentPage();
 		$pageCount = $this->paginateService->getPageCount();
 
@@ -110,7 +117,7 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 		}
 
 		$configuration = array(
-			'currentPage' => $currentPage,
+			'currentPage' => $this->createPageElement($currentPage),
 			'pages' => array()
 		);
 
@@ -134,7 +141,8 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 
 		// if there are previous pages
 		if ($currentPage > 1) {
-			$configuration['previousPage'] = $currentPage - 1;
+			// @TODO ___llang
+			$configuration['previousPage'] = array('number' => $currentPage - 1, 'label' => 'previous');
 
 			// beforeCurrent starts at page 1, unless beforeScaled is applied
 			$beforeCurrentStart = 1;
@@ -142,18 +150,18 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 			if ($currentPage > ($scaleParts[0] + $scaleParts[1] + 1)) {
 				$configuration['pages']['beforeScaled'] = array();
 				for ($i=1; $i <= $scaleParts[0]; $i++) {
-					$configuration['pages']['beforeScaled'][] = $i;
+					$configuration['pages']['beforeScaled'][] = $this->createPageElement($i);
 				}
 				$beforeCurrentStart = $currentPage - $scaleParts[1];
 			}
 			$configuration['pages']['beforeCurrent'] = array();
 			for ($i = $beforeCurrentStart; $i < $currentPage; $i++) {
-				$configuration['pages']['beforeCurrent'][] = $i;
+				$configuration['pages']['beforeCurrent'][] = $this->createPageElement($i);
 			}
 		}
 		// if there are more pages following
 		if ($currentPage < $pageCount) {
-			$configuration['nextPage'] = $currentPage + 1;
+			$configuration['nextPage'] = array('number' => $currentPage + 1, 'label' => 'next');
 
 			// afterCurrent stops at last page, unless afterScaled is applied
 			$afterCurrentStop = $pageCount;
@@ -161,13 +169,13 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 			if (($pageCount-$currentPage) > ($scaleParts[2] + $scaleParts[3] + 1)) {
 				$configuration['pages']['afterScaled'] = array();
 				for ($i=$pageCount-($scaleParts[3]-1); $i <= $pageCount; $i++) {
-					$configuration['pages']['afterScaled'][] = $i;
+					$configuration['pages']['afterScaled'][] = $this->createPageElement($i);
 				}
 				$afterCurrentStop = $currentPage + $scaleParts[2];
 			}
 			$configuration['pages']['afterCurrent'] = array();
 			for ($i=$currentPage+1; $i <= $afterCurrentStop; $i++) {
-				$configuration['pages']['afterCurrent'][] = $i;
+				$configuration['pages']['afterCurrent'][] = $this->createPageElement($i);
 			}
 		}
 
@@ -196,6 +204,21 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 			);
 		}
 		return $resultCountConfiguration;
+	}
+
+	/**
+	 * Creates a page element from a page number
+	 *
+	 * @param integer $pageNumber
+	 * @return array
+	 */
+	protected function createPageElement($pageNumber) {
+		return array(
+			'number' => $pageNumber,
+			'label' => isset($this->pageLabelMap[$pageNumber])
+				? $this->pageLabelMap[$pageNumber]
+				: $pageNumber
+		);
 	}
 
 }

@@ -24,19 +24,29 @@ namespace Innologi\Decosdata\Service;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Database\PreparedStatement;
 use Innologi\Decosdata\Exception\PaginationError;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 /**
  * Pagination Service
  *
- * Provides the pagination information for any configuration/Statement combination.
+ * Provides the pagination information for any configuration/Query combination.
  * Holds several key variables for any pagebrowser to be displayed afterwards.
+ *
+ * Works in tandem with the PageBrowserViewHelper.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class PaginateService implements SingletonInterface {
+	// @LOW _note all the MySQL keywords in yearly.. should be supplied by QueryProvider classes
+	// @TODO ___why doesn't this service have any error codes for its exceptions? Did I fuck up some rebase conflicts?
+
+	/**
+	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
+	 * @inject
+	 */
+	protected $constraintFactory;
 
 	/**
 	 * @var array
@@ -59,14 +69,14 @@ class PaginateService implements SingletonInterface {
 	protected $resultCount;
 
 	/**
-	 * @var integer
+	 * @var array
 	 */
-	protected $limit;
+	protected $pageLabelMap = array();
 
 	/**
-	 * @var integer
+	 * @var boolean
 	 */
-	protected $offset;
+	protected $ready = FALSE;
 
 	/**
 	 * Returns current page number
@@ -96,120 +106,193 @@ class PaginateService implements SingletonInterface {
 	}
 
 	/**
-	 * Returns per page limit, e.g. for use in query LIMIT
+	 * Returns page mapping
 	 *
-	 * @return integer
+	 * @return array
 	 */
-	public function getLimit() {
-		return $this->limit;
+	public function getPageLabelMap() {
+		return $this->pageLabelMap;
 	}
 
 	/**
-	 * Returns offset for current page, e.g. for use in query LIMIT ... OFFSET
-	 *
-	 * @return integer
-	 */
-	public function getOffset() {
-		return $this->offset;
-	}
-
-	/**
-	 * Confirms whether the service was successfully configured and is applicable
+	 * Confirms whether the service was successfully configured and active.
 	 *
 	 * Note that this also returns FALSE when there was only 1 page, so not ready !== error
 	 *
 	 * @return boolean
 	 */
-	public function isReady() {
-		return $this->offset !== NULL;
+	public function isActive() {
+		return $this->active;
 	}
 
 	/**
 	 * Paginate a Query object
 	 *
 	 * @param array $configuration
-	 * @param \TYPO3\CMS\Core\Database\PreparedStatement $statement
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Query $query
+	 * @return void
+	 */
+	public function configurePagination(array $configuration, Query $query) {
+		$this->initializeConfiguration($configuration);
+
+		switch ($configuration['type']) {
+			case 'yearly':
+				$this->configureYearly($configuration, $query);
+				break;
+			default:
+				$this->configureDefault($configuration, $query);
+		}
+	}
+
+	/**
+	 * Initiliaze and validate shared configuration
+	 *
+	 * @param array $configuration
 	 * @return void
 	 * @throws \Innologi\Decosdata\Exception\PaginationError
 	 */
-	public function configurePagination(array $configuration, PreparedStatement $statement) {
+	protected function initializeConfiguration(array $configuration) {
 		if ( isset($configuration['type']) && !in_array($configuration['type'], $this->supportedTypes, TRUE) ) {
 			throw new PaginationError(array(
 				'type', $configuration['type'], join('/', $this->supportedTypes)
 			));
 		}
-		// invalidate any previous configuration
-		$this->offset = NULL;
+		if ($configuration['pageLimit'] === NULL || $configuration['pageLimit'] <= 0) {
+			throw new PaginationError(array(
+				'pageLimit', $configuration['pageLimit'], 100
+			));
+		}
+		// set currentPage if > 1
+		if (isset($configuration['currentPage']) && $configuration['currentPage'] > 1) {
+			$this->currentPage = $configuration['currentPage'];
+		}
 
-		switch ($configuration['type']) {
-			#case 'yearly':
-				#$this->configureYearly($configuration, $query);
-				#break;
-			default:
-				$this->configureDefault($configuration, $statement);
+		// invalidate any previous configuration, just in case
+		$this->active = FALSE;
+	}
+
+	/**
+	 * Configures pagination by year
+	 *
+	 * @param array $configuration
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Query $query
+	 * @return void
+	 */
+	protected function configureYearly(array $configuration, Query $query) {
+		// clone the Query and reset the parts not relevant for it
+		$yQuery = clone $query;
+		$yQuery->resetParts(TRUE, FALSE, FALSE, TRUE, TRUE);
+
+		// set limit and ordering
+		$yQuery->setLimit($configuration['pageLimit']);
+		$queryContent = $yQuery->getContent('pbYear');
+		$queryContent->getOrderBy()
+			->setPriority(10)
+			->setSortOrder('DESC');
+
+		// define field values
+		$tableAlias = 'itf_pbYear';
+		$field = 'field_value';
+		$queryField = $queryContent->getField('');
+
+		// if an offset year was configured, apply it
+		if ($configuration['offsetYear'] > 0) {
+			$queryField->getWhere()->setConstraint(
+				$this->constraintFactory->createConstraintByValue($field, $tableAlias, '>=', $configuration['offsetYear'])->addWrapLocal('year', 'YEAR(|)')
+			);
+		}
+		// if a maximum year was configured, apply it
+		if ($configuration['maxYear'] > 0) {
+			$queryField->getWhere()->addConstraint('pagebrowser-max',
+				$this->constraintFactory->createConstraintByValue($field, $tableAlias, '<=', $configuration['maxYear'])->addWrapLocal('year', 'YEAR(|)')
+			);
+		}
+
+		// this pattern is used to prevent mysql warnings and errors at fields
+		// that have no consistent date values
+		$pattern = '^[0-9]{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])';
+		// we're using the default wrap divider in the pattern, so it needs to change
+		$wrapDivider = ':::|||:::';
+
+		// add select
+		$queryField->getSelect()
+			->setTableAlias($tableAlias)
+			->setField($field)
+			// @TODO ___test how this works with NULL again
+			->addWrap('if', 'IF(' . $wrapDivider . ' REGEXP (\'' . $pattern . '\'),YEAR(' . $wrapDivider . '),NULL)')
+			->setWrapDivider($wrapDivider);
+
+		// add from and keep it in a variable for later use
+		$parameterKey = ':pagebrowserfield';
+		$yQuery->addParameter($parameterKey, $configuration['field']);
+		$from = $queryField->getFrom(
+			'pagebrowser-year', 'tx_decosdata_domain_model_itemfield', $tableAlias
+		)->setJoinType(
+			'LEFT'
+		)->setConstraint(
+			$this->constraintFactory->createConstraintAnd(array(
+				$this->constraintFactory->createConstraintByField('item', $tableAlias, '=', 'uid', 'it'),
+				$this->constraintFactory->createConstraintByValue('field', $tableAlias, '=', $parameterKey)
+			))
+		);
+
+		// execute the cloned query to retrieve the years
+		$statement = $yQuery->createStatement();
+		$statement->execute();
+		// prevent any years to be assigned to page 0
+		$years = array(0 => 0);
+		while (($row = $statement->fetch()) !== FALSE) {
+			$years[] = $row['pbYear'];
+		}
+		$statement->free();
+		$pages = count($years);
+		if ($pages > 1) {
+			// removes the extra count of our manually added key 0
+			$pages--;
+		}
+
+		// if current page nr exceeds page amount, replace it with last page nr
+		if ($this->currentPage > $pages) {
+			$this->currentPage = $pages;
+		}
+
+		if ($pages > 1 && $years[$this->currentPage] !== NULL) {
+			// @LOW _do we want resultCount to be available or not?
+			//$statement = $query->createStatement();
+			//$statement->execute();
+			//$this->resultCount = $statement->rowCount();
+			//$statement->free();
+
+			// add the FROM to the original Query object
+			$queryField = $query->getContent('pagebrowser')->getField('year');
+			$queryField->setFrom(array($from));
+			$query->addParameter($parameterKey, $configuration['field']);
+
+			// add the year restriction for the current page
+			$parameterKey = ':pagebrowseryear';
+			$queryField->getWhere()->setConstraint(
+				$this->constraintFactory->createConstraintByValue($field, $tableAlias, '=', $parameterKey)
+					->addWrapLocal('if-begin', 'IF(' . $wrapDivider . ' REGEXP (\'' . $pattern . '\'),YEAR(' . $wrapDivider . ')')
+					->addWrap('if-end', $wrapDivider . ',FALSE)')
+					->setWrapDivider($wrapDivider)
+			);
+			$query->addParameter($parameterKey, $years[$this->currentPage]);
+
+			// activate
+			$this->pageCount = $pages;
+			$this->pageLabelMap = $years;
+			$this->active = TRUE;
 		}
 	}
 
-	// @TODO _finish this one
-	#protected function configureYearly(array $configuration, PreparedStatement $statement) {
-		/*
-		 * regex used to prevent mysql warnings and errors at fields that have
-		 * no consistent date values
-		 */
-		/*$regex = '^[0-9]{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])';
-		// secure parameters for query expansion
-		$dateField = $GLOBALS['TYPO3_DB']->fullQuoteStr($configuration['dateField'], NULL);
-		$offsetYear = $configuration['offsetYear'];
-		$maxYear = $configuration['maxYear'];
-
-		// alter a copy of the query to retrieve the existing years
-		$yearQuery = $query;
-		$yearQuery['SELECT'] = 'DISTINCT IF(itf_pbYear.fieldvalue REGEXP (\'' . $regex . '\')' .
-			',YEAR(itf_pbYear.fieldvalue),\'....\') AS pbYear';
-		$yearQuery['FROM'] .= '
-					LEFT JOIN (tx_decospublisher_itemfield itf_pbYear)
-						ON (it.uid=itf_pbYear.item_id AND itf_pbYear.fieldname=' . $dateField . ')';
-		$yearQuery['ORDERBY'] = 'pbYear DESC';
-		// expand the newest query with the supplied conditions
-		$yearQuery['WHERE'] .= $offsetYear > 0 ? '
-					AND YEAR(itf_pbYear.fieldvalue)>=' . $offsetYear : '';
-		$yearQuery['WHERE'] .= $maxYear > 0 ? '
-					AND YEAR(itf_pbYear.fieldvalue)<=' . $maxYear : '';
-		$yearQuery['GROUPBY'] = '';
-		$yearQuery['LIMIT'] .= $pageLimit > 0 ? $pageLimit : '';
-		// execute the newest query to retrieve the years
-		$yearArray = $this->returnQueryResult($yearQuery, '', 'pbYear');
-
-		$yearCount = count($yearArray);
-		// if there were no years, the following would produce SQL errors
-		if ($yearCount) {
-			if ($currentPage > $yearCount) {
-				// if current page nr exceeds amount of years, replace it with amount of years
-				$currentPage = $yearCount;
-			}
-			// prepend element to make indexes line up with page nrs. DONT use array_unshift
-			$yearArray = array_merge(array(0 => 0), $yearArray);
-			// finally, set the remaining parameters and expand the original query
-			$val = $yearArray[$currentPage];
-			// but only on a valid date returned
-			if ($val !== '....') {
-				$configuration['truePageCount'] = $yearCount;
-				$configuration['pageArray'] = $yearArray;
-				$query['FROM'] = $yearQuery['FROM'];
-				$query['WHERE'] .= '
-							AND IF(itf_pbYear.fieldvalue REGEXP (\'' . $regex . '\'),YEAR(itf_pbYear.fieldvalue)=' . $val . ',FALSE)';
-			}
-		}
-	}*/
-
 	/**
-	 * Configures a default pagination
+	 * Configures default pagination
 	 *
 	 * @param array $configuration
-	 * @param \TYPO3\CMS\Core\Database\PreparedStatement $statement
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Query $statement
 	 * @throws \Innologi\Decosdata\Exception\PaginationError
 	 */
-	protected function configureDefault(array $configuration, PreparedStatement $statement) {
+	protected function configureDefault(array $configuration, Query $query) {
 		// @TODO ___use or clean up override
 		// perPageLimit override through GET var
 		/*$overrideVar = $this->controller->getPerPageLimitOverride();
@@ -224,18 +307,6 @@ class PaginateService implements SingletonInterface {
 			));
 		}
 		$pageLimit = $configuration['pageLimit'];
-		if ($pageLimit === NULL || $pageLimit <= 0) {
-			throw new PaginationError(array(
-				'pageLimit', $configuration['pageLimit'], 100
-			));
-		}
-
-		// set currentPage if > 1
-		if (isset($configuration['currentPage']) && $configuration['currentPage'] > 1) {
-			$this->currentPage = $configuration['currentPage'];
-		}
-
-		// calculate page amount, and only continue if more than 1
 
 		// @FIX ___note that Query->createStatement() will happen more than once in a single request, and that each time will result
 		// in the same workload. So we need to cache it on at least one level, e.g. locally. If useful, even query cache could
@@ -244,11 +315,14 @@ class PaginateService implements SingletonInterface {
 		// instead of making LIMIT a part of the cached results. For the time being, we could add LIMIT to $preparedStatement,
 		// until we sort out what the definitive method is going to be. It might be smart to wait until all options have been
 		// migrated to decosdata, so that we can see if any option needs to be able to alter LIMIT through $query.
-		// ALSO: can LIMIT be provided as parameter?
+		// ALSO: can LIMIT be provided as parameter? See PerPageLimitOverride above
 
 		// @TODO ___execute() may return FALSE on error, we need to catch that
 		// @TODO ___we might want a service that does Statement interaction for us, also in the repository.
 		// Using our own service for the latter may reduce overhead caused by extbase (repository->query->statement() is an extbase construct anyway, not a FLOW backport)
+
+		// calculate page amount, and only continue if > 1
+		$statement = $query->createStatement();
 		$statement->execute();
 		$numRows = $statement->rowCount();
 		$statement->free();
@@ -263,10 +337,10 @@ class PaginateService implements SingletonInterface {
 				$pages = $pageLimit;
 			}
 
-			// set definitive values
+			// activate
 			$this->pageCount = $pages;
-			$this->limit = $perPageLimit;
-			$this->offset = $perPageLimit * ($this->currentPage - 1);
+			$query->setLimit($perPageLimit, $perPageLimit * ($this->currentPage - 1));
+			$this->active = TRUE;
 		}
 
 		// if current page nr exceeds page amount, replace it with last page nr

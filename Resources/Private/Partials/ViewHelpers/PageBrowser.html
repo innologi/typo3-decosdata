@@ -1,5 +1,4 @@
 {namespace d=Innologi\Decosdata\ViewHelpers}
-<!-- @TODO ___llang -->
 <f:if condition="{renderAbove}">
 	<div class="pagebrowser pagebrowser-top">
 		<d:render section="pagebrowser" arguments="{configuration: pageBrowser}" />
@@ -20,13 +19,11 @@
 	</div>
 </f:if>
 
-
-<!-- @TODO ___what about link titles? -->
 <f:section name="pagebrowser">
 <ul class="pagebrowser-navigation">
 	<f:if condition="{configuration.previousPage}">
 		<li class="previous">
-			<f:link.action arguments="{page: configuration.previousPage}" addQueryString="TRUE">previous</f:link.action>
+			<f:link.action arguments="{page: configuration.previousPage.number}" addQueryString="TRUE">{configuration.previousPage.label}</f:link.action>
 		</li>
 	</f:if>
 	<f:if condition="{configuration.pages.beforeScaled}">
@@ -37,7 +34,7 @@
 		<f:render section="pagenumbers" arguments="{pages: configuration.pages.beforeCurrent}" />
 	</f:if>
 	<li class="current">
-		{configuration.currentPage}
+		{configuration.currentPage.label}
 	</li>
 	<f:if condition="{configuration.pages.afterCurrent}">
 		<f:render section="pagenumbers" arguments="{pages: configuration.pages.afterCurrent}" />
@@ -48,7 +45,7 @@
 	</f:if>
 	<f:if condition="{configuration.nextPage}">
 		<li class="next">
-			<f:link.action arguments="{page: configuration.nextPage}" addQueryString="TRUE">next</f:link.action>
+			<f:link.action arguments="{page: configuration.nextPage.number}" addQueryString="TRUE">{configuration.nextPage.label}</f:link.action>
 		</li>
 	</f:if>
 </ul>
@@ -57,7 +54,7 @@
 <f:section name="pagenumbers">
 <f:for each="{pages}" as="page">
 	<li>
-		<f:link.action arguments="{page: page}" addQueryString="TRUE">{page}</f:link.action>
+		<f:link.action arguments="{page: page.number}" addQueryString="TRUE">{page.label}</f:link.action>
 	</li>
 </f:for>
 </f:section>

@@ -143,14 +143,7 @@ class QueryBuilder {
 
 		// apply pagination settings
 		if (isset($configuration['paginate'])) {
-			$this->paginateService->configurePagination($configuration['paginate'], $query->createStatement());
-			if ($this->paginateService->isReady()) {
-				# @LOW _this is a temporary interface until the relevant FIX task in PaginateService is completed
-				$query->setLimit(
-					$this->paginateService->getLimit(),
-					$this->paginateService->getOffset()
-				);
-			}
+			$this->paginateService->configurePagination($configuration['paginate'], $query);
 		}
 
 		return $query;
