@@ -121,6 +121,8 @@ abstract class ConstraintContainer {
 	 * @return void
 	 */
 	public function __clone() {
-		$this->constraint = clone $this->constraint;
+		if ($this->constraint !== NULL) {
+			$this->constraint = clone $this->constraint;
+		}
 	}
 }
