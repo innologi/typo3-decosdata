@@ -79,16 +79,16 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 		return $this->viewHelperVariableContainer->getView()->renderPartial(
 			$this->arguments['partial'],
 			NULL,
-			array(
-				'renderAbove' => $this->arguments['renderAbove'],
-				'renderBelow' => $this->arguments['renderBelow'],
-				'includeResultCountAbove' => $this->arguments['includeResultCountAbove'],
-				'includeResultCountBelow' => $this->arguments['includeResultCountBelow'],
-				'resultCount' => $this->paginateService->getResultCount(),
-				'pageBrowser' => $this->buildPageBrowserConfiguration(),
-				// requires the use of format.raw VH, which costs us ~1.6 ms on average, but keeps us
-				// from using a marker like ###CONTENT### with str_replace, which can easily be fooled
-				'content' => $this->renderChildren()
+			array_merge(
+				array(
+					'renderAbove' => $this->arguments['renderAbove'],
+					'renderBelow' => $this->arguments['renderBelow'],
+					'pageBrowser' => $this->buildPageBrowserConfiguration(),
+					// requires the use of format.raw VH, which costs us ~1.6 ms on average, but keeps us
+					// from using a marker like ###CONTENT### with str_replace, which can easily be fooled
+					'content' => $this->renderChildren()
+				),
+				$this->buildResultCountConfiguration()
 			)
 		);
 	}
@@ -172,6 +172,30 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 		}
 
 		return $configuration;
+	}
+
+	/**
+	 * Builds resultcount template configuration
+	 *
+	 * @return array
+	 */
+	protected function buildResultCountConfiguration() {
+		$resultCountConfiguration = NULL;
+		$resultCount = $this->paginateService->getResultCount();
+		if ($resultCount !== NULL) {
+			$resultCountConfiguration = array(
+				'includeResultCountAbove' => $this->arguments['includeResultCountAbove'],
+				'includeResultCountBelow' => $this->arguments['includeResultCountBelow'],
+				'resultCount' => $resultCount
+			);
+		} else {
+			$resultCountConfiguration = array(
+				'includeResultCountAbove' => FALSE,
+				'includeResultCountBelow' => FALSE,
+				'resultCount' => NULL
+			);
+		}
+		return $resultCountConfiguration;
 	}
 
 }
