@@ -117,6 +117,17 @@ class QueryField implements QueryInterface {
 		}
 		return $this->from[$id];
 	}
+	// @LOW _this naming scheme is not consistent: getFromAll but setFrom? Why not getFrom, setFrom and getOneFrom instead? or setFromAll?
+	/**
+	 * Sets From array
+	 *
+	 * @param array $from
+	 * @return $this
+	 */
+	public function setFrom(array $from) {
+		$this->from = $from;
+		return $this;
+	}
 
 	/**
 	 * Returns Where object
