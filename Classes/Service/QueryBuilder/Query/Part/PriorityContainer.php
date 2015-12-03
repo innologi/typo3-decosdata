@@ -33,7 +33,7 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class PriorityContainer {
+abstract class PriorityContainer {
 
 	/**
 	 * @var integer
