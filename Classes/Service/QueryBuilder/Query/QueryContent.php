@@ -113,6 +113,17 @@ class QueryContent extends QueryIterator implements QueryInterface {
 		return $this->id;
 	}
 
+	/**
+	 * Overrides parent
+	 *
+	 * @param QueryInterface $parent
+	 * @return $this
+	 */
+	public function setParent(QueryInterface $parent) {
+		$this->parent = $parent;
+		return $this;
+	}
+
 
 	/**
 	 * {@inheritDoc}

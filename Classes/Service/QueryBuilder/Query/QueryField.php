@@ -146,6 +146,17 @@ class QueryField implements QueryInterface {
 	}
 
 	/**
+	 * Overrides parent
+	 *
+	 * @param QueryInterface $parent
+	 * @return $this
+	 */
+	public function setParent(QueryInterface $parent) {
+		$this->parent = $parent;
+		return $this;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface::getParameters()
 	 */
