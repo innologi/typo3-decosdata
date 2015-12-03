@@ -100,6 +100,32 @@ class Query extends QueryIterator implements QueryInterface {
 	}
 
 	/**
+	 * Resets specific parts for all content/fields
+	 *
+	 * @param boolean $select
+	 * @param boolean $from
+	 * @param boolean $where
+	 * @param boolean $groupBy
+	 * @param boolean $orderBy
+	 * @return $this
+	 */
+	public function resetParts($select, $from = FALSE, $where = FALSE, $groupBy = FALSE, $orderBy = FALSE) {
+		/** @var $content \Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent */
+		foreach ($this->children as $queryContent) {
+			if ($orderBy) $queryContent->getOrderBy()->setTableAlias(NULL)->setField(NULL)->setPriority(NULL)->setSortOrder(NULL);
+			if ($groupBy) $queryContent->getGroupBy()->setPriority(NULL);
+			/** @var $queryField \Innologi\Decosdata\Service\QueryBuilder\Query\QueryField */
+			foreach ($queryContent as $queryField) {
+				if ($select) $queryField->getSelect()->setTableAlias(NULL)->setField(NULL)->setWrap(array());
+				if ($where) $queryField->getWhere()->setConstraint(NULL);
+				if ($orderBy) $queryField->getOrderBy()->setTableAlias(NULL)->setField(NULL)->setPriority(NULL)->setSortOrder(NULL);
+				if ($from) $queryField->setFrom(array());
+			}
+		}
+		return $this;
+	}
+
+	/**
 	 * Build a Statement object from this Query object
 	 *
 	 * @return \Innologi\Decosdata\Service\Database\Statement
