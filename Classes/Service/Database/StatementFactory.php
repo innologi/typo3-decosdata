@@ -92,9 +92,6 @@ class StatementFactory implements SingletonInterface {
 		}
 		if (isset($queryParts['ORDERBY'][0])) {
 			$query .= "\n" . 'ORDER BY ' . $queryParts['ORDERBY'];
-		} else {
-			// NULL prevents potential filesorts through GROUP BY sorting, when no ORDER BY was given
-			$query .= "\n" . 'ORDER BY NULL';
 		}
 		# @LOW _this is a temporary interface until the relevant FIX task in PaginateService is completed
 		#if (isset($queryParts['LIMIT'][0])) {

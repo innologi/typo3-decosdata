@@ -143,16 +143,17 @@ class QueryConfigurator implements SingletonInterface {
 		if (isset($queryParts['GROUPBY'])) {
 			ksort($queryParts['GROUPBY']);
 		} else {
-			/*
-			 * If no group by, then we'll prevent duplicates by using the DISTINCT keyword.
-			 * There are MANY cases where either a DISTINCT is required (on import/mm joins),
-			 * or the effort to exclude it automatically has no effect on the item-join.
-			 * (ORDER BY/GROUP BY/pagebrowser all result in 'use temporary/filesort')
-			 */
+			// If no group by, then we'll prevent duplicates by using the DISTINCT keyword.
+			// There are MANY cases where either a DISTINCT is required (on import/mm joins),
+			// or the effort to exclude it automatically has no effect on the item-join.
+			// (ORDER BY/GROUP BY/pagebrowser all result in 'use temporary/filesort')
 			$queryParts['SELECT'][0] = 'DISTINCT ' . $queryParts['SELECT'][0];
 		}
 		if (isset($queryParts['ORDERBY'])) {
 			ksort($queryParts['ORDERBY']);
+		} else {
+			// NULL prevents potential filesorts through GROUP BY sorting, when no ORDER BY was given
+			$query .= "\n" . 'ORDER BY NULL';
 		}
 
 		// add parameter:values that were not yet parameterized
