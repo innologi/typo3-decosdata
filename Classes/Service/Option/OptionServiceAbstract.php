@@ -97,6 +97,7 @@ abstract class OptionServiceAbstract {
 	 * @param string $className
 	 * @return object
 	 * @throws Exception\MissingOptionClass
+	 * @throws Exception\InvalidOptionClass
 	 */
 	protected function resolveOptionClass($className) {
 		if (strpos($className, '\\') === FALSE) {
@@ -108,7 +109,7 @@ abstract class OptionServiceAbstract {
 		$object = $this->objectManager->get($className);
 		$interfaceClassName = $this->optionNamespace . '\\OptionInterface';
 		if ( !is_subclass_of($object, $interfaceClassName) ) {
-			throw new Exception\InvalidOptionClass(array(
+			throw new Exception\InvalidOptionClass(1449155186, array(
 				// since $object was retrieved via objectManager, we're not sure if $object Class === $className
 				get_class($object), $interfaceClassName
 			));
