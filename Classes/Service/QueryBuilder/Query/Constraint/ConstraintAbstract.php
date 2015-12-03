@@ -23,7 +23,7 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Constraint;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use Innologi\Decosdata\Service\QueryBuilder\Query\Part\WrapContainer;
 /**
  * Constraint Abstract
  *
@@ -31,7 +31,7 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Constraint;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-abstract class ConstraintAbstract implements ConstraintInterface {
+abstract class ConstraintAbstract extends WrapContainer implements ConstraintInterface {
 
 	/**
 	 * @var string
@@ -47,6 +47,11 @@ abstract class ConstraintAbstract implements ConstraintInterface {
 	 * @var string
 	 */
 	protected $operator;
+
+	/**
+	 * @var array
+	 */
+	protected $wrapLocal = array();
 
 	/**
 	 * Returns Local Field
@@ -108,5 +113,50 @@ abstract class ConstraintAbstract implements ConstraintInterface {
 		return $this;
 	}
 
+	/**
+	 * Returns Local Wrap
+	 *
+	 * @return array
+	 */
+	public function getWrapLocal() {
+		return $this->wrapLocal;
+	}
+
+	/**
+	 * Sets Local Wrap
+	 *
+	 * @param array $wrapLocal
+	 * @return $this
+	 */
+	public function setWrapLocal(array $wrapLocal) {
+		$this->wrapLocal = $wrapLocal;
+		return $this;
+	}
+
+	/**
+	 * Add Local Wrap by key
+	 *
+	 * @param string $key
+	 * @param string $wrapLocal
+	 * @return $this
+	 */
+	public function addWrapLocal($key, $wrapLocal) {
+		// @LOW _should this and other methods like it throw an exception if it already exists?
+		$this->wrapLocal[$key] = $wrapLocal;
+		return $this;
+	}
+
+	/**
+	 * Remove Local Wrap by key
+	 *
+	 * @param string $key
+	 * @return $this
+	 */
+	public function removeWrapLocal($key) {
+		if (isset($this->wrapLocal[$key])) {
+			unset($this->wrapLocal[$key]);
+		}
+		return $this;
+	}
 
 }

@@ -25,61 +25,63 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
  ***************************************************************/
 
 /**
- * Select Query Part Object
+ * Wrap Container abstract
+ *
+ * Extend this abstract for a class to have $wrap and associated methods.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class Select extends WrapContainer {
+abstract class WrapContainer {
 
 	/**
-	 * @var string
+	 * @var array
 	 */
-	protected $tableAlias;
+	protected $wrap = array();
 
 	/**
-	 * @var string
-	 */
-	protected $field;
-
-	/**
-	 * Returns Table Alias
+	 * Returns wrap
 	 *
-	 * @return string
+	 * @return array
 	 */
-	public function getTableAlias() {
-		return $this->tableAlias;
+	public function getWrap() {
+		return $this->wrap;
 	}
 
 	/**
-	 * Sets Table Alias
+	 * Sets wrap
 	 *
-	 * @param string $tableAlias
+	 * @param array $wrap
 	 * @return $this
 	 */
-	public function setTableAlias($tableAlias) {
-		$this->tableAlias = $tableAlias;
+	public function setWrap(array $wrap) {
+		$this->wrap = $wrap;
 		return $this;
 	}
 
 	/**
-	 * Returns field
+	 * Add wrap by key
 	 *
-	 * @return string
+	 * @param string $key
+	 * @param string $wrap
+	 * @return $this
 	 */
-	public function getField() {
-		return $this->field;
+	public function addWrap($key, $wrap) {
+		$this->wrap[$key] = $wrap;
+		return $this;
 	}
 
 	/**
-	 * Sets field
+	 * Remove wrap by key
 	 *
-	 * @param string $field
+	 * @param string $key
 	 * @return $this
 	 */
-	public function setField($field) {
-		$this->field = $field;
+	public function removeWrap($key) {
+		if (isset($this->wrap[$key])) {
+			unset($this->wrap[$key]);
+		}
 		return $this;
 	}
 

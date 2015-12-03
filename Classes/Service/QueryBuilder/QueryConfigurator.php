@@ -196,14 +196,7 @@ class QueryConfigurator implements SingletonInterface {
 			));
 		}
 
-		$string = $tableAlias . '.' . $field;
-
-		$wrapArray = $select->getWrap();
-		foreach ($wrapArray as $wrap) {
-			$string = str_replace('|', $string, $wrap);
-		}
-
-		return $string;
+		return $this->transformWrap($tableAlias . '.' . $field, $select->getWrap());
 	}
 
 	/**
@@ -252,6 +245,7 @@ class QueryConfigurator implements SingletonInterface {
 		}
 
 		$joinType = $from->getJoinType();
+		// @LOW _if joinType is NULL, transformConfiguration will still join the table with "\n" and not with a comma..
 		if ($joinType !== NULL) {
 			if (!in_array($joinType, $this->supportedJoins, TRUE)) {
 				throw new Exception\UnsupportedFeatureType(1448552612, array(
@@ -311,15 +305,17 @@ class QueryConfigurator implements SingletonInterface {
 				$queryPart, 'constraint.localAlias', json_encode($constraint)
 			));
 		}
-		$operator = $this->resolveOperator($constraint->getOperator());
 
-		$string = $localAlias . '.' . $localField . ' ' . $operator . ' ';
+		$string = $this->transformWrap($localAlias . '.' . $localField, $constraint->getWrapLocal()) .
+			' ' . $this->resolveOperator($constraint->getOperator()) . ' ';
+
 		if ($constraint instanceof ConstraintByValue) {
-			return $string . $this->resolveConstraintValue($constraint->getValue());
+			$string .= $this->resolveConstraintValue($constraint->getValue());
 		}
 		if ($constraint instanceof ConstraintByField) {
-			return $string . $constraint->getForeignAlias() . '.' . $constraint->getForeignField();
+			$string .= $constraint->getForeignAlias() . '.' . $constraint->getForeignField();
 		}
+		return $this->transformWrap($string, $constraint->getWrap());
 	}
 
 	/**
@@ -371,6 +367,21 @@ class QueryConfigurator implements SingletonInterface {
 				));
 			}
 			$string .= ' ' . $sortOrder;
+		}
+		return $string;
+	}
+
+	/**
+	 * Transforms a wrap
+	 *
+	 * @param string $string
+	 * @param array $wrapArray
+	 * @return string
+	 */
+	protected function transformWrap($string, array $wrapArray) {
+		foreach ($wrapArray as $wrap) {
+			// @LOW _doesn't look like a wrap to me, does it? should we rename the feature?
+			$string = str_replace('|', $string, $wrap);
 		}
 		return $string;
 	}
