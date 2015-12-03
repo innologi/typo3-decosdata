@@ -227,7 +227,7 @@ class ItemController extends ActionController {
 								array(
 									'option' => 'LinkLevel',
 									'args' => array(
-										'level' => 2
+										'level' => 2,
 									)
 								)
 							),
@@ -262,15 +262,13 @@ class ItemController extends ActionController {
 				),
 				2 => array(
 					'paginate' => array(
+						'type' => 'yearly',
 						'pageLimit' => 20,
-						'perPageLimit' => 20,
-						// @FIX ___years, field DATE1
+						// DATE1
+						'field' => 20
 					),
 					'itemType' => array(
 						1
-					),
-					'relation' => array(
-						'noItemId' => TRUE,
 					),
 					'contentField' => array(
 						1 => array(
@@ -297,7 +295,8 @@ class ItemController extends ActionController {
 								array(
 									'option' => 'LinkLevel',
 									'args' => array(
-										'level' => 3
+										'level' => 3,
+										'linkItem' => TRUE
 									)
 								)
 							),
@@ -375,6 +374,6 @@ class ItemController extends ActionController {
 		$this->view->assign('configuration', $activeConfiguration);
 		$this->view->assign('items', $items);
 		// @TODO ___remove
-		$this->view->assign('query', $statement->getQuery());
+		$this->view->assign('query', $statement->getProcessedQuery());
 	}
 }

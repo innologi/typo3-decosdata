@@ -47,6 +47,11 @@ class RenderOptionService extends OptionServiceAbstract {
 	protected $originalContent;
 
 	/**
+	 * @var array
+	 */
+	protected $item;
+
+	/**
 	 * Matches argument:"value"[,]
 	 * @var string
 	 */
@@ -97,6 +102,15 @@ class RenderOptionService extends OptionServiceAbstract {
 	 */
 	public function getOriginalContent() {
 		return $this->originalContent;
+	}
+
+	/**
+	 * Returns the whole item array
+	 *
+	 * @return array
+	 */
+	public function getItem() {
+		return $this->item;
 	}
 
 	/**
@@ -156,7 +170,8 @@ class RenderOptionService extends OptionServiceAbstract {
 	 * @param string &$content
 	 * @return void
 	 */
-	public function processOptions(array $options, &$content) {
+	public function processOptions(array $options, &$content, array $item) {
+		$this->item = $item;
 		$this->originalContent = $content;
 		foreach ($options as $option) {
 			$this->executeOption('alterContentValue', $option, $content, $this);

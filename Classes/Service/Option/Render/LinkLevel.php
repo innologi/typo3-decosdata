@@ -44,10 +44,16 @@ class LinkLevel implements OptionInterface {
 		if ( !(isset($args['level']) && is_int($args['level'])) ) {
 			throw new MissingArgument(1449048090, array(self::class, 'level'));
 		}
-		$linkValue = $service->getOriginalContent();
+		$linkValue = NULL;
+		if (isset($args['linkItem']) && $args['linkItem']) {
+			$item = $service->getItem();
+			$linkValue = $item['itemID'];
+		} else {
+			$linkValue = $service->getOriginalContent();
+		}
 
 		$uriBuilder = $service->getControllerContext()->getUriBuilder();
-		// @TODO ___test if this should be urlencode, or rawurlencode, or.. whatever
+		// @TODO ___test if this should be urlencode, or rawurlencode, or.. whatever. maybe even add htmlspecialchars? Or would uriBuilder already have done that?
 		// @LOW _if we just read the latest _ argument, can't we derive level from there, so we can get rid of the level arg? we have to be sure that it's not read anywhere else
 		// @LOW _see if addQueryStringMethod is of any use to us
 		$uri = $uriBuilder->reset()
