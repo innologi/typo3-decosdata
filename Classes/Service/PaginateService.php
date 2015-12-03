@@ -39,8 +39,11 @@ use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class PaginateService implements SingletonInterface {
+	// @LOW _consider that an Option-like interface for pagination could improve maintainability even further:
+	// a class which provides both the Query and the Display logic, completely self-contained, implementing
+	// an interface tht is called upon by QueryBuilder and the Pagebrowser VH. Maybe worth doing if there
+	// will be more pagebrowsers
 	// @LOW _note all the MySQL keywords in yearly.. should be supplied by QueryProvider classes
-	// @TODO ___why doesn't this service have any error codes for its exceptions? Did I fuck up some rebase conflicts?
 
 	/**
 	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
@@ -153,12 +156,12 @@ class PaginateService implements SingletonInterface {
 	 */
 	protected function initializeConfiguration(array $configuration) {
 		if ( isset($configuration['type']) && !in_array($configuration['type'], $this->supportedTypes, TRUE) ) {
-			throw new PaginationError(array(
+			throw new PaginationError(1449154955, array(
 				'type', $configuration['type'], join('/', $this->supportedTypes)
 			));
 		}
 		if ($configuration['pageLimit'] === NULL || $configuration['pageLimit'] <= 0) {
-			throw new PaginationError(array(
+			throw new PaginationError(1449154970, array(
 				'pageLimit', $configuration['pageLimit'], 100
 			));
 		}
@@ -177,8 +180,17 @@ class PaginateService implements SingletonInterface {
 	 * @param array $configuration
 	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Query $query
 	 * @return void
+	 * @throws \Innologi\Decosdata\Exception\PaginationError
 	 */
 	protected function configureYearly(array $configuration, Query $query) {
+		// check for valid configuration values first
+		$fieldId = $configuration['field'];
+		if ($fieldId === NULL) {
+			throw new PaginationError(1449154980, array(
+				'field', $fieldId, 5
+			));
+		}
+
 		// clone the Query and reset the parts not relevant for it
 		$yQuery = clone $query;
 		$yQuery->resetParts(TRUE, FALSE, FALSE, TRUE, TRUE);
@@ -218,13 +230,12 @@ class PaginateService implements SingletonInterface {
 		$queryField->getSelect()
 			->setTableAlias($tableAlias)
 			->setField($field)
-			// @TODO ___test how this works with NULL again
+			// the NULL will make pagination fail on purpose, without error
 			->addWrap('if', 'IF(' . $wrapDivider . ' REGEXP (\'' . $pattern . '\'),YEAR(' . $wrapDivider . '),NULL)')
 			->setWrapDivider($wrapDivider);
 
 		// add from and keep it in a variable for later use
 		$parameterKey = ':pagebrowserfield';
-		$yQuery->addParameter($parameterKey, $configuration['field']);
 		$from = $queryField->getFrom(
 			'pagebrowser-year', 'tx_decosdata_domain_model_itemfield', $tableAlias
 		)->setJoinType(
@@ -235,6 +246,7 @@ class PaginateService implements SingletonInterface {
 				$this->constraintFactory->createConstraintByValue('field', $tableAlias, '=', $parameterKey)
 			))
 		);
+		$yQuery->addParameter($parameterKey, $fieldId);
 
 		// execute the cloned query to retrieve the years
 		$statement = $yQuery->createStatement();
@@ -256,6 +268,7 @@ class PaginateService implements SingletonInterface {
 			$this->currentPage = $pages;
 		}
 
+		// if NULL, it means that the date-field contains no valid date values
 		if ($pages > 1 && $years[$this->currentPage] !== NULL) {
 			// @LOW _do we want resultCount to be available or not?
 			//$statement = $query->createStatement();
@@ -266,7 +279,7 @@ class PaginateService implements SingletonInterface {
 			// add the FROM to the original Query object
 			$queryField = $query->getContent('pagebrowser')->getField('year');
 			$queryField->setFrom(array($from));
-			$query->addParameter($parameterKey, $configuration['field']);
+			$query->addParameter($parameterKey, $fieldId);
 
 			// add the year restriction for the current page
 			$parameterKey = ':pagebrowseryear';
@@ -290,6 +303,7 @@ class PaginateService implements SingletonInterface {
 	 *
 	 * @param array $configuration
 	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Query $statement
+	 * @return void
 	 * @throws \Innologi\Decosdata\Exception\PaginationError
 	 */
 	protected function configureDefault(array $configuration, Query $query) {
@@ -302,8 +316,8 @@ class PaginateService implements SingletonInterface {
 		// check for valid configuration values first
 		$perPageLimit = $configuration['perPageLimit'];
 		if ($perPageLimit === NULL || $perPageLimit <= 0) {
-			throw new PaginationError(array(
-				'perPageLimit', $configuration['perPageLimit'], 20
+			throw new PaginationError(1449154988, array(
+				'perPageLimit', $perPageLimit, 20
 			));
 		}
 		$pageLimit = $configuration['pageLimit'];
