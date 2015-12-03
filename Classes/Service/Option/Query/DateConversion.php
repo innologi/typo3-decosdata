@@ -48,7 +48,8 @@ class DateConversion extends OptionAbstract {
 
 		$id = $queryField->getId() . 'dateconversion' . $optionIndex;
 		$parameterKey = ':' . $id;
-		$queryField->getSelect()->addWrap($id, 'DATE_FORMAT(|, ' . $parameterKey . ')');
+		$select = $queryField->getSelect();
+		$select->addWrap($id, 'DATE_FORMAT(' . $select->getWrapDivider() . ', ' . $parameterKey . ')');
 		$queryField->addParameter($parameterKey, $args['format']);
 	}
 

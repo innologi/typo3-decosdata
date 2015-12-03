@@ -41,6 +41,11 @@ abstract class WrapContainer {
 	protected $wrap = array();
 
 	/**
+	 * @var string
+	 */
+	protected $wrapDivider = '|';
+
+	/**
 	 * Returns wrap
 	 *
 	 * @return array
@@ -82,6 +87,26 @@ abstract class WrapContainer {
 		if (isset($this->wrap[$key])) {
 			unset($this->wrap[$key]);
 		}
+		return $this;
+	}
+
+	/**
+	 * Returns Wrap divider
+	 *
+	 * @return string
+	 */
+	public function getWrapDivider() {
+		return $this->wrapDivider;
+	}
+
+	/**
+	 * Sets Wrap divider
+	 *
+	 * @param string $wrapDivider
+	 * @return $this
+	 */
+	public function setWrapDivider($wrapDivider) {
+		$this->wrapDivider = $wrapDivider;
 		return $this;
 	}
 

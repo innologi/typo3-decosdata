@@ -196,7 +196,7 @@ class QueryConfigurator implements SingletonInterface {
 			));
 		}
 
-		return $this->transformWrap($tableAlias . '.' . $field, $select->getWrap());
+		return $this->transformWrap($tableAlias . '.' . $field, $select->getWrap(), $select->getWrapDivider());
 	}
 
 	/**
@@ -306,7 +306,7 @@ class QueryConfigurator implements SingletonInterface {
 			));
 		}
 
-		$string = $this->transformWrap($localAlias . '.' . $localField, $constraint->getWrapLocal()) .
+		$string = $this->transformWrap($localAlias . '.' . $localField, $constraint->getWrapLocal(), $constraint->getWrapDivider()) .
 			' ' . $this->resolveOperator($constraint->getOperator()) . ' ';
 
 		if ($constraint instanceof ConstraintByValue) {
@@ -315,7 +315,7 @@ class QueryConfigurator implements SingletonInterface {
 		if ($constraint instanceof ConstraintByField) {
 			$string .= $constraint->getForeignAlias() . '.' . $constraint->getForeignField();
 		}
-		return $this->transformWrap($string, $constraint->getWrap());
+		return $this->transformWrap($string, $constraint->getWrap(), $constraint->getWrapDivider());
 	}
 
 	/**
@@ -378,10 +378,10 @@ class QueryConfigurator implements SingletonInterface {
 	 * @param array $wrapArray
 	 * @return string
 	 */
-	protected function transformWrap($string, array $wrapArray) {
+	protected function transformWrap($string, array $wrapArray, $divider = '|') {
 		foreach ($wrapArray as $wrap) {
 			// @LOW _doesn't look like a wrap to me, does it? should we rename the feature?
-			$string = str_replace('|', $string, $wrap);
+			$string = str_replace($divider, $string, $wrap);
 		}
 		return $string;
 	}
