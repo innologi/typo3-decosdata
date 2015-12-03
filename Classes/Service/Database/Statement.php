@@ -45,13 +45,36 @@ use TYPO3\CMS\Core\Database\PreparedStatement;
 class Statement extends PreparedStatement {
 
 	/**
-	 * Returns query
+	 * @var string
+	 */
+	protected $processedQuery;
+
+	/**
+	 * @var array
+	 */
+	protected $usedParameters = array();
+
+	/**
+	 * Returns processed query for debugging.
+	 *
+	 * This Query is NOT ENTIRELY SAFE to use.
 	 *
 	 * @return string
 	 */
-	public function getQuery() {
-		// @TODO _how to return a query that has its parameters replaced?
-		return $this->query;
+	public function getProcessedQuery() {
+		// the isset statement part is to ensure we can only do this
+		if ($this->processedQuery === NULL) {
+			$parameters = !empty($this->parameters) ? $this->parameters : $this->usedParameters;
+			$precompiledQueryParts = $this->precompiledQueryParts;
+			$tempQuery = $this->query;
+			$this->convertNamedPlaceholdersToQuestionMarks($tempQuery, $parameters, $precompiledQueryParts);
+			$queryArray = explode('?', $tempQuery);
+			foreach ($parameters as $index => $parameter) {
+				$queryArray[$index] .= '\'' . $parameter['value'] . '\'';
+			}
+			$this->processedQuery = join('', $queryArray);
+		}
+		return $this->processedQuery;
 	}
 
 
@@ -74,6 +97,16 @@ class Statement extends PreparedStatement {
 		unset($this->statement);
 	}
 
+	/**
+	 * Necessary for getProcessedQuery() to work
+	 *
+	 * {@inheritDoc}
+	 * @see \TYPO3\CMS\Core\Database\PreparedStatement::execute()
+	 */
+	public function execute(array $input_parameters = array()) {
+		$this->usedParameters = $this->parameters;
+		return parent::execute($input_parameters);
+	}
 
 
 	/**
