@@ -5,8 +5,8 @@
 
 <f:flashMessages renderMode="div" />
 
-<f:debug>{query}</f:debug>
 <f:debug>{configuration}</f:debug>
+<f:format.html>{query}</f:format.html>
 
 <d:pageBrowser>
 <table>
@@ -21,7 +21,7 @@
 		<f:for each="{items}" as="item">
 			<tr class="item-{item.itemID}">
 				<d:item.for configuration="{configuration.contentField}" item="{item}" contentAs="content" configAs="contentConfig">
-					<td>{content -> d:content.render(configuration: contentConfig)}</td>
+					<td>{content -> d:content.render(configuration: contentConfig, item: item)}</td>
 				</d:item.for>
 			</tr>
 		</f:for>
