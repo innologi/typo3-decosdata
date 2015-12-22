@@ -152,10 +152,10 @@ class RenderOptionService extends OptionServiceAbstract {
 					}
 				}
 				// execute option with original content
-				$content = $this->getOriginalContent();
+				$content = $this->originalContent;
 				// note that it will reset original content to the same value,
 				// so until we support utilizing a different content value, no harm is done
-				$this->processOptions(array($option), $content);
+				$this->processOptions(array($option), $content, $this->item);
 				return $content;
 			},
 			$string
