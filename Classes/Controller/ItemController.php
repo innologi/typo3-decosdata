@@ -84,6 +84,7 @@ class ItemController extends ActionController {
 						'perPageLimit' => 50,
 					),
 					'itemType' => array(
+						// DOCUMENT
 						2
 					),
 					'contentField' => array(
@@ -196,7 +197,7 @@ class ItemController extends ActionController {
 			)
 		);
 		} elseif ($pid === 18) {
-		// extdev BIS
+		// extdev: BIS
 		$this->pluginConfiguration = array(
 			'import' => array(
 				3
@@ -208,10 +209,12 @@ class ItemController extends ActionController {
 						'perPageLimit' => 20,
 					),
 					'itemType' => array(
+						// FOLDER
 						1
 					),
 					// @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
 					'relation' => array(
+						// prevents a groupBy on itemID
 						'noItemId' => TRUE
 					),
 					'contentField' => array(
@@ -268,6 +271,7 @@ class ItemController extends ActionController {
 						'field' => 20
 					),
 					'itemType' => array(
+						// FOLDER
 						1
 					),
 					'contentField' => array(
@@ -328,6 +332,134 @@ class ItemController extends ActionController {
 									)
 								),
 								'matchAll' => TRUE
+							)
+						)
+					)
+				),
+				// @FIX ______multiple views per plugin?
+				// @FIX ______different view types per view? we have list, now we need single for "header"?
+				// @FIX ______zaak support
+				// @FIX ______childview mogelijk maken!
+				// @FIX ______crumbpaths
+				// 1:4(1,1,1|1,1,2|1,1,3|1,*,*);
+				// 1:childView()-fixNumberOrdering();5:getIdOfOtherParentWithinCurrentParent(0|'FOLDER')-makeIcon('zaak')-makeLink(4|''|'SUBJECT1'|1)-whiteList('BOL3 = 1','BOOKNAME LIKE Zake%'|1|1|1);6:dateConversion();
+				3 => array(
+					'paginate' => array(
+						'pageLimit' => 20,
+						'perPageLimit' => 10,
+					),
+					'itemType' => array(
+						// DOCUMENT
+						2
+					),
+					'contentField' => array(
+						1 => array(
+							'title' => 'Agendanr.',
+							'content' => array(
+								/*array(
+									// DATE2 (NUM2)
+									'field' => 21,
+								),
+								array(
+									// DATE3 (NUM3)
+									'field' => 24,
+								),
+								array(
+									// DATE4 (NUM4)
+									'field' => 28,
+								),*/
+								array(
+									// TEXT8
+									'field' => 10,
+								)
+							),
+							'order' => array(
+								'sort' => 'ASC',
+								'priority' => 10
+							),
+						),
+						2 => array(
+							'title' => 'Document type',
+							'content' => array(
+								array(
+									// SUBJECT1
+									'field' => 5,
+								)
+							),
+							'order' => array(
+								'sort' => 'ASC',
+								'priority' => 20
+							),
+						),
+						3 => array(
+							'title' => 'Inhoud document',
+							'content' => array(
+								array(
+									// TEXT9
+									'field' => 16,
+								)
+							),
+							'order' => array(
+								'sort' => 'ASC',
+								'priority' => 30
+							),
+						),
+						4 => array(
+							'title' => 'Download',
+							'content' => array(
+								array(
+									'blob' => TRUE,
+								)
+							),
+							'renderOptions' => array(
+								array(
+									'option' => 'FileIcon',
+								),
+								array(
+									'option' => 'Wrapper',
+									'args' => array(
+										'wrap' => '|| {render:FileSize}|'
+									)
+								),
+								array(
+									'option' => 'FileDownload',
+								)
+							)
+						),
+						5 => array(
+							'title' => 'Zaak',
+						),
+						6 => array(
+							'title' => 'Reg.datum',
+							'content' => array(
+								array(
+									// DOCUMENT_DATE
+									'field' => 13,
+								)
+							),
+						),
+						7 => array(
+							'title' => 'Reg.nr.',
+							'content' => array(
+								array(
+									// MARK
+									'field' => 4,
+								)
+							),
+						),
+					),
+					'queryOptions' => array(
+						array(
+							'option' => 'FilterItems',
+							'args' => array(
+								'filters' => array(
+									array(
+										'value' => '1',
+										'operator' => '=',
+										// BOL3
+										'field' => 27
+									)
+								),
 							)
 						)
 					)
