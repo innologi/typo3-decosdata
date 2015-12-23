@@ -84,7 +84,7 @@ class QueryBuilder {
 		$queryContent = $query->getContent('itemID');
 		$queryField = $queryContent->getField('');
 		// @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
-		if (!isset($configuration['relation']['noItemId'])) {
+		if (!isset($configuration['noItemId']) || !$configuration['noItemId']) {
 			$queryContent->getGroupBy()->setPriority(0);
 			$queryField->getSelect()
 				->setField('uid')
@@ -170,6 +170,12 @@ class QueryBuilder {
 
 				// add field: these contain metadata strings provided as is by Decos export
 				if (isset($contentConfiguration['field'])) {
+					// @TODO ___field, blob and order keys could probably be converted to more configurable queryOptions, to make it all more flexible.
+					// We could re-introduce document_date for blobs then and make that configurable too, as well as which of multiple blobs to get.
+					// We could then keep field, blob and order keys as shortcuts for TCA/Typoscript configuration, which are transformed by a
+					// future service which translates these to standard options. Do that for all the stuff that is common, like a download link
+					// and restrictById/ParentId, et voila, you combine the ease of use of said shortcuts with the flexibility of queryoption-equivalents.
+					// @LOW ___Now that I think about it, the same goes for itemtype and import.. except I don't think they have anything to gain in flexibility.
 					$tableAlias = 'itf' . $index . 's' . $subIndex;
 					$parameterKey = ':' . $tableAlias . 'field';
 					// @TODO ___move to method? wait to see if it really used elsewhere
@@ -211,6 +217,7 @@ class QueryBuilder {
 						->setConstraint(
 							$this->constraintFactory->createConstraintAnd(array(
 								$this->constraintFactory->createConstraintByField('item', $blobAlias2, '=', 'uid', 'it'),
+								// @TODO ___note that this does not produce the same result as those that still use document_date. Need to see if Heemskerk is affected with newer tests
 								$this->constraintFactory->createConstraintByField('sequence', $blobAlias2, '<', 'sequence', $blobAlias1)
 							))
 						);

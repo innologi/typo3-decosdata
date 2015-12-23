@@ -71,6 +71,7 @@ class ItemController extends ActionController {
 	 */
 	protected function initializePluginConfiguration() {
 		$pid = (int) $GLOBALS['TSFE']->id;
+		// @LOW _consider this: we translated querybuilder configuration from arrays to classes. would there be an advantage to doing the same for this? this isn't going to be adjustable like query configurations, but maybe there are other advantages?
 		// extdev: regelgeving actief
 		if ($pid === 11) {
 		$this->pluginConfiguration = array(
@@ -213,10 +214,7 @@ class ItemController extends ActionController {
 						1
 					),
 					// @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
-					'relation' => array(
-						// prevents a groupBy on itemID
-						'noItemId' => TRUE
-					),
+					'noItemId' => TRUE,
 					'contentField' => array(
 						1 => array(
 							'title' => 'Vergaderingen',
@@ -339,10 +337,9 @@ class ItemController extends ActionController {
 				// @FIX ______multiple views per plugin?
 				// @FIX ______different view types per view? we have list, now we need single for "header"?
 				// @FIX ______zaak support
-				// @FIX ______childview mogelijk maken!
 				// @FIX ______crumbpaths
 				// 1:4(1,1,1|1,1,2|1,1,3|1,*,*);
-				// 1:childView()-fixNumberOrdering();5:getIdOfOtherParentWithinCurrentParent(0|'FOLDER')-makeIcon('zaak')-makeLink(4|''|'SUBJECT1'|1)-whiteList('BOL3 = 1','BOOKNAME LIKE Zake%'|1|1|1);6:dateConversion();
+				// 1:fixNumberOrdering();5:getIdOfOtherParentWithinCurrentParent(0|'FOLDER')-makeIcon('zaak')-makeLink(4|''|'SUBJECT1'|1)-whiteList('BOL3 = 1','BOOKNAME LIKE Zake%'|1|1|1);6:dateConversion();
 				3 => array(
 					'paginate' => array(
 						'pageLimit' => 20,
@@ -428,6 +425,7 @@ class ItemController extends ActionController {
 						),
 						5 => array(
 							'title' => 'Zaak',
+
 						),
 						6 => array(
 							'title' => 'Reg.datum',
@@ -435,6 +433,14 @@ class ItemController extends ActionController {
 								array(
 									// DOCUMENT_DATE
 									'field' => 13,
+									'queryOptions' => array(
+										array(
+											'option' => 'DateConversion',
+											'args' => array(
+												'format' => '%d-%m-%Y'
+											)
+										)
+									)
 								)
 							),
 						),
@@ -449,6 +455,12 @@ class ItemController extends ActionController {
 						),
 					),
 					'queryOptions' => array(
+						array(
+							'option' => 'RestrictByParentId',
+							'args' => array(
+								'parameter' => '_3',
+							)
+						),
 						array(
 							'option' => 'FilterItems',
 							'args' => array(
