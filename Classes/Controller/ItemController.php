@@ -339,7 +339,7 @@ class ItemController extends ActionController {
 				// @FIX ______zaak support
 				// @FIX ______crumbpaths
 				// 1:4(1,1,1|1,1,2|1,1,3|1,*,*);
-				// 1:fixNumberOrdering();5:getIdOfOtherParentWithinCurrentParent(0|'FOLDER')-makeIcon('zaak')-makeLink(4|''|'SUBJECT1'|1)-whiteList('BOL3 = 1','BOOKNAME LIKE Zake%'|1|1|1);6:dateConversion();
+				// 1:fixNumberOrdering();;
 				3 => array(
 					'paginate' => array(
 						'pageLimit' => 20,
@@ -425,7 +425,52 @@ class ItemController extends ActionController {
 						),
 						5 => array(
 							'title' => 'Zaak',
-
+							'queryOptions' => array(
+								array(
+									'option' => 'ParentInParent',
+									'args' => array(
+										// FOLDER
+										'itemType' => array(
+											1
+										)
+									)
+								),
+								/*array(
+								 'option' => 'FilterSubItems',
+									'args' => array(
+										'filters' => array(
+											array(
+												'value' => 'zake%',
+												'operator' => 'LIKE',
+												// BOOKMARK
+												'field' => 2
+											),
+											array(
+												'value' => '1',
+												'operator' => '=',
+												// BOL3
+												'field' => 27
+											)
+										),
+										'matchAll' => TRUE
+									)
+								)*/
+							),
+							'renderOptions' => array(
+								/*array(
+									'option' => 'Icon',
+									'args' => array(
+										'name' => 'zaak'
+									)
+								),*/
+								array(
+									'option' => 'LinkLevel',
+									'args' => array(
+										'level' => 4,
+										'linkContentItem' => TRUE
+									)
+								)
+							)
 						),
 						6 => array(
 							'title' => 'Reg.datum',

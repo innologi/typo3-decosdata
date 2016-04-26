@@ -194,6 +194,7 @@ class QueryBuilder {
 					$queryContent->addParameter($parameterKey, $contentConfiguration['field']);
 				}
 				// @LOW ___can we have both a field and blob in the same content? no right? because this should be an if/else then
+				// @TODO ___why do it this way? why not use a linkvalue equivalent? then we can combine with any value. probably a lot simpler
 				// add blob: these contain file references, thus will result in file:uid
 				if (isset($contentConfiguration['blob'])) {
 					// @LOW _if we ever are to support multiple files in a single content, these aliases will conflict
@@ -255,6 +256,7 @@ class QueryBuilder {
 
 				// apply field-wide query options
 				if (isset($contentConfiguration['queryOptions'])) {
+					// @TODO ___throw catchable exception if $queryField is NULL? (which is the case if no field/blob configuration is present)
 					$this->optionService->processFieldOptions($contentConfiguration['queryOptions'], $queryField);
 				}
 			}
