@@ -38,7 +38,7 @@ use Innologi\Decosdata\Service\QueryBuilder\Query\Part\GroupBy;
 class QueryContent extends QueryIterator implements QueryInterface {
 
 	/**
-	 * @var QueryInterface
+	 * @var Query
 	 */
 	protected $parent;
 
@@ -114,12 +114,21 @@ class QueryContent extends QueryIterator implements QueryInterface {
 	}
 
 	/**
+	 * Returns parent
+	 *
+	 * @return Query
+	 */
+	public function getParent() {
+		return $this->parent;
+	}
+
+	/**
 	 * Overrides parent
 	 *
-	 * @param QueryInterface $parent
+	 * @param Query $parent
 	 * @return $this
 	 */
-	public function setParent(QueryInterface $parent) {
+	public function setParent(Query $parent) {
 		$this->parent = $parent;
 		return $this;
 	}
