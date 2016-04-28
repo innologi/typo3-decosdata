@@ -71,7 +71,7 @@ class FilterItems extends OptionAbstract {
 		if (!isset($filter['operator'][0])) {
 			throw new MissingArgument(1448897878, array(self::class, 'filters.operator'));
 		}
-		if (!isset($filter['value'][0])) {
+		if (!isset($filter['value'])) {
 			if (!isset($filter['parameter'][0])) {
 				throw new MissingArgument(1448897891, array(self::class, 'filters.value/parameter'));
 			}

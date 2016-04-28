@@ -99,8 +99,7 @@ class ItemController extends ActionController {
 							),
 							'order' => array(
 								'sort' => 'ASC',
-								'priori/opt/lampp/bin/php ./typo3/cli_dispatch.phpsh decosdata:migrate
-								ty' => 10
+								'priority' => 10
 							)
 						),
 						2 => array(
@@ -123,6 +122,10 @@ class ItemController extends ActionController {
 													array(
 														'value' => 'NULL',
 														'operator' => 'IS NOT',
+													),
+													array(
+														'value' => '',
+														'operator' => '!=',
 													),
 													array(
 														'value' => 'NOW()',
@@ -160,6 +163,10 @@ class ItemController extends ActionController {
 													array(
 														'value' => 'NULL',
 														'operator' => 'IS',
+													),
+													array(
+														'value' => '',
+														'operator' => '=',
 													),
 													array(
 														'value' => 'NOW()',
