@@ -657,6 +657,8 @@ class ext_update extends ExtUpdateAbstract {
 					'foreignTable' => 'tx_' . $this->extensionKey . '_domain_model_field',
 					'foreignField' => 'uid',
 					'valueField' => 'field_name',
+					// @TODO ___test this
+					'uniqueBy' => array('pid')
 				)
 			),
 			'fieldvalue' => 'field_value',
