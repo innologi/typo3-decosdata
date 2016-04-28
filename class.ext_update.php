@@ -671,7 +671,10 @@ class ext_update extends ExtUpdateAbstract {
 			'hidden' => 'hidden'
 		);
 		$evaluation = array(
-			'no_migrate = 0'
+			'no_migrate = 0',
+			// exclude empty values, since we no longer import those in decosdata
+			// @TODO ___test this!
+			'fieldvalue != \'\''
 		);
 
 		// attempt migration
