@@ -355,7 +355,7 @@ class ItemController extends ActionController {
 					),
 					'itemType' => array(
 						// DOCUMENT
-						2
+						1
 					),
 					'contentField' => array(
 						1 => array(
@@ -375,7 +375,7 @@ class ItemController extends ActionController {
 								),*/
 								array(
 									// TEXT8
-									'field' => 10,
+									'field' => 11,
 								)
 							),
 							'order' => array(
