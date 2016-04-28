@@ -76,7 +76,7 @@ class ItemController extends ActionController {
 		if ($pid === 11) {
 		$this->pluginConfiguration = array(
 			'import' => array(
-				2
+				4
 			),
 			'level' => array(
 				1 => array(
@@ -86,7 +86,7 @@ class ItemController extends ActionController {
 					),
 					'itemType' => array(
 						// DOCUMENT
-						2
+						1
 					),
 					'contentField' => array(
 						1 => array(
@@ -94,12 +94,13 @@ class ItemController extends ActionController {
 							'content' => array(
 								array(
 									// TEXT9
-									'field' => 16,
+									'field' => 6,
 								)
 							),
 							'order' => array(
 								'sort' => 'ASC',
-								'priority' => 10
+								'priori/opt/lampp/bin/php ./typo3/cli_dispatch.phpsh decosdata:migrate
+								ty' => 10
 							)
 						),
 						2 => array(
@@ -107,7 +108,7 @@ class ItemController extends ActionController {
 							'content' => array(
 								array(
 									// DATE5
-									'field' => 23,
+									'field' => 34,
 									'queryOptions' => array(
 										array(
 											'option' => 'DateConversion',
@@ -144,7 +145,7 @@ class ItemController extends ActionController {
 							'content' => array(
 								array(
 									// DATE6
-									'field' => 19,
+									'field' => 31,
 									'queryOptions' => array(
 										array(
 											'option' => 'DateConversion',
@@ -201,7 +202,7 @@ class ItemController extends ActionController {
 		// extdev: BIS
 		$this->pluginConfiguration = array(
 			'import' => array(
-				3
+				5,1
 			),
 			'level' => array(
 				1 => array(
@@ -211,7 +212,7 @@ class ItemController extends ActionController {
 					),
 					'itemType' => array(
 						// FOLDER
-						1
+						2
 					),
 					// @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
 					'noItemId' => TRUE,
@@ -221,7 +222,7 @@ class ItemController extends ActionController {
 							'content' => array(
 								array(
 									// SUBJECT1
-									'field' => 5,
+									'field' => 23,
 								)
 							),
 							'renderOptions' => array(
@@ -246,14 +247,14 @@ class ItemController extends ActionController {
 									array(
 										'value' => 'vergaderdossiers',
 										'operator' => '=',
-										// BOOKMARK
+										// BOOKNAME
 										'field' => 2
 									),
 									array(
 										'value' => '1',
 										'operator' => '=',
 										// BOL3
-										'field' => 27
+										'field' => 16
 									)
 								),
 								'matchAll' => TRUE
@@ -266,11 +267,11 @@ class ItemController extends ActionController {
 						'type' => 'yearly',
 						'pageLimit' => 20,
 						// DATE1
-						'field' => 20
+						'field' => 24
 					),
 					'itemType' => array(
 						// FOLDER
-						1
+						2
 					),
 					'contentField' => array(
 						1 => array(
@@ -278,7 +279,7 @@ class ItemController extends ActionController {
 							'content' => array(
 								array(
 									// DATE1
-									'field' => 20,
+									'field' => 24,
 									'order' => array(
 										'sort' => 'DESC',
 										'priority' => 10
@@ -314,19 +315,19 @@ class ItemController extends ActionController {
 										'parameter' => '_2',
 										'operator' => '=',
 										// SUBJECT1
-										'field' => 5
+										'field' => 23
 									),
 									array(
 										'value' => 'vergaderdossiers',
 										'operator' => '=',
-										// BOOKMARK
+										// BOOKNAME
 										'field' => 2
 									),
 									array(
 										'value' => '1',
 										'operator' => '=',
 										// BOL3
-										'field' => 27
+										'field' => 16
 									)
 								),
 								'matchAll' => TRUE
@@ -355,15 +356,15 @@ class ItemController extends ActionController {
 							'content' => array(
 								/*array(
 									// DATE2 (NUM2)
-									'field' => 21,
+									'field' => 32,
 								),
 								array(
 									// DATE3 (NUM3)
-									'field' => 24,
+									'field' => 35,
 								),
 								array(
 									// DATE4 (NUM4)
-									'field' => 28,
+									'field' => 17,
 								),*/
 								array(
 									// TEXT8
@@ -380,7 +381,7 @@ class ItemController extends ActionController {
 							'content' => array(
 								array(
 									// SUBJECT1
-									'field' => 5,
+									'field' => 23,
 								)
 							),
 							'order' => array(
@@ -393,7 +394,7 @@ class ItemController extends ActionController {
 							'content' => array(
 								array(
 									// TEXT9
-									'field' => 16,
+									'field' => 6,
 								)
 							),
 							'order' => array(
@@ -431,7 +432,7 @@ class ItemController extends ActionController {
 									'args' => array(
 										// FOLDER
 										'itemType' => array(
-											1
+											2
 										)
 									)
 								),
@@ -442,14 +443,14 @@ class ItemController extends ActionController {
 											array(
 												'value' => 'zake%',
 												'operator' => 'LIKE',
-												// BOOKMARK
+												// BOOKNAME
 												'field' => 2
 											),
 											array(
 												'value' => '1',
 												'operator' => '=',
 												// BOL3
-												'field' => 27
+												'field' => 16
 											)
 										),
 										'matchAll' => TRUE
@@ -477,7 +478,7 @@ class ItemController extends ActionController {
 							'content' => array(
 								array(
 									// DOCUMENT_DATE
-									'field' => 13,
+									'field' => 21,
 									'queryOptions' => array(
 										array(
 											'option' => 'DateConversion',
@@ -514,7 +515,7 @@ class ItemController extends ActionController {
 										'value' => '1',
 										'operator' => '=',
 										// BOL3
-										'field' => 27
+										'field' => 16
 									)
 								),
 							)
