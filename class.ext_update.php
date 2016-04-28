@@ -590,8 +590,7 @@ class ext_update extends ExtUpdateAbstract {
 			$i = $GLOBALS['TYPO3_DB']->sql_insert_id();
 			foreach ($toInsert as $uid => $row) {
 				// update migrated_uid for inserted records
-					// CURRENTLY UNUSED
-				//$this->databaseService->updateTableRecords($sourceTable, array('migrated_uid' => $i), array('uid' => $uid));
+				$this->databaseService->updateTableRecords($sourceTable, array('migrated_uid' => $i), array('uid' => $uid));
 				// create the file reference
 				$this->fileService->setFileReference($fileUid[$uid], $targetTable, $i++, 'file', (int) $row['pid']);
 				// for every $toInsert, there is a matching $fileUid, so no need for a condition
@@ -611,7 +610,7 @@ class ext_update extends ExtUpdateAbstract {
 			);
 		}
 
-		// set migrated_uid to -1 for all itemfields of these records
+		// set no_migrate to 1 for all itemfields of these records
 		$this->databaseService->updateTableRecords(
 			$sourceDataTable,
 			array('no_migrate' => 1),
