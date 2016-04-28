@@ -81,10 +81,6 @@ class ext_update extends ExtUpdateAbstract {
 		'nNothing' => 'No %1$s to %2$s.',
 		'pluginCreate' => 'It is recommended to create new plugins and delete the old ones once succesfully re-created. Only then will they disappear from the following list',
 		'profileImport' => 'You will need to re-import the profiles if you wish to use them. The following profiles were found to be not yet re-imported',
-		'updaterFinish' => 'The updater has finished all of its tasks, you don\'t need to run it again until the next extension-update.',
-		'updaterFinishTitle' => 'Update complete',
-		'updaterRepeat' => 'Please run the updater again to continue updating and/or follow any remaining instructions, until this message disappears.',
-		'updaterRepeatTitle' => 'Run updater again',
 	);
 
 	/**
@@ -106,11 +102,12 @@ class ext_update extends ExtUpdateAbstract {
 		'plugins' => FALSE,
 		'profiles' => FALSE,
 	);
-
+	// @LOW can we add x "of Y" migrated records to messages? Helps to show progress
+	// @LOW can we remove <code> in messages?
 	/**
 	 * Provides the methods to be executed during update.
 	 *
-	 * @return void
+	 * @return boolean TRUE on complete, FALSE on incomplete
 	 */
 	public function processUpdates() {
 		// the order is important for some of these!
@@ -131,13 +128,8 @@ class ext_update extends ExtUpdateAbstract {
 		$this->checkProfiles();
 		$this->checkPlugins();
 
-		// if even one finishState is FALSE, we'll add the instruction to run the updater again
-		if (in_array(FALSE, $this->finishState, TRUE)) {
-			$this->addFlashMessage($this->lang['updaterRepeat'], $this->lang['updaterRepeatTitle'], FlashMessage::WARNING);
-		} else {
-			$this->addFlashMessage($this->lang['updaterFinish'], $this->lang['updaterFinishTitle'], FlashMessage::OK);
-		}
-
+		// if even one finishState is FALSE, we're not finished
+		return !in_array(FALSE, $this->finishState, TRUE);
 		// @TODO ___Task Migration ('auto' property)
 	}
 
@@ -380,7 +372,7 @@ class ext_update extends ExtUpdateAbstract {
 				ON (itf.item_id=itxr.uid_local
 					AND itxr.uid_foreign=itx.uid AND itxr.current=1)';
 		$where = 'it.no_migrate = 0 AND it.migrated_uid = 0 AND it.migrated_file = 0 AND itf.fieldname = \'FILEPATH\'';
-
+		# @TODO ___might be too steep a number, dev was busy for almost 5 minutes
 		$toMigrate = $this->databaseService->selectTableRecords($from, $where, $select, 10000);
 		// no results means we're done migrating
 		if (empty($toMigrate)) {

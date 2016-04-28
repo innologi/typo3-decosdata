@@ -89,6 +89,8 @@ class FileReferenceRepository implements SingletonInterface {
 		$this->beUser = isset($GLOBALS['BE_USER'])
 			? $GLOBALS['BE_USER']
 			: GeneralUtility::makeInstance(\TYPO3\CMS\Core\Authentication\BackendUserAuthentication::class);
+		// @TODO ___temp, remove once instructions are made?
+		$this->beUser->user['admin'] = 1;
 	}
 
 	/**

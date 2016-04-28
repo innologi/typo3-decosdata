@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\Library\ExtUpdate;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Controller\CommandLineController;
 /**
  * Ext Update Abstract
  *
@@ -33,12 +34,40 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-abstract class ExtUpdateAbstract implements ExtUpdateInterface{
+abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 	// @LOW ___what about a reload button?
+	// @TODO ___give ext_update a namespace, seems we can get rid of typo3temp version that way!
 	/**
 	 * @var \TYPO3\CMS\Core\Messaging\FlashMessageQueue
 	 */
 	protected $flashMessageQueue;
+
+	/**
+	 * @var \TYPO3\CMS\Core\Controller\CommandLineController
+	 */
+	protected $cli;
+
+	/**
+	 * @var array
+	 */
+	protected $cliAllowedSeverities = array(
+		FlashMessage::OK => TRUE,
+		FlashMessage::WARNING => TRUE,
+		FlashMessage::ERROR => TRUE
+	);
+
+	/**
+	 * @var array
+	 */
+	protected $cliErrorSeverities = array(
+		FlashMessage::WARNING => TRUE,
+		FlashMessage::ERROR => TRUE
+	);
+
+	/**
+	 * @var integer
+	 */
+	protected $errorCount = 0;
 
 	/**
 	 * @var \Innologi\Decosdata\Library\ExtUpdate\Service\DatabaseService
@@ -76,10 +105,13 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	/**
 	 * Constructor
 	 *
+	 * If called from CLI, the parameter will be used to print messages.
+	 *
+	 * @param \TYPO3\CMS\Core\Controller\CommandLineController $cli
 	 * @return void
 	 * @throws Exception\NoExtkeySet
 	 */
-	public function __construct() {
+	public function __construct(CommandLineController $cli = NULL) {
 		if ( !isset($this->extensionKey[0]) ) {
 			throw new Exception\NoExtkeySet(1448616492);
 		}
@@ -101,6 +133,24 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 		$this->fileService = $objectManager->get(
 			__NAMESPACE__ . '\\Service\\FileService'
 		);
+
+		// determine mode
+		if (!defined('TYPO3_cliMode')) {
+			define('TYPO3_cliMode', FALSE, TRUE);
+		}
+		if (TYPO3_cliMode) {
+			// in CLI mode, messages are to be printed
+			if ($cli === NULL) {
+				throw new Exception\ImproperCliInit(1461682094);
+			}
+			$this->cli = $cli;
+		} else {
+			// in normal (non-CLI) mode, messages are queued
+			$this->flashMessageQueue = $objectManager->get(
+				'TYPO3\\CMS\\Core\\Messaging\\FlashMessageQueue',
+				'extbase.flashmessages.tx_' . $this->extensionKey . '_extupdate'
+			);
+		}
 	}
 
 	/**
@@ -113,7 +163,25 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	public function main() {
 		try {
 			$this->checkPrerequisites();
-			$this->processUpdates();
+			// CLI mode will loop until finished
+			do {
+				$finished = $this->processUpdates();
+			} while (TYPO3_cliMode && $this->errorCount < 1 && !$finished);
+
+			// if not finished, we'll add the instruction to run the updater again
+			if ($finished) {
+				$this->addFlashMessage(
+					'The updater has finished all of its tasks, you don\'t need to run it again until the next extension-update.',
+					'Update complete',
+					FlashMessage::OK
+				);
+			} else {
+				$this->addFlashMessage(
+					'Please run the updater again to continue updating and/or follow any remaining instructions, until this message disappears.',
+					'Run updater again',
+					FlashMessage::WARNING
+				);
+			}
 		} catch (Exception\Exception $e) {
 			$this->addFlashMessage(
 				$e->getFormattedErrorMessage(),
@@ -127,7 +195,7 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 				FlashMessage::ERROR
 			);
 		}
-		return $this->flashMessageQueue->renderFlashMessages();
+		return TYPO3_cliMode ? '' : $this->flashMessageQueue->renderFlashMessages();
 	}
 
 	/**
@@ -171,7 +239,7 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 			}
 		}
 	}
-
+	// @TODO ___better naming and description
 	/**
 	 * Creates a Message object and adds it to the FlashMessageQueue.
 	 *
@@ -181,11 +249,20 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	 * @return void
 	 */
 	protected function addFlashMessage($messageBody, $messageTitle = '', $severity = \TYPO3\CMS\Core\Messaging\FlashMessage::OK) {
-		/* @var $flashMessage \TYPO3\CMS\Core\Messaging\FlashMessage */
-		$flashMessage = GeneralUtility::makeInstance(
-			\TYPO3\CMS\Core\Messaging\FlashMessage::class, $messageBody, $messageTitle, $severity
-		);
-		$this->flashMessageQueue->enqueue($flashMessage);
+		if (TYPO3_cliMode) {
+			if (isset($this->cliAllowedSeverities[$severity])) {
+				$this->cli->cli_echo($messageBody . PHP_EOL . PHP_EOL);
+			}
+			if (isset($this->cliErrorSeverities[$severity])) {
+				$this->errorCount++;
+			}
+		} else {
+			/* @var $flashMessage \TYPO3\CMS\Core\Messaging\FlashMessage */
+			$flashMessage = GeneralUtility::makeInstance(
+				\TYPO3\CMS\Core\Messaging\FlashMessage::class, $messageBody, $messageTitle, $severity
+			);
+			$this->flashMessageQueue->enqueue($flashMessage);
+		}
 	}
 
 }
