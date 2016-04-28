@@ -531,6 +531,7 @@ class ext_update extends ExtUpdateAbstract {
 		$where = 'it.itemtype = \'BLOB\'
 			AND it.migrated_uid = 0 AND it.no_migrate = 0
 			AND it2.migrated_uid > 0';
+		// note that docdate is only used for extra sorting, if necessary
 		$orderBy = 'item ASC,sequence ASC,docdate DESC';
 		$toMigrate = $this->databaseService->selectTableRecords($from, $where, $select, 250, $orderBy);
 
@@ -587,6 +588,7 @@ class ext_update extends ExtUpdateAbstract {
 				$targetTable, $propertyMap, $toInsert
 			);
 			// not nice, but it's a very specific part of an update script, I really don't care
+			// get first insert ID
 			$i = $GLOBALS['TYPO3_DB']->sql_insert_id();
 			foreach ($toInsert as $uid => $row) {
 				// update migrated_uid for inserted records
@@ -702,7 +704,8 @@ class ext_update extends ExtUpdateAbstract {
 		$targetTable = 'tx_' . $this->extensionKey . '_item_item_mm';
 		$localConfig = array(
 			'table' => 'tx_' . $this->sourceExtensionKey . '_item',
-			'uid' => 'migrated_uid'
+			'uid' => 'migrated_uid',
+			'evaluation' => array('itemtype != \'BLOB\'')
 		);
 		$foreignConfig = $localConfig;
 		$propertyMap = array(
@@ -740,7 +743,8 @@ class ext_update extends ExtUpdateAbstract {
 		$targetTable = 'tx_' . $this->extensionKey . '_item_import_mm';
 		$localConfig = array(
 			'table' => 'tx_' . $this->sourceExtensionKey . '_item',
-			'uid' => 'migrated_uid'
+			'uid' => 'migrated_uid',
+			'evaluation' => array('itemtype != \'BLOB\'')
 		);
 		$foreignConfig = array(
 			'table' => 'tx_' . $this->sourceExtensionKey . '_itemxml',
