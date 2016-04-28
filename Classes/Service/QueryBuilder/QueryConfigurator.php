@@ -222,9 +222,8 @@ class QueryConfigurator implements SingletonInterface {
 	 * to reduce configuration complexity. Just provide multiple FROM
 	 * configurations if there are multiple tables to be joined.
 	 *
-	 * - Requires 'table' element
+	 * - Requires 'tables' element
 	 * - Supports 'joinType' element
-	 * - Supports 'alias' element
 	 * - Supports a 'constraint'
 	 *
 	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Part\From $from
@@ -233,17 +232,18 @@ class QueryConfigurator implements SingletonInterface {
 	 * @throws Exception\UnsupportedFeatureType
 	 */
 	protected function transformFrom(From $from) {
-		$string = $from->getTable();
-		if (!isset($string[0])) {
+		$tables = $from->getTables();
+		if (!isset($tables) || empty($tables)) {
 			throw new Exception\MissingConfigurationProperty(1448552598, array(
-				'FROM', 'table', json_encode($from)
+				'FROM', 'tables', json_encode($from)
 			));
 		}
 
-		$alias = $from->getAlias();
-		if (isset($alias[0])) {
-			$string .= ' ' . $alias;
+		$formatTables = array();
+		foreach ($tables as $alias => $table) {
+			$formatTables[] = $table . ' ' . $alias;
 		}
+		$string = '(' . join(',', $formatTables) . ')';
 
 		$joinType = $from->getJoinType();
 		// @LOW _if joinType is NULL, transformConfiguration will still join the table with "\n" and not with a comma..

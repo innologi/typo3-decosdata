@@ -158,7 +158,7 @@ class FilterItems extends OptionAbstract {
 			}
 			$alias = $id . $filter['field'];
 			// identify the join by the field, so we don't create redundant joins
-			$from = $queryField->getFrom($filter['field'], $table, $alias);
+			$from = $queryField->getFrom($filter['field'], array($alias => $table));
 			if ($from->getJoinType() === NULL) {
 				// initialize join if it did not exist yet
 				$parameterKey = ':' . $alias;

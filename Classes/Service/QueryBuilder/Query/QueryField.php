@@ -106,14 +106,15 @@ class QueryField implements QueryInterface {
 	/**
 	 * Returns From object. If it does not exist yet, it is created.
 	 *
+	 * Optional property $tables needs to consist of $alias => $table pairs.
+	 *
 	 * @param string $id
-	 * @param string $table
-	 * @param string $alias
+	 * @param array $tables
 	 * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Part\From
 	 */
-	public function getFrom($id, $table, $alias) {
+	public function getFrom($id, array $tables = array()) {
 		if (!isset($this->from[$id])) {
-			$this->from[$id] = GeneralUtility::makeInstance(From::class, $table, $alias);
+			$this->from[$id] = GeneralUtility::makeInstance(From::class, $tables);
 		}
 		return $this->from[$id];
 	}

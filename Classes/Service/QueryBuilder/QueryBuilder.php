@@ -90,7 +90,7 @@ class QueryBuilder {
 				->setField('uid')
 				->setTableAlias('it');
 		}
-		$queryField->getFrom('item', 'tx_decosdata_domain_model_item', 'it');
+		$queryField->getFrom('item', array('it' => 'tx_decosdata_domain_model_item'));
 
 		// add xml_id-condition if configured
 		if (!empty($import)) {
@@ -98,7 +98,7 @@ class QueryBuilder {
 			 * making this an INNER rather than LEFT JOIN with WHERE, will allow the eq_ref
 			 * join-type to use only index (also uses where if NULL-values are possible)
 			 */
-			$queryField->getFrom('import', 'tx_decosdata_item_import_mm', 'xmm')
+			$queryField->getFrom('import', array('xmm' => 'tx_decosdata_item_import_mm'))
 				->setJoinType('INNER')
 				->setConstraint(
 					$this->constraintFactory->createConstraintAnd(array(
@@ -183,7 +183,7 @@ class QueryBuilder {
 					$queryField->getSelect()
 						->setField('field_value')
 						->setTableAlias($tableAlias);
-					$queryField->getFrom(0, 'tx_decosdata_domain_model_itemfield', $tableAlias)
+					$queryField->getFrom(0, array($tableAlias => 'tx_decosdata_domain_model_itemfield'))
 						->setJoinType('LEFT')
 						->setConstraint(
 							$this->constraintFactory->createConstraintAnd(array(
@@ -205,15 +205,16 @@ class QueryBuilder {
 					$blobTable = 'tx_decosdata_domain_model_itemblob';
 
 					$queryField = $queryContent->getField('blob' . $subIndex);
+					// @TODO ___can these be joined?
 					// the main join to the blob table
-					$queryField->getFrom('blob1', $blobTable, $blobAlias1)
+					$queryField->getFrom('blob1', array($blobAlias1 => $blobTable))
 						->setJoinType('LEFT')
 						->setConstraint(
 							$this->constraintFactory->createConstraintByField('item', $blobAlias1, '=', 'uid', 'it')
 						);
 					// a second join is necessary for a maximum-groupwise comparison to always retrieve the latest file
 						// maximum-groupwise is performance-wise much preferred over subqueries
-					$queryField->getFrom('blob2', $blobTable, $blobAlias2)
+					$queryField->getFrom('blob2', array($blobAlias2 => $blobTable))
 						->setJoinType('LEFT')
 						->setConstraint(
 							$this->constraintFactory->createConstraintAnd(array(
@@ -233,7 +234,7 @@ class QueryBuilder {
 						->setTableAlias($fileAlias)
 							// @TODO ___what happens here if we don't have a file uid? do we get a 'file:' ?
 						->addWrap('file', 'CONCAT(\'file:\',|)');
-					$queryField->getFrom('fileref', 'sys_file_reference', $fileAlias)
+					$queryField->getFrom('fileref', array($fileAlias => 'sys_file_reference'))
 						->setJoinType('LEFT')
 						->setConstraint(
 							$this->constraintFactory->createConstraintAnd(array(

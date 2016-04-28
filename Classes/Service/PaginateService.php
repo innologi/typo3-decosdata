@@ -237,7 +237,7 @@ class PaginateService implements SingletonInterface {
 		// add from and keep it in a variable for later use
 		$parameterKey = ':pagebrowserfield';
 		$from = $queryField->getFrom(
-			'pagebrowser-year', 'tx_decosdata_domain_model_itemfield', $tableAlias
+			'pagebrowser-year', array($tableAlias => 'tx_decosdata_domain_model_itemfield')
 		)->setJoinType(
 			'LEFT'
 		)->setConstraint(
