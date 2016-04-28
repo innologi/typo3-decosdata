@@ -224,7 +224,7 @@ class DatabaseService implements SingletonInterface {
 			$foreignConfig['table']
 		);
 		$where = sprintf(
-			'mm.%3$s=0 AND f.uid=mm.uid_foreign AND l.uid=mm.uid_local AND f.%1$s > 0 AND l.%2$s > 0',
+			'mm.%3$s=0 AND f.uid=mm.uid_foreign AND l.uid=mm.uid_local AND f.%2$s > 0 AND l.%1$s > 0',
 			$localConfig['uid'],
 			$foreignConfig['uid'],
 			$sourceFlagProperty
