@@ -345,7 +345,7 @@ class ext_update extends ExtUpdateAbstract {
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getFormattedErrorMessage(), '', FlashMessage::INFO);
+			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['itemxml'] = TRUE;
 		}
 	}
@@ -477,7 +477,7 @@ class ext_update extends ExtUpdateAbstract {
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getFormattedErrorMessage(), '', FlashMessage::INFO);
+			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['item'] = TRUE;
 		}
 	}
@@ -680,7 +680,7 @@ class ext_update extends ExtUpdateAbstract {
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getFormattedErrorMessage(), '', FlashMessage::INFO);
+			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['itemfield'] = TRUE;
 		}
 	}
@@ -718,7 +718,7 @@ class ext_update extends ExtUpdateAbstract {
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getFormattedErrorMessage(), '', FlashMessage::INFO);
+			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['item_item_mm'] = TRUE;
 		}
 	}
@@ -758,7 +758,7 @@ class ext_update extends ExtUpdateAbstract {
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getFormattedErrorMessage(), '', FlashMessage::INFO);
+			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['item_xml_mm'] = TRUE;
 		}
 	}
