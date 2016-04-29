@@ -205,7 +205,9 @@ class QueryBuilder {
 					$blobTable = 'tx_decosdata_domain_model_itemblob';
 
 					$queryField = $queryContent->getField('blob' . $subIndex);
-					// @TODO ___can these be joined?
+
+					// note that these joins should not be combined into a single JOIN
+
 					// the main join to the blob table
 					$queryField->getFrom('blob1', array($blobAlias1 => $blobTable))
 						->setJoinType('LEFT')
@@ -227,7 +229,7 @@ class QueryBuilder {
 						$this->constraintFactory->createConstraintByValue('uid', $blobAlias2, 'IS', 'NULL')
 					);
 
-					// retrieve associated file uid from file reference table
+					// after maximum-groupwise: retrieve associated file uid from file reference table
 					$parameterKey = ':' . $fileAlias . 'table';
 					$queryField->getSelect()
 						->setField('uid_local')
