@@ -56,6 +56,7 @@ class RenderViewHelper extends AbstractViewHelper {
 	public function __construct() {
 		$this->registerArgument('configuration', 'array', 'Configuration directives for rendering content.', TRUE);
 		$this->registerArgument('item', 'array', 'Complete item.', TRUE);
+		$this->registerArgument('index', 'integer', 'Current content index.', TRUE);
 	}
 
 	/**
@@ -95,7 +96,12 @@ class RenderViewHelper extends AbstractViewHelper {
 		$configuration = $this->arguments['configuration'];
 		if (isset($configuration['renderOptions'])) {
 			// @TODO ___if we want to support field- en blob-less content, consider a render->content element referring to a content-# or a default 'current'. We would also have to have access to other content fields.
-			$this->optionService->processOptions($configuration['renderOptions'], $content, $this->arguments['item']);
+			$this->optionService->processOptions(
+				$configuration['renderOptions'],
+				$content,
+				$this->arguments['index'],
+				$this->arguments['item']
+			);
 		}
 		return $content;
 	}

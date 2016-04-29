@@ -51,6 +51,11 @@ class RenderOptionService extends OptionServiceAbstract {
 	protected $item;
 
 	/**
+	 * @var integer
+	 */
+	protected $index;
+
+	/**
 	 * Matches argument:"value"[,]
 	 * @var string
 	 */
@@ -113,6 +118,15 @@ class RenderOptionService extends OptionServiceAbstract {
 	}
 
 	/**
+	 * Returns current content index
+	 *
+	 * @return integer
+	 */
+	public function getIndex() {
+		return $this->index;
+	}
+
+	/**
 	 * Checks for, and then processes inline RenderOptions in $string.
 	 * Returns the $string with all those inline RenderOptions replaced
 	 * by their resulting values.
@@ -154,7 +168,7 @@ class RenderOptionService extends OptionServiceAbstract {
 				$content = $this->originalContent;
 				// note that it will reset original content to the same value,
 				// so until we support utilizing a different content value, no harm is done
-				$this->processOptions(array($option), $content, $this->item);
+				$this->processOptions(array($option), $content, $this->index, $this->item);
 				return $content;
 			},
 			$string
@@ -167,10 +181,13 @@ class RenderOptionService extends OptionServiceAbstract {
 	 *
 	 * @param array $options
 	 * @param string &$content
+	 * $param integer $index
+	 * @param array $item
 	 * @return void
 	 */
-	public function processOptions(array $options, &$content, array $item) {
+	public function processOptions(array $options, &$content, $index, array $item) {
 		$this->item = $item;
+		$this->index = $index;
 		$this->originalContent = $content;
 		foreach ($options as $option) {
 			$this->executeOption('alterContentValue', $option, $content, $this);

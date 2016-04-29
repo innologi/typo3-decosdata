@@ -23,8 +23,8 @@
 	<tbody>
 		<f:for each="{items}" as="item">
 			<tr class="item-{item.itemID}">
-				<d:item.for configuration="{configuration.contentField}" item="{item}" contentAs="content" configAs="contentConfig">
-					<td>{content -> d:content.render(configuration: contentConfig, item: item)}</td>
+				<d:item.for configuration="{configuration.contentField}" item="{item}">
+					<td>{content -> d:content.render(configuration: contentConfiguration, item: item, index: index)}</td>
 				</d:item.for>
 			</tr>
 		</f:for>
