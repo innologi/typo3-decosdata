@@ -51,11 +51,6 @@ class RenderOptionService extends OptionServiceAbstract {
 	protected $item;
 
 	/**
-	 * @var integer
-	 */
-	protected $index;
-
-	/**
 	 * Matches argument:"value"[,]
 	 * @var string
 	 */
@@ -118,15 +113,6 @@ class RenderOptionService extends OptionServiceAbstract {
 	}
 
 	/**
-	 * Returns current content index
-	 *
-	 * @return integer
-	 */
-	public function getIndex() {
-		return $this->index;
-	}
-
-	/**
 	 * Checks for, and then processes inline RenderOptions in $string.
 	 * Returns the $string with all those inline RenderOptions replaced
 	 * by their resulting values.
@@ -174,7 +160,7 @@ class RenderOptionService extends OptionServiceAbstract {
 			$string
 		);
 	}
-	// @LOW ___if the service becomes a singleton, we could do away with the need to pass $this
+
 	/**
 	 * Processes an array of render-options by calling the contained alterValue()
 	 * methods and passing the content reference and renderer object to it.
@@ -190,7 +176,7 @@ class RenderOptionService extends OptionServiceAbstract {
 		$this->index = $index;
 		$this->originalContent = $content;
 		foreach ($options as $option) {
-			$this->executeOption('alterContentValue', $option, $content, $this);
+			$this->executeOption('alterContentValue', $option, $content);
 		}
 	}
 

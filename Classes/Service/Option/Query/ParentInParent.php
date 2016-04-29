@@ -24,6 +24,7 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
+use Innologi\Decosdata\Service\Option\QueryOptionService;
 /**
  * ParentInParent option
  *
@@ -48,9 +49,8 @@ class ParentInParent extends OptionAbstract {
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
 	 */
-	public function alterQueryColumn(array $args, QueryContent $queryContent, $optionIndex) {
-		$index = str_replace('content', '', $queryContent->getId());
-		$alias = 'relation' . $index;
+	public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service) {
+		$alias = 'relation' . $service->getIndex();
 		$queryField = $queryContent->getParent()->getContent($alias)->getField('itemRelation');
 
 		// relation to original item
@@ -112,8 +112,6 @@ class ParentInParent extends OptionAbstract {
 					AND it5.uid=itxr5s1.uid_local
 					AND itxr5s1.uid_foreign IN(\'' . implode('\',\'', $xmlIdArray) . '\')';
 			}*/
-
-
 
 	}
 

@@ -260,7 +260,7 @@ class QueryBuilder {
 				// apply field-wide query options
 				if (isset($contentConfiguration['queryOptions'])) {
 					// @TODO ___throw catchable exception if $queryField is NULL? (which is the case if no field/blob configuration is present)
-					$this->optionService->processFieldOptions($contentConfiguration['queryOptions'], $queryField);
+					$this->optionService->processFieldOptions($contentConfiguration['queryOptions'], $queryField, $subIndex);
 				}
 			}
 
@@ -279,7 +279,7 @@ class QueryBuilder {
 
 		// apply content-wide query options
 		if (isset($configuration['queryOptions'])) {
-			$this->optionService->processColumnOptions($configuration['queryOptions'], $queryContent);
+			$this->optionService->processColumnOptions($configuration['queryOptions'], $queryContent, $index);
 		}
 	}
 

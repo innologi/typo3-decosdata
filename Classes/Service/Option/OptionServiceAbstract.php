@@ -54,6 +54,11 @@ abstract class OptionServiceAbstract {
 	protected $optionNamespace;
 
 	/**
+	 * @var integer
+	 */
+	protected $index;
+
+	/**
 	 * Class constructor
 	 *
 	 * @return void
@@ -61,6 +66,16 @@ abstract class OptionServiceAbstract {
 	public function __construct() {
 		$this->optionNamespace = str_replace('OptionService', '', get_class($this));
 	}
+
+	/**
+	 * Returns current index
+	 *
+	 * @return integer
+	 */
+	public function getIndex() {
+		return $this->index;
+	}
+
 	// @TODO ___debug to see if this is still a valid construction now that Query uses objects as $value
 	/**
 	 * Executes the given optionMethod on the requested option.
@@ -68,11 +83,10 @@ abstract class OptionServiceAbstract {
 	 * @param string $optionMethod
 	 * @param array $option
 	 * @param mixed &$value
-	 * @param mixed $helperVar
 	 * @return void
 	 * @throws Exception\MissingOption
 	 */
-	protected function executeOption($optionMethod, array $option, &$value, $helperVar) {
+	protected function executeOption($optionMethod, array $option, &$value) {
 		if ( !isset($option['option']) ) {
 			throw new Exception\MissingOption(1448552481);
 		}
@@ -85,7 +99,8 @@ abstract class OptionServiceAbstract {
 		}
 		call_user_func_array(
 			array($this->objectCache[$className], $optionMethod),
-			array($option['args'], &$value, $helperVar)
+			// @LOW ___if the service becomes a singleton, we could do away with the need to pass $this
+			array($option['args'], &$value, $this)
 		);
 	}
 

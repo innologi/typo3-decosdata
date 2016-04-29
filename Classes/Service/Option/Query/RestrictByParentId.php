@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\Service\Option\Query;
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
+use Innologi\Decosdata\Service\Option\QueryOptionService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * RestrictByParentId option
@@ -49,7 +50,7 @@ class RestrictByParentId extends OptionAbstract {
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
 	 */
-	public function alterQueryRow(array $args, Query $query, $optionIndex) {
+	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
 		if (!isset($args['parameter'][0])) {
 			throw new MissingArgument(1450794744, array(self::class, 'parameter'));
 		}

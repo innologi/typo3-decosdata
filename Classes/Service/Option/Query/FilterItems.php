@@ -26,6 +26,7 @@ namespace Innologi\Decosdata\Service\Option\Query;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
+use Innologi\Decosdata\Service\Option\QueryOptionService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * FilterItems option
@@ -89,9 +90,9 @@ class FilterItems extends OptionAbstract {
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
 	 */
-	public function alterQueryField(array $args, QueryField $queryField, $optionIndex) {
+	public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service) {
 		$this->initialize($args);
-		$id = $queryField->getId() . 'filteritems' . $optionIndex;
+		$id = $queryField->getId() . 'filteritems' . $service->getOptionIndex();
 
 		$select = $queryField->getSelect();
 		$conditions = array();
@@ -141,7 +142,7 @@ class FilterItems extends OptionAbstract {
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
 	 */
-	public function alterQueryRow(array $args, Query $query, $optionIndex) {
+	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
 		$this->initialize($args);
 		$id = 'filteritems';
 		$table = 'tx_decosdata_domain_model_itemfield';
@@ -187,7 +188,7 @@ class FilterItems extends OptionAbstract {
 			$constraint = $conditions[0];
 		}
 
-		$queryField->getWhere()->addConstraint($optionIndex, $constraint);
+		$queryField->getWhere()->addConstraint($service->getOptionIndex(), $constraint);
 	}
 
 }
