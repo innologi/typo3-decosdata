@@ -254,7 +254,8 @@ class QueryBuilder {
 						->setTableAlias($select->getTableAlias())
 						->setField($select->getField())
 						->setPriority($contentConfiguration['order']['priority'])
-						->setSortOrder($contentConfiguration['order']['sort']);
+						->setSortOrder($contentConfiguration['order']['sort'])
+						->setForceNumeric(isset($contentConfiguration['order']['forceNumeric']) && (bool)$contentConfiguration['order']['forceNumeric']);
 				}
 
 				// apply field-wide query options
@@ -274,7 +275,8 @@ class QueryBuilder {
 		if (isset($configuration['order'])) {
 			$queryContent->getOrderBy()
 				->setPriority($configuration['order']['priority'])
-				->setSortOrder($configuration['order']['sort']);
+				->setSortOrder($configuration['order']['sort'])
+				->setForceNumeric(isset($configuration['order']['forceNumeric']) && (bool)$configuration['order']['forceNumeric']);
 		}
 
 		// apply content-wide query options

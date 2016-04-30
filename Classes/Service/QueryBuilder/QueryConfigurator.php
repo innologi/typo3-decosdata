@@ -360,6 +360,12 @@ class QueryConfigurator implements SingletonInterface {
 			$string = $tableAlias . '.' . $field;
 		}
 
+		if ($orderBy->getForceNumeric()) {
+			// @LOW _consider supporting a wrap instead, if we're going to have more types of sorting adjustments
+				// cause otherwise this feels like doing DATE_FORMAT with a boolean "isDate" :/
+			$string = 'CAST(' . $string . ' AS SIGNED)';
+		}
+
 		$sortOrder = $orderBy->getSortOrder();
 		if ($sortOrder !== NULL) {
 			if (!in_array($sortOrder, $this->supportedSorting, TRUE)) {
