@@ -51,7 +51,7 @@ class ParentInParent extends OptionAbstract {
 	 */
 	public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service) {
 		$alias = 'relation' . $service->getIndex();
-		$queryField = $queryContent->getParent()->getContent($alias)->getField('itemRelation');
+		$queryField = $queryContent->getParent()->getContent($alias)->getField('');
 
 		// relation to original item
 		$alias1 = $alias . 'mm1';
@@ -61,7 +61,7 @@ class ParentInParent extends OptionAbstract {
 		// if we don't pair these up in a single join, the first table will identify
 		// with it.uid and therefore with restrictBy.uid_local, which shuts out our
 		// ability to get the desired relation with the second table
-		$from = $queryField->getFrom('ParentInParent', array(
+		$from = $queryField->getFrom('', array(
 			$alias1 => 'tx_decosdata_item_item_mm',
 			$alias2 => 'tx_decosdata_item_item_mm'
 		))->setJoinType('LEFT')->setConstraint(
