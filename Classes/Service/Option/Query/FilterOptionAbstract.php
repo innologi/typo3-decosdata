@@ -33,7 +33,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 abstract class FilterOptionAbstract extends OptionAbstract {
-
+	// @TODO ___base FilterItemContent (items outer join), FilterItemsByRelations (relations inner join) on these
 	/**
 	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
 	 * @inject
