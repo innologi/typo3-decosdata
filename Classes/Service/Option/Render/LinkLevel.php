@@ -47,9 +47,23 @@ class LinkLevel implements OptionInterface {
 		$linkValue = NULL;
 		if (isset($args['linkItem']) && $args['linkItem']) {
 			$item = $service->getItem();
-			$linkValue = $item['itemID'];
+			$linkValue = (string) $item['itemID'];
+		} elseif (isset($args['linkRelation']) && $args['linkRelation']) {
+			$item = $service->getItem();
+			$linkValue = (string) $item['relation' . $service->getIndex()];
 		} else {
 			$linkValue = $service->getOriginalContent();
+		}
+
+		// no linkValue means no uri building, this is not an error
+		if (!isset($linkValue[0])) {
+			return;
+		}
+
+		// no content means we need a default substitute
+		if (!isset($content[0])) {
+			// @LOW ___allow this to be set via configuration? TS? or maybe even args?
+			$content = 'link';
 		}
 
 		$uriBuilder = $service->getControllerContext()->getUriBuilder();
@@ -64,6 +78,5 @@ class LinkLevel implements OptionInterface {
 		// @TODO ___title and or other attributes? in tx_decospublisher, a title could be set through an argument, which would expand the query to include the field containing the title
 		$content = '<a href="' . $uri . '">' . $content . '</a>';
 	}
-
 
 }
