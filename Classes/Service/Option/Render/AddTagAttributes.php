@@ -24,50 +24,54 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Service\TagBuilder\TagInterface;
+use Innologi\Decosdata\Service\TagBuilder\Tag;
+use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
+
 /**
- * Custom Image option
+ * Adds Tag Attributes
  *
- * Renders a custom image as the content.
+ * Adds tag attributes to the current Tag, or if TagContent, encloses it with
+ * a new Tag with said attributes.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class CustomImage implements OptionInterface {
-	// @TODO ___Absolute URIs for other contexts than normal HTML?
+class AddTagAttributes implements OptionInterface {
+	// @LOW ___allow this to be set via configuration? TS? or maybe even args?
+	/**
+	 * @var string
+	 */
+	protected $defaultTag = 'span';
 
 	/**
 	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
+	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterTag()
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( !isset($args['path'][0]) ) {
-			throw new MissingArgument(1462019242, array(self::class, 'path'));
+		if ( !(isset($args['attributes']) && is_array($args['attributes'])) ) {
+			throw new MissingArgument(1466180012, array(self::class, 'attributes'));
 		}
 
-		// check requirements
-		$ifContent = isset($args['requireContent']) && (bool)$args['requireContent'];
-		$ifRelation = isset($args['requireRelation']) && (bool)$args['requireRelation'];
-		$originalContent = $service->getOriginalContent();
-		$item = $service->getItem();
-		$index = $service->getIndex();
-		if (
-			($ifContent && !isset($originalContent[0]))
-			|| ($ifRelation && !isset($item['relation' . $index]))
+		// if not an actual Tag, enclose it with one with all the attributes and return it
+		if (!($tag instanceof Tag)) {
+			return $service->getTagBuilder()->generateTag(
+				$this->defaultTag, $args['attributes'], $tag
+			);
+		}
+
+		// if $tag has class and $args has class and appendClass is set ..
+		if (isset($args['appendClass']) && (bool) $args['appendClass']
+			&& isset($args['attributes']['class'][0]) && $tag->hasAttribute('class')
 		) {
-			// if requirements are set but not met, stop
-			return $tag;
+			$tag->addAttribute('class', $tag->getAttribute('class') . ' ' . $args['attributes']['class']);
+			unset($args['attributes']['class']);
 		}
 
-		if (!is_file(PATH_site . $args['path'])) {
-			// @TODO ___throw exception instead?
-			// if image does not exist, stop
-			return $tag;
-		}
-
-		return $service->getTagBuilder()->generateTag('img', ['src' => $args['path']]);
+		// otherwise, just add the remaining attributes
+		$tag->addAttributes($args['attributes']);
+		return $tag;
 	}
 
 }

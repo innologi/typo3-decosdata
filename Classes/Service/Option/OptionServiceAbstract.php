@@ -82,11 +82,11 @@ abstract class OptionServiceAbstract {
 	 *
 	 * @param string $optionMethod
 	 * @param array $option
-	 * @param mixed &$value
-	 * @return void
+	 * @param mixed $subject
+	 * @return mixed
 	 * @throws Exception\MissingOption
 	 */
-	protected function executeOption($optionMethod, array $option, &$value) {
+	protected function executeOption($optionMethod, array $option, $subject) {
 		if ( !isset($option['option']) ) {
 			throw new Exception\MissingOption(1448552481);
 		}
@@ -97,10 +97,11 @@ abstract class OptionServiceAbstract {
 		if (!isset($this->objectCache[$className])) {
 			$this->objectCache[$className] = $this->resolveOptionClass($className);
 		}
-		call_user_func_array(
+
+		return call_user_func_array(
 			array($this->objectCache[$className], $optionMethod),
 			// @LOW ___if the service becomes a singleton, we could do away with the need to pass $this
-			array($option['args'], &$value, $this)
+			array($option['args'], $subject, $this)
 		);
 	}
 

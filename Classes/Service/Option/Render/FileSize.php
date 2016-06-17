@@ -25,6 +25,8 @@ namespace Innologi\Decosdata\Service\Option\Render;
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Innologi\Decosdata\Service\TagBuilder\TagInterface;
+use Innologi\Decosdata\Service\TagBuilder\TagContent;
 /**
  * File Size option
  *
@@ -40,7 +42,7 @@ class FileSize extends FileOptionAbstract {
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
-	public function alterContentValue(array $args, &$content, RenderOptionService $service) {
+	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
 		if ( !$this->isFileHandle($service->getOriginalContent()) ) {
 			return;
 		}
@@ -51,6 +53,12 @@ class FileSize extends FileOptionAbstract {
 			// @LOW ___support formatting argument?
 			'b|kb|MB|GB|TB'
 		);
+
+		if ($tag instanceof TagContent) {
+			return $tag->reset()->setContent($content);
+		}
+
+		return $service->getTagBuilder()->generateTagContent($content);
 	}
 
 }

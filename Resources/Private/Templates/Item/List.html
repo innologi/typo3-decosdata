@@ -15,8 +15,11 @@
 <table>
 	<thead>
 		<tr>
-			<f:for each="{configuration.contentField}" as="column">
-				<th scope="col">{column.title}</th>
+			<!-- @TODO ______________replace "configuration" attr with "options" ? -->
+			<f:for each="{configuration.contentField}" as="column" key="index">
+				<d:content.render tag="th" tagAttributes="{scope: 'col'}" options="{column.title.renderOptions}" index="{index}">
+					{column.title.value}
+				</d:content.render>
 			</f:for>
 		</tr>
 	</thead>
@@ -24,7 +27,9 @@
 		<f:for each="{items}" as="item">
 			<tr class="item-{item.itemID}">
 				<d:item.for configuration="{configuration.contentField}" item="{item}">
-					<td>{content -> d:content.render(configuration: contentConfiguration, item: item, index: index)}</td>
+					<d:content.render tag="td" options="{contentConfiguration.renderOptions}" item="{item}" index="{index}">
+						{content}
+					</d:content.render>
 				</d:item.for>
 			</tr>
 		</f:for>

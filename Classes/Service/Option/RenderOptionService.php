@@ -23,7 +23,7 @@ namespace Innologi\Decosdata\Service\Option;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
+use Innologi\Decosdata\Service\TagBuilder\TagBuilder;
 /**
  * Render Option Service
  *
@@ -36,9 +36,9 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 class RenderOptionService extends OptionServiceAbstract {
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext
+	 * @var \Innologi\Decosdata\Service\TagBuilder\TagBuilder
 	 */
-	protected $controllerContext;
+	protected $tagBuilder;
 
 	/**
 	 * @var string
@@ -75,22 +75,22 @@ class RenderOptionService extends OptionServiceAbstract {
 	}
 
 	/**
-	 * Returns controller context
+	 * Returns tag builder
 	 *
-	 * @return \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext
+	 * @return \Innologi\Decosdata\Service\TagBuilder\TagBuilder
 	 */
-	public function getControllerContext() {
-		return $this->controllerContext;
+	public function getTagBuilder() {
+		return $this->tagBuilder;
 	}
 
 	/**
-	 * Sets controller context
+	 * Sets tag builder
 	 *
-	 * @param \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext $controllerContext
+	 * @param \Innologi\Decosdata\Service\TagBuilder\TagBuilder $tagBuilder
 	 * @return $this
 	 */
-	public function setControllerContext(ControllerContext $controllerContext) {
-		$this->controllerContext = $controllerContext;
+	public function setTagBuilder(TagBuilder $tagBuilder) {
+		$this->tagBuilder = $tagBuilder;
 		return $this;
 	}
 
@@ -115,25 +115,28 @@ class RenderOptionService extends OptionServiceAbstract {
 	/**
 	 * Checks for, and then processes inline RenderOptions in $string.
 	 * Returns the $string with all those inline RenderOptions replaced
-	 * by their resulting values.
+	 * by marks, and corresponding values in $return.
 	 *
 	 * If an inline RenderOption is formatted incorrectly, it will
 	 * not be replaced.
 	 *
 	 * @param string $string
+	 * @param array &$return
 	 * @return string
 	 */
-	public function processInlineOptions($string) {
+	public function processInlineOptions($string, array &$return) {
 		// quick check to prevent an unnecessary performance impact by RegExp
 		if (strpos($string, '{render:') === FALSE) {
 			return $string;
 		}
 
+		$originalTag = $this->tagBuilder->generateTagContent($this->originalContent);
+
 		// replaces inline RenderOptions by their resulting values
 		return preg_replace_callback(
 			'/' . $this->patternInline . '/',
 			// callback function that executes the options
-			function ($matches) {
+			function ($matches) use ($originalTag, &$return) {
 				$option = array(
 					'option' => $matches[1],
 					'args' => array()
@@ -150,12 +153,13 @@ class RenderOptionService extends OptionServiceAbstract {
 						}
 					}
 				}
-				// execute option with original content
-				$content = $this->originalContent;
 				// note that it will reset original content to the same value,
 				// so until we support utilizing a different content value, no harm is done
-				$this->processOptions(array($option), $content, $this->index, $this->item);
-				return $content;
+				// @LOW __note that this does not yet cache entries that are set multiple times
+				$mark = '###RENDER' . md5(json_encode($option)) . '###';
+				$return[$mark] = $this->processOptions(array($option), $originalTag, $this->index, $this->item);
+
+				return $mark;
 			},
 			$string
 		);

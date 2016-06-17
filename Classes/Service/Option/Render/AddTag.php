@@ -24,50 +24,32 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Service\TagBuilder\TagInterface;
+use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 /**
- * Custom Image option
+ * Add Tag
  *
- * Renders a custom image as the content.
+ * Simply adds a tag around $tag
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class CustomImage implements OptionInterface {
-	// @TODO ___Absolute URIs for other contexts than normal HTML?
+class AddTag implements OptionInterface {
 
 	/**
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( !isset($args['path'][0]) ) {
-			throw new MissingArgument(1462019242, array(self::class, 'path'));
+		if ( !isset($args['name'][0]) ) {
+			throw new MissingArgument(1466007305, array(self::class, 'name'));
 		}
-
-		// check requirements
-		$ifContent = isset($args['requireContent']) && (bool)$args['requireContent'];
-		$ifRelation = isset($args['requireRelation']) && (bool)$args['requireRelation'];
-		$originalContent = $service->getOriginalContent();
-		$item = $service->getItem();
-		$index = $service->getIndex();
-		if (
-			($ifContent && !isset($originalContent[0]))
-			|| ($ifRelation && !isset($item['relation' . $index]))
-		) {
-			// if requirements are set but not met, stop
-			return $tag;
-		}
-
-		if (!is_file(PATH_site . $args['path'])) {
-			// @TODO ___throw exception instead?
-			// if image does not exist, stop
-			return $tag;
-		}
-
-		return $service->getTagBuilder()->generateTag('img', ['src' => $args['path']]);
+		return $service->getTagBuilder()->generateTag(
+			$args['name'],
+			(isset($args['attributes']) && is_array($args['attributes']) ? $args['attributes'] : []),
+			$tag
+		);
 	}
 
 }

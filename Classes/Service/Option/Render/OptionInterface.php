@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -24,6 +24,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
+use Innologi\Decosdata\Service\TagBuilder\TagInterface;
 /**
  * Render Option Interface
  *
@@ -32,15 +33,15 @@ use Innologi\Decosdata\Service\Option\RenderOptionService;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 interface OptionInterface {
-
+	// @TODO _______better doc
 	/**
-	 * Alters $content.
+	 * Alters content.
 	 *
 	 * @param array $args
-	 * @param string &$content
+	 * @param \Innologi\Decosdata\Service\TagBuilder\TagInterface $tag
 	 * @param \Innologi\Decosdata\Service\Option\RenderOptionService $service
-	 * @return void
+	 * @return \Innologi\Decosdata\Service\TagBuilder\TagInterface
 	 */
-	public function alterContentValue(array $args, &$content, RenderOptionService $service);
+	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service);
 
 }

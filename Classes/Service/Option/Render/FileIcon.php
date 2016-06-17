@@ -27,6 +27,7 @@ use Innologi\Decosdata\Service\Option\RenderOptionService;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Innologi\Decosdata\Service\TagBuilder\TagInterface;
 /**
  * File Icon option
  *
@@ -58,18 +59,17 @@ class FileIcon extends FileOptionAbstract {
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
-	public function alterContentValue(array $args, &$content, RenderOptionService $service) {
+	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
 		if ( !$this->isFileHandle($service->getOriginalContent()) ) {
 			return;
 		}
 
 		$file = $this->getFileObject($this->fileUid);
 		$fileExtension = $file->getExtension();
-		$icon = $this->iconFactory->getIconForFileExtension(
+
+		return $this->iconFactory->getIconForFileExtension(
 			$fileExtension, Icon::SIZE_SMALL
 		);
-		$content = $icon->render();
-		return;
 	}
 
 }

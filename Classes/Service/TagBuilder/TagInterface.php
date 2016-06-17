@@ -1,9 +1,9 @@
 <?php
-namespace Innologi\Decosdata\Service\Option\Exception;
+namespace Innologi\Decosdata\Service\TagBuilder;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -23,19 +23,58 @@ namespace Innologi\Decosdata\Service\Option\Exception;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+// @TODO ______doc
 /**
- * MissingOptionClass Exception
+ * Tag Interface
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MissingOptionClass extends OptionException {
+interface TagInterface {
 
 	/**
-	 * @var string
+	 * Returns TRUE if tag contains content, otherwise FALSE
+	 *
+	 * @return boolean
 	 */
-	protected $message = 'Option Configuration Error: Option class %1$s could not be found. It either does not exist, or an external option was set without its actual namespace.';
+	public function hasContent();
+
+	/**
+	 * Gets the content of the tag
+	 *
+	 * @return mixed
+	 */
+	public function getContent();
+
+	/**
+	 * Sets the content of the tag
+	 *
+	 * @param mixed $content Content of the tag to be rendered
+	 * @return $this
+	 */
+	public function setContent($content);
+
+
+	/**
+	 * Render the object as string, includes recursively rendering any content.
+	 *
+	 * @return string
+	 */
+	public function render();
+
+	/**
+	 * Magic method invoked when using the object directly into a string.
+	 *
+	 * @return string
+	 */
+	public function __toString();
+
+	/**
+	 * Resets objects properties.
+	 *
+	 * @return $this
+	 */
+	public function reset();
 
 }
