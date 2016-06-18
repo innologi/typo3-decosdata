@@ -60,7 +60,7 @@ class RenderOptionService extends OptionServiceAbstract {
 	 * Matches argument:"value"[,]
 	 * @var string
 	 */
-	protected $patternArgumentInline = '([a-zA-Z]+):"([^"]+)",?';
+	protected $patternArgumentInline = '([a-zA-Z0-9]+):"([^"]+)",?';
 
 	/**
 	 * Matches {render:RenderOption[( $patternArgumentInline[ ... ] )]}
@@ -136,47 +136,44 @@ class RenderOptionService extends OptionServiceAbstract {
 	 * not be replaced.
 	 *
 	 * @param string $string
-	 * @param array &$return
-	 * @return string
+	 * @return array
 	 */
-	public function processInlineOptions($string, array &$return) {
+	public function processInlineOptions($string) {
 		// quick check to prevent an unnecessary performance impact by RegExp
 		if (strpos($string, '{render:') === FALSE) {
-			return $string;
+			return [];
 		}
 
-		// @TODO ___so we're replacing the {render:..} with ###RENDER(hashed render-option)###.. WHY? Why not just use the original {render:..} as the replacement-mark?
-		// replaces inline RenderOptions by their resulting values
-		return preg_replace_callback(
-			'/' . $this->patternInline . '/',
-			// callback function that executes the options
-			function ($matches) use (&$return) {
-				$option = array(
-					'option' => $matches[1],
-					'args' => array()
-				);
-				// if arguments were found, they need to be detected by another regular expression,
-				// as preg_replace_callback can't set multiple arguments in $matches[5] and $matches[6]
-				// @LOW ___is there really no way? something I can change in the pattern used by preg_replace_callback?
-				if (isset($matches[3][0])) {
-					$argMatch = array();
-					preg_match_all('/' . $this->patternArgumentInline . '/', $matches[3], $argMatch);
+		$replacements = [];
+		$matches = [];
+		if (preg_match_all('/' . $this->patternInline . '/', $string, $matches) === FALSE) {
+			// @TODO ____throw exception?
+		}
+
+		foreach ($matches[0] as $index => $match) {
+			$option = [
+				'option' => $matches[1][$index],
+				'args' => []
+			];
+			// if arguments were found, they need to be indentified by another regular expression,
+			// as preg_match_all can't set multiple arguments in $matches[5] and $matches[6]
+			// @LOW ___is there really no way? something I can change in the pattern used by preg_match_all?
+			if (isset($matches[3][$index][0])) {
+				$argMatch = [];
+				preg_match_all('/' . $this->patternArgumentInline . '/', $matches[3][$index], $argMatch);
 					if (isset($argMatch[1]) && isset($argMatch[2])) {
-						foreach ($argMatch[1] as $index => $arg) {
-							$option['args'][$arg] = $argMatch[2][$index];
+						foreach ($argMatch[1] as $argIndex => $arg) {
+							$option['args'][$arg] = $argMatch[2][$argIndex];
 						}
 					}
 				}
 				// note that it will reset original content to the same value,
 				// so until we support utilizing a different content value, no harm is done
 				// @LOW __note that this does not yet cache entries that are set multiple times
-				$mark = '###RENDER' . md5(json_encode($option)) . '###';
-				$return[$mark] = $this->processOptions(array($option), $this->originalContent, $this->index, $this->item);
+				$replacements[$match] = $this->processOptions([ $option ], $this->originalContent, $this->index, $this->item);
+			}
 
-				return $mark;
-			},
-			$string
-		);
+		return $replacements;
 	}
 
 	/**

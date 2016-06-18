@@ -59,8 +59,8 @@ class Wrapper implements OptionInterface {
 			throw new MissingArgument(1448551326, array(self::class, 'wrap'));
 		}
 
-		$tags = [];
-		$args['wrap'] = $service->processInlineOptions($args['wrap'], $tags);
+		$tags = $service->processInlineOptions($args['wrap']);
+
 		// note that by choosing to first process inline options, they can never return
 		// pipe characters without consequence to the following preg match
 		if (!preg_match('/' . $this->patternWrap . '/', $args['wrap'], $wrap)) {
