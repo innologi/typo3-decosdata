@@ -24,8 +24,8 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use Innologi\Decosdata\Service\TagBuilder\TagInterface;
-use Innologi\Decosdata\Service\TagBuilder\Tag;
+use Innologi\Decosdata\Library\TagBuilder\TagInterface;
+use Innologi\Decosdata\Library\TagBuilder\Tag;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 
 /**
@@ -56,7 +56,7 @@ class AddTagAttributes implements OptionInterface {
 
 		// if not an actual Tag, enclose it with one with all the attributes and return it
 		if (!($tag instanceof Tag)) {
-			return $service->getTagBuilder()->generateTag(
+			return $service->getTagFactory()->createTag(
 				$this->defaultTag, $args['attributes'], $tag
 			);
 		}
@@ -65,7 +65,7 @@ class AddTagAttributes implements OptionInterface {
 		if (isset($args['appendClass']) && (bool) $args['appendClass']
 			&& isset($args['attributes']['class'][0]) && $tag->hasAttribute('class')
 		) {
-			$tag->addAttribute('class', $tag->getAttribute('class') . ' ' . $args['attributes']['class']);
+			$tag->addAttributes(['class' => $tag->getAttribute('class') . ' ' . $args['attributes']['class']]);
 			unset($args['attributes']['class']);
 		}
 

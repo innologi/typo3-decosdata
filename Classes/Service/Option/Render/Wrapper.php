@@ -25,8 +25,8 @@ namespace Innologi\Decosdata\Service\Option\Render;
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
-use Innologi\Decosdata\Service\TagBuilder\TagInterface;
-use Innologi\Decosdata\Service\TagBuilder\TagContent;
+use Innologi\Decosdata\Library\TagBuilder\TagInterface;
+use Innologi\Decosdata\Library\TagBuilder\TagContent;
 /**
  * Wrapper
  *
@@ -73,10 +73,12 @@ class Wrapper implements OptionInterface {
 			return $tag;
 		}
 
+		// if $tag is an actual Tag instance, place it within a TagContent instance
 		$mark = '###RENDER' . $tag->getTagName() . '###';
-		$newTag = $service->getTagBuilder()->generateTagContent($wrap[1] . $mark . $wrap[2]);
-		$newTag->addMarkReplacements([$mark => $tag] + $tags);
-		return $newTag;
+		return $service->getTagFactory()->createTagContent(
+			$wrap[1] . $mark . $wrap[2],
+			[$mark => $tag] + $tags
+		);
 	}
 
 }

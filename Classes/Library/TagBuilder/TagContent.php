@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Service\TagBuilder;
+namespace Innologi\Decosdata\Library\TagBuilder;
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +31,12 @@ namespace Innologi\Decosdata\Service\TagBuilder;
  * TagInterfaces within $markReplacements, that will be rendered into $content where $content
  * has corresponding marks.
  *
- * @package decosdata
+ * @package InnologiLibs
+ * @subpackage TagBuilder
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class TagContent implements TagInterface {
+class TagContent extends TagAbstract {
 
 	/**
 	 * @var string
@@ -53,8 +54,9 @@ class TagContent implements TagInterface {
 	 * @param string $content
 	 * @return void
 	 */
-	public function __construct($content = '') {
+	public function __construct($content = '', array $markReplacements = []) {
 		$this->content = $content;
+		$this->markReplacements = $markReplacements;
 	}
 
 	/**
@@ -63,25 +65,6 @@ class TagContent implements TagInterface {
 	 */
 	public function hasContent() {
 		return isset($this->content[0]);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see TagInterface::getContent()
-	 * @return string
-	 */
-	public function getContent() {
-		return $this->content;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see TagInterface::setContent()
-	 * @param string $content
-	 */
-	public function setContent($content) {
-		$this->content = $content;
-		return $this;
 	}
 
 	/**
@@ -106,14 +89,6 @@ class TagContent implements TagInterface {
 			$content = str_replace($mark, $tag->render(), $content);
 		}
 		return $content;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see TagInterface::__toString()
-	 */
-	public function __toString() {
-		return $this->render();
 	}
 
 	/**

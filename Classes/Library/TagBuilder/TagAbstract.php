@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Service\TagBuilder;
+namespace Innologi\Decosdata\Library\TagBuilder;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,58 +23,39 @@ namespace Innologi\Decosdata\Service\TagBuilder;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-// @TODO ______doc
 /**
- * Tag Interface
+ * Abstract Tag class
  *
- * @package decosdata
+ * @package InnologiLibs
+ * @subpackage TagBuilder
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-interface TagInterface {
+abstract class TagAbstract implements TagInterface {
 
 	/**
-	 * Returns TRUE if tag contains content, otherwise FALSE
-	 *
-	 * @return boolean
+	 * {@inheritDoc}
+	 * @see TagInterface::getContent()
 	 */
-	public function hasContent();
+	public function getContent() {
+		return $this->content;
+	}
 
 	/**
-	 * Gets the content of the tag
-	 *
-	 * @return mixed
+	 * {@inheritDoc}
+	 * @see TagInterface::setContent()
 	 */
-	public function getContent();
+	public function setContent($content) {
+		$this->content = $content;
+		return $this;
+	}
 
 	/**
-	 * Sets the content of the tag
-	 *
-	 * @param mixed $content Content of the tag to be rendered
-	 * @return $this
+	 * {@inheritDoc}
+	 * @see TagInterface::__toString()
 	 */
-	public function setContent($content);
-
-
-	/**
-	 * Render the object as string, includes recursively rendering any content.
-	 *
-	 * @return string
-	 */
-	public function render();
-
-	/**
-	 * Magic method invoked when using the object directly into a string.
-	 *
-	 * @return string
-	 */
-	public function __toString();
-
-	/**
-	 * Resets objects properties.
-	 *
-	 * @return $this
-	 */
-	public function reset();
+	public function __toString() {
+		return $this->render();
+	}
 
 }

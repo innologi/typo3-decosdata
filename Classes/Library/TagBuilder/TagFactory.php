@@ -1,9 +1,9 @@
 <?php
-namespace Innologi\Decosdata\Service\Option\Render;
+namespace Innologi\Decosdata\Library\TagBuilder;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015-2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -23,25 +23,42 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\Option\RenderOptionService;
-use Innologi\Decosdata\Library\TagBuilder\TagInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\SingletonInterface;
 /**
- * Render Option Interface
+ * Tag Factory
  *
- * @package decosdata
+ * Should be used to create Tag objects that are used to render
+ * frontend output.
+ *
+ * @package InnologiLibs
+ * @subpackage TagBuilder
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-interface OptionInterface {
-	// @TODO _______better doc
+class TagFactory implements SingletonInterface {
+
 	/**
-	 * Alters content.
+	 * Creates Tag object
 	 *
-	 * @param array $args
-	 * @param \Innologi\Decosdata\Library\TagBuilder\TagInterface $tag
-	 * @param \Innologi\Decosdata\Service\Option\RenderOptionService $service
-	 * @return \Innologi\Decosdata\Library\TagBuilder\TagInterface
+	 * @param string $tagName
+	 * @param array $tagAttributes
+	 * @param TagInterface $content
+	 * @return Tag
 	 */
-	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service);
+	public function createTag($tagName, array $tagAttributes = array(), TagInterface $content = NULL) {
+		return GeneralUtility::makeInstance(Tag::class, $tagName, $tagAttributes, $content);
+	}
+
+	/**
+	 * Creates TagContent object
+	 *
+	 * @param string $content
+	 * @param array $markReplacements
+	 * return TagContent
+	 */
+	public function createTagContent($content, array $markReplacements = []) {
+		return GeneralUtility::makeInstance(TagContent::class, $content, $markReplacements);
+	}
 
 }

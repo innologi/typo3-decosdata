@@ -25,7 +25,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
-use Innologi\Decosdata\Service\TagBuilder\TagInterface;
+use Innologi\Decosdata\Library\TagBuilder\TagInterface;
 /**
  * Custom Image option
  *
@@ -67,7 +67,7 @@ class CustomImage implements OptionInterface {
 			return $tag;
 		}
 
-		return $service->getTagBuilder()->generateTag('img', ['src' => $args['path']]);
+		return $service->getTagFactory()->createTag('img', ['src' => $args['path']]);
 	}
 
 }

@@ -27,7 +27,7 @@ use Innologi\Decosdata\Service\Option\RenderOptionService;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Innologi\Decosdata\Service\TagBuilder\TagInterface;
+use Innologi\Decosdata\Library\TagBuilder\TagInterface;
 /**
  * File Icon option
  *

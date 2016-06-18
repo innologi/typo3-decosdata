@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -23,7 +23,7 @@ namespace Innologi\Decosdata\Service\Option;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\TagBuilder\TagBuilder;
+use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 /**
  * Render Option Service
  *
@@ -36,9 +36,15 @@ use Innologi\Decosdata\Service\TagBuilder\TagBuilder;
 class RenderOptionService extends OptionServiceAbstract {
 
 	/**
-	 * @var \Innologi\Decosdata\Service\TagBuilder\TagBuilder
+	 * @var \Innologi\Decosdata\Library\TagBuilder\TagFactory
+	 * @inject
 	 */
-	protected $tagBuilder;
+	protected $tagFactory;
+
+	/**
+	 * @var \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext
+	 */
+	protected $controllerContext;
 
 	/**
 	 * @var string
@@ -75,23 +81,32 @@ class RenderOptionService extends OptionServiceAbstract {
 	}
 
 	/**
-	 * Returns tag builder
+	 * Sets controller context
 	 *
-	 * @return \Innologi\Decosdata\Service\TagBuilder\TagBuilder
+	 * @param \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext $controllerContext
+	 * @return $this
 	 */
-	public function getTagBuilder() {
-		return $this->tagBuilder;
+	public function setControllerContext(ControllerContext $controllerContext) {
+		$this->controllerContext = $controllerContext;
+		return $this;
 	}
 
 	/**
-	 * Sets tag builder
+	 * Returns controller context
 	 *
-	 * @param \Innologi\Decosdata\Service\TagBuilder\TagBuilder $tagBuilder
-	 * @return $this
+	 * @return \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext
 	 */
-	public function setTagBuilder(TagBuilder $tagBuilder) {
-		$this->tagBuilder = $tagBuilder;
-		return $this;
+	public function getControllerContext() {
+		return $this->controllerContext;
+	}
+
+	/**
+	 * Returns tag builder
+	 *
+	 * @return \Innologi\Decosdata\Library\TagBuilder\TagFactory
+	 */
+	public function getTagFactory() {
+		return $this->tagFactory;
 	}
 
 	/**
@@ -130,13 +145,12 @@ class RenderOptionService extends OptionServiceAbstract {
 			return $string;
 		}
 
-		$originalTag = $this->tagBuilder->generateTagContent($this->originalContent);
-
+		// @TODO ___so we're replacing the {render:..} with ###RENDER(hashed render-option)###.. WHY? Why not just use the original {render:..} as the replacement-mark?
 		// replaces inline RenderOptions by their resulting values
 		return preg_replace_callback(
 			'/' . $this->patternInline . '/',
 			// callback function that executes the options
-			function ($matches) use ($originalTag, &$return) {
+			function ($matches) use (&$return) {
 				$option = array(
 					'option' => $matches[1],
 					'args' => array()
@@ -157,7 +171,7 @@ class RenderOptionService extends OptionServiceAbstract {
 				// so until we support utilizing a different content value, no harm is done
 				// @LOW __note that this does not yet cache entries that are set multiple times
 				$mark = '###RENDER' . md5(json_encode($option)) . '###';
-				$return[$mark] = $this->processOptions(array($option), $originalTag, $this->index, $this->item);
+				$return[$mark] = $this->processOptions(array($option), $this->originalContent, $this->index, $this->item);
 
 				return $mark;
 			},
@@ -170,18 +184,33 @@ class RenderOptionService extends OptionServiceAbstract {
 	 * methods and passing the content reference and renderer object to it.
 	 *
 	 * @param array $options
-	 * @param string &$content
+	 * @param string $content
 	 * $param integer $index
 	 * @param array $item
-	 * @return void
+	 * @return \Innologi\Decosdata\Library\TagBuilder\TagInterface
 	 */
-	public function processOptions(array $options, &$content, $index, array $item) {
+	public function processOptions(array $options, $content, $index, array $item) {
 		$this->item = $item;
 		$this->index = $index;
 		$this->originalContent = $content;
+
+		// starting TagInterface instance
+		$tag = $this->tagFactory->createTagContent($content);
+
+		$lastOptions = [];
 		foreach ($options as $option) {
-			$this->executeOption('alterContentValue', $option, $content);
+			// if an option has the last attribute, save it for last
+			if (isset($option['last']) && (bool)$option['last']) {
+				$lastOptions[] = $option;
+				continue;
+			}
+			$tag = $this->executeOption('alterContentValue', $option, $tag);
 		}
+		// last options, if any
+		foreach ($lastOptions as $option) {
+			$tag = $this->executeOption('alterContentValue', $option, $tag);
+		}
+		return $tag;
 	}
 
 }

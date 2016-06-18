@@ -25,8 +25,8 @@ namespace Innologi\Decosdata\Service\Option\Render;
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
-use Innologi\Decosdata\Service\TagBuilder\TagInterface;
-use Innologi\Decosdata\Service\TagBuilder\TagContent;
+use Innologi\Decosdata\Library\TagBuilder\TagInterface;
+use Innologi\Decosdata\Library\TagBuilder\TagContent;
 
 /**
  * Link Level option
@@ -73,11 +73,9 @@ class LinkLevel implements OptionInterface {
 			$tag->setContent($this->defaultContent);
 		}
 
-		$tagBuilder = $service->getTagBuilder();
-
 		// @LOW _if we just read the latest _ argument, can't we derive level from there, so we can get rid of the level arg? we have to be sure that it's not read anywhere else
 		// @LOW _see if addQueryStringMethod is of any use to us
-		$uri = $tagBuilder->getControllerContext()->getUriBuilder()
+		$uri = $service->getControllerContext()->getUriBuilder()
 			->reset()
 			->setAddQueryString(TRUE)
 			// @LOW _if we support a page argument per level, we could maintain current and previous levels through arguments. Another option would be the session
@@ -86,7 +84,7 @@ class LinkLevel implements OptionInterface {
 			->uriFor(NULL, array('level' => $args['level'], '_' . $args['level'] => rawurlencode($linkValue)));
 
 		// @TODO ___title and or other attributes? in tx_decospublisher, a title could be set through an argument, which would expand the query to include the field containing the title
-		return $tagBuilder->generateTag('a', ['href' => $uri], $tag);
+		return $service->getTagFactory()->createTag('a', ['href' => $uri], $tag);
 	}
 
 }

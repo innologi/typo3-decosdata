@@ -1,9 +1,9 @@
 <?php
-namespace Innologi\Decosdata\Service\Option\Render;
+namespace Innologi\Decosdata\Library\TagBuilder;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015-2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -23,25 +23,59 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\Option\RenderOptionService;
-use Innologi\Decosdata\Library\TagBuilder\TagInterface;
+
 /**
- * Render Option Interface
+ * Tag Interface
  *
- * @package decosdata
+ * @package InnologiLibs
+ * @subpackage TagBuilder
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-interface OptionInterface {
-	// @TODO _______better doc
+interface TagInterface {
+
 	/**
-	 * Alters content.
+	 * Returns TRUE if tag contains content, otherwise FALSE
 	 *
-	 * @param array $args
-	 * @param \Innologi\Decosdata\Library\TagBuilder\TagInterface $tag
-	 * @param \Innologi\Decosdata\Service\Option\RenderOptionService $service
-	 * @return \Innologi\Decosdata\Library\TagBuilder\TagInterface
+	 * @return boolean
 	 */
-	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service);
+	public function hasContent();
+
+	/**
+	 * Gets the content of the tag
+	 *
+	 * @return mixed
+	 */
+	public function getContent();
+
+	/**
+	 * Sets the content of the tag
+	 *
+	 * @param mixed $content Content of the tag to be rendered
+	 * @return $this
+	 */
+	public function setContent($content);
+
+
+	/**
+	 * Render the object as string, includes recursively rendering any content.
+	 *
+	 * @return string
+	 */
+	public function render();
+
+	/**
+	 * Magic method invoked when using the object directly into a string.
+	 *
+	 * @return string
+	 */
+	public function __toString();
+
+	/**
+	 * Resets objects properties.
+	 *
+	 * @return $this
+	 */
+	public function reset();
 
 }

@@ -24,7 +24,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use Innologi\Decosdata\Service\TagBuilder\TagInterface;
+use Innologi\Decosdata\Library\TagBuilder\TagInterface;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 /**
  * Add Tag
@@ -45,7 +45,7 @@ class AddTag implements OptionInterface {
 		if ( !isset($args['name'][0]) ) {
 			throw new MissingArgument(1466007305, array(self::class, 'name'));
 		}
-		return $service->getTagBuilder()->generateTag(
+		return $service->getTagFactory()->createTag(
 			$args['name'],
 			(isset($args['attributes']) && is_array($args['attributes']) ? $args['attributes'] : []),
 			$tag

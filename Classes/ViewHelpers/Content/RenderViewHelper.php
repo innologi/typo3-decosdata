@@ -42,10 +42,10 @@ class RenderViewHelper extends AbstractViewHelper {
 	protected $escapeOutput = FALSE;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\TagBuilder\TagBuilder
+	 * @var \Innologi\Decosdata\Service\Option\RenderOptionService
 	 * @inject
 	 */
-	protected $tagBuilder;
+	protected $optionService;
 
 	// @TODO _______use method initializeArguments() instead
 	/**
@@ -69,7 +69,7 @@ class RenderViewHelper extends AbstractViewHelper {
 	 */
 	public function initialize() {
 		if ($this->controllerContext !== NULL) {
-			$this->tagBuilder->setControllerContext($this->controllerContext);
+			$this->optionService->setControllerContext($this->controllerContext);
 		}
 	}
 
@@ -86,7 +86,7 @@ class RenderViewHelper extends AbstractViewHelper {
 
 		// if configured, add an outer tag
 		if ($this->hasArgument('tag')) {
-			// we use the AddTag RenderOption instead of directly using the tagBuilder,
+			// we use the AddTag RenderOption instead of directly using the tagFactory,
 				// so that other options can be used to influence said tag, like adding
 				// a class or title or data-attribute, or whatever
 			$this->arguments['options'][] = [
@@ -98,14 +98,18 @@ class RenderViewHelper extends AbstractViewHelper {
 			];
 		}
 
-		$tag = $this->tagBuilder->buildTag(
-			$content,
-			$this->arguments['options'],
-			$this->arguments['index'],
-			$this->arguments['item']
-		);
+		if (!empty($this->arguments['options'])) {
+			// @TODO ___if we want to support field- en blob-less content, consider a render->content element referring to a content-# or a default 'current'. We would also have to have access to other content fields.
+			$tag = $this->optionService->processOptions(
+				$this->arguments['options'],
+				$content,
+				$this->arguments['index'],
+				$this->arguments['item']
+			);
+			return $tag->render();
+		}
 
-		return $tag->render();
+		return $content;
 	}
 
 }

@@ -24,7 +24,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use Innologi\Decosdata\Service\TagBuilder\TagInterface;
+use Innologi\Decosdata\Library\TagBuilder\TagInterface;
 /**
  * File Download option
  *
@@ -60,7 +60,7 @@ class FileDownload extends FileOptionAbstract {
 		// @TODO _____what happens if file id does not exist?
 		$file = $this->getFileObject($this->fileUid);
 
-		return $service->getTagBuilder()->generateTag('a', [
+		return $service->getTagFactory()->createTag('a', [
 			'href' => $file->getPublicUrl()
 		], $tag);
 	}
