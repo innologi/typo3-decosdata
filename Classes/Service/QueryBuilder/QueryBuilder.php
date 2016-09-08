@@ -123,6 +123,12 @@ class QueryBuilder {
 			$query->addParameter(':itemtype', $configuration['itemType']);
 		}
 
+		// apply item-wide query options
+		if (isset($configuration['queryOptions'])) {
+			// @TODO ___item wide options, e.g. filter/child view????
+			$this->optionService->processRowOptions($configuration['queryOptions'], $query);
+		}
+
 		// expand the query through field configuration
 		if (isset($configuration['contentField']) && is_array($configuration['contentField'])) {
 			// for each configured content-field..
@@ -133,12 +139,6 @@ class QueryBuilder {
 					$query->getContent('content' . $index)
 				);
 			}
-		}
-
-		// apply item-wide query options
-		if (isset($configuration['queryOptions'])) {
-			// @TODO ___item wide options, e.g. filter/child view????
-			$this->optionService->processRowOptions($configuration['queryOptions'], $query);
 		}
 
 		// apply pagination settings

@@ -50,8 +50,15 @@ class ParentInParent extends OptionAbstract {
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
 	 */
 	public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service) {
+		$query = $queryContent->getParent();
+
+		// we depend on RestrictByParentId
+		if (!$query->getContent('itemID')->getField('')->hasFrom('restrictBy')) {
+			// @TODO ___throw exception?
+		}
+
 		$alias = 'relation' . $service->getIndex();
-		$queryField = $queryContent->getParent()->getContent($alias)->getField('');
+		$queryField = $query->getContent($alias)->getField('');
 
 		// relation to original item
 		$alias1 = $alias . 'mm1';
@@ -68,7 +75,6 @@ class ParentInParent extends OptionAbstract {
 			$this->constraintFactory->createConstraintAnd(array(
 				$this->constraintFactory->createConstraintByField('uid_local', $alias1, '=', 'uid', 'it'),
 				$this->constraintFactory->createConstraintByField('uid_local', $alias2, '=', 'uid_foreign', $alias1),
-				// @FIX _______what if restrictBy doesn't exist? we can't detect that here if restrictBy is to be added on row-level
 				$this->constraintFactory->createConstraintByField('uid_foreign', $alias2, '=', 'uid_foreign', 'restrictBy')
 			))
 		);

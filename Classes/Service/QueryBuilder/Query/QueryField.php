@@ -118,6 +118,18 @@ class QueryField implements QueryInterface {
 		}
 		return $this->from[$id];
 	}
+
+	// @TODO ______inherent flaw? we have to check WITHIN a content field for any FROM's, soooo we could end up with duplicates, crashing the query. Wouldn't an alias-register be worthwhile?
+	/**
+	 * Returns whether the given FROM alias exists in this field
+	 *
+	 * @param string $id
+	 * @return boolean
+	 */
+	public function hasFrom($id) {
+		return isset($this->from[$id]);
+	}
+
 	// @LOW _this naming scheme is not consistent: getFromAll but setFrom? Why not getFrom, setFrom and getOneFrom instead? or setFromAll?
 	/**
 	 * Sets From array
