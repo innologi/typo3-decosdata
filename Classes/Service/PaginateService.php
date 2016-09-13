@@ -79,7 +79,7 @@ class PaginateService implements SingletonInterface {
 	/**
 	 * @var boolean
 	 */
-	protected $ready = FALSE;
+	protected $active = FALSE;
 
 	/**
 	 * Returns current page number
