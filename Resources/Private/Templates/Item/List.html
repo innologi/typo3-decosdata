@@ -15,7 +15,6 @@
 <table>
 	<thead>
 		<tr>
-			<!-- @TODO ______________replace "configuration" attr with "options" ? -->
 			<f:for each="{configuration.contentField}" as="column" key="index">
 				<d:content.render tag="th" tagAttributes="{scope: 'col'}" options="{column.title.renderOptions}" index="{index}">
 					{column.title.value}
