@@ -55,8 +55,6 @@ return [
 			'config' => [
 				'type' => 'input',
 				'renderType' => 'inputDateTime',
-				'size' => 13,
-				'max' => 20,
 				'eval' => 'datetime',
 				'default' => 0,
 				'behaviour' => [
@@ -70,8 +68,6 @@ return [
 			'config' => [
 				'type' => 'input',
 				'renderType' => 'inputDateTime',
-				'size' => 13,
-				'max' => 20,
 				'eval' => 'datetime',
 				'default' => 0,
 				'range' => [
