@@ -4,20 +4,6 @@ defined('TYPO3_MODE') or die();
 $tablePrefix = 'tx_' . $_EXTKEY . '_domain_model_';
 $cshPathPrefix = 'EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_csh_';
 
-// add publish-plugin
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-	$_EXTKEY,
-	'Publish',
-	'Publish Decos Data'
-);
-
-// add static TS
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
-	$_EXTKEY,
-	'Configuration/TypoScript',
-	'Decos Data TS'
-);
-
 // allow records of these tables to be stored on standard page types
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages($tablePrefix . 'profile');
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages($tablePrefix . 'profilefield');
