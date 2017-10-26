@@ -1,176 +1,141 @@
 <?php
 defined('TYPO3_MODE') or die();
 
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-
 $extKey = 'decosdata';
 $table = 'tx_' . $extKey . '_domain_model_item';
 $ll = 'LLL:EXT:' . $extKey . '/Resources/Private/Language/locallang_db.xlf:' . $table;
-$llWiz = 'LLL:EXT:' . $extKey . '/Resources/Private/Language/locallang_be.xlf:tca_wizard';
-// this won't always be up to date because of caching, but that's ok
-$today = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
-// for use of similar item relations
-$itemRelationWizards = array(
-	'_POSITION' => 'bottom',
-	'_PADDING' => 3,
-	'_DISTANCE' => 5,
-	'list' => array(
-		'type' => 'script',
-		'title' => $llWiz . '.list',
-		'icon' => 'list.gif',
-		'params' => array(
-			'table' => $table,
-			'pid' => '###CURRENT_PID###'
-		),
-		'module' => array(
-			'name' => 'wizard_list'
-		)
-	),
-	'edit' => array(
-		'type' => 'popup',
-		'title' => $llWiz . '.edit',
-		'icon' => 'edit2.gif',
-		'module' => array(
-			'name' => 'wizard_edit'
-		),
-		'popup_onlyOpenIfSelected' => TRUE,
-		'JSopenParams' => 'height=600,width=800,status=0,menubar=0,scrollbars=1',
-	),
-);
 
-return array(
-	'ctrl' => array(
+return [
+	'ctrl' => [
 		'title'	=> $ll,
 		'label' => 'uid',
 		'tstamp' => 'tstamp',
 		'crdate' => 'crdate',
 		'cruser_id' => 'cruser_id',
 		'delete' => 'deleted',
-		'enablecolumns' => array(
+		'enablecolumns' => [
 			'disabled' => 'hidden',
 			'starttime' => 'starttime',
 			'endtime' => 'endtime',
-		),
+		],
 		'dividers2tabs' => 1,
 		'hideAtCopy' => TRUE,
 		'default_sortby' => 'ORDER BY uid DESC',
 		// @LOW __I'd like to be able to find item_field.field_value, but this does not seem possible right now
 		// instead, we're expanding item_field.item with an edit wizard, see itemfield TCA
 		'searchFields' => 'uid, item_field',
-		'iconfile' => ExtensionManagementUtility::extRelPath($extKey) . 'Resources/Public/Icons/' . $table . '.gif'
-	),
+		'iconfile' => 'EXT:' . $extKey . '/Resources/Public/Icons/' . $table . '.gif'
+	],
 
-	'interface' => array(
+	'interface' => [
 		'showRecordFieldList' => 'hidden, item_key, item_type, import, parent_item, child_item, item_field, item_blob',
-	),
-	'types' => array(
-		'0' => array(
+	],
+	'types' => [
+		'0' => [
 			'showitem' => 'hidden, item_key, item_type, import, parent_item, child_item,
 				--div--;' . $ll . '.item_field,item_field,
 				--div--;' . $ll . '.item_blob,item_blob,
-				--div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'
-		),
-	),
-	'palettes' => array(),
-	'columns' => array(
+				--div--;LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:tabs.access, starttime, endtime'
+		],
+	],
+	'palettes' => [],
+	'columns' => [
 
-		'hidden' => array(
+		'hidden' => [
 			'exclude' => TRUE,
-			'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.hidden',
-			'config' => array(
+			'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
+			'config' => [
 				'type' => 'check',
 				'default' => 1
-			),
-		),
-		'starttime' => array(
+			],
+		],
+		'starttime' => [
 			'exclude' => TRUE,
-			'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.starttime',
-			'config' => array(
+			'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.starttime',
+			'config' => [
 				'type' => 'input',
+				'renderType' => 'inputDateTime',
 				'size' => 13,
 				'max' => 20,
 				'eval' => 'datetime',
 				'default' => 0,
-				'range' => array(
-					'lower' => $today
-				),
-			),
-		),
-		'endtime' => array(
+				'behaviour' => [
+					'allowLanguageSynchronization' => TRUE,
+				]
+			],
+		],
+		'endtime' => [
 			'exclude' => TRUE,
-			'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.endtime',
-			'config' => array(
+			'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.endtime',
+			'config' => [
 				'type' => 'input',
+				'renderType' => 'inputDateTime',
 				'size' => 13,
 				'max' => 20,
 				'eval' => 'datetime',
 				'default' => 0,
-				'range' => array(
-					'lower' => $today
-				),
-			),
-		),
+				'range' => [
+					'upper' => mktime(0, 0, 0, 1, 1, 2038)
+				],
+				'behaviour' => [
+					'allowLanguageSynchronization' => TRUE,
+				]
+			],
+		],
 
-		'item_key' => array(
+		'item_key' => [
 			'exclude' => FALSE,
 			'label' => $ll . '.item_key',
-			'config' => array(
+			'config' => [
 				'type' => 'input',
 				'size' => 40,
 				'max' => 32,
 				'eval' => 'required,uniqueInPid,trim,nospace,alphanum,upper'
-			),
-		),
-		'item_type' => array(
+			],
+		],
+		'item_type' => [
 			'exclude' => FALSE,
 			'label' => $ll . '.item_type',
-			'config' => array(
+			'config' => [
 				'type' => 'select',
+				'renderType' => 'selectSingle',
 				'foreign_table' => 'tx_decosdata_domain_model_itemtype',
 				'foreign_table_where' => '
-					AND tx_decosdata_domain_model_itemtype.pid = ###CURRENT_PID###
-					ORDER BY tx_decosdata_domain_model_itemtype.item_type ASC',
+                    AND tx_decosdata_domain_model_itemtype.pid = ###CURRENT_PID###
+                    ORDER BY tx_decosdata_domain_model_itemtype.item_type ASC',
 				'minitems' => 1,
 				'maxitems' => 1,
-			),
-		),
-		'import' => array(
+			],
+		],
+		'import' => [
 			'exclude' => FALSE,
 			'label' => $ll . '.import',
-			'config' => array(
+			'config' => [
 				'type' => 'select',
+				'renderType' => 'selectMultipleSideBySide',
 				'foreign_table' => 'tx_decosdata_domain_model_import',
 				'foreign_table_where' => '
-					AND tx_decosdata_domain_model_import.pid = ###CURRENT_PID###
-					ORDER BY tx_decosdata_domain_model_import.title ASC',
+                    AND tx_decosdata_domain_model_import.pid = ###CURRENT_PID###
+                    ORDER BY tx_decosdata_domain_model_import.title ASC',
 				'MM' => 'tx_decosdata_item_import_mm',
 				'size' => 6,
 				'autoSizeMax' => 15,
 				'maxitems' => 9999,
 				'multiple' => 0,
-				'wizards' => array(
-					'_POSITION' => 'bottom',
-					'_PADDING' => 3,
-					'edit' => array(
-						'type' => 'popup',
-						'title' => $llWiz . '.edit',
-						'icon' => 'edit2.gif',
-						'module' => array(
-							'name' => 'wizard_edit'
-						),
-						'popup_onlyOpenIfSelected' => TRUE,
-						// @LOW ___resizable=1 ?
-						'JSopenParams' => 'height=600,width=800,status=0,menubar=0,scrollbars=1',
-					),
-				)
-			),
-		),
+				'fieldControl' => [
+					'editPopup' => [
+						'disabled' => FALSE,
+					]
+				]
+			],
+		],
 		// note that these bidirectional relations don't seem to update references on both sides (6.2.11)
-		'parent_item' => array(
+		'parent_item' => [
 			'exclude' => FALSE,
 			'label' => $ll . '.parent_item',
-			'config' => array(
+			'config' => [
 				'type' => 'select',
+				'renderType' => 'selectMultipleSideBySide',
 				'foreign_table' => $table,
 				/*
 				 * Couple of restrictions set here:
@@ -180,18 +145,18 @@ return array(
 				 * - Limit the range of items in both directions to some extent
 				 */
 				'foreign_table_where' => '
-					AND ' . $table . '.uid <> ###THIS_UID###
-					AND ' . $table . '.pid = ###CURRENT_PID###
-					AND ' . $table . '.uid IN (
-						SELECT impr1.uid_local
-						FROM tx_decosdata_item_import_mm impr1
-							LEFT JOIN tx_decosdata_item_import_mm impr2
-								ON (impr1.uid_foreign = impr2.uid_foreign)
-						WHERE impr2.uid_local = ###THIS_UID###
-					)
-					AND ' . $table . '.uid < (###THIS_UID### + 5000)
-					AND ' . $table . '.uid > (###THIS_UID### - 10000)
-					ORDER BY ' . $table . '.uid ASC',
+                    AND ' . $table . '.uid <> ###THIS_UID###
+                    AND ' . $table . '.pid = ###CURRENT_PID###
+                    AND ' . $table . '.uid IN (
+                        SELECT impr1.uid_local
+                        FROM tx_decosdata_item_import_mm impr1
+                            LEFT JOIN tx_decosdata_item_import_mm impr2
+                                ON (impr1.uid_foreign = impr2.uid_foreign)
+                        WHERE impr2.uid_local = ###THIS_UID###
+                    )
+                    AND ' . $table . '.uid < (###THIS_UID### + 5000)
+                    AND ' . $table . '.uid > (###THIS_UID### - 10000)
+                    ORDER BY ' . $table . '.uid ASC',
 				// parent = foreign
 				'MM' => 'tx_decosdata_item_item_mm',
 				'size' => 10,
@@ -199,29 +164,37 @@ return array(
 				'maxitems' => 9999,
 				'multiple' => 0,
 				'enableMultiSelectFilterTextfield' => TRUE,
-				'wizards' => $itemRelationWizards
-			),
-		),
-		'child_item' => array(
+				'fieldControl' => [
+					'editPopup' => [
+						'disabled' => FALSE,
+					],
+					'listModule' => [
+						'disabled' => FALSE,
+					]
+				]
+			],
+		],
+		'child_item' => [
 			'exclude' => FALSE,
 			'label' => $ll . '.child_item',
-			'config' => array(
+			'config' => [
 				'type' => 'select',
+				'renderType' => 'selectMultipleSideBySide',
 				'foreign_table' => $table,
 				// slight variation from parent_item
 				'foreign_table_where' => '
-					AND ' . $table . '.uid <> ###THIS_UID###
-					AND ' . $table . '.pid = ###CURRENT_PID###
-					AND ' . $table . '.uid IN (
-						SELECT impr1.uid_local
-						FROM tx_decosdata_item_import_mm impr1
-							LEFT JOIN tx_decosdata_item_import_mm impr2
-								ON (impr1.uid_foreign = impr2.uid_foreign)
-						WHERE impr2.uid_local = ###THIS_UID###
-					)
-					AND ' . $table . '.uid < (###THIS_UID### + 10000)
-					AND ' . $table . '.uid > (###THIS_UID### - 5000)
-					ORDER BY ' . $table . '.uid DESC',
+                    AND ' . $table . '.uid <> ###THIS_UID###
+                    AND ' . $table . '.pid = ###CURRENT_PID###
+                    AND ' . $table . '.uid IN (
+                        SELECT impr1.uid_local
+                        FROM tx_decosdata_item_import_mm impr1
+                            LEFT JOIN tx_decosdata_item_import_mm impr2
+                                ON (impr1.uid_foreign = impr2.uid_foreign)
+                        WHERE impr2.uid_local = ###THIS_UID###
+                    )
+                    AND ' . $table . '.uid < (###THIS_UID### + 10000)
+                    AND ' . $table . '.uid > (###THIS_UID### - 5000)
+                    ORDER BY ' . $table . '.uid DESC',
 				// child = local
 				'MM' => 'tx_decosdata_item_item_mm',
 				'MM_opposite_field' => 'parent_item',
@@ -230,14 +203,21 @@ return array(
 				'maxitems' => 9999,
 				'multiple' => 0,
 				'enableMultiSelectFilterTextfield' => TRUE,
-				'wizards' => $itemRelationWizards
-			),
-		),
+				'fieldControl' => [
+					'editPopup' => [
+						'disabled' => FALSE,
+					],
+					'listModule' => [
+						'disabled' => FALSE,
+					]
+				]
+			],
+		],
 		// @LOW __what if we add a wizard or customControl that lets us pick a profile for field-names?
-		'item_field' => array(
+		'item_field' => [
 			'exclude' => FALSE,
 			'label' => $ll . '.item_field',
-			'config' => array(
+			'config' => [
 				'type' => 'inline',
 				'foreign_table' => 'tx_decosdata_domain_model_itemfield',
 				'foreign_field' => 'item',
@@ -249,19 +229,19 @@ return array(
 				'foreign_label' => 'field',
 				'foreign_selector' => 'field',
 				'maxitems' => 9999,
-				'appearance' => array(
+				'appearance' => [
 					'collapseAll' => TRUE,
 					'levelLinksPosition' => 'top',
-				),
-				'behaviour' => array(
+				],
+				'behaviour' => [
 					'enableCascadingDelete' => TRUE,
-				)
-			),
-		),
-		'item_blob' => array(
+				]
+			],
+		],
+		'item_blob' => [
 			'exclude' => FALSE,
 			'label' => $ll . '.item_blob',
-			'config' => array(
+			'config' => [
 				'type' => 'inline',
 				'foreign_table' => 'tx_decosdata_domain_model_itemblob',
 				'foreign_field' => 'item',
@@ -269,15 +249,15 @@ return array(
 				// override ctrl/label setting
 				'foreign_label' => 'sequence',
 				'maxitems' => 9999,
-				'appearance' => array(
+				'appearance' => [
 					'collapseAll' => TRUE,
 					'levelLinksPosition' => 'top',
-				),
-				'behaviour' => array(
+				],
+				'behaviour' => [
 					'enableCascadingDelete' => TRUE,
-				)
-			),
-		),
+				]
+			],
+		],
 
-	),
-);
+	],
+];
