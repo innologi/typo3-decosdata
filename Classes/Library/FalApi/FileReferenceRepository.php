@@ -156,7 +156,7 @@ class FileReferenceRepository implements SingletonInterface {
 	 */
 	public function addRecordByFilePath($filePath, $foreignTable, $foreignUid, $foreignField, $referenceUid = NULL) {
 		$fileObject = $this->resourceFactory->retrieveFileOrFolderObject($filePath);
-		if ( !($fileObject instanceof TYPO3\CMS\Core\Resource\File) ) {
+		if ( !($fileObject instanceof \TYPO3\CMS\Core\Resource\File) ) {
 			throw new Exception\FileException(1448550118, array($filePath));
 		}
 		$this->addRecord($fileObject->getUid(), $foreignTable, $foreignUid, $foreignField, $referenceUid);

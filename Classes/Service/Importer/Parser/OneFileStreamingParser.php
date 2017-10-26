@@ -167,7 +167,7 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	 *
 	 * Note that parentItem is optional, because we have to start somewhere.
 	 *
-	 * @param XMLReader $reader The xml parser object
+	 * @param \XMLReader $reader The xml parser object
 	 * @param mixed $parentItem Type-independent, as this is decided by storageHandler
 	 * @return void
 	 */
