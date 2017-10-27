@@ -23,7 +23,10 @@ namespace Innologi\Decosdata\ViewHelpers;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use Innologi\Decosdata\Service\RuntimeStorageService;
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithRenderStatic;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Render ViewHelper
  *
@@ -37,30 +40,41 @@ namespace Innologi\Decosdata\ViewHelpers;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class RenderViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\RenderViewHelper {
+class RenderViewHelper extends \TYPO3Fluid\Fluid\ViewHelpers\RenderViewHelper {
+	use CompileWithRenderStatic;
+
+	/**
+	 * @var boolean
+	 */
+	protected $escapeOutput = FALSE;
 
 	/**
 	 * @var \Innologi\Decosdata\Service\RuntimeStorageService
-	 * @inject
 	 */
-	protected $storageService;
+	protected static $storageService;
 
 	/**
-	 * Renders the content.
+	 * Get Storage Service
 	 *
-	 * @param string $section Name of section to render. If used in a layout, renders a section of the main content file. If used inside a standard template, renders a section of the same file.
-	 * @param string $partial Reference to a partial.
-	 * @param array $arguments Arguments to pass to the partial.
-	 * @param boolean $optional Set to TRUE, to ignore unknown sections, so the definition of a section inside a template can be optional for a layout
-	 * @return string
+	 * @return \Innologi\Decosdata\Service\RuntimeStorageService
 	 */
-	public function render($section = NULL, $partial = NULL, $arguments = array(), $optional = FALSE) {
-		$id = 'RenderViewHelper-' . $this->storageService->generateHash($this->arguments);
-		if ($this->storageService->has($id)) {
-			$output = $this->storageService->get($id);
+	protected static function getStorageService() {
+		if (self::$storageService === NULL) {
+			self::$storageService = GeneralUtility::makeInstance(RuntimeStorageService::class);
+		}
+		return self::$storageService;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext) {
+		$id = 'RenderViewHelper-' . self::getStorageService()->generateHash($arguments);
+		if (self::getStorageService()->has($id)) {
+			$output = self::getStorageService()->get($id);
 		} else {
-			$output = parent::render($section, $partial, $arguments, $optional);
-			$this->storageService->set($id, $output);
+			$output = parent::renderStatic($arguments, $renderChildrenClosure, $renderingContext);
+			self::getStorageService()->set($id, $output);
 		}
 		return $output;
 	}

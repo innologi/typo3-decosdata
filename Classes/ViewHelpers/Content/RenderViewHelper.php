@@ -39,6 +39,11 @@ use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 class RenderViewHelper extends AbstractViewHelper {
 
 	/**
+	 * @var boolean
+	 */
+	protected $escapeOutput = FALSE;
+
+	/**
 	 * @var \Innologi\Decosdata\Service\Option\RenderOptionService
 	 * @inject
 	 */
