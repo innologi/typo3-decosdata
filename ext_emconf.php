@@ -24,12 +24,17 @@ $EM_CONF[$_EXTKEY] = array(
 	'version' => '0.8.0',
 	'constraints' => array(
 		'depends' => array(
-			'typo3' => '6.2.11-6.2.99',
-			'php' => '5.5',
+			'php' => '7.1',
+			'typo3' => '8.7.0-8.7.99',
 		),
 		'conflicts' => array(
 		),
 		'suggests' => array(
 		),
 	),
+	'autoload' => array(
+		'psr-4' => array(
+			'Innologi\\Decosdata\\' => 'Classes'
+		)
+	)
 );
