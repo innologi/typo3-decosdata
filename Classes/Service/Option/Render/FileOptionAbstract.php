@@ -23,8 +23,8 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Core\Resource\ResourceFactory;
-/**
+
+ /**
  * Abstract File Option class
  *
  * Offers some basic file-related methods for use by RenderOptions,
