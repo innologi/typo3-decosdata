@@ -68,18 +68,8 @@ return [
 				'renderType' => 'selectSingle',
 				'foreign_table' => 'tx_decosdata_domain_model_field',
 				// the 2nd AND forces unique field per item
-				'foreign_table_where' => '
-                    AND tx_decosdata_domain_model_field.pid = ###CURRENT_PID###
-                    AND (
-                        tx_decosdata_domain_model_field.uid NOT IN ((
-                            SELECT f.uid
-                            FROM tx_decosdata_domain_model_field f,tx_decosdata_domain_model_itemfield itf
-                            WHERE f.uid = itf.field
-                                AND itf.item=###REC_FIELD_item###
-                        ))
-                        OR tx_decosdata_domain_model_field.uid = ###REC_FIELD_field###
-                    )
-                    ORDER BY tx_decosdata_domain_model_field.field_name ASC',
+				// Note that T3 8.7.4 fails to extract the "ORDER BY" before putting it in a "WHERE", if there are newlines and possibly tabs, due to the limited regular expession employed in \TYPO3\CMS\Backend\Form\FormDataProvider\AbstractItemProvider->processForeignTableClause():1145
+				'foreign_table_where' => 'AND tx_decosdata_domain_model_field.pid = ###CURRENT_PID### AND (tx_decosdata_domain_model_field.uid NOT IN ((SELECT f.uid FROM tx_decosdata_domain_model_field f,tx_decosdata_domain_model_itemfield itf WHERE f.uid = itf.field AND itf.item=###REC_FIELD_item###)) OR tx_decosdata_domain_model_field.uid = ###REC_FIELD_field###) ORDER BY tx_decosdata_domain_model_field.field_name ASC',
 				'minitems' => 1,
 				'maxitems' => 1,
 			],
@@ -94,13 +84,8 @@ return [
 				'renderType' => 'selectSingle',
 				'foreign_table' => 'tx_decosdata_domain_model_item',
 				// the 2nd AND limits items to those from same import
-				'foreign_table_where' => '
-                    AND tx_decosdata_domain_model_item.pid = ###CURRENT_PID###
-                    AND (
-                        tx_decosdata_domain_model_item.tstamp = ###REC_FIELD_tstamp###
-                        OR tx_decosdata_domain_model_item.uid = ###REC_FIELD_item###
-                    )
-                    ORDER BY tx_decosdata_domain_model_item.uid ASC',
+				// Note that T3 8.7.4 fails to extract the "ORDER BY" before putting it in a "WHERE", if there are newlines and possibly tabs, due to the limited regular expession employed in \TYPO3\CMS\Backend\Form\FormDataProvider\AbstractItemProvider->processForeignTableClause():1145
+				'foreign_table_where' => 'AND tx_decosdata_domain_model_item.pid = ###CURRENT_PID### AND (tx_decosdata_domain_model_item.tstamp = ###REC_FIELD_tstamp### OR tx_decosdata_domain_model_item.uid = ###REC_FIELD_item###) ORDER BY tx_decosdata_domain_model_item.uid ASC',
 				'minitems' => 1,
 				'maxitems' => 1,
 				'fieldControl' => [

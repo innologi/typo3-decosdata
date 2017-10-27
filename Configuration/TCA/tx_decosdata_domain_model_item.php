@@ -96,9 +96,8 @@ return [
 				'type' => 'select',
 				'renderType' => 'selectSingle',
 				'foreign_table' => 'tx_decosdata_domain_model_itemtype',
-				'foreign_table_where' => '
-                    AND tx_decosdata_domain_model_itemtype.pid = ###CURRENT_PID###
-                    ORDER BY tx_decosdata_domain_model_itemtype.item_type ASC',
+				// Note that T3 8.7.4 fails to extract the "ORDER BY" before putting it in a "WHERE", if there are newlines and possibly tabs, due to the limited regular expession employed in \TYPO3\CMS\Backend\Form\FormDataProvider\AbstractItemProvider->processForeignTableClause():1145
+				'foreign_table_where' => 'AND tx_decosdata_domain_model_itemtype.pid = ###CURRENT_PID### ORDER BY tx_decosdata_domain_model_itemtype.item_type ASC',
 				'minitems' => 1,
 				'maxitems' => 1,
 			],
@@ -110,9 +109,8 @@ return [
 				'type' => 'select',
 				'renderType' => 'selectMultipleSideBySide',
 				'foreign_table' => 'tx_decosdata_domain_model_import',
-				'foreign_table_where' => '
-                    AND tx_decosdata_domain_model_import.pid = ###CURRENT_PID###
-                    ORDER BY tx_decosdata_domain_model_import.title ASC',
+				// Note that T3 8.7.4 fails to extract the "ORDER BY" before putting it in a "WHERE", if there are newlines and possibly tabs, due to the limited regular expession employed in \TYPO3\CMS\Backend\Form\FormDataProvider\AbstractItemProvider->processForeignTableClause():1145
+				'foreign_table_where' => 'AND tx_decosdata_domain_model_import.pid = ###CURRENT_PID### ORDER BY tx_decosdata_domain_model_import.title ASC',
 				'MM' => 'tx_decosdata_item_import_mm',
 				'size' => 6,
 				'autoSizeMax' => 15,
@@ -140,19 +138,8 @@ return [
 				 * - Only show items from the same XML (which we have to do with a subquery instead of a join, ugh)
 				 * - Limit the range of items in both directions to some extent
 				 */
-				'foreign_table_where' => '
-                    AND ' . $table . '.uid <> ###THIS_UID###
-                    AND ' . $table . '.pid = ###CURRENT_PID###
-                    AND ' . $table . '.uid IN (
-                        SELECT impr1.uid_local
-                        FROM tx_decosdata_item_import_mm impr1
-                            LEFT JOIN tx_decosdata_item_import_mm impr2
-                                ON (impr1.uid_foreign = impr2.uid_foreign)
-                        WHERE impr2.uid_local = ###THIS_UID###
-                    )
-                    AND ' . $table . '.uid < (###THIS_UID### + 5000)
-                    AND ' . $table . '.uid > (###THIS_UID### - 10000)
-                    ORDER BY ' . $table . '.uid ASC',
+				// Note that T3 8.7.4 fails to extract the "ORDER BY" before putting it in a "WHERE", if there are newlines and possibly tabs, due to the limited regular expession employed in \TYPO3\CMS\Backend\Form\FormDataProvider\AbstractItemProvider->processForeignTableClause():1145
+				'foreign_table_where' => 'AND ' . $table . '.uid <> ###THIS_UID### AND ' . $table . '.pid = ###CURRENT_PID### AND ' . $table . '.uid IN (SELECT impr1.uid_local FROM tx_decosdata_item_import_mm impr1 LEFT JOIN tx_decosdata_item_import_mm impr2 ON impr1.uid_foreign = impr2.uid_foreign WHERE impr2.uid_local = ###THIS_UID###) AND ' . $table . '.uid < (###THIS_UID### + 5000) AND ' . $table . '.uid > (###THIS_UID### - 10000) ORDER BY ' . $table . '.uid ASC',
 				// parent = foreign
 				'MM' => 'tx_decosdata_item_item_mm',
 				'size' => 10,
@@ -178,19 +165,8 @@ return [
 				'renderType' => 'selectMultipleSideBySide',
 				'foreign_table' => $table,
 				// slight variation from parent_item
-				'foreign_table_where' => '
-                    AND ' . $table . '.uid <> ###THIS_UID###
-                    AND ' . $table . '.pid = ###CURRENT_PID###
-                    AND ' . $table . '.uid IN (
-                        SELECT impr1.uid_local
-                        FROM tx_decosdata_item_import_mm impr1
-                            LEFT JOIN tx_decosdata_item_import_mm impr2
-                                ON (impr1.uid_foreign = impr2.uid_foreign)
-                        WHERE impr2.uid_local = ###THIS_UID###
-                    )
-                    AND ' . $table . '.uid < (###THIS_UID### + 10000)
-                    AND ' . $table . '.uid > (###THIS_UID### - 5000)
-                    ORDER BY ' . $table . '.uid DESC',
+				// Note that T3 8.7.4 fails to extract the "ORDER BY" before putting it in a "WHERE", if there are newlines and possibly tabs, due to the limited regular expession employed in \TYPO3\CMS\Backend\Form\FormDataProvider\AbstractItemProvider->processForeignTableClause():1145
+				'foreign_table_where' => 'AND ' . $table . '.uid <> ###THIS_UID### AND ' . $table . '.pid = ###CURRENT_PID### AND ' . $table . '.uid IN (SELECT impr1.uid_local FROM tx_decosdata_item_import_mm impr1 LEFT JOIN tx_decosdata_item_import_mm impr2 ON impr1.uid_foreign = impr2.uid_foreign WHERE impr2.uid_local = ###THIS_UID###) AND ' . $table . '.uid < (###THIS_UID### + 10000) AND ' . $table . '.uid > (###THIS_UID### - 5000) ORDER BY ' . $table . '.uid DESC',
 				// child = local
 				'MM' => 'tx_decosdata_item_item_mm',
 				'MM_opposite_field' => 'parent_item',
