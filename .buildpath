@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <buildpath>
 	<buildpathentry kind="con" path="org.eclipse.php.core.LANGUAGE"/>
-	<buildpathentry kind="con" path="org.eclipse.dltk.USER_LIBRARY/typo3_src"/>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/TYPO3-extdev8"/>
 	<buildpathentry kind="src" path=""/>
 </buildpath>

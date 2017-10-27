@@ -23,14 +23,15 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Backend\Utility\IconUtility;
 use Innologi\Decosdata\Service\Option\RenderOptionService;
+use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * File Icon option
  *
  * Renders a fileicon of the content, if content represents a valid file.
- * Uses the original icons used by the t3skin sprites.
+ * Uses the internal TYPO3 icons.
  *
  * @package decosdata
  * @author Frenck Lutke
@@ -40,9 +41,9 @@ class FileIcon extends FileOptionAbstract {
 	// @TODO ___Absolute URIs for other contexts than normal HTML?
 
 	/**
-	 * @var boolean
+	 * @var IconFactory
 	 */
-	protected $t3skinIsLoaded = FALSE;
+	protected $iconFactory;
 
 	/**
 	 * Class constructor
@@ -50,7 +51,7 @@ class FileIcon extends FileOptionAbstract {
 	 * @return void
 	 */
 	public function __construct() {
-		$this->t3skinIsLoaded = ExtensionManagementUtility::isLoaded('t3skin');
+		$this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
 	}
 
 	/**
@@ -58,52 +59,17 @@ class FileIcon extends FileOptionAbstract {
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
 	public function alterContentValue(array $args, &$content, RenderOptionService $service) {
-		if ( !($this->t3skinIsLoaded && $this->isFileHandle($service->getOriginalContent())) ) {
+		if ( !$this->isFileHandle($service->getOriginalContent()) ) {
 			return;
 		}
 
 		$file = $this->getFileObject($this->fileUid);
 		$fileExtension = $file->getExtension();
-		$mimeIconName = IconUtility::mapFileExtensionToSpriteIconName(
-			$fileExtension
+		$icon = $this->iconFactory->getIconForFileExtension(
+			$fileExtension, Icon::SIZE_SMALL
 		);
-		// note that a sprite icon name includes its original containing directory
-		// we just need to replace the first '-' with '/'
-		$iconName = join('/', explode('-', $mimeIconName, 2));
-
-		// contains the original icons that make up the sprites
-		$iconPath = ExtensionManagementUtility::siteRelPath('t3skin') . 'images/icons/';
-		$iconExt = array('png','gif');
-
-		// check if the icon exists with the given extensions
-		$iconExists = FALSE;
-		foreach ($iconExt as $ext) {
-			$icon = $iconPath . $iconName . '.' . $ext;
-			if (is_file(PATH_site . $icon)) {
-				$content = $icon;
-				$iconExists = TRUE;
-				break;
-			}
-		}
-
-		// if icon does not exist, return without alteration
-		if (!$iconExists) {
-			// @TODO ___why not set a default icon instead?
-			return;
-		}
-
-		// change $content to icon image
-			// none of these are useful to me if I don't add BE CSS
-			//$content = IconUtility::getSpriteIconForResource($file);
-			//$content = IconUtility::getSpriteIconForFile($file->getExtension());
-			//$content = IconUtility::getSpriteIcon($mimeIconName);
-
-		// @TODO ___the html tag should be configurable by TS or be provided by an internal TYPO3 function
-		$content = sprintf(
-			'<img src="%1$s" alt="%2$s" />',
-			$content,
-			$fileExtension
-		);
+		$content = $icon->render();
+		return;
 	}
 
 }

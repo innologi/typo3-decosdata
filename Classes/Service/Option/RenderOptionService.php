@@ -23,7 +23,6 @@ namespace Innologi\Decosdata\Service\Option;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\ViewHelpers\Content\RenderViewHelper;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 /**
  * Render Option Service

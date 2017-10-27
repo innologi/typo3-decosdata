@@ -1,18 +1,12 @@
 <?php
-if (!defined('TYPO3_MODE')) {
-	die ('Access denied.');
-}
-
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+defined('TYPO3_MODE') or die();
 
 $extKey = 'decosdata';
 $table = 'tx_' . $extKey . '_domain_model_itemblob';
 $ll = 'LLL:EXT:' . $extKey . '/Resources/Private/Language/locallang_db.xlf:' . $table;
-// this won't always be up to date because of caching, but that's ok
-$today = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
 
-return array(
-	'ctrl' => array(
+return [
+	'ctrl' => [
 		'title'	=> $ll,
 		// @LOW ___ for more descriptive TCA labels, check out http://docs.typo3.org/typo3cms/TCAReference/Reference/Ctrl/Index.html#label-userfunc
 		'label' => 'sequence',
@@ -22,109 +16,110 @@ return array(
 		'crdate' => 'crdate',
 		'cruser_id' => 'cruser_id',
 		'delete' => 'deleted',
-		'enablecolumns' => array(
+		'enablecolumns' => [
 			'disabled' => 'hidden',
 			'starttime' => 'starttime',
 			'endtime' => 'endtime',
-		),
+		],
 		'dividers2tabs' => 1,
 		'hideTable' => TRUE,
 		'hideAtCopy' => TRUE,
 		'default_sortby' => 'ORDER BY uid DESC',
 		// the table is non-searchable
 		//'searchFields' => '',
-		'iconfile' => ExtensionManagementUtility::extRelPath($extKey) . 'Resources/Public/Icons/' . $table . '.gif'
-	),
+		'iconfile' => 'EXT:' . $extKey . '/Resources/Public/Icons/' . $table . '.gif'
+	],
 
-	'interface' => array(
+	'interface' => [
 		'showRecordFieldList' => 'hidden, item_key, sequence, file, item',
-	),
-	'types' => array(
-		'0' => array(
+	],
+	'types' => [
+		'0' => [
 			'showitem' => 'hidden, item_key, sequence, file,
-				--div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'
-		),
-	),
-	'palettes' => array(),
-	'columns' => array(
+				--div--;LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:tabs.access, starttime, endtime'
+		],
+	],
+	'palettes' => [],
+	'columns' => [
 
-		'hidden' => array(
+		'hidden' => [
 			'exclude' => TRUE,
-			'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.hidden',
-			'config' => array(
+			'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
+			'config' => [
 				'type' => 'check',
 				'default' => 1
-			),
-		),
-		'starttime' => array(
+			],
+		],
+		'starttime' => [
 			'exclude' => TRUE,
-			'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.starttime',
-			'config' => array(
+			'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.starttime',
+			'config' => [
 				'type' => 'input',
-				'size' => 13,
-				'max' => 20,
+				'renderType' => 'inputDateTime',
 				'eval' => 'datetime',
 				'default' => 0,
-				'range' => array(
-					'lower' => $today
-				),
-			),
-		),
-		'endtime' => array(
+				'behaviour' => [
+					'allowLanguageSynchronization' => TRUE,
+				]
+			],
+		],
+		'endtime' => [
 			'exclude' => TRUE,
-			'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.endtime',
-			'config' => array(
+			'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.endtime',
+			'config' => [
 				'type' => 'input',
-				'size' => 13,
-				'max' => 20,
+				'renderType' => 'inputDateTime',
 				'eval' => 'datetime',
 				'default' => 0,
-				'range' => array(
-					'lower' => $today
-				),
-			),
-		),
+				'range' => [
+					'upper' => mktime(0, 0, 0, 1, 1, 2038)
+				],
+				'behaviour' => [
+					'allowLanguageSynchronization' => TRUE,
+				]
+			],
+		],
 
-		'item_key' => array(
+		'item_key' => [
 			'exclude' => FALSE,
 			'label' => $ll . '.item_key',
-			'config' => array(
+			'config' => [
 				'type' => 'input',
 				'size' => 40,
 				'max' => 32,
 				'eval' => 'required,uniqueInPid,trim,nospace,alphanum,upper'
-			),
-		),
-		'sequence' => array(
+			],
+		],
+		'sequence' => [
 			'exclude' => FALSE,
 			'label' => $ll . '.sequence',
-			'config' => array(
+			'config' => [
 				'type' => 'input',
 				'size' => 40,
 				'max' => 32,
 				'eval' => 'required,int'
-			),
-		),
-		'file' => array(
+			],
+		],
+		'file' => [
 			'exclude' => FALSE,
 			'label' => $ll . '.file',
-			'config' => ExtensionManagementUtility::getFileFieldTCAConfig(
+			'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig(
 				'file',
-				array(
+				[
 					'maxitems' => 1,
-					'foreign_match_fields' => array(
+					'foreign_match_fields' => [
 						'fieldname' => 'file',
 						'tablenames' => $table,
 						'table_local' => 'sys_file',
-					),
-				)
+					],
+				]
 			),
-		),
-		'item' => array(
-			'config' => array(
+		],
+		'item' => [
+			'config' => [
 				'type' => 'passthrough',
-			),
-		),
+			],
+		],
 
-	),
-);
+	],
+];

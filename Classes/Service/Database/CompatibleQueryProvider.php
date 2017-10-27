@@ -24,7 +24,6 @@ namespace Innologi\Decosdata\Service\Database;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Database\DatabaseConnection;
 /**
  * Query Provider: Compatible edition
  *

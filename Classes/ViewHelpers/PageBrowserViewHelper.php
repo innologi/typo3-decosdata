@@ -41,6 +41,10 @@ use Innologi\Decosdata\Exception\PaginationError;
 class PageBrowserViewHelper extends AbstractViewHelper {
 	// @LOW _argumentsToBeExcludedFromQueryString="{0:'tx_decosdata_publish[page]'}" on page 1 links?
 	// @TODO ___what about link titles?
+	/**
+	 * @var boolean
+	 */
+	protected $escapeOutput = FALSE;
 
 	/**
 	 * @var \Innologi\Decosdata\Service\PaginateService

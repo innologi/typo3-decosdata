@@ -24,7 +24,6 @@ namespace Innologi\Decosdata\ViewHelpers\Content;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
-use Innologi\Decosdata\Service\Option\RenderOptionService;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 // @TODO ___use \TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface ?
 /**
@@ -37,6 +36,11 @@ use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class RenderViewHelper extends AbstractViewHelper {
+
+	/**
+	 * @var boolean
+	 */
+	protected $escapeOutput = FALSE;
 
 	/**
 	 * @var \Innologi\Decosdata\Service\Option\RenderOptionService

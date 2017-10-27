@@ -38,6 +38,11 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
 class ForViewHelper extends AbstractViewHelper {
 
 	/**
+	 * @var boolean
+	 */
+	protected $escapeOutput = FALSE;
+
+	/**
 	 * Class constructor
 	 *
 	 * @return void
