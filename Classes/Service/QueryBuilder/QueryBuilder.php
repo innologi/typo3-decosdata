@@ -222,7 +222,7 @@ class QueryBuilder {
 							$this->constraintFactory->createConstraintAnd(array(
 								$this->constraintFactory->createConstraintByField('item', $blobAlias2, '=', 'uid', 'it'),
 								// @TODO ___note that this does not produce the same result as those that still use document_date. Need to see if Heemskerk is affected with newer tests
-								$this->constraintFactory->createConstraintByField('sequence', $blobAlias2, '<', 'sequence', $blobAlias1)
+								$this->constraintFactory->createConstraintByField('sequence', $blobAlias2, '>', 'sequence', $blobAlias1)
 							))
 						);
 					$queryField->getWhere()->setConstraint(
