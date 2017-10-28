@@ -265,6 +265,7 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	 */
 	protected function parseItemBlob(\XMLReader $reader, $parentItem) {
 		$data = array();
+		$fallback = NULL;
 
 		// place cursor at the next element (regardless of depth) and get new depth
 		while ($reader->read() && $reader->nodeType !== \XMLReader::ELEMENT);
@@ -278,16 +279,29 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 					$data['item_key'] = $this->readNodeValue($reader);
 					break;
 				case 'SEQUENCE':
+					// @TODO is there ever any use-case for maintaining multiple file versions?
+						// maybe we can introduce a setting that allows you to only keep the latest file version
+						// it would allow us to make the related query parts quite a bit simpler
+						// it would also allow us to remove both decos data and files and FAL data, decreasing the footprint of the database
 					$data['sequence'] = $this->readNodeValue($reader);
 					break;
 				case 'FILEPATH':
 					// determine complete relative path
 					$data['filepath'] = GeneralUtility::fixWindowsFilePath($this->baseFilePath . $this->readNodeValue($reader));
 					break;
+				case 'DOCUMENT_DATE':
+					// fallback for older decos exports
+					$fallback = $this->readNodeValue($reader);
+					break;
 				default:
 					// do nothing for any other node except move pointer
 					while ($reader->nodeType !== \XMLReader::END_ELEMENT && $reader->read());
 			}
+		}
+
+		// fallback for older decos exports that didn't have sequence fields but did have document dates
+		if (!(isset($data['sequence']) || $fallback === NULL)) {
+			$data['sequence'] = strtotime($fallback);
 		}
 
 		$data['item'] = $parentItem;
