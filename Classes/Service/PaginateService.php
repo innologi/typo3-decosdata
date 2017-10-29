@@ -148,7 +148,7 @@ class PaginateService implements SingletonInterface {
 	}
 
 	/**
-	 * Initiliaze and validate shared configuration
+	 * Initialize and validate shared configuration
 	 *
 	 * @param array $configuration
 	 * @return void
