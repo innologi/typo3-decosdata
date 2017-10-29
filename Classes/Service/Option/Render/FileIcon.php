@@ -28,6 +28,7 @@ use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Innologi\Decosdata\Library\TagBuilder\TagInterface;
+use Innologi\Decosdata\Library\TagBuilder\TagContent;
 /**
  * File Icon option
  *
@@ -67,9 +68,18 @@ class FileIcon extends FileOptionAbstract {
 		$file = $this->getFileObject($this->fileUid);
 		$fileExtension = $file->getExtension();
 
-		return $this->iconFactory->getIconForFileExtension(
+		// @LOW support setting the size through config?
+		// will always return an icon, even if the extension is unknown
+		// while technically a tag, we have to make do with a string
+			// if we want to make use of the internal API
+		$content = $this->iconFactory->getIconForFileExtension(
 			$fileExtension, Icon::SIZE_SMALL
-		);
+		)->getMarkup();
+		if ($tag instanceof TagContent) {
+			return $tag->reset()->setContent($content);
+		}
+
+		return $service->getTagFactory()->createTagContent($content);
 	}
 
 }
