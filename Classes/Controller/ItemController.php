@@ -46,6 +46,12 @@ class ItemController extends ActionController {
 	protected $queryBuilder;
 
 	/**
+	 * @var \Innologi\Decosdata\Service\BreadcrumbService
+	 * @inject
+	 */
+	protected $breadcrumbService;
+
+	/**
 	 * @var integer
 	 */
 	protected $level = 1;
@@ -567,6 +573,12 @@ class ItemController extends ActionController {
 				$activeConfiguration, $this->pluginConfiguration['import']
 			)->createStatement())
 		);
+
+		// initialize breadcrumb
+		if (isset($this->pluginConfiguration['breadcrumb']) && is_array($this->pluginConfiguration['breadcrumb'])) {
+			// @LOW this being optional, means I probably shouldn't inject it
+			$this->breadcrumbService->configureBreadcrumb($this->pluginConfiguration['breadcrumb'], $this->pluginConfiguration['import']);
+		}
 
 		$this->view->assign('configuration', $activeConfiguration);
 		$this->view->assign('items', $items);

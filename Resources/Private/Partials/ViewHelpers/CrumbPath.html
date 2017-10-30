@@ -1,0 +1,31 @@
+<html data-namespace-typo3-fluid="true"
+	xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+	xmlns:d="http://typo3.org/ns/Innologi/Decosdata/ViewHelpers">
+	
+<f:if condition="{renderAbove}">
+	<div class="crumbpath crumbpath-top">
+		<f:debug>{crumbPath}</f:debug>
+		<d:render section="crumbpath" arguments="{configuration: crumbPath}" />
+	</div>
+</f:if>
+
+<f:format.raw>{content}</f:format.raw>
+
+<f:if condition="{renderBelow}">
+	<div class="crumbpath crumbpath-bottom">
+		<d:render section="crumbpath" arguments="{configuration: crumbPath}" />
+	</div>
+</f:if>
+
+<f:section name="crumbpath">
+<ul class="crumbpath-navigation">
+	<f:for each="{configuration.crumbs}" as="item">
+		<li>
+			<f:link.action addQueryString="TRUE" argumentsToBeExcludedFromQueryString="{item.exclude}" arguments="{item.arguments}">{item.label}</f:link.action>
+		</li>
+	</f:for>
+	<li>{configuration.current.label}</li>
+</ul>
+</f:section>
+
+</html>

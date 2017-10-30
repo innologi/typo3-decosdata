@@ -146,11 +146,13 @@ class Query extends QueryIterator implements QueryInterface {
 	}
 
 	# @LOW _this is a temporary interface until the relevant FIX task in PaginateService is completed
+		# keep in mind this is now also used in crumbpath
 	protected $limit;
 	protected $offset;
 	public function setLimit($limit = NULL, $offset = NULL) {
 		$this->limit = $limit;
 		$this->offset = $offset;
+		return $this;
 	}
 
 }
