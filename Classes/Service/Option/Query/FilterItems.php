@@ -109,6 +109,7 @@ class FilterItems extends FilterOptionAbstract {
 			if ($from->getJoinType() === NULL) {
 				// initialize join if it did not exist yet
 				$parameterKey = ':' . $alias;
+				// note that we do LEFT and not INNER joins so the WHERE conditions can be used to filter on IS NULL as well
 				$from->setJoinType('LEFT')->setConstraint(
 					$this->constraintFactory->createConstraintAnd(array(
 						'item' => $this->constraintFactory->createConstraintByField('item', $alias, '=', 'uid', 'it'),
