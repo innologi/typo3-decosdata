@@ -153,7 +153,7 @@ class QueryConfigurator implements SingletonInterface {
 			ksort($queryParts['ORDERBY']);
 		} else {
 			// NULL prevents potential filesorts through GROUP BY sorting, when no ORDER BY was given
-			$query .= "\n" . 'ORDER BY NULL';
+			$queryParts['ORDERBY'] = [ 'NULL' ];
 		}
 
 		// add parameter:values that were not yet parameterized
