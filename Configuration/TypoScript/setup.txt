@@ -13,4 +13,30 @@ plugin.tx_decosdata {
 		storagePid = {$plugin.tx_decosdata.persistence.storagePid}
 	}
 	
+	advanced {
+		# by loading each content-object as an actual content object, we can separate caching concerns
+		# and since USER objects are cached anyway, the added overhead isn't that big of a deal minimal
+		_LIST = USER
+		_LIST {
+			userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+			extensionName = Decosdata
+			pluginName = Publish
+			vendorName = Innologi
+			switchableControllerActions.Item.1 = list
+		}
+		_SHOW < ._LIST
+		_SHOW.switchableControllerActions.Item.1 = show
+	}
 }
+
+#@LOW we're forced to use 0,1,2 on arrays that would otherwise expect 10 in TS. This influences the parameter query names, and e.g. 10 causes the original Statement object to fail but not ours. Why is that?
+
+# regelgeving
+[globalVar = TSFE:id = 12]
+<INCLUDE_TYPOSCRIPT: source="FILE:EXT:decosdata/Configuration/TypoScript/Publish/regelgeving.ts">
+
+# bis
+[globalVar = TSFE:id = 13]
+<INCLUDE_TYPOSCRIPT: source="FILE:EXT:decosdata/Configuration/TypoScript/Publish/bis.ts">
+
+[global]

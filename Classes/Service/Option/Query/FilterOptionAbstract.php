@@ -48,8 +48,7 @@ abstract class FilterOptionAbstract extends OptionAbstract {
 	 * @throws \Innologi\Decosdata\Service\Option\Exception\MissingArgument
 	 */
 	protected function initialize(array $args) {
-		if (!isset($args['filters'][0])) {
-			// @TODO ___test this
+		if (!isset($args['filters']) || empty($args['filters'])) {
 			throw new MissingArgument(1448551220, array(self::class, 'filters'));
 		}
 	}
@@ -76,7 +75,7 @@ abstract class FilterOptionAbstract extends OptionAbstract {
 			$filter['value'] = rawurldecode($param[$filter['parameter']]);
 			// @TODO ___throw exception if it does not exist?
 		}
-		if ($requireField && !(isset($filter['field']) && is_int($filter['field'])) ) {
+		if ($requireField && !(isset($filter['field']) && is_numeric($filter['field'])) ) {
 			throw new MissingArgument(1448898010, array(self::class, 'filters.field'));
 		}
 	}
