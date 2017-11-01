@@ -79,7 +79,7 @@ class PaginateService implements SingletonInterface {
 	/**
 	 * @var boolean
 	 */
-	protected $ready = FALSE;
+	protected $active = FALSE;
 
 	/**
 	 * Returns current page number
@@ -148,7 +148,7 @@ class PaginateService implements SingletonInterface {
 	}
 
 	/**
-	 * Initiliaze and validate shared configuration
+	 * Initialize and validate shared configuration
 	 *
 	 * @param array $configuration
 	 * @return void
@@ -237,7 +237,7 @@ class PaginateService implements SingletonInterface {
 		// add from and keep it in a variable for later use
 		$parameterKey = ':pagebrowserfield';
 		$from = $queryField->getFrom(
-			'pagebrowser-year', 'tx_decosdata_domain_model_itemfield', $tableAlias
+			'pagebrowser-year', array($tableAlias => 'tx_decosdata_domain_model_itemfield')
 		)->setJoinType(
 			'LEFT'
 		)->setConstraint(

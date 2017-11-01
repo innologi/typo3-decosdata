@@ -1,9 +1,9 @@
 <?php
-namespace Innologi\Decosdata\Service\Option\Exception;
+namespace Innologi\Decosdata\Library\TagBuilder;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -23,19 +23,42 @@ namespace Innologi\Decosdata\Service\Option\Exception;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\SingletonInterface;
 /**
- * MissingOptionClass Exception
+ * Tag Factory
  *
- * @package decosdata
+ * Should be used to create Tag objects that are used to render
+ * frontend output.
+ *
+ * @package InnologiLibs
+ * @subpackage TagBuilder
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MissingOptionClass extends OptionException {
+class TagFactory implements SingletonInterface {
 
 	/**
-	 * @var string
+	 * Creates Tag object
+	 *
+	 * @param string $tagName
+	 * @param array $tagAttributes
+	 * @param TagInterface $content
+	 * @return Tag
 	 */
-	protected $message = 'Option Configuration Error: Option class %1$s could not be found. It either does not exist, or an external option was set without its actual namespace.';
+	public function createTag($tagName, array $tagAttributes = array(), TagInterface $content = NULL) {
+		return GeneralUtility::makeInstance(Tag::class, $tagName, $tagAttributes, $content);
+	}
+
+	/**
+	 * Creates TagContent object
+	 *
+	 * @param string $content
+	 * @param array $markReplacements
+	 * return TagContent
+	 */
+	public function createTagContent($content, array $markReplacements = []) {
+		return GeneralUtility::makeInstance(TagContent::class, $content, $markReplacements);
+	}
 
 }

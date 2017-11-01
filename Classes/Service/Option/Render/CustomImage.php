@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -24,41 +24,50 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Library\TagBuilder\TagInterface;
-use Innologi\Decosdata\Library\TagBuilder\TagContent;
 /**
- * File Size option
+ * Custom Image option
  *
- * Renders the filesize of the content, if content represents a valid file.
+ * Renders a custom image as the content.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileSize extends FileOptionAbstract {
+class CustomImage implements OptionInterface {
+	// @TODO ___Absolute URIs for other contexts than normal HTML?
 
 	/**
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( !$this->isFileHandle($service->getOriginalContent()) ) {
-			return;
+		if ( !isset($args['path'][0]) ) {
+			throw new MissingArgument(1462019242, array(self::class, 'path'));
 		}
 
-		$content = GeneralUtility::formatSize(
-			$this->getFileObject($this->fileUid)->getSize(),
-			// @TODO ___get default format from typoscript?
-			// @LOW ___support formatting argument?
-			'b|kb|MB|GB|TB'
-		);
-
-		if ($tag instanceof TagContent) {
-			return $tag->reset()->setContent($content);
+		// check requirements
+		$ifContent = isset($args['requireContent']) && (bool)$args['requireContent'];
+		$ifRelation = isset($args['requireRelation']) && (bool)$args['requireRelation'];
+		$originalContent = $service->getOriginalContent();
+		$item = $service->getItem();
+		$index = $service->getIndex();
+		if (
+			($ifContent && !isset($originalContent[0]))
+			|| ($ifRelation && !isset($item['relation' . $index]))
+		) {
+			// if requirements are set but not met, stop
+			return $tag;
 		}
 
-		return $service->getTagFactory()->createTagContent($content);
+		if (!is_file(PATH_site . $args['path'])) {
+			// @TODO ___throw exception instead?
+			// if image does not exist, stop
+			return $tag;
+		}
+
+		return $service->getTagFactory()->createTag('img', ['src' => $args['path']]);
 	}
 
 }

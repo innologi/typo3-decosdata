@@ -24,6 +24,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
+use Innologi\Decosdata\Library\TagBuilder\TagInterface;
 /**
  * File Download option
  *
@@ -48,7 +49,7 @@ class FileDownload extends FileOptionAbstract {
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
-	public function alterContentValue(array $args, &$content, RenderOptionService $service) {
+	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
 		// @TODO ___what if the content is empty? Can (and should) we differentiate between originalContent and content? I mean it's clear we shouldn't generate a downloadlink if no file was found
 		// $fileRelativeUrl = $renderer->getFileRelativeUrl();?
 		//if ($fileRelativeUrl === NULL) {
@@ -56,10 +57,12 @@ class FileDownload extends FileOptionAbstract {
 		if (!$this->isFileHandle($fileHandle)) {
 			return;
 		}
+		// @TODO _____what happens if file id does not exist?
+		$file = $this->getFileObject($this->fileUid);
 
-		$content = $this->contentObjectRenderer->typoLink($content, array(
-			'parameter' => $fileHandle
-		));
+		return $service->getTagFactory()->createTag('a', [
+			'href' => $file->getPublicUrl()
+		], $tag);
 	}
 
 }

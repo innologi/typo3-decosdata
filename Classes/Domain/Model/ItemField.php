@@ -38,7 +38,7 @@ class ItemField extends AbstractEntity {
 	 *
 	 * @var string
 	 */
-	protected $fieldValue;
+	protected $fieldValue = '';
 
 	/**
 	 * Field

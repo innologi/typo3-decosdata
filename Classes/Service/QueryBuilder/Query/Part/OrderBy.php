@@ -49,6 +49,11 @@ class OrderBy extends PriorityContainer {
 	protected $field;
 
 	/**
+	 * @var boolean
+	 */
+	protected $forceNumeric = FALSE;
+
+	/**
 	 * Returns Sort Order
 	 *
 	 * @return string
@@ -105,6 +110,26 @@ class OrderBy extends PriorityContainer {
 	 */
 	public function setField($field) {
 		$this->field = $field;
+		return $this;
+	}
+
+	/**
+	 * Returns ForceNumeric
+	 *
+	 * @return boolean
+	 */
+	public function getForceNumeric() {
+		return $this->forceNumeric;
+	}
+
+	/**
+	 * Sets ForceNumeric
+	 *
+	 * @param boolean $forceNumeric
+	 * @return $this
+	 */
+	public function setForceNumeric($forceNumeric) {
+		$this->forceNumeric = $forceNumeric;
 		return $this;
 	}
 

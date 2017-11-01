@@ -25,6 +25,9 @@ namespace Innologi\Decosdata\Service\Option\Render;
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
+use Innologi\Decosdata\Library\TagBuilder\TagInterface;
+use Innologi\Decosdata\Library\TagBuilder\TagContent;
+
 /**
  * Link Level option
  *
@@ -35,35 +38,53 @@ use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class LinkLevel implements OptionInterface {
+	// @LOW ___allow this to be set via configuration? TS? or maybe even args?
+	/**
+	 * @var string
+	 */
+	protected $defaultContent = 'link';
 
 	/**
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
-	public function alterContentValue(array $args, &$content, RenderOptionService $service) {
+	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
 		if ( !(isset($args['level']) && is_int($args['level'])) ) {
 			throw new MissingArgument(1449048090, array(self::class, 'level'));
 		}
 		$linkValue = NULL;
 		if (isset($args['linkItem']) && $args['linkItem']) {
 			$item = $service->getItem();
-			$linkValue = $item['itemID'];
+			$linkValue = (string) $item['itemID'];
+		} elseif (isset($args['linkRelation']) && $args['linkRelation']) {
+			$item = $service->getItem();
+			$linkValue = (string) $item['relation' . $service->getIndex()];
 		} else {
 			$linkValue = $service->getOriginalContent();
 		}
 
-		$uriBuilder = $service->getControllerContext()->getUriBuilder();
-		// @TODO ___test if this should be urlencode, or rawurlencode, or.. whatever. maybe even add htmlspecialchars? Or would uriBuilder already have done that?
+		// no linkValue means no uri building, this is not an error
+		if (!isset($linkValue[0])) {
+			return $tag;
+		}
+
+		// no content in a TagContent means we need a default substitute
+		if ($tag instanceof TagContent && !$tag->hasContent()) {
+			$tag->setContent($this->defaultContent);
+		}
+
 		// @LOW _if we just read the latest _ argument, can't we derive level from there, so we can get rid of the level arg? we have to be sure that it's not read anywhere else
 		// @LOW _see if addQueryStringMethod is of any use to us
-		$uri = $uriBuilder->reset()
+		$uri = $service->getControllerContext()->getUriBuilder()
+			->reset()
 			->setAddQueryString(TRUE)
 			// @LOW _if we support a page argument per level, we could maintain current and previous levels through arguments. Another option would be the session
 			->setArgumentsToBeExcludedFromQueryString(array('tx_decosdata_publish[page]'))
+			// @TODO ___test if this should be urlencode, or rawurlencode, or.. whatever. maybe even add htmlspecialchars? Or would uriBuilder already have done that?
 			->uriFor(NULL, array('level' => $args['level'], '_' . $args['level'] => rawurlencode($linkValue)));
-		// @TODO ___title and or other attributes? in tx_decospublisher, a title could be set through an argument, which would expand the query to include the field containing the title
-		$content = '<a href="' . $uri . '">' . $content . '</a>';
-	}
 
+		// @TODO ___title and or other attributes? in tx_decospublisher, a title could be set through an argument, which would expand the query to include the field containing the title
+		return $service->getTagFactory()->createTag('a', ['href' => $uri], $tag);
+	}
 
 }

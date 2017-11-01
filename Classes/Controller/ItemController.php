@@ -46,6 +46,12 @@ class ItemController extends ActionController {
 	protected $queryBuilder;
 
 	/**
+	 * @var \Innologi\Decosdata\Service\BreadcrumbService
+	 * @inject
+	 */
+	protected $breadcrumbService;
+
+	/**
 	 * @var integer
 	 */
 	protected $level = 1;
@@ -71,11 +77,12 @@ class ItemController extends ActionController {
 	 */
 	protected function initializePluginConfiguration() {
 		$pid = (int) $GLOBALS['TSFE']->id;
+		// @LOW _consider this: we translated querybuilder configuration from arrays to classes. would there be an advantage to doing the same for this? this isn't going to be adjustable like query configurations, but maybe there are other advantages?
 		// extdev: regelgeving actief
 		if ($pid === 11) {
 		$this->pluginConfiguration = array(
 			'import' => array(
-				2
+				4
 			),
 			'level' => array(
 				1 => array(
@@ -85,7 +92,7 @@ class ItemController extends ActionController {
 					),
 					'itemType' => array(
 						// DOCUMENT
-						2
+						1
 					),
 					'contentField' => array(
 						1 => array(
@@ -93,7 +100,7 @@ class ItemController extends ActionController {
 							'content' => array(
 								array(
 									// TEXT9
-									'field' => 16,
+									'field' => 6,
 								)
 							),
 							'order' => array(
@@ -106,7 +113,7 @@ class ItemController extends ActionController {
 							'content' => array(
 								array(
 									// DATE5
-									'field' => 23,
+									'field' => 34,
 									'queryOptions' => array(
 										array(
 											'option' => 'DateConversion',
@@ -121,6 +128,10 @@ class ItemController extends ActionController {
 													array(
 														'value' => 'NULL',
 														'operator' => 'IS NOT',
+													),
+													array(
+														'value' => '',
+														'operator' => '!=',
 													),
 													array(
 														'value' => 'NOW()',
@@ -143,7 +154,7 @@ class ItemController extends ActionController {
 							'content' => array(
 								array(
 									// DATE6
-									'field' => 19,
+									'field' => 31,
 									'queryOptions' => array(
 										array(
 											'option' => 'DateConversion',
@@ -158,6 +169,10 @@ class ItemController extends ActionController {
 													array(
 														'value' => 'NULL',
 														'operator' => 'IS',
+													),
+													array(
+														'value' => '',
+														'operator' => '=',
 													),
 													array(
 														'value' => 'NOW()',
@@ -200,7 +215,7 @@ class ItemController extends ActionController {
 		// extdev: BIS
 		$this->pluginConfiguration = array(
 			'import' => array(
-				3
+				5,1
 			),
 			'level' => array(
 				1 => array(
@@ -210,20 +225,17 @@ class ItemController extends ActionController {
 					),
 					'itemType' => array(
 						// FOLDER
-						1
+						2
 					),
 					// @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
-					'relation' => array(
-						// prevents a groupBy on itemID
-						'noItemId' => TRUE
-					),
+					'noItemId' => TRUE,
 					'contentField' => array(
 						1 => array(
 							'title' => 'Vergaderingen',
 							'content' => array(
 								array(
 									// SUBJECT1
-									'field' => 5,
+									'field' => 23,
 								)
 							),
 							'renderOptions' => array(
@@ -248,14 +260,14 @@ class ItemController extends ActionController {
 									array(
 										'value' => 'vergaderdossiers',
 										'operator' => '=',
-										// BOOKMARK
+										// BOOKNAME
 										'field' => 2
 									),
 									array(
 										'value' => '1',
 										'operator' => '=',
 										// BOL3
-										'field' => 27
+										'field' => 16
 									)
 								),
 								'matchAll' => TRUE
@@ -268,11 +280,11 @@ class ItemController extends ActionController {
 						'type' => 'yearly',
 						'pageLimit' => 20,
 						// DATE1
-						'field' => 20
+						'field' => 24
 					),
 					'itemType' => array(
 						// FOLDER
-						1
+						2
 					),
 					'contentField' => array(
 						1 => array(
@@ -280,7 +292,7 @@ class ItemController extends ActionController {
 							'content' => array(
 								array(
 									// DATE1
-									'field' => 20,
+									'field' => 24,
 									'order' => array(
 										'sort' => 'DESC',
 										'priority' => 10
@@ -316,19 +328,19 @@ class ItemController extends ActionController {
 										'parameter' => '_2',
 										'operator' => '=',
 										// SUBJECT1
-										'field' => 5
+										'field' => 23
 									),
 									array(
 										'value' => 'vergaderdossiers',
 										'operator' => '=',
-										// BOOKMARK
+										// BOOKNAME
 										'field' => 2
 									),
 									array(
 										'value' => '1',
 										'operator' => '=',
 										// BOL3
-										'field' => 27
+										'field' => 16
 									)
 								),
 								'matchAll' => TRUE
@@ -339,10 +351,9 @@ class ItemController extends ActionController {
 				// @FIX ______multiple views per plugin?
 				// @FIX ______different view types per view? we have list, now we need single for "header"?
 				// @FIX ______zaak support
-				// @FIX ______childview mogelijk maken!
 				// @FIX ______crumbpaths
 				// 1:4(1,1,1|1,1,2|1,1,3|1,*,*);
-				// 1:childView()-fixNumberOrdering();5:getIdOfOtherParentWithinCurrentParent(0|'FOLDER')-makeIcon('zaak')-makeLink(4|''|'SUBJECT1'|1)-whiteList('BOL3 = 1','BOOKNAME LIKE Zake%'|1|1|1);6:dateConversion();
+				// 1:fixNumberOrdering();;
 				3 => array(
 					'paginate' => array(
 						'pageLimit' => 20,
@@ -350,7 +361,7 @@ class ItemController extends ActionController {
 					),
 					'itemType' => array(
 						// DOCUMENT
-						2
+						1
 					),
 					'contentField' => array(
 						1 => array(
@@ -358,19 +369,19 @@ class ItemController extends ActionController {
 							'content' => array(
 								/*array(
 									// DATE2 (NUM2)
-									'field' => 21,
+									'field' => 32,
 								),
 								array(
 									// DATE3 (NUM3)
-									'field' => 24,
+									'field' => 35,
 								),
 								array(
 									// DATE4 (NUM4)
-									'field' => 28,
+									'field' => 17,
 								),*/
 								array(
 									// TEXT8
-									'field' => 10,
+									'field' => 11,
 								)
 							),
 							'order' => array(
@@ -383,7 +394,7 @@ class ItemController extends ActionController {
 							'content' => array(
 								array(
 									// SUBJECT1
-									'field' => 5,
+									'field' => 23,
 								)
 							),
 							'order' => array(
@@ -396,7 +407,7 @@ class ItemController extends ActionController {
 							'content' => array(
 								array(
 									// TEXT9
-									'field' => 16,
+									'field' => 6,
 								)
 							),
 							'order' => array(
@@ -428,13 +439,67 @@ class ItemController extends ActionController {
 						),
 						5 => array(
 							'title' => 'Zaak',
+							'queryOptions' => array(
+								array(
+									'option' => 'ParentInParent',
+									'args' => array(
+										// FOLDER
+										'itemType' => array(
+											2
+										)
+									)
+								),
+								/*array(
+								 'option' => 'FilterSubItems',
+									'args' => array(
+										'filters' => array(
+											array(
+												'value' => 'zake%',
+												'operator' => 'LIKE',
+												// BOOKNAME
+												'field' => 2
+											),
+											array(
+												'value' => '1',
+												'operator' => '=',
+												// BOL3
+												'field' => 16
+											)
+										),
+										'matchAll' => TRUE
+									)
+								)*/
+							),
+							'renderOptions' => array(
+								/*array(
+									'option' => 'Icon',
+									'args' => array(
+										'name' => 'zaak'
+									)
+								),*/
+								array(
+									'option' => 'LinkLevel',
+									'args' => array(
+										'level' => 4,
+										'linkContentItem' => TRUE
+									)
+								)
+							)
 						),
 						6 => array(
 							'title' => 'Reg.datum',
 							'content' => array(
 								array(
 									// DOCUMENT_DATE
-									'field' => 13,
+									'field' => 21,
+									'queryOptions' => array(
+										array(
+											'option' => 'DateConversion',
+											'args' => array(
+												'format' => '%d-%m-%Y'
+											)
+										)
+									)
 								)
 							),
 						),
@@ -450,6 +515,12 @@ class ItemController extends ActionController {
 					),
 					'queryOptions' => array(
 						array(
+							'option' => 'RestrictByParentId',
+							'args' => array(
+								'parameter' => '_3',
+							)
+						),
+						array(
 							'option' => 'FilterItems',
 							'args' => array(
 								'filters' => array(
@@ -457,7 +528,7 @@ class ItemController extends ActionController {
 										'value' => '1',
 										'operator' => '=',
 										// BOL3
-										'field' => 27
+										'field' => 16
 									)
 								),
 							)
@@ -502,6 +573,12 @@ class ItemController extends ActionController {
 				$activeConfiguration, $this->pluginConfiguration['import']
 			)->createStatement())
 		);
+
+		// initialize breadcrumb
+		if (isset($this->pluginConfiguration['breadcrumb']) && is_array($this->pluginConfiguration['breadcrumb'])) {
+			// @LOW this being optional, means I probably shouldn't inject it
+			$this->breadcrumbService->configureBreadcrumb($this->pluginConfiguration['breadcrumb'], $this->pluginConfiguration['import']);
+		}
 
 		$this->view->assign('configuration', $activeConfiguration);
 		$this->view->assign('items', $items);

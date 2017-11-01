@@ -27,6 +27,8 @@ use Innologi\Decosdata\Service\Option\RenderOptionService;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Innologi\Decosdata\Library\TagBuilder\TagInterface;
+use Innologi\Decosdata\Library\TagBuilder\TagContent;
 /**
  * File Icon option
  *
@@ -58,18 +60,26 @@ class FileIcon extends FileOptionAbstract {
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
-	public function alterContentValue(array $args, &$content, RenderOptionService $service) {
+	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
 		if ( !$this->isFileHandle($service->getOriginalContent()) ) {
 			return;
 		}
 
 		$file = $this->getFileObject($this->fileUid);
 		$fileExtension = $file->getExtension();
-		$icon = $this->iconFactory->getIconForFileExtension(
+
+		// @LOW support setting the size through config?
+		// will always return an icon, even if the extension is unknown
+		// while technically a tag, we have to make do with a string
+			// if we want to make use of the internal API
+		$content = $this->iconFactory->getIconForFileExtension(
 			$fileExtension, Icon::SIZE_SMALL
-		);
-		$content = $icon->render();
-		return;
+		)->getMarkup();
+		if ($tag instanceof TagContent) {
+			return $tag->reset()->setContent($content);
+		}
+
+		return $service->getTagFactory()->createTagContent($content);
 	}
 
 }

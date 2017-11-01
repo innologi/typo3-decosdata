@@ -26,6 +26,7 @@ namespace Innologi\Decosdata\Service\Option\Query;
 use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
 use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
+use Innologi\Decosdata\Service\Option\QueryOptionService;
 /**
  * Query Option Interface
  *
@@ -34,17 +35,17 @@ use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 interface OptionInterface {
-
+	// @TODO __consider that for TCA to offer some kind of interface to apply queryOptions with, it could be helpful to NOT enforce these options, put a method_exists check in the optionService, and detect the available uses by which of these methods exist per option
 	/**
 	 * Alters query through $queryField on the field level.
 	 * Influences a specific column field.
 	 *
 	 * @param array $args
 	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\QueryField $queryField
-	 * @param integer $optionIndex
+	 * @param \Innologi\Decosdata\Service\Option\QueryOptionService $service
 	 * @return void
 	 */
-	public function alterQueryField(array $args, QueryField $queryField, $optionIndex);
+	public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service);
 
 	/**
 	 * Alters query through $queryContent on the column level.
@@ -52,10 +53,10 @@ interface OptionInterface {
 	 *
 	 * @param array $args
 	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent $queryContent
-	 * @param integer $optionIndex
+	 * @param \Innologi\Decosdata\Service\Option\QueryOptionService $service
 	 * @return void
 	 */
-	public function alterQueryColumn(array $args, QueryContent $queryContent, $optionIndex);
+	public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service);
 
 	/**
 	 * Alters query through $query on the row level.
@@ -63,9 +64,9 @@ interface OptionInterface {
 	 *
 	 * @param array $args
 	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Query $query
-	 * @param integer $optionIndex
+	 * @param \Innologi\Decosdata\Service\Option\QueryOptionService $service
 	 * @return void
 	 */
-	public function alterQueryRow(array $args, Query $query, $optionIndex);
+	public function alterQueryRow(array $args, Query $query, QueryOptionService $service);
 
 }

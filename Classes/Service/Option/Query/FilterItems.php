@@ -23,10 +23,9 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Innologi\Decosdata\Service\Option\QueryOptionService;
 /**
  * FilterItems option
  *
@@ -36,52 +35,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FilterItems extends OptionAbstract {
+class FilterItems extends FilterOptionAbstract {
 	// @TODO ___can we include the quick filters?
-	// @TODO ___base FilterSubItem(?) on this one, see if we can create an abstract on which both rely
-
-	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
-	 * @inject
-	 */
-	protected $constraintFactory;
-
-	/**
-	 * Initializes public methods by providing shared logic
-	 *
-	 * @param array $args
-	 * @return void
-	 * @throws \Innologi\Decosdata\Service\Option\Exception\MissingArgument
-	 */
-	protected function initialize(array $args) {
-		if (!isset($args['filters'][0])) {
-			// @TODO ___test this
-			throw new MissingArgument(1448551220, array(self::class, 'filters'));
-		}
-	}
-
-	/**
-	 * Initializes filter
-	 *
-	 * @param array &$filter
-	 * @return void
-	 * @throws \Innologi\Decosdata\Service\Option\Exception\MissingArgument
-	 */
-	protected function initializeFilter(array &$filter) {
-		if (!isset($filter['operator'][0])) {
-			throw new MissingArgument(1448897878, array(self::class, 'filters.operator'));
-		}
-		if (!isset($filter['value'][0])) {
-			if (!isset($filter['parameter'][0])) {
-				throw new MissingArgument(1448897891, array(self::class, 'filters.value/parameter'));
-			}
-			// @LOW ___add support for other extension parameters?
-			// @TODO ___not validated. shouldn't we get it from controller/request or something? that way we can keep validation on a single location
-			$param = GeneralUtility::_GP('tx_decosdata_publish');
-			$filter['value'] = rawurldecode($param[$filter['parameter']]);
-			// @TODO ___throw exception if it does not exist?
-		}
-	}
 
 	/**
 	 * Filter is applied on current field configuration.
@@ -89,9 +44,9 @@ class FilterItems extends OptionAbstract {
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
 	 */
-	public function alterQueryField(array $args, QueryField $queryField, $optionIndex) {
+	public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service) {
 		$this->initialize($args);
-		$id = $queryField->getId() . 'filteritems' . $optionIndex;
+		$id = $queryField->getId() . 'filteritems' . $service->getOptionIndex();
 
 		$select = $queryField->getSelect();
 		$conditions = array();
@@ -105,17 +60,12 @@ class FilterItems extends OptionAbstract {
 			);
 		}
 
-		$constraint = NULL;
-		if (count($conditions) > 1) {
-			$logic = isset($args['matchAll']) && (bool) $args['matchAll'] ? 'AND' : 'OR';
-			$constraint = $this->constraintFactory->createConstraintCollection($logic, $conditions);
-		} else {
-			$constraint = $conditions[0];
-		}
-
-		$queryField->getWhere()->addConstraint($id, $constraint);
+		$queryField->getWhere()->addConstraint(
+			$id,
+			$this->processConditions($args, $conditions)
+		);
 	}
-
+	// @TODO ___cleanup or finish
 	/**
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
@@ -141,7 +91,7 @@ class FilterItems extends OptionAbstract {
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
 	 */
-	public function alterQueryRow(array $args, Query $query, $optionIndex) {
+	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
 		$this->initialize($args);
 		$id = 'filteritems';
 		$table = 'tx_decosdata_domain_model_itemfield';
@@ -152,16 +102,14 @@ class FilterItems extends OptionAbstract {
 		$queryField = $query->getContent($id)->getField('');
 		$conditions = array();
 		foreach ($args['filters'] as $filter) {
-			$this->initializeFilter($filter);
-			if ( !(isset($filter['field']) && is_int($filter['field'])) ) {
-				throw new MissingArgument(1448898010, array(self::class, 'filters.field'));
-			}
+			$this->initializeFilter($filter, TRUE);
 			$alias = $id . $filter['field'];
 			// identify the join by the field, so we don't create redundant joins
-			$from = $queryField->getFrom($filter['field'], $table, $alias);
+			$from = $queryField->getFrom($filter['field'], array($alias => $table));
 			if ($from->getJoinType() === NULL) {
 				// initialize join if it did not exist yet
 				$parameterKey = ':' . $alias;
+				// note that we do LEFT and not INNER joins so the WHERE conditions can be used to filter on IS NULL as well
 				$from->setJoinType('LEFT')->setConstraint(
 					$this->constraintFactory->createConstraintAnd(array(
 						'item' => $this->constraintFactory->createConstraintByField('item', $alias, '=', 'uid', 'it'),
@@ -179,15 +127,10 @@ class FilterItems extends OptionAbstract {
 			);
 		}
 
-		$constraint = NULL;
-		if (count($conditions) > 1) {
-			$logic = isset($args['matchAll']) && (bool) $args['matchAll'] ? 'AND' : 'OR';
-			$constraint = $this->constraintFactory->createConstraintCollection($logic, $conditions);
-		} else {
-			$constraint = $conditions[0];
-		}
-
-		$queryField->getWhere()->addConstraint($optionIndex, $constraint);
+		$queryField->getWhere()->addConstraint(
+			$service->getOptionIndex(),
+			$this->processConditions($args, $conditions)
+		);
 	}
 
 }

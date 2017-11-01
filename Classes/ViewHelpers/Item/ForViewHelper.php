@@ -50,8 +50,9 @@ class ForViewHelper extends AbstractViewHelper {
 	public function __construct() {
 		$this->registerArgument('configuration', 'array', 'Configuration directives for rendering all content fields.', TRUE);
 		$this->registerArgument('item', 'array', 'Item array containing all its content fields.', TRUE);
-		$this->registerArgument('contentAs', 'string', 'Variable name for current content.', TRUE);
-		$this->registerArgument('configAs', 'string', 'Variable name for current content configuration.', TRUE);
+		$this->registerArgument('contentAs', 'string', 'Variable name for current content.', FALSE, 'content');
+		$this->registerArgument('configAs', 'string', 'Variable name for current content configuration.', FALSE, 'contentConfiguration');
+		$this->registerArgument('indexAs', 'string', 'Variable name for current content index.', FALSE, 'index');
 	}
 
 	/**
@@ -66,12 +67,15 @@ class ForViewHelper extends AbstractViewHelper {
 		foreach ($this->arguments['configuration'] as $index => $config) {
 			if (!isset($item['content' . $index])) {
 				// @TODO ___throw exception 'configuration / content mismatch'
+				// @TODO ___wait, if we do that, don't we have an issue with BIS level 3 field 5?
 			}
+			$this->templateVariableContainer->add($this->arguments['indexAs'], $index);
 			$this->templateVariableContainer->add($this->arguments['configAs'], $config);
 			$this->templateVariableContainer->add($this->arguments['contentAs'], $item['content' . $index]);
 			$output .= $this->renderChildren();
 			$this->templateVariableContainer->remove($this->arguments['contentAs']);
 			$this->templateVariableContainer->remove($this->arguments['configAs']);
+			$this->templateVariableContainer->remove($this->arguments['indexAs']);
 		}
 		return $output;
 	}

@@ -24,7 +24,6 @@ namespace Innologi\Decosdata\ViewHelpers\Content;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
-use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 // @TODO ___use \TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface ?
 /**
  * Content.Render ViewHelper
@@ -48,24 +47,27 @@ class RenderViewHelper extends AbstractViewHelper {
 	 */
 	protected $optionService;
 
+	// @TODO _______use method initializeArguments() instead
 	/**
 	 * Class constructor
 	 *
 	 * @return void
 	 */
 	public function __construct() {
-		$this->registerArgument('configuration', 'array', 'Configuration directives for rendering content.', TRUE);
-		$this->registerArgument('item', 'array', 'Complete item.', TRUE);
+		$this->registerArgument('tag', 'string', 'Wraps content with optional tag.', FALSE);
+		$this->registerArgument('tagAttributes', 'array', 'Sets attributes to optional tag.', FALSE, []);
+
+		$this->registerArgument('options', 'array', 'Configuration directives for rendering content.', FALSE, []);
+		// @FIX ______does this stay FALSE + default or what? If yes, then how to deal with LinkLevel's dependency thereof?
+		$this->registerArgument('item', 'array', 'Complete item.', FALSE, []);
+		$this->registerArgument('index', 'integer', 'Current content index.', TRUE);
 	}
 
 	/**
-	 * Override method to pass on controller context to Option Service
-	 *
-	 * @param \TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface $renderingContext
-	 * @return void
+	 * {@inheritDoc}
+	 * @see \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper::initialize()
 	 */
-	public function setRenderingContext(RenderingContextInterface $renderingContext) {
-		parent::setRenderingContext($renderingContext);
+	public function initialize() {
 		if ($this->controllerContext !== NULL) {
 			$this->optionService->setControllerContext($this->controllerContext);
 		}
@@ -79,24 +81,34 @@ class RenderViewHelper extends AbstractViewHelper {
 	 */
 	public function render($content = NULL) {
 		if ($content === NULL) {
-			$content = $this->renderChildren();
+			$content = trim($this->renderChildren());
 		}
 
-		return $this->applyConfiguration($content);
-	}
+		// if configured, add an outer tag
+		if ($this->hasArgument('tag')) {
+			// we use the AddTag RenderOption instead of directly using the tagFactory,
+				// so that other options can be used to influence said tag, like adding
+				// a class or title or data-attribute, or whatever
+			$this->arguments['options'][] = [
+				'option' => 'AddTag',
+				'args' => [
+					'name' => $this->arguments['tag'],
+					'attributes' => $this->arguments['tagAttributes']
+				]
+			];
+		}
 
-	/**
-	 * Applies configuration unto content to produce the desired value.
-	 *
-	 * @param string $content
-	 * @return string
-	 */
-	protected function applyConfiguration($content) {
-		$configuration = $this->arguments['configuration'];
-		if (isset($configuration['renderOptions'])) {
+		if (!empty($this->arguments['options'])) {
 			// @TODO ___if we want to support field- en blob-less content, consider a render->content element referring to a content-# or a default 'current'. We would also have to have access to other content fields.
-			$this->optionService->processOptions($configuration['renderOptions'], $content, $this->arguments['item']);
+			$tag = $this->optionService->processOptions(
+				$this->arguments['options'],
+				$content,
+				$this->arguments['index'],
+				$this->arguments['item']
+			);
+			return $tag->render();
 		}
+
 		return $content;
 	}
 

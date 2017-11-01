@@ -23,47 +23,52 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\Option\Exception\AlterQueryFieldDenied;
-use Innologi\Decosdata\Service\Option\Exception\AlterQueryColumnDenied;
-use Innologi\Decosdata\Service\Option\Exception\AlterQueryRowDenied;
-use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
-use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
+use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
- * Query Option Abstract
+ * RestrictByParentId option
+ *
+ * Restricts shown items by a parent item id
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-abstract class OptionAbstract implements OptionInterface {
+class RestrictByParentId extends OptionAbstract {
 
 	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
-	 * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryFieldDenied
+	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
+	 * @inject
 	 */
-	public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service) {
-		throw new AlterQueryFieldDenied(1448551244, array(get_class($this)));
-	}
+	protected $constraintFactory;
 
 	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
-	 * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryColumnDenied
-	 */
-	public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service) {
-		throw new AlterQueryColumnDenied(1448551259, array(get_class($this)));
-	}
-
-	/**
+	 * Restricts items by parent item id
+	 *
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
-	 * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryRowDenied
 	 */
 	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
-		throw new AlterQueryRowDenied(1448551286, array(get_class($this)));
+		if (!isset($args['parameter'][0])) {
+			throw new MissingArgument(1450794744, array(self::class, 'parameter'));
+		}
+		// @LOW _maybe create some service, use it as a source for every parameter-based action, including in FilterItems? otherwise every TASK applicable to FilterItems is applicable here!
+		$param = GeneralUtility::_GP('tx_decosdata_publish');
+		$itemId = rawurldecode($param[$args['parameter']]);
+
+		$alias = 'restrictBy';
+		$parameterKey = ':' . $alias;
+		$query->getContent('itemID')->getField('')
+			->getFrom($alias, array($alias => 'tx_decosdata_item_item_mm'))
+			->setJoinType('INNER')->setConstraint(
+				$this->constraintFactory->createConstraintAnd(array(
+					'relation' => $this->constraintFactory->createConstraintByField('uid_local', $alias, '=', 'uid', 'it'),
+					'restriction' => $this->constraintFactory->createConstraintByValue('uid_foreign', $alias, '=', $parameterKey)
+				))
+			);
+		$query->addParameter($parameterKey, $itemId);
 	}
 
 }

@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -25,6 +25,8 @@ namespace Innologi\Decosdata\Service\Option\Render;
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
+use Innologi\Decosdata\Library\TagBuilder\TagInterface;
+use Innologi\Decosdata\Library\TagBuilder\TagContent;
 /**
  * Wrapper
  *
@@ -51,18 +53,32 @@ class Wrapper implements OptionInterface {
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 * @throws \Innologi\Decosdata\Service\Option\Exception\MissingArgument
 	 */
-	public function alterContentValue(array $args, &$content, RenderOptionService $service) {
-		$wrap = array();
+	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
+		$wrap = [];
 		if (!isset($args['wrap'][0])) {
 			throw new MissingArgument(1448551326, array(self::class, 'wrap'));
 		}
-		$args['wrap'] = $service->processInlineOptions($args['wrap']);
+
+		$tags = $service->processInlineOptions($args['wrap']);
+
 		// note that by choosing to first process inline options, they can never return
 		// pipe characters without consequence to the following preg match
 		if (!preg_match('/' . $this->patternWrap . '/', $args['wrap'], $wrap)) {
 			// @TODO ___throw exception ..unless we do away with the preg_match?
 		}
-		$content = $wrap[1] . $content . $wrap[2];
+
+		if ($tag instanceof TagContent) {
+			$tag->setContent($wrap[1] . $tag->getContent() . $wrap[2]);
+			$tag->addMarkReplacements($tags);
+			return $tag;
+		}
+
+		// if $tag is an actual Tag instance, place it within a TagContent instance
+		$mark = '###RENDER' . $tag->getTagName() . '###';
+		return $service->getTagFactory()->createTagContent(
+			$wrap[1] . $mark . $wrap[2],
+			[$mark => $tag] + $tags
+		);
 	}
 
 }

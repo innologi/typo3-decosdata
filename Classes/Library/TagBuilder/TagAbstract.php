@@ -1,9 +1,9 @@
 <?php
-namespace Innologi\Decosdata\Service\Option\Exception;
+namespace Innologi\Decosdata\Library\TagBuilder;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -23,19 +23,39 @@ namespace Innologi\Decosdata\Service\Option\Exception;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
 /**
- * MissingOptionClass Exception
+ * Abstract Tag class
  *
- * @package decosdata
+ * @package InnologiLibs
+ * @subpackage TagBuilder
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MissingOptionClass extends OptionException {
+abstract class TagAbstract implements TagInterface {
 
 	/**
-	 * @var string
+	 * {@inheritDoc}
+	 * @see TagInterface::getContent()
 	 */
-	protected $message = 'Option Configuration Error: Option class %1$s could not be found. It either does not exist, or an external option was set without its actual namespace.';
+	public function getContent() {
+		return $this->content;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see TagInterface::setContent()
+	 */
+	public function setContent($content) {
+		$this->content = $content;
+		return $this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see TagInterface::__toString()
+	 */
+	public function __toString() {
+		return $this->render();
+	}
 
 }

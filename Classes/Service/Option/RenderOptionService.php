@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -36,6 +36,12 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 class RenderOptionService extends OptionServiceAbstract {
 
 	/**
+	 * @var \Innologi\Decosdata\Library\TagBuilder\TagFactory
+	 * @inject
+	 */
+	protected $tagFactory;
+
+	/**
 	 * @var \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext
 	 */
 	protected $controllerContext;
@@ -54,7 +60,7 @@ class RenderOptionService extends OptionServiceAbstract {
 	 * Matches argument:"value"[,]
 	 * @var string
 	 */
-	protected $patternArgumentInline = '([a-zA-Z]+):"([^"]+)",?';
+	protected $patternArgumentInline = '([a-zA-Z0-9]+):"([^"]+)",?';
 
 	/**
 	 * Matches {render:RenderOption[( $patternArgumentInline[ ... ] )]}
@@ -75,6 +81,17 @@ class RenderOptionService extends OptionServiceAbstract {
 	}
 
 	/**
+	 * Sets controller context
+	 *
+	 * @param \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext $controllerContext
+	 * @return $this
+	 */
+	public function setControllerContext(ControllerContext $controllerContext) {
+		$this->controllerContext = $controllerContext;
+		return $this;
+	}
+
+	/**
 	 * Returns controller context
 	 *
 	 * @return \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext
@@ -84,14 +101,12 @@ class RenderOptionService extends OptionServiceAbstract {
 	}
 
 	/**
-	 * Sets controller context
+	 * Returns tag builder
 	 *
-	 * @param \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext $controllerContext
-	 * @return $this
+	 * @return \Innologi\Decosdata\Library\TagBuilder\TagFactory
 	 */
-	public function setControllerContext(ControllerContext $controllerContext) {
-		$this->controllerContext = $controllerContext;
-		return $this;
+	public function getTagFactory() {
+		return $this->tagFactory;
 	}
 
 	/**
@@ -115,66 +130,84 @@ class RenderOptionService extends OptionServiceAbstract {
 	/**
 	 * Checks for, and then processes inline RenderOptions in $string.
 	 * Returns the $string with all those inline RenderOptions replaced
-	 * by their resulting values.
+	 * by marks, and corresponding values in $return.
 	 *
 	 * If an inline RenderOption is formatted incorrectly, it will
 	 * not be replaced.
 	 *
 	 * @param string $string
-	 * @return string
+	 * @return array
 	 */
 	public function processInlineOptions($string) {
 		// quick check to prevent an unnecessary performance impact by RegExp
 		if (strpos($string, '{render:') === FALSE) {
-			return $string;
+			return [];
 		}
 
-		// replaces inline RenderOptions by their resulting values
-		return preg_replace_callback(
-			'/' . $this->patternInline . '/',
-			// callback function that executes the options
-			function ($matches) {
-				$option = array(
-					'option' => $matches[1],
-					'args' => array()
-				);
-				// if arguments were found, they need to be detected by another regular expression,
-				// as preg_replace_callback can't set multiple arguments in $matches[5] and $matches[6]
-				// @LOW ___is there really no way? something I can change in the pattern used by preg_replace_callback?
-				if (isset($matches[3][0])) {
-					$argMatch = array();
-					preg_match_all('/' . $this->patternArgumentInline . '/', $matches[3], $argMatch);
+		$replacements = [];
+		$matches = [];
+		if (preg_match_all('/' . $this->patternInline . '/', $string, $matches) === FALSE) {
+			// @TODO ____throw exception?
+		}
+
+		foreach ($matches[0] as $index => $match) {
+			$option = [
+				'option' => $matches[1][$index],
+				'args' => []
+			];
+			// if arguments were found, they need to be indentified by another regular expression,
+			// as preg_match_all can't set multiple arguments in $matches[5] and $matches[6]
+			// @LOW ___is there really no way? something I can change in the pattern used by preg_match_all?
+			if (isset($matches[3][$index][0])) {
+				$argMatch = [];
+				preg_match_all('/' . $this->patternArgumentInline . '/', $matches[3][$index], $argMatch);
 					if (isset($argMatch[1]) && isset($argMatch[2])) {
-						foreach ($argMatch[1] as $index => $arg) {
-							$option['args'][$arg] = $argMatch[2][$index];
+						foreach ($argMatch[1] as $argIndex => $arg) {
+							$option['args'][$arg] = $argMatch[2][$argIndex];
 						}
 					}
 				}
-				// execute option with original content
-				$content = $this->originalContent;
 				// note that it will reset original content to the same value,
 				// so until we support utilizing a different content value, no harm is done
-				$this->processOptions(array($option), $content, $this->item);
-				return $content;
-			},
-			$string
-		);
+				// @LOW __note that this does not yet cache entries that are set multiple times
+				$replacements[$match] = $this->processOptions([ $option ], $this->originalContent, $this->index, $this->item);
+			}
+
+		return $replacements;
 	}
-	// @LOW ___if the service becomes a singleton, we could do away with the need to pass $this
+
 	/**
 	 * Processes an array of render-options by calling the contained alterValue()
 	 * methods and passing the content reference and renderer object to it.
 	 *
 	 * @param array $options
-	 * @param string &$content
-	 * @return void
+	 * @param string $content
+	 * $param integer $index
+	 * @param array $item
+	 * @return \Innologi\Decosdata\Library\TagBuilder\TagInterface
 	 */
-	public function processOptions(array $options, &$content, array $item) {
+	public function processOptions(array $options, $content, $index, array $item) {
 		$this->item = $item;
+		$this->index = $index;
 		$this->originalContent = $content;
+
+		// starting TagInterface instance
+		$tag = $this->tagFactory->createTagContent($content);
+
+		$lastOptions = [];
 		foreach ($options as $option) {
-			$this->executeOption('alterContentValue', $option, $content, $this);
+			// if an option has the last attribute, save it for last
+			if (isset($option['last']) && (bool)$option['last']) {
+				$lastOptions[] = $option;
+				continue;
+			}
+			$tag = $this->executeOption('alterContentValue', $option, $tag);
 		}
+		// last options, if any
+		foreach ($lastOptions as $option) {
+			$tag = $this->executeOption('alterContentValue', $option, $tag);
+		}
+		return $tag;
 	}
 
 }

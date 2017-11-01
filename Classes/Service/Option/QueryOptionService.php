@@ -36,16 +36,33 @@ use Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface;
 class QueryOptionService extends OptionServiceAbstract {
 
 	/**
+	 * @var integer
+	 */
+	protected $optionIndex;
+
+	/**
+	 * Returns Option index
+	 *
+	 * @return integer
+	 */
+	public function getOptionIndex() {
+		return $this->optionIndex;
+	}
+
+	/**
 	 * Processes an array of field-options by calling the contained alterQueryField()
 	 * methods and passing the necessary arguments to it.
 	 *
 	 * @param array $options
 	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface $configuration
+	 * @param integer $fieldIndex
 	 * @return void
 	 */
-	public function processFieldOptions(array $options, QueryInterface $configuration) {
+	public function processFieldOptions(array $options, QueryInterface $configuration, $fieldIndex) {
+		$this->index = $fieldIndex;
 		foreach ($options as $index => $option) {
-			$this->executeOption('alterQueryField', $option, $configuration, $index);
+			$this->optionIndex = $index;
+			$this->executeOption('alterQueryField', $option, $configuration);
 		}
 	}
 
@@ -55,11 +72,14 @@ class QueryOptionService extends OptionServiceAbstract {
 	 *
 	 * @param array $options
 	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface $configuration
+	 * @param integer $columnIndex
 	 * @return void
 	 */
-	public function processColumnOptions(array $options, QueryInterface $configuration) {
+	public function processColumnOptions(array $options, QueryInterface $configuration, $columnIndex) {
+		$this->index = $columnIndex;
 		foreach ($options as $index => $option) {
-			$this->executeOption('alterQueryColumn', $option, $configuration, $index);
+			$this->optionIndex = $index;
+			$this->executeOption('alterQueryColumn', $option, $configuration);
 		}
 	}
 
@@ -72,8 +92,10 @@ class QueryOptionService extends OptionServiceAbstract {
 	 * @return void
 	 */
 	public function processRowOptions(array $options, QueryInterface $configuration) {
+		$this->index = 0;
 		foreach ($options as $index => $option) {
-			$this->executeOption('alterQueryRow', $option, $configuration, $index);
+			$this->optionIndex = $index;
+			$this->executeOption('alterQueryRow', $option, $configuration);
 		}
 	}
 

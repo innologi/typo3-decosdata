@@ -34,14 +34,9 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
 class From extends ConstraintContainer {
 
 	/**
-	 * @var string
+	 * @var array
 	 */
-	protected $table;
-
-	/**
-	 * @var string
-	 */
-	protected $alias;
+	protected $tables;
 
 	/**
 	 * @var string
@@ -51,53 +46,53 @@ class From extends ConstraintContainer {
 	/**
 	 * Class constructor
 	 *
-	 * @param string $table
-	 * @param string $alias
+	 * Optional parameter needs to consist of $alias => $table pairs.
+	 *
+	 * @param array $tables
 	 * @return $this
 	 */
-	public function __construct($table, $alias = '') {
-		$this->table = $table;
-		$this->alias = $alias;
-		return $this;
+	public function __construct(array $tables = array()) {
+		return $this->setTables($tables);
 	}
 
 	/**
-	 * Returns Table
+	 * Returns Table by alias
 	 *
 	 * @return string
 	 */
-	public function getTable() {
-		return $this->table;
+	public function getTableNameByAlias($alias) {
+		return isset($this->tables[$alias]) ? $this->tables[$alias] : NULL;
 	}
 
 	/**
 	 * Sets table
 	 *
 	 * @param string $table
+	 * @param string $alias
 	 * @return $this
 	 */
-	public function setTable($table) {
-		$this->table = $table;
+	public function addTable($table, $alias) {
+		$this->tables[$alias] = $table;
 		return $this;
 	}
 
 	/**
-	 * Returns alias
+	 * Returns all $alias => $table pairs
 	 *
-	 * @return string
+	 * @return array
 	 */
-	public function getAlias() {
-		return $this->alias;
+	public function getTables() {
+		return $this->tables;
 	}
 
 	/**
-	 * Sets alias
+	 * Sets or replaces entire table collection
 	 *
-	 * @param string $alias
+	 * @param array $tables
 	 * @return $this
 	 */
-	public function setAlias($alias) {
-		$this->alias = $alias;
+	public function setTables(array $tables) {
+		$this->tables = $tables;
 		return $this;
 	}
 

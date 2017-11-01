@@ -116,7 +116,7 @@ CREATE TABLE tx_decosdata_domain_model_itemfield (
 	uid int(11) unsigned NOT NULL auto_increment,
 	pid int(11) unsigned DEFAULT '0' NOT NULL,
 
-	field_value varchar(255) DEFAULT '' NOT NULL,
+	field_value text NOT NULL,
 	field int(11) unsigned DEFAULT '0' NOT NULL,
 	item int(11) unsigned DEFAULT '0' NOT NULL,
 

@@ -45,7 +45,6 @@ return [
 				'default' => 1
 			],
 		],
-		// @LOW __should this be varchar(255) or text? research!
 		'field_value' => [
 			'exclude' => FALSE,
 			'label' => $ll . '.field_value',
@@ -53,7 +52,8 @@ return [
 				'type' => 'text',
 				'cols' => 50,
 				'rows' => 15,
-				'eval' => 'trim'
+				'eval' => 'trim',
+				'default' => ''
 			],
 			'search' => [
 				// search speed up

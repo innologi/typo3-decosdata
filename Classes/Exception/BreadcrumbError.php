@@ -1,9 +1,9 @@
 <?php
-namespace Innologi\Decosdata\Service\Option\Exception;
+namespace Innologi\Decosdata\Exception;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -25,17 +25,17 @@ namespace Innologi\Decosdata\Service\Option\Exception;
  ***************************************************************/
 
 /**
- * MissingOptionClass Exception
+ * Breadcrumb Error
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MissingOptionClass extends OptionException {
+class BreadcrumbError extends Exception {
 
 	/**
 	 * @var string
 	 */
-	protected $message = 'Option Configuration Error: Option class %1$s could not be found. It either does not exist, or an external option was set without its actual namespace.';
+	protected $message = 'Breadcrumb Error: Level %1$d not available, reason: %2$s';
 
 }

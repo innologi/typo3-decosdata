@@ -1,9 +1,9 @@
 <?php
-namespace Innologi\Decosdata\Service\Option\Exception;
+namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -23,19 +23,33 @@ namespace Innologi\Decosdata\Service\Option\Exception;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use Innologi\Decosdata\Service\Option\RenderOptionService;
+use Innologi\Decosdata\Library\TagBuilder\TagInterface;
+use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 /**
- * MissingOptionClass Exception
+ * Add Tag
+ *
+ * Simply adds a tag around $tag
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MissingOptionClass extends OptionException {
+class AddTag implements OptionInterface {
 
 	/**
-	 * @var string
+	 * {@inheritDoc}
+	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
-	protected $message = 'Option Configuration Error: Option class %1$s could not be found. It either does not exist, or an external option was set without its actual namespace.';
+	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
+		if ( !isset($args['name'][0]) ) {
+			throw new MissingArgument(1466007305, array(self::class, 'name'));
+		}
+		return $service->getTagFactory()->createTag(
+			$args['name'],
+			(isset($args['attributes']) && is_array($args['attributes']) ? $args['attributes'] : []),
+			$tag
+		);
+	}
 
 }

@@ -40,7 +40,7 @@ use Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy;
 class QueryField implements QueryInterface {
 
 	/**
-	 * @var QueryInterface
+	 * @var QueryContent
 	 */
 	protected $parent;
 
@@ -73,10 +73,10 @@ class QueryField implements QueryInterface {
 	 * Class constructor
 	 *
 	 * @param string $id
-	 * @param QueryInterface $parent
+	 * @param QueryContent $parent
 	 * @return
 	 */
-	public function __construct($id, QueryInterface $parent) {
+	public function __construct($id, QueryContent $parent) {
 		$this->id = $id;
 		$this->parent = $parent;
 		$this->select = GeneralUtility::makeInstance(Select::class);
@@ -106,17 +106,30 @@ class QueryField implements QueryInterface {
 	/**
 	 * Returns From object. If it does not exist yet, it is created.
 	 *
+	 * Optional property $tables needs to consist of $alias => $table pairs.
+	 *
 	 * @param string $id
-	 * @param string $table
-	 * @param string $alias
+	 * @param array $tables
 	 * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Part\From
 	 */
-	public function getFrom($id, $table, $alias) {
+	public function getFrom($id, array $tables = array()) {
 		if (!isset($this->from[$id])) {
-			$this->from[$id] = GeneralUtility::makeInstance(From::class, $table, $alias);
+			$this->from[$id] = GeneralUtility::makeInstance(From::class, $tables);
 		}
 		return $this->from[$id];
 	}
+
+	// @TODO ______inherent flaw? we have to check WITHIN a content field for any FROM's, soooo we could end up with duplicates, crashing the query. Wouldn't an alias-register be worthwhile?
+	/**
+	 * Returns whether the given FROM alias exists in this field
+	 *
+	 * @param string $id
+	 * @return boolean
+	 */
+	public function hasFrom($id) {
+		return isset($this->from[$id]);
+	}
+
 	// @LOW _this naming scheme is not consistent: getFromAll but setFrom? Why not getFrom, setFrom and getOneFrom instead? or setFromAll?
 	/**
 	 * Sets From array
@@ -157,12 +170,21 @@ class QueryField implements QueryInterface {
 	}
 
 	/**
+	 * Returns parent
+	 *
+	 * @return QueryContent
+	 */
+	public function getParent() {
+		return $this->parent;
+	}
+
+	/**
 	 * Overrides parent
 	 *
-	 * @param QueryInterface $parent
+	 * @param QueryContent $parent
 	 * @return $this
 	 */
-	public function setParent(QueryInterface $parent) {
+	public function setParent(QueryContent $parent) {
 		$this->parent = $parent;
 		return $this;
 	}

@@ -84,13 +84,13 @@ class QueryBuilder {
 		$queryContent = $query->getContent('itemID');
 		$queryField = $queryContent->getField('');
 		// @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
-		if (!isset($configuration['relation']['noItemId'])) {
+		if (!isset($configuration['noItemId']) || !$configuration['noItemId']) {
 			$queryContent->getGroupBy()->setPriority(0);
 			$queryField->getSelect()
 				->setField('uid')
 				->setTableAlias('it');
 		}
-		$queryField->getFrom('item', 'tx_decosdata_domain_model_item', 'it');
+		$queryField->getFrom('item', array('it' => 'tx_decosdata_domain_model_item'));
 
 		// add xml_id-condition if configured
 		if (!empty($import)) {
@@ -98,7 +98,7 @@ class QueryBuilder {
 			 * making this an INNER rather than LEFT JOIN with WHERE, will allow the eq_ref
 			 * join-type to use only index (also uses where if NULL-values are possible)
 			 */
-			$queryField->getFrom('import', 'tx_decosdata_item_import_mm', 'xmm')
+			$queryField->getFrom('import', array('xmm' => 'tx_decosdata_item_import_mm'))
 				->setJoinType('INNER')
 				->setConstraint(
 					$this->constraintFactory->createConstraintAnd(array(
@@ -123,6 +123,12 @@ class QueryBuilder {
 			$query->addParameter(':itemtype', $configuration['itemType']);
 		}
 
+		// apply item-wide query options
+		if (isset($configuration['queryOptions'])) {
+			// @TODO ___item wide options, e.g. filter/child view????
+			$this->optionService->processRowOptions($configuration['queryOptions'], $query);
+		}
+
 		// expand the query through field configuration
 		if (isset($configuration['contentField']) && is_array($configuration['contentField'])) {
 			// for each configured content-field..
@@ -133,12 +139,6 @@ class QueryBuilder {
 					$query->getContent('content' . $index)
 				);
 			}
-		}
-
-		// apply item-wide query options
-		if (isset($configuration['queryOptions'])) {
-			// @TODO ___item wide options, e.g. filter/child view????
-			$this->optionService->processRowOptions($configuration['queryOptions'], $query);
 		}
 
 		// apply pagination settings
@@ -170,6 +170,12 @@ class QueryBuilder {
 
 				// add field: these contain metadata strings provided as is by Decos export
 				if (isset($contentConfiguration['field'])) {
+					// @TODO ___field, blob and order keys could probably be converted to more configurable queryOptions, to make it all more flexible.
+					// We could re-introduce document_date for blobs then and make that configurable too, as well as which of multiple blobs to get.
+					// We could then keep field, blob and order keys as shortcuts for TCA/Typoscript configuration, which are transformed by a
+					// future service which translates these to standard options. Do that for all the stuff that is common, like a download link
+					// and restrictById/ParentId, et voila, you combine the ease of use of said shortcuts with the flexibility of queryoption-equivalents.
+					// @LOW ___Now that I think about it, the same goes for itemtype and import.. except I don't think they have anything to gain in flexibility.
 					$tableAlias = 'itf' . $index . 's' . $subIndex;
 					$parameterKey = ':' . $tableAlias . 'field';
 					// @TODO ___move to method? wait to see if it really used elsewhere
@@ -177,7 +183,7 @@ class QueryBuilder {
 					$queryField->getSelect()
 						->setField('field_value')
 						->setTableAlias($tableAlias);
-					$queryField->getFrom(0, 'tx_decosdata_domain_model_itemfield', $tableAlias)
+					$queryField->getFrom(0, array($tableAlias => 'tx_decosdata_domain_model_itemfield'))
 						->setJoinType('LEFT')
 						->setConstraint(
 							$this->constraintFactory->createConstraintAnd(array(
@@ -188,6 +194,7 @@ class QueryBuilder {
 					$queryContent->addParameter($parameterKey, $contentConfiguration['field']);
 				}
 				// @LOW ___can we have both a field and blob in the same content? no right? because this should be an if/else then
+				// @TODO ___why do it this way? why not use a linkvalue equivalent? then we can combine with any value. probably a lot simpler
 				// add blob: these contain file references, thus will result in file:uid
 				if (isset($contentConfiguration['blob'])) {
 					// @LOW _if we ever are to support multiple files in a single content, these aliases will conflict
@@ -198,34 +205,38 @@ class QueryBuilder {
 					$blobTable = 'tx_decosdata_domain_model_itemblob';
 
 					$queryField = $queryContent->getField('blob' . $subIndex);
+
+					// note that these joins should not be combined into a single JOIN
+
 					// the main join to the blob table
-					$queryField->getFrom('blob1', $blobTable, $blobAlias1)
+					$queryField->getFrom('blob1', array($blobAlias1 => $blobTable))
 						->setJoinType('LEFT')
 						->setConstraint(
 							$this->constraintFactory->createConstraintByField('item', $blobAlias1, '=', 'uid', 'it')
 						);
 					// a second join is necessary for a maximum-groupwise comparison to always retrieve the latest file
 						// maximum-groupwise is performance-wise much preferred over subqueries
-					$queryField->getFrom('blob2', $blobTable, $blobAlias2)
+					$queryField->getFrom('blob2', array($blobAlias2 => $blobTable))
 						->setJoinType('LEFT')
 						->setConstraint(
 							$this->constraintFactory->createConstraintAnd(array(
 								$this->constraintFactory->createConstraintByField('item', $blobAlias2, '=', 'uid', 'it'),
-								$this->constraintFactory->createConstraintByField('sequence', $blobAlias2, '<', 'sequence', $blobAlias1)
+								// @TODO ___note that this does not produce the same result as those that still use document_date. Need to see if Heemskerk is affected with newer tests
+								$this->constraintFactory->createConstraintByField('sequence', $blobAlias2, '>', 'sequence', $blobAlias1)
 							))
 						);
 					$queryField->getWhere()->setConstraint(
 						$this->constraintFactory->createConstraintByValue('uid', $blobAlias2, 'IS', 'NULL')
 					);
 
-					// retrieve associated file uid from file reference table
+					// after maximum-groupwise: retrieve associated file uid from file reference table
 					$parameterKey = ':' . $fileAlias . 'table';
 					$queryField->getSelect()
 						->setField('uid_local')
 						->setTableAlias($fileAlias)
 							// @TODO ___what happens here if we don't have a file uid? do we get a 'file:' ?
 						->addWrap('file', 'CONCAT(\'file:\',|)');
-					$queryField->getFrom('fileref', 'sys_file_reference', $fileAlias)
+					$queryField->getFrom('fileref', array($fileAlias => 'sys_file_reference'))
 						->setJoinType('LEFT')
 						->setConstraint(
 							$this->constraintFactory->createConstraintAnd(array(
@@ -243,12 +254,14 @@ class QueryBuilder {
 						->setTableAlias($select->getTableAlias())
 						->setField($select->getField())
 						->setPriority($contentConfiguration['order']['priority'])
-						->setSortOrder($contentConfiguration['order']['sort']);
+						->setSortOrder($contentConfiguration['order']['sort'])
+						->setForceNumeric(isset($contentConfiguration['order']['forceNumeric']) && (bool)$contentConfiguration['order']['forceNumeric']);
 				}
 
 				// apply field-wide query options
 				if (isset($contentConfiguration['queryOptions'])) {
-					$this->optionService->processFieldOptions($contentConfiguration['queryOptions'], $queryField);
+					// @TODO ___throw catchable exception if $queryField is NULL? (which is the case if no field/blob configuration is present)
+					$this->optionService->processFieldOptions($contentConfiguration['queryOptions'], $queryField, $subIndex);
 				}
 			}
 
@@ -262,12 +275,13 @@ class QueryBuilder {
 		if (isset($configuration['order'])) {
 			$queryContent->getOrderBy()
 				->setPriority($configuration['order']['priority'])
-				->setSortOrder($configuration['order']['sort']);
+				->setSortOrder($configuration['order']['sort'])
+				->setForceNumeric(isset($configuration['order']['forceNumeric']) && (bool)$configuration['order']['forceNumeric']);
 		}
 
 		// apply content-wide query options
 		if (isset($configuration['queryOptions'])) {
-			$this->optionService->processColumnOptions($configuration['queryOptions'], $queryContent);
+			$this->optionService->processColumnOptions($configuration['queryOptions'], $queryContent, $index);
 		}
 	}
 
