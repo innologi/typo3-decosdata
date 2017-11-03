@@ -69,6 +69,14 @@ class BreadcrumbService implements SingletonInterface {
 	protected $active = FALSE;
 
 	/**
+	 * Locking prevents the service from changing state. The VH may also use
+	 * it to determine whether it should be rendered.
+	 *
+	 * @var boolean
+	 */
+	protected $locked = FALSE;
+
+	/**
 	 * Returns current level
 	 *
 	 * @return integer
@@ -98,15 +106,40 @@ class BreadcrumbService implements SingletonInterface {
 	}
 
 	/**
-	 * Initialize Breadcrumbs
+	 * Confirms if the service is locked or not
+	 *
+	 * @return boolean
+	 */
+	public function isLocked() {
+		return $this->locked;
+	}
+
+	/**
+	 * Locks/Unlocks the service.
+	 *
+	 * @param boolean $locked
+	 * @return $this
+	 */
+	public function lock($locked) {
+		$this->locked = $locked;
+		return $this;
+	}
+
+	/**
+	 * Initialize Breadcrumbs (if not locked)
 	 *
 	 * @param array $configuration
 	 * @param array $import
-	 * @return void
+	 * @return boolean
 	 */
 	public function configureBreadcrumb(array $configuration, array $import) {
+		if ($this->locked) {
+			return FALSE;
+		}
+
 		$this->initializeConfiguration();
 		$this->configureDefault($configuration, $import);
+		return TRUE;
 	}
 
 	/**
