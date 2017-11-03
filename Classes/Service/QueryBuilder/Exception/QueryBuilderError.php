@@ -31,7 +31,7 @@ use Innologi\Decosdata\Exception\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ConfigurationError extends Exception {
+class QueryBuilderError extends Exception {
 
 	/**
 	 * @var string

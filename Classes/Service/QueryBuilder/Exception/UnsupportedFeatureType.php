@@ -31,7 +31,7 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class UnsupportedFeatureType extends ConfigurationError {
+class UnsupportedFeatureType extends QueryBuilderError {
 
 	/**
 	 * @var string
