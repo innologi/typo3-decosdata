@@ -85,6 +85,15 @@ class ItemController extends ActionController {
 	}
 
 	/**
+	 * Initialize show action
+	 *
+	 * @return void
+	 */
+	protected function initializeShowAction() {
+		$this->activeConfiguration = $this->settings['level'][$this->level];
+	}
+
+	/**
 	 * Initialize list action
 	 *
 	 * @return void
@@ -96,6 +105,22 @@ class ItemController extends ActionController {
 			$this->settings['level'][$this->level]['paginate']['currentPage'] = (int) $this->request->getArgument('page');
 		}
 		$this->activeConfiguration = $this->settings['level'][$this->level];
+	}
+	
+	/**
+	 * Show single item details per publication configuration.
+	 *
+	 * @return void
+	 */
+	public function showAction() {
+		$items = $this->itemRepository->findWithStatement(
+			$this->queryBuilder->buildListQuery(
+				$this->activeConfiguration, $this->settings['import']
+			)->setLimit(1)->createStatement()
+		);
+
+		$this->view->assign('configuration', $this->activeConfiguration);
+		$this->view->assign('item', $items[0] ?? NULL);
 	}
 
 	/**
