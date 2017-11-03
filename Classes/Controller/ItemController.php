@@ -24,6 +24,7 @@ namespace Innologi\Decosdata\Controller;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use Innologi\Decosdata\Exception\ConfigurationError;
 /**
  * Item controller
  *
@@ -106,7 +107,27 @@ class ItemController extends ActionController {
 		}
 		$this->activeConfiguration = $this->settings['level'][$this->level];
 	}
-	
+
+	/**
+	 * Initialize advanced action
+	 *
+	 * @return void
+	 * @throws ConfigurationError
+	 */
+	protected function initializeAdvancedAction() {
+		if (!isset($this->settings['level'][$this->level]['_typoScriptNodeValue'])) {
+			throw new ConfigurationError(1509719824, ['Missing TypoScript ContentObject configuration on level ' . $this->level]);
+		}
+
+		/** @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager */
+		$configurationManager = $this->objectManager->get(\TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface::class);
+		// content object configurations require the original TS
+		$originalTypoScript = $configurationManager->getConfiguration(
+			\TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT
+		);
+		$this->activeConfiguration = $originalTypoScript['plugin.']['tx_decosdata.']['settings.']['level.'][$this->level . '.'];
+	}
+
 	/**
 	 * Show single item details per publication configuration.
 	 *
@@ -139,6 +160,26 @@ class ItemController extends ActionController {
 		$this->view->assign('items', $items);
 		// @TODO ___remove
 		$this->view->assign('query', $statement->getProcessedQuery());
+	}
+
+	/**
+	 * Run multiple publish-configurations and/or custom TS elements as a single cohesive content element.
+	 *
+	 * @return void
+	 */
+	public function advancedAction() {
+		// if successfully configured, lock its state, as you generally only want 1 state if plugins are nested
+		!$this->breadcrumbService->isActive() or $this->breadcrumbService->lock(TRUE);
+
+		/** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObjectRenderer */
+		$contentObjectRenderer = $GLOBALS['TSFE']->cObj;
+		$contentType = $this->settings['level'][$this->level]['_typoScriptNodeValue'];
+		$content = $contentObjectRenderer->cObjGetSingle($contentType, $this->activeConfiguration);
+
+		// unlock its state in case of other plugin content elements
+		$this->breadcrumbService->lock(FALSE);
+
+		$this->view->assign('content', $content);
 	}
 
 }
