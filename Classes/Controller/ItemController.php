@@ -59,53 +59,43 @@ class ItemController extends ActionController {
 	/**
 	 * @var array
 	 */
-	protected $pluginConfiguration;
+	protected $activeConfiguration;
 
 	/**
 	 * {@inheritDoc}
 	 * @see \TYPO3\CMS\Extbase\Mvc\Controller\ActionController::initializeAction()
 	 */
-	public function initializeAction() {
-		$this->initializePluginConfiguration();
-		$this->initializeSharedArguments();
-	}
-
-	/**
-	 * Initializes plugin configuration for use by any action method
-	 *
-	 * @return void
-	 */
-	protected function initializePluginConfiguration() {
-		// @LOW _consider this: we translated querybuilder configuration from arrays to classes. would there be an advantage to doing the same for this? this isn't going to be adjustable like query configurations, but maybe there are other advantages?
-
-		/** @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager */
-		$configurationManager = $this->objectManager->get(\TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface::class);
-		$frameworkConfiguration = $configurationManager->getConfiguration(
-			\TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK
-		);
-
-		$this->pluginConfiguration = $frameworkConfiguration['publish'];
-	}
-
-	/**
-	 * Initializes and validates request parameters shared by all actions
-	 *
-	 * @return void
-	 */
-	protected function initializeSharedArguments() {
+	protected function initializeAction() {
+		// initializes and validates request parameters shared by all actions
 		if ($this->request->hasArgument('level')) {
 			// set current level
 			$this->level = (int) $this->request->getArgument('level');
 			if ($this->request->hasArgument('_' . $this->level)) {
+				// @TODO what to do with this one?
 				$levelParameter = $this->request->getArgument('_' . $this->level);
 			}
 		}
 		// @LOW ___will probably require some validation to see if provided level exists in available configuration
-		// @LOW _consider that said check could throw an exception, and that we could then apply an override somewhere that catches it to produce a 404? (or just generate a flash message, which I think we've done in another extbase ext)
-		if ($this->request->hasArgument('page')) {
-			// a valid page-parameter will set current page in configuration
-			$this->pluginConfiguration['level'][$this->level]['paginate']['currentPage'] = (int) $this->request->getArgument('page');
+
+		// initialize breadcrumb
+		if (isset($this->settings['breadcrumb']) && is_array($this->settings['breadcrumb'])) {
+			// @LOW this being optional, means I probably shouldn't inject it
+			$this->breadcrumbService->configureBreadcrumb($this->settings['breadcrumb'], $this->settings['import']);
 		}
+	}
+
+	/**
+	 * Initialize list action
+	 *
+	 * @return void
+	 */
+	protected function initializeListAction() {
+		// @LOW _consider that said check could throw an exception, and that we could then apply an override somewhere that catches it to produce a 404? (or just generate a flash message, which I think we've done in another extbase ext)
+		if ($this->request->hasArgument('page') && isset($this->settings['level'][$this->level]['paginate'])) {
+			// a valid page-parameter will set current page in configuration
+			$this->settings['level'][$this->level]['paginate']['currentPage'] = (int) $this->request->getArgument('page');
+		}
+		$this->activeConfiguration = $this->settings['level'][$this->level];
 	}
 
 	/**
@@ -114,32 +104,16 @@ class ItemController extends ActionController {
 	 * @return void
 	 */
 	public function listAction() {
-		$activeConfiguration = $this->pluginConfiguration['level'][$this->level];
 		$items = $this->itemRepository->findWithStatement(
 			($statement = $this->queryBuilder->buildListQuery(
-				$activeConfiguration, $this->pluginConfiguration['import']
+				$this->activeConfiguration, $this->settings['import']
 			)->createStatement())
 		);
 
-		// initialize breadcrumb
-		if (isset($this->pluginConfiguration['breadcrumb']) && is_array($this->pluginConfiguration['breadcrumb'])) {
-			// @LOW this being optional, means I probably shouldn't inject it
-			$this->breadcrumbService->configureBreadcrumb($this->pluginConfiguration['breadcrumb'], $this->pluginConfiguration['import']);
-		}
-
-		$this->view->assign('configuration', $activeConfiguration);
-		$this->view->assign('extra', $this->pluginConfiguration['extra']);
+		$this->view->assign('configuration', $this->activeConfiguration);
 		$this->view->assign('items', $items);
 		// @TODO ___remove
 		$this->view->assign('query', $statement->getProcessedQuery());
 	}
 
-	/**
-	 * Show single item details per publication configuration.
-	 *
-	 * @return void
-	 */
-	public function showAction() {
-
-	}
 }
