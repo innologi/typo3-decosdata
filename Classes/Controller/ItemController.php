@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\Controller;
  ***************************************************************/
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use Innologi\Decosdata\Exception\ConfigurationError;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Item controller
  *
