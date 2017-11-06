@@ -115,8 +115,7 @@ class ItemController extends ActionController {
 		// initialize breadcrumb
 		if (isset($this->settings['breadcrumb']) && is_array($this->settings['breadcrumb'])) {
 			// @LOW this being optional, means I probably shouldn't inject it
-			$this->breadcrumbService->configureBreadcrumb($this->settings['breadcrumb'], $this->settings['import']);
-		}
+			$this->breadcrumbService->configureBreadcrumb($this->settings['breadcrumb'], $this->import);
 	}
 
 	/**
@@ -168,7 +167,7 @@ class ItemController extends ActionController {
 	public function showAction() {
 		$items = $this->itemRepository->findWithStatement(
 			$this->queryBuilder->buildListQuery(
-				$this->activeConfiguration, $this->settings['import']
+				$this->activeConfiguration, $this->import
 			)->setLimit(1)->createStatement()
 		);
 
@@ -184,7 +183,7 @@ class ItemController extends ActionController {
 	public function listAction() {
 		$items = $this->itemRepository->findWithStatement(
 			($statement = $this->queryBuilder->buildListQuery(
-				$this->activeConfiguration, $this->settings['import']
+				$this->activeConfiguration, $this->import
 			)->createStatement())
 		);
 
