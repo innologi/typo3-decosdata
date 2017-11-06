@@ -53,14 +53,30 @@ class ItemController extends ActionController {
 	protected $breadcrumbService;
 
 	/**
-	 * @var integer
+	 * @var \TYPO3\CMS\Core\TypoScript\TypoScriptService
+	 * @inject
 	 */
-	protected $level = 1;
+	protected $typoScriptService;
+
+	/**
+	 * @var array
+	 */
+	protected $typoScriptSetup;
 
 	/**
 	 * @var array
 	 */
 	protected $activeConfiguration;
+
+	/**
+	 * @var array
+	 */
+	protected $import;
+
+	/**
+	 * @var integer
+	 */
+	protected $level = 1;
 
 	/**
 	 * {@inheritDoc}
@@ -76,7 +92,24 @@ class ItemController extends ActionController {
 				$levelParameter = $this->request->getArgument('_' . $this->level);
 			}
 		}
-		// @LOW ___will probably require some validation to see if provided level exists in available configuration
+
+		// @LOW validate?
+		// set imports
+		$this->import = isset($this->settings['override']['import'][0])
+			? GeneralUtility::intExplode(',', $this->settings['override']['import'], TRUE)
+			: $this->settings['import'];
+
+		// @LOW cache?
+		// check override TS
+		if (isset(trim($this->settings['override']['ts'])[0])) {
+			/** @var \TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser $tsParser */
+			$tsParser = GeneralUtility::makeInstance(\TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser::class);
+			$tsParser->parse($this->settings['override']['ts']);
+			$this->typoScriptSetup = $tsParser->setup;
+			// completely replace original settings
+			$this->settings = $this->typoScriptService->convertTypoScriptArrayToPlainArray($this->typoScriptSetup);
+		}
+
 
 		// initialize breadcrumb
 		if (isset($this->settings['breadcrumb']) && is_array($this->settings['breadcrumb'])) {
@@ -119,13 +152,11 @@ class ItemController extends ActionController {
 			throw new ConfigurationError(1509719824, ['Missing TypoScript ContentObject configuration on level ' . $this->level]);
 		}
 
-		/** @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager */
-		$configurationManager = $this->objectManager->get(\TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface::class);
+		if ($this->typoScriptSetup === NULL) {
+			$this->typoScriptSetup = $this->typoScriptService->convertPlainArrayToTypoScriptArray($this->settings);
+		}
 		// content object configurations require the original TS
-		$originalTypoScript = $configurationManager->getConfiguration(
-			\TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT
-		);
-		$this->activeConfiguration = $originalTypoScript['plugin.']['tx_decosdata.']['settings.']['level.'][$this->level . '.'];
+		$this->activeConfiguration = $this->typoScriptSetup['level.'][$this->level . '.'];
 	}
 
 	/**

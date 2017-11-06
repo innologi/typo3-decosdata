@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<T3DataStructure>
+  <meta>
+    <langDisable>1</langDisable>
+  </meta>
+  <sheets>
+    <sDEF>
+      <ROOT>
+        <TCEforms>
+          <sheetTitle>LLL:EXT:streamovations_vp/Resources/Private/Language/locallang_be.xml:ff_video_sheet_sDEF</sheetTitle>
+          <cshFile>LLL:EXT:streamovations_vp/Resources/Private/Language/locallang_csh_flexform_video.xlf</cshFile>
+        </TCEforms>
+        <type>array</type>
+        <el>
+		<switchableControllerActions>
+			<TCEforms>
+				<label>Plugin type</label>
+				<config>
+					<type>select</type>
+					<renderType>selectSingle</renderType>
+					<items type="array">
+						<numIndex index="0" type="array">
+							<numIndex index="0">List multiple items</numIndex>
+							<numIndex index="1">Item->list</numIndex>
+						</numIndex>
+						<numIndex index="1" type="array">
+							<numIndex index="0">Show single item</numIndex>
+							<numIndex index="1">Item->show</numIndex>
+						</numIndex>
+						<numIndex index="2" type="array">
+							<numIndex index="0">Advanced</numIndex>
+							<numIndex index="1">Item->advanced</numIndex>
+						</numIndex>
+					</items>
+					<maxitems>1</maxitems>
+					<size>1</size>
+				</config>
+			</TCEforms>
+		</switchableControllerActions>
+		<settings.override.import>
+			<TCEforms>
+				<label>Import override</label>
+				<config>
+					<type>group</type>
+					<internal_type>db</internal_type>
+					<allowed>tx_decosdata_domain_model_import</allowed>
+					<size>4</size>
+					<autoSizeMax>10</autoSizeMax>
+					<maxitems>9999</maxitems>
+					<fieldControl>
+						<elementBrowser>
+							<disabled>true</disabled>
+						</elementBrowser>
+					</fieldControl>
+				</config>
+			</TCEforms>
+		</settings.override.import>
+		<settings.override.ts>
+			<TCEforms>
+				<label>TypoScript override</label>
+				<config>
+					<type>text</type>
+					<renderType>t3editor</renderType>
+					<format>typoscript</format>
+					<default></default>
+				</config>
+			</TCEforms>
+		</settings.override.ts>
+        </el>
+      </ROOT>
+    </sDEF>
+  </sheets>
+</T3DataStructure>
