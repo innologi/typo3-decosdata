@@ -116,7 +116,7 @@ abstract class RepositoryAbstract extends Repository {
 	 */
 	protected function getStoragePid() {
 		$frameworkConfiguration = $this->objectManager->get(
-			'TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManagerInterface'
+			ConfigurationManagerInterface::class
 		)->getConfiguration(
 			ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK
 		);

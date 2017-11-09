@@ -65,15 +65,15 @@ class ImporterTask extends AbstractTask {
 		));
 
 		/* @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
-		$objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+		$objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
 
 		/* @var $importerService \Innologi\Decosdata\Service\Importer\ImporterService */
-		$importerService = $objectManager->get('Innologi\\Decosdata\\Service\\Importer\\ImporterService');
+		$importerService = $objectManager->get(\Innologi\Decosdata\Service\Importer\ImporterService::class);
 		$importerService->importUidSelection($this->selectedImports);
 
 		// persist any lingering data
 		/* @var $persistenceManager \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager */
-		$persistenceManager = $objectManager->get('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager');
+		$persistenceManager = $objectManager->get(\TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager::class);
 		$persistenceManager->persistAll();
 
 		$errors = $importerService->getErrors();
