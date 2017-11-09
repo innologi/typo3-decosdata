@@ -7,16 +7,7 @@
 <f:section name="main">
 
 <d:crumbPath>
-<dl class="item-{item.itemID}">
-	<d:item.for configuration="{configuration.contentField}" item="{item}">
-		<d:content.render tag="dt" options="{contentConfiguration.title.renderOptions}" index="{index}">
-			{contentConfiguration.title.value}
-		</d:content.render>
-		<d:content.render tag="dd" options="{contentConfiguration.renderOptions}" item="{item}" index="{index}">
-			{content}
-		</d:content.render>
-	</d:item.for>
-</dl>
+	<f:render partial="Item/Show" arguments="{data:item, configuration:configuration}" />
 </d:crumbPath>
 
 </f:section>

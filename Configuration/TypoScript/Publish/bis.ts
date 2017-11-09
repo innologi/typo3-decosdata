@@ -67,7 +67,7 @@ plugin.tx_decosdata.settings {
 		4.value = Zaak
 	}
 	level {
-		1 < plugin.tx_decosdata.advanced._LIST
+		1 = _LIST
 		1 {
 			paginate {
 				pageLimit = 20
@@ -111,7 +111,7 @@ plugin.tx_decosdata.settings {
 				}
 			}
 		}
-		2 < plugin.tx_decosdata.advanced._LIST
+		2 = _LIST
 		2 {
 			paginate {
 				type = yearly
@@ -172,9 +172,9 @@ plugin.tx_decosdata.settings {
 			}
 		}
 		# @TODO 1:4(1,1,1|1,1,2|1,1,3|1,*,*);
-		3 = COA
-		3.10 < plugin.tx_decosdata.advanced._SHOW
-		3.10.settings.level.3 {
+		3 = _COA
+		3.10 = _SHOW
+		3.10 {
 			contentField {
 				1 {
 					title.value = Type vergadering:
@@ -198,8 +198,8 @@ plugin.tx_decosdata.settings {
 				args.parameter = _3
 			}
 		}
-		3.20 < plugin.tx_decosdata.advanced._LIST
-		3.20.settings.level.3 {
+		3.20 = _LIST
+		3.20 {
 			paginate {
 				pageLimit = 20
 				perPageLimit = 10
@@ -364,7 +364,7 @@ plugin.tx_decosdata.settings {
 			}
 		}
 		# @TODO ______hide 'hide-me' fields with JS + add switch
-		4 < plugin.tx_decosdata.advanced._LIST
+		4 = _LIST
 		4 {
 			paginate {
 				pageLimit = 20

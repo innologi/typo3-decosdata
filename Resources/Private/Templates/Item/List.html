@@ -7,30 +7,7 @@
 <f:section name="main">
 
 <d:crumbPath>
-<d:pageBrowser>
-<table>
-	<thead>
-		<tr>
-			<f:for each="{configuration.contentField}" as="column" key="index">
-				<d:content.render tag="th" tagAttributes="{scope: 'col'}" options="{column.title.renderOptions}" index="{index}">
-					{column.title.value}
-				</d:content.render>
-			</f:for>
-		</tr>
-	</thead>
-	<tbody>
-		<f:for each="{items}" as="item">
-			<tr class="item-{item.itemID}">
-				<d:item.for configuration="{configuration.contentField}" item="{item}">
-					<d:content.render tag="td" options="{contentConfiguration.renderOptions}" item="{item}" index="{index}">
-						{content}
-					</d:content.render>
-				</d:item.for>
-			</tr>
-		</f:for>
-	</tbody>
-</table>
-</d:pageBrowser>
+	<f:render partial="Item/List" arguments="{data:items, configuration:configuration}" />
 </d:crumbPath>
 
 </f:section>

@@ -1,0 +1,30 @@
+<html data-namespace-typo3-fluid="true"
+	xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+	xmlns:d="http://typo3.org/ns/Innologi/Decosdata/ViewHelpers">
+
+<d:pageBrowser>
+<table>
+	<thead>
+		<tr>
+			<f:for each="{configuration.contentField}" as="column" key="index">
+				<d:content.render tag="th" tagAttributes="{scope: 'col'}" options="{column.title.renderOptions}" index="{index}">
+					{column.title.value}
+				</d:content.render>
+			</f:for>
+		</tr>
+	</thead>
+	<tbody>
+		<f:for each="{data}" as="item">
+			<tr class="item-{item.itemID}">
+				<d:item.for configuration="{configuration.contentField}" item="{item}">
+					<d:content.render tag="td" options="{contentConfiguration.renderOptions}" item="{item}" index="{index}">
+						{content}
+					</d:content.render>
+				</d:item.for>
+			</tr>
+		</f:for>
+	</tbody>
+</table>
+</d:pageBrowser>
+
+</html>

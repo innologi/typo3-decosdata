@@ -1,0 +1,16 @@
+<html data-namespace-typo3-fluid="true"
+	xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+	xmlns:d="http://typo3.org/ns/Innologi/Decosdata/ViewHelpers">
+
+<dl class="item-{data.itemID}">
+	<d:item.for configuration="{configuration.contentField}" item="{data}">
+		<d:content.render tag="dt" options="{contentConfiguration.title.renderOptions}" index="{index}">
+			{contentConfiguration.title.value}
+		</d:content.render>
+		<d:content.render tag="dd" options="{contentConfiguration.renderOptions}" item="{data}" index="{index}">
+			{content}
+		</d:content.render>
+	</d:item.for>
+</dl>
+
+</html>
