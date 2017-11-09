@@ -49,7 +49,7 @@ class LinkLevel implements OptionInterface {
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( !(isset($args['level']) && is_int($args['level'])) ) {
+		if ( !(isset($args['level']) && is_numeric($args['level'])) ) {
 			throw new MissingArgument(1449048090, array(self::class, 'level'));
 		}
 		$linkValue = NULL;

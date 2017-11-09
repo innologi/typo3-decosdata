@@ -1,9 +1,9 @@
 <?php
-namespace Innologi\Decosdata\Service\QueryBuilder\Exception;
+namespace Innologi\Decosdata\Exception;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -23,7 +23,6 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Exception;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Exception\Exception;
 /**
  * Configuration Error
  *
@@ -36,6 +35,6 @@ class ConfigurationError extends Exception {
 	/**
 	 * @var string
 	 */
-	protected $message = 'Query Builder Error: %1$s';
+	protected $message = 'Configuration Error: %1$s';
 
 }

@@ -24,6 +24,8 @@ namespace Innologi\Decosdata\Controller;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use Innologi\Decosdata\Exception\ConfigurationError;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Item controller
  *
@@ -52,513 +54,129 @@ class ItemController extends ActionController {
 	protected $breadcrumbService;
 
 	/**
+	 * @var \TYPO3\CMS\Core\TypoScript\TypoScriptService
+	 * @inject
+	 */
+	protected $typoScriptService;
+
+	/**
+	 * @var array
+	 */
+	protected $typoScriptSetup;
+
+	/**
+	 * @var array
+	 */
+	protected $activeConfiguration;
+
+	/**
+	 * @var array
+	 */
+	protected $import;
+
+	/**
 	 * @var integer
 	 */
 	protected $level = 1;
 
 	/**
-	 * @var array
-	 */
-	protected $pluginConfiguration;
-
-	/**
 	 * {@inheritDoc}
 	 * @see \TYPO3\CMS\Extbase\Mvc\Controller\ActionController::initializeAction()
 	 */
-	public function initializeAction() {
-		$this->initializePluginConfiguration();
-		$this->initializeSharedArguments();
-	}
-
-	/**
-	 * Initializes plugin configuration for use by any action method
-	 *
-	 * @return void
-	 */
-	protected function initializePluginConfiguration() {
-		$pid = (int) $GLOBALS['TSFE']->id;
-		// @LOW _consider this: we translated querybuilder configuration from arrays to classes. would there be an advantage to doing the same for this? this isn't going to be adjustable like query configurations, but maybe there are other advantages?
-		// extdev: regelgeving actief
-		if ($pid === 11) {
-		$this->pluginConfiguration = array(
-			'import' => array(
-				4
-			),
-			'level' => array(
-				1 => array(
-					'paginate' => array(
-						'pageLimit' => 30,
-						'perPageLimit' => 50,
-					),
-					'itemType' => array(
-						// DOCUMENT
-						1
-					),
-					'contentField' => array(
-						1 => array(
-							'title' => 'Naam Regelgeving',
-							'content' => array(
-								array(
-									// TEXT9
-									'field' => 6,
-								)
-							),
-							'order' => array(
-								'sort' => 'ASC',
-								'priority' => 10
-							)
-						),
-						2 => array(
-							'title' => 'Datum Inwerkingtreding',
-							'content' => array(
-								array(
-									// DATE5
-									'field' => 34,
-									'queryOptions' => array(
-										array(
-											'option' => 'DateConversion',
-											'args' => array(
-												'format' => '%d-%m-%Y'
-											)
-										),
-										array(
-											'option' => 'FilterItems',
-											'args' => array(
-												'filters' => array(
-													array(
-														'value' => 'NULL',
-														'operator' => 'IS NOT',
-													),
-													array(
-														'value' => '',
-														'operator' => '!=',
-													),
-													array(
-														'value' => 'NOW()',
-														'operator' => '<=',
-													)
-												),
-												'matchAll' => TRUE
-											)
-										),
-									),
-								)
-							),
-							'order' => array(
-								'sort' => 'DESC',
-								'priority' => 20
-							)
-						),
-						3 => array(
-							'title' => 'Datum Intrekking',
-							'content' => array(
-								array(
-									// DATE6
-									'field' => 31,
-									'queryOptions' => array(
-										array(
-											'option' => 'DateConversion',
-											'args' => array(
-												'format' => '%d-%m-%Y'
-											)
-										),
-										array(
-											'option' => 'FilterItems',
-											'args' => array(
-												'filters' => array(
-													array(
-														'value' => 'NULL',
-														'operator' => 'IS',
-													),
-													array(
-														'value' => '',
-														'operator' => '=',
-													),
-													array(
-														'value' => 'NOW()',
-														'operator' => '>',
-													)
-												)
-											)
-										)
-									)
-								)
-							)
-						),
-						4 => array(
-							'title' => 'Download',
-							'content' => array(
-								array(
-									'blob' => TRUE,
-								)
-							),
-							'renderOptions' => array(
-								array(
-									'option' => 'FileIcon',
-								),
-								array(
-								 'option' => 'Wrapper',
-									'args' => array(
-										'wrap' => '|| {render:FileSize}|'
-									)
-								),
-								array(
-									'option' => 'FileDownload',
-								)
-							)
-						)
-					)
-				)
-			)
-		);
-		} elseif ($pid === 18) {
-		// extdev: BIS
-		$this->pluginConfiguration = array(
-			'import' => array(
-				5,1
-			),
-			'level' => array(
-				1 => array(
-					'paginate' => array(
-						'pageLimit' => 20,
-						'perPageLimit' => 20,
-					),
-					'itemType' => array(
-						// FOLDER
-						2
-					),
-					// @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
-					'noItemId' => TRUE,
-					'contentField' => array(
-						1 => array(
-							'title' => 'Vergaderingen',
-							'content' => array(
-								array(
-									// SUBJECT1
-									'field' => 23,
-								)
-							),
-							'renderOptions' => array(
-								array(
-									'option' => 'LinkLevel',
-									'args' => array(
-										'level' => 2,
-									)
-								)
-							),
-							'order' => array(
-								'sort' => 'ASC',
-								'priority' => 10
-							)
-						)
-					),
-					'queryOptions' => array(
-						array(
-							'option' => 'FilterItems',
-							'args' => array(
-								'filters' => array(
-									array(
-										'value' => 'vergaderdossiers',
-										'operator' => '=',
-										// BOOKNAME
-										'field' => 2
-									),
-									array(
-										'value' => '1',
-										'operator' => '=',
-										// BOL3
-										'field' => 16
-									)
-								),
-								'matchAll' => TRUE
-							)
-						)
-					)
-				),
-				2 => array(
-					'paginate' => array(
-						'type' => 'yearly',
-						'pageLimit' => 20,
-						// DATE1
-						'field' => 24
-					),
-					'itemType' => array(
-						// FOLDER
-						2
-					),
-					'contentField' => array(
-						1 => array(
-							'title' => 'Vergaderdatum',
-							'content' => array(
-								array(
-									// DATE1
-									'field' => 24,
-									'order' => array(
-										'sort' => 'DESC',
-										'priority' => 10
-									),
-									'queryOptions' => array(
-										array(
-											'option' => 'DateConversion',
-											'args' => array(
-												'format' => '%d-%m-%Y'
-											)
-										)
-									)
-								)
-							),
-							'renderOptions' => array(
-								array(
-									'option' => 'LinkLevel',
-									'args' => array(
-										'level' => 3,
-										'linkItem' => TRUE
-									)
-								)
-							),
-						)
-					),
-					'queryOptions' => array(
-						array(
-							'option' => 'FilterItems',
-							'args' => array(
-								'filters' => array(
-									// perfect replacement for filterView! using what is already there :D
-									array(
-										'parameter' => '_2',
-										'operator' => '=',
-										// SUBJECT1
-										'field' => 23
-									),
-									array(
-										'value' => 'vergaderdossiers',
-										'operator' => '=',
-										// BOOKNAME
-										'field' => 2
-									),
-									array(
-										'value' => '1',
-										'operator' => '=',
-										// BOL3
-										'field' => 16
-									)
-								),
-								'matchAll' => TRUE
-							)
-						)
-					)
-				),
-				// @FIX ______multiple views per plugin?
-				// @FIX ______different view types per view? we have list, now we need single for "header"?
-				// @FIX ______zaak support
-				// @FIX ______crumbpaths
-				// 1:4(1,1,1|1,1,2|1,1,3|1,*,*);
-				// 1:fixNumberOrdering();;
-				3 => array(
-					'paginate' => array(
-						'pageLimit' => 20,
-						'perPageLimit' => 10,
-					),
-					'itemType' => array(
-						// DOCUMENT
-						1
-					),
-					'contentField' => array(
-						1 => array(
-							'title' => 'Agendanr.',
-							'content' => array(
-								/*array(
-									// DATE2 (NUM2)
-									'field' => 32,
-								),
-								array(
-									// DATE3 (NUM3)
-									'field' => 35,
-								),
-								array(
-									// DATE4 (NUM4)
-									'field' => 17,
-								),*/
-								array(
-									// TEXT8
-									'field' => 11,
-								)
-							),
-							'order' => array(
-								'sort' => 'ASC',
-								'priority' => 10
-							),
-						),
-						2 => array(
-							'title' => 'Document type',
-							'content' => array(
-								array(
-									// SUBJECT1
-									'field' => 23,
-								)
-							),
-							'order' => array(
-								'sort' => 'ASC',
-								'priority' => 20
-							),
-						),
-						3 => array(
-							'title' => 'Inhoud document',
-							'content' => array(
-								array(
-									// TEXT9
-									'field' => 6,
-								)
-							),
-							'order' => array(
-								'sort' => 'ASC',
-								'priority' => 30
-							),
-						),
-						4 => array(
-							'title' => 'Download',
-							'content' => array(
-								array(
-									'blob' => TRUE,
-								)
-							),
-							'renderOptions' => array(
-								array(
-									'option' => 'FileIcon',
-								),
-								array(
-									'option' => 'Wrapper',
-									'args' => array(
-										'wrap' => '|| {render:FileSize}|'
-									)
-								),
-								array(
-									'option' => 'FileDownload',
-								)
-							)
-						),
-						5 => array(
-							'title' => 'Zaak',
-							'queryOptions' => array(
-								array(
-									'option' => 'ParentInParent',
-									'args' => array(
-										// FOLDER
-										'itemType' => array(
-											2
-										)
-									)
-								),
-								/*array(
-								 'option' => 'FilterSubItems',
-									'args' => array(
-										'filters' => array(
-											array(
-												'value' => 'zake%',
-												'operator' => 'LIKE',
-												// BOOKNAME
-												'field' => 2
-											),
-											array(
-												'value' => '1',
-												'operator' => '=',
-												// BOL3
-												'field' => 16
-											)
-										),
-										'matchAll' => TRUE
-									)
-								)*/
-							),
-							'renderOptions' => array(
-								/*array(
-									'option' => 'Icon',
-									'args' => array(
-										'name' => 'zaak'
-									)
-								),*/
-								array(
-									'option' => 'LinkLevel',
-									'args' => array(
-										'level' => 4,
-										'linkContentItem' => TRUE
-									)
-								)
-							)
-						),
-						6 => array(
-							'title' => 'Reg.datum',
-							'content' => array(
-								array(
-									// DOCUMENT_DATE
-									'field' => 21,
-									'queryOptions' => array(
-										array(
-											'option' => 'DateConversion',
-											'args' => array(
-												'format' => '%d-%m-%Y'
-											)
-										)
-									)
-								)
-							),
-						),
-						7 => array(
-							'title' => 'Reg.nr.',
-							'content' => array(
-								array(
-									// MARK
-									'field' => 4,
-								)
-							),
-						),
-					),
-					'queryOptions' => array(
-						array(
-							'option' => 'RestrictByParentId',
-							'args' => array(
-								'parameter' => '_3',
-							)
-						),
-						array(
-							'option' => 'FilterItems',
-							'args' => array(
-								'filters' => array(
-									array(
-										'value' => '1',
-										'operator' => '=',
-										// BOL3
-										'field' => 16
-									)
-								),
-							)
-						)
-					)
-				)
-			)
-		);
-		}
-	}
-
-	/**
-	 * Initializes and validates request parameters shared by all actions
-	 *
-	 * @return void
-	 */
-	protected function initializeSharedArguments() {
+	protected function initializeAction() {
+		// initializes and validates request parameters shared by all actions
 		if ($this->request->hasArgument('level')) {
 			// set current level
 			$this->level = (int) $this->request->getArgument('level');
 			if ($this->request->hasArgument('_' . $this->level)) {
+				// @TODO what to do with this one?
 				$levelParameter = $this->request->getArgument('_' . $this->level);
 			}
 		}
-		// @LOW ___will probably require some validation to see if provided level exists in available configuration
-		// @LOW _consider that said check could throw an exception, and that we could then apply an override somewhere that catches it to produce a 404? (or just generate a flash message, which I think we've done in another extbase ext)
-		if ($this->request->hasArgument('page')) {
-			// a valid page-parameter will set current page in configuration
-			$this->pluginConfiguration['level'][$this->level]['paginate']['currentPage'] = (int) $this->request->getArgument('page');
+
+		// @LOW validate?
+		// set imports, stage 1: find flexform override before TS overrides get in effect
+		if (isset($this->settings['override']['import'][0])) {
+			$this->import = GeneralUtility::intExplode(',', $this->settings['override']['import'], TRUE);
 		}
+
+		// @LOW cache?
+		// check override TS
+		if (isset(trim($this->settings['override']['ts'])[0])) {
+			/** @var \TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser $tsParser */
+			$tsParser = GeneralUtility::makeInstance(\TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser::class);
+			$tsParser->parse($this->settings['override']['ts']);
+			$this->typoScriptSetup = $tsParser->setup;
+			// completely replace original settings
+			$this->settings = $this->typoScriptService->convertTypoScriptArrayToPlainArray($this->typoScriptSetup);
+		}
+
+		// set imports, stage 2: no flexform overrides? get it from TS
+		if ($this->import === NULL) {
+			$this->import = $this->settings['import'] ?? [];
+		}
+
+		// initialize breadcrumb
+		if (isset($this->settings['breadcrumb']) && is_array($this->settings['breadcrumb'])) {
+			// @LOW this being optional, means I probably shouldn't inject it
+			$this->breadcrumbService->configureBreadcrumb($this->settings['breadcrumb'], $this->import);
+	}
+
+	/**
+	 * Initialize show action
+	 *
+	 * @return void
+	 */
+	protected function initializeShowAction() {
+		$this->activeConfiguration = $this->settings['level'][$this->level];
+	}
+
+	/**
+	 * Initialize list action
+	 *
+	 * @return void
+	 */
+	protected function initializeListAction() {
+		// @LOW _consider that said check could throw an exception, and that we could then apply an override somewhere that catches it to produce a 404? (or just generate a flash message, which I think we've done in another extbase ext)
+		if ($this->request->hasArgument('page') && isset($this->settings['level'][$this->level]['paginate'])) {
+			// a valid page-parameter will set current page in configuration
+			$this->settings['level'][$this->level]['paginate']['currentPage'] = (int) $this->request->getArgument('page');
+		}
+		$this->activeConfiguration = $this->settings['level'][$this->level];
+	}
+
+	/**
+	 * Initialize advanced action
+	 *
+	 * @return void
+	 * @throws ConfigurationError
+	 */
+	protected function initializeAdvancedAction() {
+		if (!isset($this->settings['level'][$this->level]['_typoScriptNodeValue'])) {
+			throw new ConfigurationError(1509719824, ['Missing TypoScript ContentObject configuration on level ' . $this->level]);
+		}
+
+		if ($this->typoScriptSetup === NULL) {
+			$this->typoScriptSetup = $this->typoScriptService->convertPlainArrayToTypoScriptArray($this->settings);
+		}
+		// content object configurations require the original TS
+		$this->activeConfiguration = $this->typoScriptSetup['level.'][$this->level . '.'];
+	}
+
+	/**
+	 * Show single item details per publication configuration.
+	 *
+	 * @return void
+	 */
+	public function showAction() {
+		$items = $this->itemRepository->findWithStatement(
+			$this->queryBuilder->buildListQuery(
+				$this->activeConfiguration, $this->import
+			)->setLimit(1)->createStatement()
+		);
+
+		$this->view->assign('configuration', $this->activeConfiguration);
+		$this->view->assign('item', $items[0] ?? NULL);
 	}
 
 	/**
@@ -567,22 +185,36 @@ class ItemController extends ActionController {
 	 * @return void
 	 */
 	public function listAction() {
-		$activeConfiguration = $this->pluginConfiguration['level'][$this->level];
 		$items = $this->itemRepository->findWithStatement(
 			($statement = $this->queryBuilder->buildListQuery(
-				$activeConfiguration, $this->pluginConfiguration['import']
+				$this->activeConfiguration, $this->import
 			)->createStatement())
 		);
 
-		// initialize breadcrumb
-		if (isset($this->pluginConfiguration['breadcrumb']) && is_array($this->pluginConfiguration['breadcrumb'])) {
-			// @LOW this being optional, means I probably shouldn't inject it
-			$this->breadcrumbService->configureBreadcrumb($this->pluginConfiguration['breadcrumb'], $this->pluginConfiguration['import']);
-		}
-
-		$this->view->assign('configuration', $activeConfiguration);
+		$this->view->assign('configuration', $this->activeConfiguration);
 		$this->view->assign('items', $items);
 		// @TODO ___remove
 		$this->view->assign('query', $statement->getProcessedQuery());
 	}
+
+	/**
+	 * Run multiple publish-configurations and/or custom TS elements as a single cohesive content element.
+	 *
+	 * @return void
+	 */
+	public function advancedAction() {
+		// if successfully configured, lock its state, as you generally only want 1 state if plugins are nested
+		!$this->breadcrumbService->isActive() or $this->breadcrumbService->lock(TRUE);
+
+		/** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObjectRenderer */
+		$contentObjectRenderer = $GLOBALS['TSFE']->cObj;
+		$contentType = $this->settings['level'][$this->level]['_typoScriptNodeValue'];
+		$content = $contentObjectRenderer->cObjGetSingle($contentType, $this->activeConfiguration);
+
+		// unlock its state in case of other plugin content elements
+		$this->breadcrumbService->lock(FALSE);
+
+		$this->view->assign('content', $content);
+	}
+
 }

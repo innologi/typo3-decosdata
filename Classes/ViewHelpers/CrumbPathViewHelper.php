@@ -63,6 +63,7 @@ class CrumbPathViewHelper extends AbstractViewHelper {
 		$this->registerArgument('partial', 'string', 'Dedicated partial template override.', FALSE, 'ViewHelpers/CrumbPath');
 		$this->registerArgument('renderAbove', 'boolean', 'Renders crumbpath above content.', FALSE, TRUE);
 		$this->registerArgument('renderBelow', 'boolean', 'Renders crumbpath below content.', FALSE, TRUE);
+		$this->registerArgument('ignoreLock', 'boolean', 'Ignores the crumbpath lock, if set.', FALSE, FALSE);
 	}
 
 	/**
@@ -71,8 +72,8 @@ class CrumbPathViewHelper extends AbstractViewHelper {
 	 * @return string
 	 */
 	public function render() {
-		// render crumbpath only if active
-		if ( !$this->breadcrumbService->isActive() ) {
+		// render crumbpath only if active and not locked (unless ignored)
+		if ( !$this->breadcrumbService->isActive() || ( !$this->arguments['ignoreLock'] && $this->breadcrumbService->isLocked() ) ) {
 			return $this->renderChildren();
 		}
 

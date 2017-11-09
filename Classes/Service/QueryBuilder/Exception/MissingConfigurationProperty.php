@@ -31,7 +31,7 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MissingConfigurationProperty extends ConfigurationError {
+class MissingConfigurationProperty extends QueryBuilderError {
 
 	/**
 	 * @var string
