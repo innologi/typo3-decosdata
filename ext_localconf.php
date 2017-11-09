@@ -7,11 +7,11 @@ $ll = 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_be.xlf:';
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
 	'Innologi.' . $_EXTKEY,
 	'Publish',
-	array(
-		'Item' => 'advanced,list,show',
-	),
+	[
+		'Item' => 'advanced',
+	],
 	// non-cacheable actions
-	array()
+	[]
 );
 
 // add scheduler tasks

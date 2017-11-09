@@ -1,11 +1,11 @@
 <?php
 defined('TYPO3_MODE') or die();
 
-// add publish-plugin
+// add plugins
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
 	'Innologi.Decosdata',
 	'Publish',
-	'Publish Decos Data'
+	'Decos Data: Publish'
 );
 
 // add the flexform

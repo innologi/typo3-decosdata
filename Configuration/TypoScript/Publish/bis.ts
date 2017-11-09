@@ -1,7 +1,7 @@
 plugin.tx_decosdata.settings {
 	import {
-		0 = 2
-		1 = 3
+		0 = 4
+		1 = 5
 	}
 	breadcrumb {
 		1.value = Vergaderingen
@@ -173,6 +173,7 @@ plugin.tx_decosdata.settings {
 		}
 		# @TODO 1:4(1,1,1|1,1,2|1,1,3|1,*,*);
 		3 = _COA
+		3.5 < plugin.tx_decosdata.advanced._TEST
 		3.10 = _SHOW
 		3.10 {
 			contentField {
