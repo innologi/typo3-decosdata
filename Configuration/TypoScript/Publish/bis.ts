@@ -173,7 +173,15 @@ plugin.tx_decosdata.settings {
 		}
 		# @TODO 1:4(1,1,1|1,1,2|1,1,3|1,*,*);
 		3 = _COA
-		3.5 < plugin.tx_decosdata.advanced._TEST
+		3.5 = USER_INT
+		3.5 {
+			userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+			extensionName = StreamovationsVp
+			pluginName = Video
+			vendorName = Innologi
+			# we can't override the configuration from here, because this action relies on FULL_TYPOSCRIPT which does not get merged
+			switchableControllerActions.Video.1 = advancedShow
+		}
 		3.10 = _SHOW
 		3.10 {
 			contentField {

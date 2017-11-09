@@ -8,7 +8,7 @@ $ll = 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_be.xlf:';
 	'Innologi.' . $_EXTKEY,
 	'Publish',
 	[
-		'Item' => 'advanced',
+		'Item' => 'complex',
 	],
 	// non-cacheable actions
 	[]

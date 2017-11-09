@@ -156,11 +156,11 @@ class ItemController extends ActionController {
 	}
 
 	/**
-	 * Run multiple publish-configurations and/or custom TS elements as a single cohesive content element.
+	 * Run multiple publish-configurations and/or custom TS elements as a single cohesive content element + overarching template.
 	 *
 	 * @return void
 	 */
-	public function advancedAction() {
+	public function complexAction() {
 		$this->view->assign(
 			'contentSections',
 			$this->typeProcessor->processTypeRecursion(
