@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Controller;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -24,7 +24,6 @@ namespace Innologi\Decosdata\Controller;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use Innologi\Decosdata\Exception\ConfigurationError;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Item controller
@@ -35,6 +34,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class ItemController extends ActionController {
 
+	/**
+	 * @var \Innologi\Decosdata\Service\TypeProcessorService
+	 * @inject
+	 */
+	protected $typeProcessor;
 	/**
 	 * @var \Innologi\Decosdata\Domain\Repository\ItemRepository
 	 * @inject
@@ -54,17 +58,6 @@ class ItemController extends ActionController {
 	protected $breadcrumbService;
 
 	/**
-	 * @var \TYPO3\CMS\Core\TypoScript\TypoScriptService
-	 * @inject
-	 */
-	protected $typoScriptService;
-
-	/**
-	 * @var array
-	 */
-	protected $typoScriptSetup;
-
-	/**
 	 * @var array
 	 */
 	protected $activeConfiguration;
@@ -80,21 +73,20 @@ class ItemController extends ActionController {
 	protected $level = 1;
 
 	/**
+	 * @var integer
+	 */
+	protected $page = 1;
+
+	/**
 	 * {@inheritDoc}
 	 * @see \TYPO3\CMS\Extbase\Mvc\Controller\ActionController::initializeAction()
 	 */
 	protected function initializeAction() {
-		// initializes and validates request parameters shared by all actions
-		if ($this->request->hasArgument('level')) {
-			// set current level
-			$this->level = (int) $this->request->getArgument('level');
-			if ($this->request->hasArgument('_' . $this->level)) {
-				// @TODO what to do with this one?
-				$levelParameter = $this->request->getArgument('_' . $this->level);
-			}
-		}
-
 		// @LOW validate?
+		// set basic parameters
+		$this->level = $this->request->hasArgument('level') ? (int) $this->request->getArgument('level') : 1;
+		$this->page = $this->request->hasArgument('page') ? (int) $this->request->getArgument('page') : 1;
+
 		// set imports, stage 1: find flexform override before TS overrides get in effect
 		if (isset($this->settings['override']['import'][0])) {
 			$this->import = GeneralUtility::intExplode(',', $this->settings['override']['import'], TRUE);
@@ -106,9 +98,10 @@ class ItemController extends ActionController {
 			/** @var \TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser $tsParser */
 			$tsParser = GeneralUtility::makeInstance(\TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser::class);
 			$tsParser->parse($this->settings['override']['ts']);
-			$this->typoScriptSetup = $tsParser->setup;
 			// completely replace original settings
-			$this->settings = $this->typoScriptService->convertTypoScriptArrayToPlainArray($this->typoScriptSetup);
+			$this->settings = $this->typeProcessor
+				->getTypoScriptService()
+				->convertTypoScriptArrayToPlainArray($tsParser->setup);
 		}
 
 		// set imports, stage 2: no flexform overrides? get it from TS
@@ -120,47 +113,15 @@ class ItemController extends ActionController {
 		if (isset($this->settings['breadcrumb']) && is_array($this->settings['breadcrumb'])) {
 			// @LOW this being optional, means I probably shouldn't inject it
 			$this->breadcrumbService->configureBreadcrumb($this->settings['breadcrumb'], $this->import);
-	}
+		}
 
-	/**
-	 * Initialize show action
-	 *
-	 * @return void
-	 */
-	protected function initializeShowAction() {
+		#if ($this->request->hasArgument('_' . $this->level)) {
+			// @TODO what to do with this one?
+		#	$levelParameter = $this->request->getArgument('_' . $this->level);
+		#}
+
+		// @LOW ___will probably require some validation to see if provided level exists in available configuration
 		$this->activeConfiguration = $this->settings['level'][$this->level];
-	}
-
-	/**
-	 * Initialize list action
-	 *
-	 * @return void
-	 */
-	protected function initializeListAction() {
-		// @LOW _consider that said check could throw an exception, and that we could then apply an override somewhere that catches it to produce a 404? (or just generate a flash message, which I think we've done in another extbase ext)
-		if ($this->request->hasArgument('page') && isset($this->settings['level'][$this->level]['paginate'])) {
-			// a valid page-parameter will set current page in configuration
-			$this->settings['level'][$this->level]['paginate']['currentPage'] = (int) $this->request->getArgument('page');
-		}
-		$this->activeConfiguration = $this->settings['level'][$this->level];
-	}
-
-	/**
-	 * Initialize advanced action
-	 *
-	 * @return void
-	 * @throws ConfigurationError
-	 */
-	protected function initializeAdvancedAction() {
-		if (!isset($this->settings['level'][$this->level]['_typoScriptNodeValue'])) {
-			throw new ConfigurationError(1509719824, ['Missing TypoScript ContentObject configuration on level ' . $this->level]);
-		}
-
-		if ($this->typoScriptSetup === NULL) {
-			$this->typoScriptSetup = $this->typoScriptService->convertPlainArrayToTypoScriptArray($this->settings);
-		}
-		// content object configurations require the original TS
-		$this->activeConfiguration = $this->typoScriptSetup['level.'][$this->level . '.'];
 	}
 
 	/**
@@ -169,14 +130,14 @@ class ItemController extends ActionController {
 	 * @return void
 	 */
 	public function showAction() {
-		$items = $this->itemRepository->findWithStatement(
-			$this->queryBuilder->buildListQuery(
-				$this->activeConfiguration, $this->import
-			)->setLimit(1)->createStatement()
-		);
-
 		$this->view->assign('configuration', $this->activeConfiguration);
-		$this->view->assign('item', $items[0] ?? NULL);
+		// @TODO what if NULL? doesn't the template break?
+		$this->view->assign(
+			'item',
+			$this->typeProcessor->processShow(
+				$this->activeConfiguration, $this->import
+			)
+		);
 	}
 
 	/**
@@ -185,36 +146,27 @@ class ItemController extends ActionController {
 	 * @return void
 	 */
 	public function listAction() {
-		$items = $this->itemRepository->findWithStatement(
-			($statement = $this->queryBuilder->buildListQuery(
-				$this->activeConfiguration, $this->import
-			)->createStatement())
-		);
-
 		$this->view->assign('configuration', $this->activeConfiguration);
-		$this->view->assign('items', $items);
-		// @TODO ___remove
-		$this->view->assign('query', $statement->getProcessedQuery());
+		$this->view->assign(
+			'items',
+			$this->typeProcessor->processList(
+				$this->activeConfiguration, $this->import, $this->page
+			)
+		);
 	}
 
 	/**
-	 * Run multiple publish-configurations and/or custom TS elements as a single cohesive content element.
+	 * Run multiple publish-configurations and/or custom TS elements as a single cohesive content element + overarching template.
 	 *
 	 * @return void
 	 */
-	public function advancedAction() {
-		// if successfully configured, lock its state, as you generally only want 1 state if plugins are nested
-		!$this->breadcrumbService->isActive() or $this->breadcrumbService->lock(TRUE);
-
-		/** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObjectRenderer */
-		$contentObjectRenderer = $GLOBALS['TSFE']->cObj;
-		$contentType = $this->settings['level'][$this->level]['_typoScriptNodeValue'];
-		$content = $contentObjectRenderer->cObjGetSingle($contentType, $this->activeConfiguration);
-
-		// unlock its state in case of other plugin content elements
-		$this->breadcrumbService->lock(FALSE);
-
-		$this->view->assign('content', $content);
+	public function complexAction() {
+		$this->view->assign(
+			'contentSections',
+			$this->typeProcessor->processTypeRecursion(
+				$this->activeConfiguration, $this->import, $this->page
+			)
+		);
 	}
 
 }

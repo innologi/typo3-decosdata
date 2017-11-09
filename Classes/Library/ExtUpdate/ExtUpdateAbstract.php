@@ -88,10 +88,10 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 			$this->sourceExtensionKey = $this->extensionKey;
 		}
 		/* @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
-		$objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+		$objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
 
 		$this->flashMessageQueue = $objectManager->get(
-			'TYPO3\\CMS\\Core\\Messaging\\FlashMessageQueue',
+			\TYPO3\CMS\Core\Messaging\FlashMessageQueue::class,
 			'extbase.flashmessages.tx_' . $this->extensionKey . '_extupdate'
 		);
 
@@ -183,7 +183,7 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	protected function addFlashMessage($messageBody, $messageTitle = '', $severity = \TYPO3\CMS\Core\Messaging\FlashMessage::OK) {
 		/* @var $flashMessage \TYPO3\CMS\Core\Messaging\FlashMessage */
 		$flashMessage = GeneralUtility::makeInstance(
-			'TYPO3\\CMS\\Core\\Messaging\\FlashMessage', $messageBody, $messageTitle, $severity
+			\TYPO3\CMS\Core\Messaging\FlashMessage::class, $messageBody, $messageTitle, $severity
 		);
 		$this->flashMessageQueue->enqueue($flashMessage);
 	}

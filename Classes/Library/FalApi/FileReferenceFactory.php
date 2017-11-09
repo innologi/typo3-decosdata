@@ -86,7 +86,7 @@ class FileReferenceFactory implements SingletonInterface {
 	 */
 	public function create(array $data) {
 		/* @var $object \TYPO3\CMS\Extbase\Domain\Model\FileReference */
-		$object = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Domain\\Model\\FileReference');
+		$object = $this->objectManager->get(\TYPO3\CMS\Extbase\Domain\Model\FileReference::class);
 		$object->setOriginalResource(
 			// all you really need is an 'uid_local' key with the File uid as value for it
 			// to persist correctly. Below method will throw an exception if missing.

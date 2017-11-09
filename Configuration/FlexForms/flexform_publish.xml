@@ -13,31 +13,6 @@
         </TCEforms>
         <type>array</type>
         <el>
-		<switchableControllerActions>
-			<TCEforms>
-				<label>Plugin type</label>
-				<config>
-					<type>select</type>
-					<renderType>selectSingle</renderType>
-					<items type="array">
-						<numIndex index="0" type="array">
-							<numIndex index="0">List multiple items</numIndex>
-							<numIndex index="1">Item->list</numIndex>
-						</numIndex>
-						<numIndex index="1" type="array">
-							<numIndex index="0">Show single item</numIndex>
-							<numIndex index="1">Item->show</numIndex>
-						</numIndex>
-						<numIndex index="2" type="array">
-							<numIndex index="0">Advanced</numIndex>
-							<numIndex index="1">Item->advanced</numIndex>
-						</numIndex>
-					</items>
-					<maxitems>1</maxitems>
-					<size>1</size>
-				</config>
-			</TCEforms>
-		</switchableControllerActions>
 		<settings.override.import>
 			<TCEforms>
 				<label>Import override</label>
