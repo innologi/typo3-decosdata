@@ -95,10 +95,10 @@ class ItemController extends ActionController {
 		}
 
 		// @LOW validate?
-		// set imports
-		$this->import = isset($this->settings['override']['import'][0])
-			? GeneralUtility::intExplode(',', $this->settings['override']['import'], TRUE)
-			: $this->settings['import'];
+		// set imports, stage 1: find flexform override before TS overrides get in effect
+		if (isset($this->settings['override']['import'][0])) {
+			$this->import = GeneralUtility::intExplode(',', $this->settings['override']['import'], TRUE);
+		}
 
 		// @LOW cache?
 		// check override TS
@@ -111,6 +111,10 @@ class ItemController extends ActionController {
 			$this->settings = $this->typoScriptService->convertTypoScriptArrayToPlainArray($this->typoScriptSetup);
 		}
 
+		// set imports, stage 2: no flexform overrides? get it from TS
+		if ($this->import === NULL) {
+			$this->import = $this->settings['import'] ?? [];
+		}
 
 		// initialize breadcrumb
 		if (isset($this->settings['breadcrumb']) && is_array($this->settings['breadcrumb'])) {
