@@ -44,7 +44,6 @@ class FilterRelations extends FilterOptionAbstract {
 	public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service) {
 		$this->initialize($args);
 		$id = 'relation' . $service->getIndex();
-		$table = 'tx_decosdata_domain_model_itemfield';
 		$aliasId = $id . 'filter';
 
 		// note that we use the same id as any relation-type option, e.g. ParentInParent,
@@ -55,10 +54,10 @@ class FilterRelations extends FilterOptionAbstract {
 		$tables = $from->getTables();
 		if (empty($tables)) {
 			// if join didn't already exist with any tables, this is a misconfiguration
-			throw new MissingDependency(1462201871, array(self::class, 'No relation set'));
+			throw new MissingDependency(1462201871, [self::class, 'No relation set']);
 		}
 
-		$conditions = array();
+		$conditions = [];
 		foreach ($args['filters'] as $filter) {
 			$this->initializeFilter($filter, TRUE);
 			// identify the table by the field, so we don't create redundancy
@@ -66,20 +65,24 @@ class FilterRelations extends FilterOptionAbstract {
 			if ($from->getTableNameByAlias($alias) === NULL) {
 				// if alias wasn't created before, do so now
 				$parameterKey = ':' . $alias;
-				$from->addTable($table, $alias)
+				$tableAlias1 = $alias . 'i';
+				$tableAlias2 = $alias . 'f';
+				$from->addTable('tx_decosdata_domain_model_itemfield', $tableAlias1)
+					->addTable('tx_decosdata_domain_model_field', $tableAlias2)
 					->addConstraint(
 						$alias,
-						$this->constraintFactory->createConstraintAnd(array(
-							'item' => $this->constraintFactory->createConstraintByField('item', $alias, '=', $select->getField(), $select->getTableAlias()),
-							'field' => $this->constraintFactory->createConstraintByValue('field', $alias, '=', $parameterKey)
-						))
+						$this->constraintFactory->createConstraintAnd([
+							'item' => $this->constraintFactory->createConstraintByField('item', $tableAlias1, '=', $select->getField(), $select->getTableAlias()),
+							'field' => $this->constraintFactory->createConstraintByField('field', $tableAlias1, '=', 'uid', $tableAlias2),
+							'fieldName' => $this->constraintFactory->createConstraintByValue('field_name', $tableAlias2, '=', $parameterKey)
+						])
 					);
 				$queryField->addParameter($parameterKey, $filter['field']);
 			}
 
 			$conditions[] = $this->constraintFactory->createConstraintByValue(
 				'field_value',
-				$alias,
+				$tableAlias1,
 				$filter['operator'],
 				$filter['value']
 			);

@@ -186,9 +186,9 @@ class PaginateService implements SingletonInterface {
 		// check for valid configuration values first
 		$fieldId = $configuration['field'];
 		if ($fieldId === NULL) {
-			throw new PaginationError(1449154980, array(
+			throw new PaginationError(1449154980, [
 				'field', $fieldId, 5
-			));
+			]);
 		}
 
 		// clone the Query and reset the parts not relevant for it
@@ -203,20 +203,21 @@ class PaginateService implements SingletonInterface {
 			->setSortOrder('DESC');
 
 		// define field values
-		$tableAlias = 'itf_pbYear';
+		$tableAlias1 = 'itf_pbYear';
+		$tableAlias2 = 'f_pbYear';
 		$field = 'field_value';
 		$queryField = $queryContent->getField('');
 
 		// if an offset year was configured, apply it
 		if ($configuration['offsetYear'] > 0) {
 			$queryField->getWhere()->setConstraint(
-				$this->constraintFactory->createConstraintByValue($field, $tableAlias, '>=', $configuration['offsetYear'])->addWrapLocal('year', 'YEAR(|)')
+				$this->constraintFactory->createConstraintByValue($field, $tableAlias1, '>=', $configuration['offsetYear'])->addWrapLocal('year', 'YEAR(|)')
 			);
 		}
 		// if a maximum year was configured, apply it
 		if ($configuration['maxYear'] > 0) {
 			$queryField->getWhere()->addConstraint('pagebrowser-max',
-				$this->constraintFactory->createConstraintByValue($field, $tableAlias, '<=', $configuration['maxYear'])->addWrapLocal('year', 'YEAR(|)')
+				$this->constraintFactory->createConstraintByValue($field, $tableAlias1, '<=', $configuration['maxYear'])->addWrapLocal('year', 'YEAR(|)')
 			);
 		}
 
@@ -228,7 +229,7 @@ class PaginateService implements SingletonInterface {
 
 		// add select
 		$queryField->getSelect()
-			->setTableAlias($tableAlias)
+			->setTableAlias($tableAlias1)
 			->setField($field)
 			// the NULL will make pagination fail on purpose, without error
 			->addWrap('if', 'IF(' . $wrapDivider . ' REGEXP (\'' . $pattern . '\'),YEAR(' . $wrapDivider . '),NULL)')
@@ -237,14 +238,18 @@ class PaginateService implements SingletonInterface {
 		// add from and keep it in a variable for later use
 		$parameterKey = ':pagebrowserfield';
 		$from = $queryField->getFrom(
-			'pagebrowser-year', array($tableAlias => 'tx_decosdata_domain_model_itemfield')
+			'pagebrowser-year', [
+				$tableAlias1 => 'tx_decosdata_domain_model_itemfield',
+				$tableAlias2 => 'tx_decosdata_domain_model_field'
+			]
 		)->setJoinType(
 			'LEFT'
 		)->setConstraint(
-			$this->constraintFactory->createConstraintAnd(array(
-				$this->constraintFactory->createConstraintByField('item', $tableAlias, '=', 'uid', 'it'),
-				$this->constraintFactory->createConstraintByValue('field', $tableAlias, '=', $parameterKey)
-			))
+			$this->constraintFactory->createConstraintAnd([
+				$this->constraintFactory->createConstraintByField('item', $tableAlias1, '=', 'uid', 'it'),
+				$this->constraintFactory->createConstraintByField('field', $tableAlias1, '=', 'uid', $tableAlias2),
+				$this->constraintFactory->createConstraintByValue('field_name', $tableAlias2, '=', $parameterKey)
+			])
 		);
 		$yQuery->addParameter($parameterKey, $fieldId);
 
@@ -252,7 +257,7 @@ class PaginateService implements SingletonInterface {
 		$statement = $yQuery->createStatement();
 		$statement->execute();
 		// prevent any years to be assigned to page 0
-		$years = array(0 => 0);
+		$years = [0 => 0];
 		while (($row = $statement->fetch()) !== FALSE) {
 			$years[] = $row['pbYear'];
 		}
@@ -278,13 +283,13 @@ class PaginateService implements SingletonInterface {
 
 			// add the FROM to the original Query object
 			$queryField = $query->getContent('pagebrowser')->getField('year');
-			$queryField->setFrom(array($from));
+			$queryField->setFrom([$from]);
 			$query->addParameter($parameterKey, $fieldId);
 
 			// add the year restriction for the current page
 			$parameterKey = ':pagebrowseryear';
 			$queryField->getWhere()->setConstraint(
-				$this->constraintFactory->createConstraintByValue($field, $tableAlias, '=', $parameterKey)
+				$this->constraintFactory->createConstraintByValue($field, $tableAlias1, '=', $parameterKey)
 					->addWrapLocal('if-begin', 'IF(' . $wrapDivider . ' REGEXP (\'' . $pattern . '\'),YEAR(' . $wrapDivider . ')')
 					->addWrap('if-end', $wrapDivider . ',FALSE)')
 					->setWrapDivider($wrapDivider)

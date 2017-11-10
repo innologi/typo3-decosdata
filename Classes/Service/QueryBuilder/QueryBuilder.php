@@ -117,9 +117,14 @@ class QueryBuilder {
 
 		// add itemtypes-condition if configured
 		if (isset($configuration['itemType'])) {
-			$queryField->getWhere()->setConstraint(
-				$this->constraintFactory->createConstraintByValue('item_type', 'it', 'IN', ':itemtype')
-			);
+			$queryField->getFrom('itemType', ['itt' => 'tx_decosdata_domain_model_itemtype'])
+				->setJoinType('INNER')
+				->setConstraint(
+					$this->constraintFactory->createConstraintAnd([
+						$this->constraintFactory->createConstraintByField('uid', 'itt', '=', 'item_type', 'it'),
+						$this->constraintFactory->createConstraintByValue('item_type', 'itt', 'IN', ':itemtype')
+					])
+				);
 			$query->addParameter(':itemtype', $configuration['itemType']);
 		}
 
@@ -176,20 +181,25 @@ class QueryBuilder {
 					// future service which translates these to standard options. Do that for all the stuff that is common, like a download link
 					// and restrictById/ParentId, et voila, you combine the ease of use of said shortcuts with the flexibility of queryoption-equivalents.
 					// @LOW ___Now that I think about it, the same goes for itemtype and import.. except I don't think they have anything to gain in flexibility.
-					$tableAlias = 'itf' . $index . 's' . $subIndex;
-					$parameterKey = ':' . $tableAlias . 'field';
+					$tableAlias1 = 'itf' . $index . 's' . $subIndex;
+					$tableAlias2 = 'f' . $index . 's' . $subIndex;
+					$parameterKey = ':' . $tableAlias1 . 'field';
 					// @TODO ___move to method? wait to see if it really used elsewhere
 					$queryField = $queryContent->getField('field' . $subIndex);
 					$queryField->getSelect()
 						->setField('field_value')
-						->setTableAlias($tableAlias);
-					$queryField->getFrom(0, array($tableAlias => 'tx_decosdata_domain_model_itemfield'))
-						->setJoinType('LEFT')
+						->setTableAlias($tableAlias1);
+
+					$queryField->getFrom(0, [
+						$tableAlias1 => 'tx_decosdata_domain_model_itemfield',
+						$tableAlias2 => 'tx_decosdata_domain_model_field'
+					])->setJoinType('LEFT')
 						->setConstraint(
-							$this->constraintFactory->createConstraintAnd(array(
-								$this->constraintFactory->createConstraintByField('item', $tableAlias, '=', 'uid', 'it'),
-								$this->constraintFactory->createConstraintByValue('field', $tableAlias, '=', $parameterKey)
-							))
+							$this->constraintFactory->createConstraintAnd([
+								$this->constraintFactory->createConstraintByField('item', $tableAlias1, '=', 'uid', 'it'),
+								$this->constraintFactory->createConstraintByField('field', $tableAlias1, '=', 'uid', $tableAlias2),
+								$this->constraintFactory->createConstraintByValue('field_name', $tableAlias2, '=', $parameterKey)
+							])
 						);
 					$queryContent->addParameter($parameterKey, $contentConfiguration['field']);
 				}
