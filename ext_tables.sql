@@ -13,7 +13,8 @@ CREATE TABLE tx_decosdata_domain_model_field (
 	deleted tinyint(4) unsigned DEFAULT '0' NOT NULL,
 
 	PRIMARY KEY (uid),
-	KEY parent (pid)
+	KEY parent (pid),
+	KEY field (field_name)
 );
 
 #
@@ -31,7 +32,8 @@ CREATE TABLE tx_decosdata_domain_model_itemtype (
 	deleted tinyint(4) unsigned DEFAULT '0' NOT NULL,
 
 	PRIMARY KEY (uid),
-	KEY parent (pid)
+	KEY parent (pid),
+	KEY item_type (item_type)
 );
 
 #
@@ -106,7 +108,8 @@ CREATE TABLE tx_decosdata_domain_model_itemblob (
 	endtime int(11) unsigned DEFAULT '0' NOT NULL,
 
 	PRIMARY KEY (uid),
-	KEY parent (pid)
+	KEY parent (pid),
+	KEY item (item)
 );
 
 #
@@ -127,7 +130,8 @@ CREATE TABLE tx_decosdata_domain_model_itemfield (
 	hidden tinyint(4) unsigned DEFAULT '0' NOT NULL,
 
 	PRIMARY KEY (uid),
-	KEY parent (pid)
+	KEY parent (pid),
+	KEY item_field (item,field)
 );
 
 #
