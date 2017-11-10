@@ -75,7 +75,7 @@ abstract class FilterOptionAbstract extends OptionAbstract {
 			$filter['value'] = rawurldecode($param[$filter['parameter']]);
 			// @TODO ___throw exception if it does not exist?
 		}
-		if ($requireField && !(isset($filter['field']) && is_numeric($filter['field'])) ) {
+		if ($requireField && !isset($filter['field'][0]) ) {
 			throw new MissingArgument(1448898010, array(self::class, 'filters.field'));
 		}
 	}

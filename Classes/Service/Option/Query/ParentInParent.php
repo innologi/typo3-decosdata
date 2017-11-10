@@ -89,14 +89,19 @@ class ParentInParent extends OptionAbstract {
 		} else {
 			// parent in parent item
 			$alias3 = $alias . 'item';
-			$parameterKey = ':' . $alias3 . 'Type';
+			$alias4 = $alias3 . 'Type';
+			$parameterKey = ':' . $alias4;
 			$from->addTable('tx_decosdata_domain_model_item', $alias3)
+				->addTable('tx_decosdata_domain_model_itemtype', $alias4)
 				->addConstraint(
 					'item',
 					$this->constraintFactory->createConstraintByField('uid', $alias3, '=', 'uid_foreign', $alias1)
 				)->addConstraint(
-					'itemtype',
-					$this->constraintFactory->createConstraintByValue('item_type', $alias3, 'IN', $parameterKey)
+					'itemtypeField',
+					$this->constraintFactory->createConstraintByField('item_type', $alias3, '=', 'uid', $alias4)
+				)->addConstraint(
+					'itemtypeValue',
+					$this->constraintFactory->createConstraintByValue('item_type', $alias4, 'IN', $parameterKey)
 				);
 			$queryContent->addParameter($parameterKey, $args['itemType']);
 

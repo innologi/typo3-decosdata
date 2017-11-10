@@ -132,11 +132,13 @@ class TypeProcessorService implements SingletonInterface {
 			$configuration['paginate']['currentPage'] = $page;
 		}
 
-		return $this->itemRepository->findWithStatement(
-			$this->queryBuilder->buildListQuery(
+		$items = $this->itemRepository->findWithStatement(
+			($statement = $this->queryBuilder->buildListQuery(
 				$configuration, $import
-			)->createStatement()
+			)->createStatement())
 		);
+		$test = $statement->getProcessedQuery();
+		return $items;
 	}
 
 	public function processShow(array $configuration, array $import) {

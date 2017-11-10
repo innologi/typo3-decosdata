@@ -94,34 +94,38 @@ class FilterItems extends FilterOptionAbstract {
 	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
 		$this->initialize($args);
 		$id = 'filteritems';
-		$table = 'tx_decosdata_domain_model_itemfield';
 
 		// note that by $id, we'll always use the same field, this way
 		// we can add multiple conditions on the same FROM join if a
 		// field is checked on multiple values
 		$queryField = $query->getContent($id)->getField('');
-		$conditions = array();
+		$conditions = [];
 		foreach ($args['filters'] as $filter) {
 			$this->initializeFilter($filter, TRUE);
-			$alias = $id . $filter['field'];
+			$alias1 = $id . $filter['field'] . 'i';
+			$alias2 = $id . $filter['field'] . 'f';
 			// identify the join by the field, so we don't create redundant joins
-			$from = $queryField->getFrom($filter['field'], array($alias => $table));
+			$from = $queryField->getFrom($filter['field'], [
+				$alias1 => 'tx_decosdata_domain_model_itemfield',
+				$alias2 => 'tx_decosdata_domain_model_field'
+			]);
 			if ($from->getJoinType() === NULL) {
 				// initialize join if it did not exist yet
-				$parameterKey = ':' . $alias;
+				$parameterKey = ':' . $alias1;
 				// note that we do LEFT and not INNER joins so the WHERE conditions can be used to filter on IS NULL as well
 				$from->setJoinType('LEFT')->setConstraint(
-					$this->constraintFactory->createConstraintAnd(array(
-						'item' => $this->constraintFactory->createConstraintByField('item', $alias, '=', 'uid', 'it'),
-						'field' => $this->constraintFactory->createConstraintByValue('field', $alias, '=', $parameterKey)
-					))
+					$this->constraintFactory->createConstraintAnd([
+						'item' => $this->constraintFactory->createConstraintByField('item', $alias1, '=', 'uid', 'it'),
+						'field' => $this->constraintFactory->createConstraintByField('field', $alias1, '=', 'uid', $alias2),
+						'fieldName' => $this->constraintFactory->createConstraintByValue('field_name', $alias2, '=', $parameterKey)
+					])
 				);
 				$query->addParameter($parameterKey, $filter['field']);
 			}
 
 			$conditions[] = $this->constraintFactory->createConstraintByValue(
 				'field_value',
-				$alias,
+				$alias1,
 				$filter['operator'],
 				$filter['value']
 			);

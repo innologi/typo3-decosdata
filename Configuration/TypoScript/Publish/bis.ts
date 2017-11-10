@@ -1,15 +1,13 @@
 plugin.tx_decosdata.settings {
 	import {
-		0 = 4
-		1 = 5
+		0 = 2
+		1 = 3
 	}
 	breadcrumb {
 		1.value = Vergaderingen
 		2 {
-			# FOLDER
-			itemType.0 = 2
-			# SUBJECT1
-			contentField.1.content.0.field = 10
+			itemType.0 = FOLDER
+			contentField.1.content.0.field = SUBJECT1
 			queryOptions.0 {
 				option = FilterItems
 				args {
@@ -17,20 +15,17 @@ plugin.tx_decosdata.settings {
 						0 {
 							parameter = _2
 							operator = =
-							# SUBJECT1
-							field = 10
+							field = SUBJECT1
 						}
 						1 {
 							value = vergaderdossiers
 							operator = =
-							# BOOKNAME
-							field = 2
+							field = BOOKNAME
 						}
 						2 {
 							value = 1
 							operator = =
-							# BOL3
-							field = 25
+							field = BOL3
 						}
 					}
 					matchAll = 1
@@ -38,11 +33,9 @@ plugin.tx_decosdata.settings {
 			}
 		}
 		3 {
-			# FOLDER
-			itemType.0 = 2
+			itemType.0 = FOLDER
 			contentField.1.content.0 {
-				# DATE1
-				field = 18
+				field = DATE1
 				queryOptions.0 {
 					option = DateConversion
 					args.format = %d-%m-%Y
@@ -58,8 +51,7 @@ plugin.tx_decosdata.settings {
 					args.filters.0 {
 						value = 1
 						operator = =
-						# BOL3
-						field = 25
+						field = BOL3
 					}
 				}
 			}
@@ -73,14 +65,12 @@ plugin.tx_decosdata.settings {
 				pageLimit = 20
 				perPageLimit = 20
 			}
-			# FOLDER
-			itemType.0 = 2
+			itemType.0 = FOLDER
 			# @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
 			noItemId = 1
 			contentField.1 {
 				title.value = Vergaderingen
-				# SUBJECT1
-				content.0.field = 10
+				content.0.field = SUBJECT1
 				renderOptions.0 {
 					option = LinkLevel
 					args.level = 2
@@ -97,14 +87,12 @@ plugin.tx_decosdata.settings {
 						0 {
 							value = vergaderdossiers
 							operator = =
-							# BOOKNAME
-							field = 2
+							field = BOOKNAME
 						}
 						1 {
 							value = 1
 							operator = =
-							# BOL3
-							field = 25
+							field = BOL3
 						}
 					}
 					matchAll = 1
@@ -116,16 +104,13 @@ plugin.tx_decosdata.settings {
 			paginate {
 				type = yearly
 				pageLimit = 20
-				# DATE1
-				field = 18
+				field = DATE1
 			}
-			# FOLDER
-			itemType.0 = 2
+			itemType.0 = FOLDER
 			contentField.1 {
 				title.value = Vergaderdatum
 				content.0 {
-					# DATE1
-					field = 18
+					field = DATE1
 					order {
 						sort = DESC
 						priority = 10
@@ -151,20 +136,17 @@ plugin.tx_decosdata.settings {
 						0 {
 							parameter = _2
 							operator = =
-							# SUBJECT1
-							field = 10
+							field = SUBJECT1
 						}
 						1 {
 							value = vergaderdossiers
 							operator = =
-							# BOOKNAME
-							field = 2
+							field = BOOKNAME
 						}
 						2 {
 							value = 1
 							operator = =
-							# BOL3
-							field = 25
+							field = BOL3
 						}
 					}
 					matchAll = 1
@@ -173,28 +155,26 @@ plugin.tx_decosdata.settings {
 		}
 		# @TODO 1:4(1,1,1|1,1,2|1,1,3|1,*,*);
 		3 = _COA
-		3.5 = USER_INT
-		3.5 {
-			userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
-			extensionName = StreamovationsVp
-			pluginName = Video
-			vendorName = Innologi
-			# we can't override the configuration from here, because this action relies on FULL_TYPOSCRIPT which does not get merged
-			switchableControllerActions.Video.1 = advancedShow
-		}
+		#3.5 = USER_INT
+		#3.5 {
+		#	userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+		#	extensionName = StreamovationsVp
+		#	pluginName = Video
+		#	vendorName = Innologi
+		#	# we can't override the configuration from here, because this action relies on FULL_TYPOSCRIPT which does not get merged
+		#	switchableControllerActions.Video.1 = advancedShow
+		#}
 		3.10 = _SHOW
 		3.10 {
 			contentField {
 				1 {
 					title.value = Type vergadering:
-					# SUBJECT1
-					content.0.field = 10
+					content.0.field = SUBJECT1
 				}
 				2 {
 					title.value = Datum:
 					content.0 {
-						# DATE1
-						field = 18
+						field = DATE1
 						queryOptions.0 {
 							option = DateConversion
 							args.format = %d-%m-%Y
@@ -213,13 +193,11 @@ plugin.tx_decosdata.settings {
 				pageLimit = 20
 				perPageLimit = 10
 			}
-			# DOCUMENT
-			itemType.0 = 1
+			itemType.0 = DOCUMENT
 			contentField {
 				1 {
 					title.value = Agendanr.
-					# TEXT8
-					content.0.field = 15
+					content.0.field = TEXT8
 					order {
 						sort = ASC
 						priority = 10
@@ -228,8 +206,7 @@ plugin.tx_decosdata.settings {
 				}
 				2 {
 					title.value = Document type
-					# SUBJECT1
-					content.0.field = 10
+					content.0.field = SUBJECT1
 					order {
 						sort = ASC
 						priority = 20
@@ -237,8 +214,7 @@ plugin.tx_decosdata.settings {
 				}
 				3 {
 					title.value = Inhoud document
-					# TEXT9
-					content.0.field = 11
+					content.0.field = TEXT9
 					order {
 						sort = ASC
 						priority = 30
@@ -261,8 +237,7 @@ plugin.tx_decosdata.settings {
 					queryOptions {
 						0 {
 							option = ParentInParent
-							# FOLDER
-							args.itemType.0 = 2
+							args.itemType.0 = FOLDER
 						}
 						1 {
 							option = FilterRelations
@@ -271,14 +246,12 @@ plugin.tx_decosdata.settings {
 									0 {
 										value = Zake%
 										operator = LIKE
-										# BOOKNAME
-										field = 2
+										field = BOOKNAME
 									}
 									1 {
 										value = 1
 										operator = =
-										# BOL3
-										field = 25
+										field = BOL3
 									}
 								}
 								matchAll = 1
@@ -316,8 +289,7 @@ plugin.tx_decosdata.settings {
 						}
 					}
 					content.0 {
-						# DOCUMENT_DATE
-						field = 27
+						field = DOCUMENT_DATE
 						queryOptions.0 {
 							option = DateConversion
 							args.format = %d-%m-%Y
@@ -344,8 +316,7 @@ plugin.tx_decosdata.settings {
 							last = 1
 						}
 					}
-					# MARK
-					content.0.field = 4
+					content.0.field = MARK
 					renderOptions.0 {
 						option = AddTagAttributes
 						args {
@@ -366,8 +337,7 @@ plugin.tx_decosdata.settings {
 					args.filters.0 {
 						value = 1
 						operator = =
-						# BOL3
-						field = 25
+						field = BOL3
 					}
 				}
 			}
@@ -379,13 +349,11 @@ plugin.tx_decosdata.settings {
 				pageLimit = 20
 				perPageLimit = 20
 			}
-			# DOCUMENT
-			itemType.0 = 1
+			itemType.0 = DOCUMENT
 			contentField {
 				1 {
 					title.value = Lijstnr.
-					# NUM6
-					content.0.field = 9
+					content.0.field = NUM6
 					order {
 						sort = ASC
 						priority = 10
@@ -393,8 +361,7 @@ plugin.tx_decosdata.settings {
 				}
 				2 {
 					title.value = Inhoud document
-					# TEXT9
-					content.0.field = 11
+					content.0.field = TEXT9
 				}
 				3 {
 					title.value = Download
@@ -422,8 +389,7 @@ plugin.tx_decosdata.settings {
 						}
 					}
 					content.0 {
-						# DOCUMENT_DATE
-						field = 27
+						field = DOCUMENT_DATE
 						queryOptions.0 {
 							option = DateConversion
 							args.format = %d-%m-%Y
@@ -454,8 +420,7 @@ plugin.tx_decosdata.settings {
 							last = 1
 						}
 					}
-					# MARK
-					content.0.field = 4
+					content.0.field = MARK
 					renderOptions.0 {
 						option = AddTagAttributes
 						args {
@@ -476,8 +441,7 @@ plugin.tx_decosdata.settings {
 					args.filters.0 {
 						value = 1
 						operator = =
-						# BOL3
-						field = 25
+						field = BOL3
 					}
 				}
 			}
