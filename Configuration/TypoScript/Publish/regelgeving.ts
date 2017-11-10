@@ -1,18 +1,17 @@
 plugin.tx_decosdata.settings {
 	import.0 = 1
 	level {
+		1 = _LIST
 		1 {
 			paginate {
 				pageLimit = 30
 				perPageLimit = 50
 			}
-			# DOCUMENT
-			itemType.0 = 1
+			itemType.0 = DOCUMENT
 			contentField {
 				1 {
 					title.value = Naam Regelgeving
-					# TEXT9
-					content.0.field = 11
+					content.0.field = TEXT9
 					order {
 						sort = ASC
 						priority = 10
@@ -21,8 +20,7 @@ plugin.tx_decosdata.settings {
 				2 {
 					title.value = Datum Inwerkingtreding
 					content.0 {
-						# DATE5
-						field = 21
+						field = DATE5
 						queryOptions {
 							0 {
 								option = DateConversion
@@ -58,8 +56,7 @@ plugin.tx_decosdata.settings {
 				3 {
 					title.value = Datum Intrekking
 					content.0 {
-						# DATE6
-						field = 17
+						field = DATE6
 						queryOptions {
 							0 {
 								option = DateConversion
