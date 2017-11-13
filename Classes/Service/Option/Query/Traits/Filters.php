@@ -1,9 +1,9 @@
 <?php
-namespace Innologi\Decosdata\Service\Option\Query;
+namespace Innologi\Decosdata\Service\Option\Query\Traits;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -26,13 +26,15 @@ namespace Innologi\Decosdata\Service\Option\Query;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
- * Filter Option Abstract
+ * Filters Trait
+ *
+ * Contains methods and properties used by Filter-options.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-abstract class FilterOptionAbstract extends OptionAbstract {
+trait Filters {
 	// @TODO ___base FilterItemContent (items outer join), FilterItemsByRelations (relations inner join) on these
 	/**
 	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
@@ -47,9 +49,9 @@ abstract class FilterOptionAbstract extends OptionAbstract {
 	 * @return void
 	 * @throws \Innologi\Decosdata\Service\Option\Exception\MissingArgument
 	 */
-	protected function initialize(array $args) {
+	protected function doFiltersExist(array $args) {
 		if (!isset($args['filters']) || empty($args['filters'])) {
-			throw new MissingArgument(1448551220, array(self::class, 'filters'));
+			throw new MissingArgument(1448551220, [self::class, 'filters']);
 		}
 	}
 
@@ -63,21 +65,38 @@ abstract class FilterOptionAbstract extends OptionAbstract {
 	 */
 	protected function initializeFilter(array &$filter, $requireField = FALSE) {
 		if (!isset($filter['operator'][0])) {
-			throw new MissingArgument(1448897878, array(self::class, 'filters.operator'));
+			throw new MissingArgument(1448897878, [self::class, 'filters.operator']);
 		}
 		if (!isset($filter['value'])) {
-			if (!isset($filter['parameter'][0])) {
-				throw new MissingArgument(1448897891, array(self::class, 'filters.value/parameter'));
-			}
-			// @LOW ___add support for other extension parameters?
-			// @TODO ___not validated. shouldn't we get it from controller/request or something? that way we can keep validation on a single location
-			$param = GeneralUtility::_GP('tx_decosdata_publish');
-			$filter['value'] = rawurldecode($param[$filter['parameter']]);
+			$filter['value'] = $this->getParameterFilterValue($filter);
 			// @TODO ___throw exception if it does not exist?
 		}
 		if ($requireField && !isset($filter['field'][0]) ) {
-			throw new MissingArgument(1448898010, array(self::class, 'filters.field'));
+			throw new MissingArgument(1448898010, [self::class, 'filters.field']);
 		}
+	}
+
+	/**
+	 * Returns parameter filter value
+	 *
+	 * @param array $filter
+	 * @throws MissingArgument
+	 * @return string
+	 */
+	protected function getParameterFilterValue(array $filter) {
+		if (!isset($filter['parameter'][0])) {
+			throw new MissingArgument(1448897891, [self::class, 'filters.value/parameter']);
+		}
+		$parts = explode('.', $filter['parameter']);
+		// @LOW ___add support for other extension parameters?
+		// @TODO ___not validated. shouldn't we get it from controller/request or something? that way we can keep validation on a single location
+		$param = GeneralUtility::_GP('tx_decosdata_publish');
+		$param = rawurldecode($param[$parts[0]]);
+		if (isset($parts[1])) {
+			$paramParts = explode('|', $param);
+			$param = $paramParts[(int) $parts[1]];
+		}
+		return $param;
 	}
 
 	/**

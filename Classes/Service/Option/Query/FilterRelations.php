@@ -35,14 +35,15 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FilterRelations extends FilterOptionAbstract {
+class FilterRelations extends OptionAbstract {
+	use Traits\Filters;
 
 	/**
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
 	 */
 	public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service) {
-		$this->initialize($args);
+		$this->doFiltersExist($args);
 		$id = 'relation' . $service->getIndex();
 		$aliasId = $id . 'filter';
 

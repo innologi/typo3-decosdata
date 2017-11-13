@@ -35,7 +35,8 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FilterItems extends FilterOptionAbstract {
+class FilterItems extends OptionAbstract {
+	use Traits\Filters;
 	// @TODO ___can we include the quick filters?
 
 	/**
@@ -45,7 +46,7 @@ class FilterItems extends FilterOptionAbstract {
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
 	 */
 	public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service) {
-		$this->initialize($args);
+		$this->doFiltersExist($args);
 		$id = $queryField->getId() . 'filteritems' . $service->getOptionIndex();
 
 		$select = $queryField->getSelect();
@@ -71,7 +72,7 @@ class FilterItems extends FilterOptionAbstract {
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
 	 */
 	/*public function alterQueryColumn(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
-		$this->initialize($args);
+		$this->doFiltersExist($args);
 
 				$fieldId = $filter['contentField'];
 				if (!isset($queryConfiguration[$fieldId][0]['SELECT']['alias'])) {
@@ -92,7 +93,7 @@ class FilterItems extends FilterOptionAbstract {
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
 	 */
 	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
-		$this->initialize($args);
+		$this->doFiltersExist($args);
 		$id = 'filteritems';
 
 		// note that by $id, we'll always use the same field, this way

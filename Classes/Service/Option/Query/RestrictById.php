@@ -23,10 +23,8 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * RestrictById option
  *
@@ -37,12 +35,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class RestrictById extends OptionAbstract {
-	// @TODO it feels cumbersome having to do it like this, but doing it automatically poses other challenges.. find alternatives?
-	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
-	 * @inject
-	 */
-	protected $constraintFactory;
+	use Traits\Filters;
 
 	/**
 	 * Restricts items by parent item id
@@ -51,12 +44,7 @@ class RestrictById extends OptionAbstract {
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
 	 */
 	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
-		if (!isset($args['parameter'][0])) {
-			throw new MissingArgument(1509374080, array(self::class, 'parameter'));
-		}
-		// @LOW _maybe create some service, use it as a source for every parameter-based action, including in FilterItems? otherwise every TASK applicable to FilterItems is applicable here!
-		$param = GeneralUtility::_GP('tx_decosdata_publish');
-		$itemId = rawurldecode($param[$args['parameter']]);
+		$itemId = $this->getParameterFilterValue($args);
 
 		// @LOW so how do we solve a conflict with RestrictByParentId here?
 		$alias = 'restrictBy';
