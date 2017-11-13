@@ -83,15 +83,15 @@ class QueryBuilder {
 		// init query config
 		$queryContent = $query->getContent('id');
 		$queryField = $queryContent->getField('');
+		$queryField->getSelect()
+			->setField('uid')
+			->setTableAlias('it');
 		$queryField->getFrom('item', ['it' => 'tx_decosdata_domain_model_item']);
 		
 		$groupByContent = isset($configuration['groupByContent']) && (bool)$configuration['groupByContent'];
 		if (!$groupByContent) {
 			// if not groupByContent, group by id column first and foremost
 			$queryContent->getGroupBy()->setPriority(0);
-			$queryField->getSelect()
-				->setField('uid')
-				->setTableAlias('it');
 		}
 
 		// add xml_id-condition if configured
