@@ -53,7 +53,7 @@ class ParentInParent extends OptionAbstract {
 		$query = $queryContent->getParent();
 
 		// we depend on RestrictByParentId
-		if (!$query->getContent('itemID')->getField('')->hasFrom('restrictBy')) {
+		if (!$query->getContent('id')->getField('')->hasFrom('restrictBy')) {
 			// @TODO ___throw exception?
 		}
 

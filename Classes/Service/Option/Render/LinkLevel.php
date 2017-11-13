@@ -53,11 +53,10 @@ class LinkLevel implements OptionInterface {
 			throw new MissingArgument(1449048090, array(self::class, 'level'));
 		}
 		$linkValue = NULL;
+		$item = $service->getItem();
 		if (isset($args['linkItem']) && $args['linkItem']) {
-			$item = $service->getItem();
-			$linkValue = (string) $item['itemID'];
+			$linkValue = (string) $item['id'] ?? '';
 		} elseif (isset($args['linkRelation']) && $args['linkRelation']) {
-			$item = $service->getItem();
 			$linkValue = (string) $item['relation' . $service->getIndex()];
 		} else {
 			$linkValue = $service->getOriginalContent();

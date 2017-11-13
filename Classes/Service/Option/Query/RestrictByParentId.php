@@ -48,7 +48,7 @@ class RestrictByParentId extends OptionAbstract {
 
 		$alias = 'restrictBy';
 		$parameterKey = ':' . $alias;
-		$query->getContent('itemID')->getField('')
+		$query->getContent('id')->getField('')
 			->getFrom($alias, array($alias => 'tx_decosdata_item_item_mm'))
 			->setJoinType('INNER')->setConstraint(
 				$this->constraintFactory->createConstraintAnd(array(

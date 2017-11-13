@@ -81,7 +81,7 @@ class QueryBuilder {
 		$query = $this->objectManager->get(Query::class);
 
 		// init query config
-		$queryContent = $query->getContent('itemID');
+		$queryContent = $query->getContent('id');
 		$queryField = $queryContent->getField('');
 		// @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
 		if (!isset($configuration['noItemId']) || !$configuration['noItemId']) {

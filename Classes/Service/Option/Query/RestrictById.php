@@ -49,7 +49,7 @@ class RestrictById extends OptionAbstract {
 		// @LOW so how do we solve a conflict with RestrictByParentId here?
 		$alias = 'restrictBy';
 		$parameterKey = ':' . $alias;
-		$query->getContent('itemID')->getField('')
+		$query->getContent('id')->getField('')
 			->getWhere()->addConstraint(
 				$alias,
 				$this->constraintFactory->createConstraintByValue('uid', 'it', '=', $parameterKey)
