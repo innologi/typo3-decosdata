@@ -83,14 +83,16 @@ class QueryBuilder {
 		// init query config
 		$queryContent = $query->getContent('id');
 		$queryField = $queryContent->getField('');
-		// @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
-		if (!isset($configuration['noItemId']) || !$configuration['noItemId']) {
+		$queryField->getFrom('item', ['it' => 'tx_decosdata_domain_model_item']);
+		
+		$groupByContent = isset($configuration['groupByContent']) && (bool)$configuration['groupByContent'];
+		if (!$groupByContent) {
+			// if not groupByContent, group by id column first and foremost
 			$queryContent->getGroupBy()->setPriority(0);
 			$queryField->getSelect()
 				->setField('uid')
 				->setTableAlias('it');
 		}
-		$queryField->getFrom('item', array('it' => 'tx_decosdata_domain_model_item'));
 
 		// add xml_id-condition if configured
 		if (!empty($import)) {
@@ -141,7 +143,8 @@ class QueryBuilder {
 				$this->addContentField(
 					$index,
 					$contentConfiguration,
-					$query->getContent('content' . $index)
+					$query->getContent('content' . $index),
+					$groupByContent
 				);
 			}
 		}
@@ -156,13 +159,18 @@ class QueryBuilder {
 
 
 	// @TODO ___rename
-	public function addContentField($index, array $configuration, QueryContent $queryContent) {
+	public function addContentField($index, array $configuration, QueryContent $queryContent, $groupByContent = FALSE) {
 		# @TODO ___remove this and below #s?
 		#$names = array(
 		#	'returnalias' => 'content',
 		#	'returnfield' => 'field_value',
 		#	'tablealias' => 'itf'
 		#);
+
+		// if group by content, enforce groupby
+		if ($groupByContent) {
+			$queryContent->getGroupBy()->setPriority(0);
+		}
 
 		if (isset($configuration['content'])) {
 			#$itcol = 'it';

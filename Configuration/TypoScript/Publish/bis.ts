@@ -66,8 +66,7 @@ plugin.tx_decosdata.settings {
 				perPageLimit = 20
 			}
 			itemType.0 = FOLDER
-			# @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
-			noItemId = 1
+			groupByContent = 1
 			contentField.1 {
 				title.value = Vergaderingen
 				content.0.field = SUBJECT1
