@@ -176,6 +176,7 @@ class QueryBuilder {
 			#$itcol = 'it';
 			#$returnfield = 'field_value';
 			#$tablealias = 'itf';
+			$idAliases = [];
 
 			// @TODO ___so how is group concat going to work? also check how options will handle that
 			foreach ($configuration['content'] as $subIndex => $contentConfiguration) {
@@ -192,6 +193,7 @@ class QueryBuilder {
 					$tableAlias1 = 'itf' . $index . 's' . $subIndex;
 					$tableAlias2 = 'f' . $index . 's' . $subIndex;
 					$parameterKey = ':' . $tableAlias1 . 'field';
+					$idAliases[] = $tableAlias1;
 					// @TODO ___move to method? wait to see if it really used elsewhere
 					$queryField = $queryContent->getField('field' . $subIndex);
 					$queryField->getSelect()
@@ -221,6 +223,7 @@ class QueryBuilder {
 					$blobAlias1 = 'itb' . $aliasId;
 					$blobAlias2 = 'itb' . $index . 's1';
 					$blobTable = 'tx_decosdata_domain_model_itemblob';
+					$idAliases[] = $blobAlias1;
 
 					$queryField = $queryContent->getField('blob' . $subIndex);
 
@@ -280,6 +283,14 @@ class QueryBuilder {
 				if (isset($contentConfiguration['queryOptions'])) {
 					// @TODO ___throw catchable exception if $queryField is NULL? (which is the case if no field/blob configuration is present)
 					$this->optionService->processFieldOptions($contentConfiguration['queryOptions'], $queryField, $subIndex);
+				}
+			}
+
+			// add content itemfield id's
+			if (!empty($idAliases)) {
+				$idContent = $queryContent->getParent()->getContent('id' . $index)->setFieldSeparator('|');
+				foreach ($idAliases as $i => $idAlias) {
+					$idContent->getField($i)->getSelect()->setField('uid')->setTableAlias($idAlias);
 				}
 			}
 

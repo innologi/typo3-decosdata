@@ -45,11 +45,10 @@ class FilterRelations extends OptionAbstract {
 	public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service) {
 		$this->doFiltersExist($args);
 		$id = 'relation' . $service->getIndex();
-		$aliasId = $id . 'filter';
-
 		// note that we use the same id as any relation-type option, e.g. ParentInParent,
 		// so that we can influence said relation with constraints
 		$queryField = $queryContent->getParent()->getContent($id)->getField('');
+
 		$select = $queryField->getSelect();
 		$from = $queryField->getFrom('');
 		$tables = $from->getTables();
@@ -58,39 +57,17 @@ class FilterRelations extends OptionAbstract {
 			throw new MissingDependency(1462201871, [self::class, 'No relation set']);
 		}
 
+		$id .= 'filter';
 		$conditions = [];
 		foreach ($args['filters'] as $filter) {
 			$this->initializeFilter($filter, TRUE);
 			// identify the table by the field, so we don't create redundancy
-			$alias = $aliasId . $filter['field'];
-			if ($from->getTableNameByAlias($alias) === NULL) {
-				// if alias wasn't created before, do so now
-				$parameterKey = ':' . $alias;
-				$tableAlias1 = $alias . 'i';
-				$tableAlias2 = $alias . 'f';
-				$from->addTable('tx_decosdata_domain_model_itemfield', $tableAlias1)
-					->addTable('tx_decosdata_domain_model_field', $tableAlias2)
-					->addConstraint(
-						$alias,
-						$this->constraintFactory->createConstraintAnd([
-							'item' => $this->constraintFactory->createConstraintByField('item', $tableAlias1, '=', $select->getField(), $select->getTableAlias()),
-							'field' => $this->constraintFactory->createConstraintByField('field', $tableAlias1, '=', 'uid', $tableAlias2),
-							'fieldName' => $this->constraintFactory->createConstraintByValue('field_name', $tableAlias2, '=', $parameterKey)
-						])
-					);
-				$queryField->addParameter($parameterKey, $filter['field']);
-			}
-
-			$conditions[] = $this->constraintFactory->createConstraintByValue(
-				'field_value',
-				$tableAlias1,
-				$filter['operator'],
-				$filter['value']
-			);
+			$alias = $id . $filter['field'];
+			$conditions[] = $this->filterBy($queryField, $filter, $alias, '', $select->getTableAlias(), $select->getField());
 		}
 
 		$from->addConstraint(
-			$aliasId . $service->getOptionIndex(),
+			$id . $service->getOptionIndex(),
 			$this->processConditions($args, $conditions)
 		);
 	}
