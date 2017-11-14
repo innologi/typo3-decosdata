@@ -26,7 +26,7 @@ namespace Innologi\Decosdata\Service\Option\Query;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
 /**
- * RestrictById option
+ * RestrictByItem option
  *
  * Restricts item by its item id
  *
@@ -34,7 +34,7 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class RestrictById extends OptionAbstract {
+class RestrictByItem extends OptionAbstract {
 	use Traits\Filters;
 
 	/**
@@ -46,7 +46,7 @@ class RestrictById extends OptionAbstract {
 	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
 		$itemId = $this->getParameterFilterValue($args);
 
-		// @LOW so how do we solve a conflict with RestrictByParentId here?
+		// @LOW so how do we solve a conflict with RestrictByParentItem here?
 		$alias = 'restrictBy';
 		$parameterKey = ':' . $alias;
 		$query->getContent('id')->getField('')

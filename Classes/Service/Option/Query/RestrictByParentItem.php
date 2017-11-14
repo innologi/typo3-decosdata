@@ -26,7 +26,7 @@ namespace Innologi\Decosdata\Service\Option\Query;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
 /**
- * RestrictByParentId option
+ * RestrictByParentItem option
  *
  * Restricts shown items by a parent item id
  *
@@ -34,7 +34,7 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class RestrictByParentId extends OptionAbstract {
+class RestrictByParentItem extends OptionAbstract {
 	use Traits\Filters;
 
 	/**
@@ -46,15 +46,15 @@ class RestrictByParentId extends OptionAbstract {
 	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
 		$itemId = $this->getParameterFilterValue($args);
 
-		$alias = 'restrictBy';
+		$alias = 'restrictByParent';
 		$parameterKey = ':' . $alias;
 		$query->getContent('id')->getField('')
-			->getFrom($alias, array($alias => 'tx_decosdata_item_item_mm'))
+			->getFrom($alias, [$alias => 'tx_decosdata_item_item_mm'])
 			->setJoinType('INNER')->setConstraint(
-				$this->constraintFactory->createConstraintAnd(array(
+				$this->constraintFactory->createConstraintAnd([
 					'relation' => $this->constraintFactory->createConstraintByField('uid_local', $alias, '=', 'uid', 'it'),
 					'restriction' => $this->constraintFactory->createConstraintByValue('uid_foreign', $alias, '=', $parameterKey)
-				))
+				])
 			);
 		$query->addParameter($parameterKey, $itemId);
 	}

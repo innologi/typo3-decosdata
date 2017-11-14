@@ -43,7 +43,7 @@ plugin.tx_decosdata.settings {
 			}
 			queryOptions {
 				0 {
-					option = RestrictById
+					option = RestrictByItem
 					args.parameter = _3
 				}
 				1 {
@@ -182,7 +182,7 @@ plugin.tx_decosdata.settings {
 				}
 			}
 			queryOptions.0 {
-				option = RestrictById
+				option = RestrictByItem
 				args.parameter = _3
 			}
 		}
@@ -328,7 +328,7 @@ plugin.tx_decosdata.settings {
 			}
 			queryOptions {
 				0 {
-					option = RestrictByParentId
+					option = RestrictByParentItem
 					args.parameter = _3
 				}
 				1 {
@@ -432,7 +432,7 @@ plugin.tx_decosdata.settings {
 			}
 			queryOptions {
 				0 {
-					option = RestrictByParentId
+					option = RestrictByParentItem
 					args.parameter = _4
 				}
 				1 {

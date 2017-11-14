@@ -52,43 +52,43 @@ class ParentInParent extends OptionAbstract {
 	public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service) {
 		$query = $queryContent->getParent();
 
-		// we depend on RestrictByParentId
-		if (!$query->getContent('id')->getField('')->hasFrom('restrictBy')) {
+		// we depend on RestrictByParentItem
+		if (!$query->getContent('id')->getField('')->hasFrom('restrictByParent')) {
 			// @TODO ___throw exception?
 		}
 
-		$alias = 'relation' . $service->getIndex();
-		$queryField = $query->getContent($alias)->getField('');
+		$id = 'relation' . $service->getIndex();
+		$queryField = $query->getContent($id)->getField('');
 
 		// relation to original item
-		$alias1 = $alias . 'mm1';
+		$alias1 = $id . 'mm1';
 		// relation to (shared) main parent, which needs to be added as an OUTER (LEFT) JOIN,
 		// since not every item will have a parent-in-parent
-		$alias2 = $alias . 'mm2';
+		$alias2 = $id . 'mm2';
 		// if we don't pair these up in a single join, the first table will identify
-		// with it.uid and therefore with restrictBy.uid_local, which shuts out our
+		// with it.uid and therefore with restrictByParent.uid_local, which shuts out our
 		// ability to get the desired relation with the second table
-		$from = $queryField->getFrom('', array(
+		$from = $queryField->getFrom('', [
 			$alias1 => 'tx_decosdata_item_item_mm',
 			$alias2 => 'tx_decosdata_item_item_mm'
-		))->setJoinType('LEFT')->setConstraint(
-			$this->constraintFactory->createConstraintAnd(array(
+		])->setJoinType('LEFT')->setConstraint(
+			$this->constraintFactory->createConstraintAnd([
 				$this->constraintFactory->createConstraintByField('uid_local', $alias1, '=', 'uid', 'it'),
 				$this->constraintFactory->createConstraintByField('uid_local', $alias2, '=', 'uid_foreign', $alias1),
-				$this->constraintFactory->createConstraintByField('uid_foreign', $alias2, '=', 'uid_foreign', 'restrictBy')
-			))
+				$this->constraintFactory->createConstraintByField('uid_foreign', $alias2, '=', 'uid_foreign', 'restrictByParent')
+			])
 		);
 
 		// set itemtype limitation if any
 		// @LOW ___what if not an array or empty?
 		if (!isset($args['itemType'])) {
-			// we don't need to an additional item-table in the join if there is no itemType to check
+			// we don't need an additional item-table in the join if there is no itemType to check
 			$queryField->getSelect()
 				->setField('uid_foreign')
 				->setTableAlias($alias1);
 		} else {
 			// parent in parent item
-			$alias3 = $alias . 'item';
+			$alias3 = $id . 'item';
 			$alias4 = $alias3 . 'Type';
 			$parameterKey = ':' . $alias4;
 			$from->addTable('tx_decosdata_domain_model_item', $alias3)

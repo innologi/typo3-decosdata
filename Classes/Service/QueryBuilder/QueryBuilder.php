@@ -187,7 +187,7 @@ class QueryBuilder {
 					// We could re-introduce document_date for blobs then and make that configurable too, as well as which of multiple blobs to get.
 					// We could then keep field, blob and order keys as shortcuts for TCA/Typoscript configuration, which are transformed by a
 					// future service which translates these to standard options. Do that for all the stuff that is common, like a download link
-					// and restrictById/ParentId, et voila, you combine the ease of use of said shortcuts with the flexibility of queryoption-equivalents.
+					// and restrictByItem/ParentItem, et voila, you combine the ease of use of said shortcuts with the flexibility of queryoption-equivalents.
 					// @LOW ___Now that I think about it, the same goes for itemtype and import.. except I don't think they have anything to gain in flexibility.
 					$tableAlias1 = 'itf' . $index . 's' . $subIndex;
 					$tableAlias2 = 'f' . $index . 's' . $subIndex;
