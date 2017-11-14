@@ -24,7 +24,6 @@ namespace Innologi\Decosdata\Service;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Innologi\Decosdata\Exception\BreadcrumbError;
 /**
  * Breadcrumb Service
@@ -41,6 +40,12 @@ use Innologi\Decosdata\Exception\BreadcrumbError;
 class BreadcrumbService implements SingletonInterface {
 	// @LOW _should we validate the crumb levels with those from the actual configuration?
 	// @LOW consider that the @injects aren't always necessary, so you might want to work with getMethods instead
+
+	/**
+	 * @var \Innologi\Decosdata\Service\ParameterService
+	 * @inject
+	 */
+	protected $parameterService;
 
 	/**
 	 * @var \Innologi\Decosdata\Domain\Repository\ItemRepository
@@ -116,11 +121,7 @@ class BreadcrumbService implements SingletonInterface {
 	 * @return void
 	 */
 	protected function initializeConfiguration() {
-		// @TODO _____________as FilterOptionAbstract says, should come from somewhere else
-		$param = GeneralUtility::_GP('tx_decosdata_publish');
-		if (isset($param['level'])) {
-			$this->currentLevel = (int) $param['level'];
-		}
+		$this->currentLevel = $this->parameterService->getParameterNormalized('level');
 
 		// invalidate any previous configuration, just in case
 		$this->active = FALSE;
