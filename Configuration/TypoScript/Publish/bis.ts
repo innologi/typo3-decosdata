@@ -43,7 +43,7 @@ plugin.tx_decosdata.settings {
 			}
 			queryOptions {
 				0 {
-					option = RestrictById
+					option = RestrictByItem
 					args.parameter = _3
 				}
 				1 {
@@ -66,8 +66,7 @@ plugin.tx_decosdata.settings {
 				perPageLimit = 20
 			}
 			itemType.0 = FOLDER
-			# @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
-			noItemId = 1
+			groupByContent = 1
 			contentField.1 {
 				title.value = Vergaderingen
 				content.0.field = SUBJECT1
@@ -183,7 +182,7 @@ plugin.tx_decosdata.settings {
 				}
 			}
 			queryOptions.0 {
-				option = RestrictById
+				option = RestrictByItem
 				args.parameter = _3
 			}
 		}
@@ -329,7 +328,7 @@ plugin.tx_decosdata.settings {
 			}
 			queryOptions {
 				0 {
-					option = RestrictByParentId
+					option = RestrictByParentItem
 					args.parameter = _3
 				}
 				1 {
@@ -433,7 +432,7 @@ plugin.tx_decosdata.settings {
 			}
 			queryOptions {
 				0 {
-					option = RestrictByParentId
+					option = RestrictByParentItem
 					args.parameter = _4
 				}
 				1 {

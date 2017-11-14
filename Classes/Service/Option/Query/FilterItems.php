@@ -35,7 +35,8 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FilterItems extends FilterOptionAbstract {
+class FilterItems extends OptionAbstract {
+	use Traits\Filters;
 	// @TODO ___can we include the quick filters?
 
 	/**
@@ -45,13 +46,16 @@ class FilterItems extends FilterOptionAbstract {
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
 	 */
 	public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service) {
-		$this->initialize($args);
+		$this->doFiltersExist($args);
 		$id = $queryField->getId() . 'filteritems' . $service->getOptionIndex();
 
 		$select = $queryField->getSelect();
-		$conditions = array();
+		$conditions = [];
 		foreach ($args['filters'] as $filter) {
 			$this->initializeFilter($filter);
+			if (!isset($filter['value'][0])) {
+				// @TODO throw exception until we support parameter on this level as well
+			}
 			$conditions[] = $this->constraintFactory->createConstraintByValue(
 				$select->getField(),
 				$select->getTableAlias(),
@@ -65,25 +69,6 @@ class FilterItems extends FilterOptionAbstract {
 			$this->processConditions($args, $conditions)
 		);
 	}
-	// @TODO ___cleanup or finish
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
-	 */
-	/*public function alterQueryColumn(array $args, array &$queryConfiguration, QueryBuilder $queryBuilder) {
-		$this->initialize($args);
-
-				$fieldId = $filter['contentField'];
-				if (!isset($queryConfiguration[$fieldId][0]['SELECT']['alias'])) {
-
-				}
-				$queryConfiguration[$fieldId][]['WHERE'][] = array(
-					'field' => $queryConfiguration[$filter['contentField']][0]['SELECT']['alias'],
-					'operator' => $this->resolveOperator($filter),
-					'value' => $this->resolveComparisonValue($filter, 'WHERE')
-				);
-
-	}*/
 
 	/**
 	 * Filter can be applied on any field.
@@ -92,7 +77,7 @@ class FilterItems extends FilterOptionAbstract {
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
 	 */
 	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
-		$this->initialize($args);
+		$this->doFiltersExist($args);
 		$id = 'filteritems';
 
 		// note that by $id, we'll always use the same field, this way
@@ -102,33 +87,9 @@ class FilterItems extends FilterOptionAbstract {
 		$conditions = [];
 		foreach ($args['filters'] as $filter) {
 			$this->initializeFilter($filter, TRUE);
-			$alias1 = $id . $filter['field'] . 'i';
-			$alias2 = $id . $filter['field'] . 'f';
-			// identify the join by the field, so we don't create redundant joins
-			$from = $queryField->getFrom($filter['field'], [
-				$alias1 => 'tx_decosdata_domain_model_itemfield',
-				$alias2 => 'tx_decosdata_domain_model_field'
-			]);
-			if ($from->getJoinType() === NULL) {
-				// initialize join if it did not exist yet
-				$parameterKey = ':' . $alias1;
-				// note that we do LEFT and not INNER joins so the WHERE conditions can be used to filter on IS NULL as well
-				$from->setJoinType('LEFT')->setConstraint(
-					$this->constraintFactory->createConstraintAnd([
-						'item' => $this->constraintFactory->createConstraintByField('item', $alias1, '=', 'uid', 'it'),
-						'field' => $this->constraintFactory->createConstraintByField('field', $alias1, '=', 'uid', $alias2),
-						'fieldName' => $this->constraintFactory->createConstraintByValue('field_name', $alias2, '=', $parameterKey)
-					])
-				);
-				$query->addParameter($parameterKey, $filter['field']);
-			}
-
-			$conditions[] = $this->constraintFactory->createConstraintByValue(
-				'field_value',
-				$alias1,
-				$filter['operator'],
-				$filter['value']
-			);
+			// identify by the field, so we don't create redundant joins
+			$alias = $id . $filter['field'];
+			$conditions[] = $this->filterBy($queryField, $filter, $alias, $filter['field']);
 		}
 
 		$queryField->getWhere()->addConstraint(

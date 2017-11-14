@@ -48,6 +48,11 @@ class QueryContent extends QueryIterator implements QueryInterface {
 	protected $id;
 
 	/**
+	 * @var string
+	 */
+	protected $fieldSeparator = ' ';
+
+	/**
 	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy
 	 */
 	protected $orderBy;
@@ -111,6 +116,26 @@ class QueryContent extends QueryIterator implements QueryInterface {
 	 */
 	public function getId() {
 		return $this->id;
+	}
+
+	/**
+	 * Returns field separator
+	 *
+	 * @return string
+	 */
+	public function getFieldSeparator() {
+		return $this->fieldSeparator;
+	}
+
+	/**
+	 * Set field separator
+	 *
+	 * @param string $fieldSeparator
+	 * @return $this
+	 */
+	public function setFieldSeparator($fieldSeparator) {
+		$this->fieldSeparator = $fieldSeparator;
+		return $this;
 	}
 
 	/**

@@ -2,7 +2,7 @@
 	xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
 	xmlns:d="http://typo3.org/ns/Innologi/Decosdata/ViewHelpers">
 
-<dl class="item-{data.itemID}">
+<dl class="item-{data.id}">
 	<d:item.for configuration="{configuration.contentField}" item="{data}">
 		<d:content.render tag="dt" options="{contentConfiguration.title.renderOptions}" index="{index}">
 			{contentConfiguration.title.value}

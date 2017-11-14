@@ -126,7 +126,7 @@ class QueryConfigurator implements SingletonInterface {
 
 			// applies concatting SELECT per id, to form a single alias per content field
 			if (!empty($concatSelect)) {
-				$queryParts['SELECT'][] = $this->concatSelect($concatSelect, $id);
+				$queryParts['SELECT'][] = $this->concatSelect($concatSelect, $id, $queryContent->getFieldSeparator());
 			}
 
 			$groupBy = $queryContent->getGroupBy();
@@ -206,12 +206,12 @@ class QueryConfigurator implements SingletonInterface {
 	 *
 	 * @param array $select
 	 * @param string $alias
+	 * @param string separator
 	 * @return string
 	 */
-	protected function concatSelect(array $select, $alias) {
-		// @TODO ___make concat arg 1 configurable?
+	protected function concatSelect(array $select, $alias, $separator = ' ') {
 		return (count($select) > 1
-			? 'CONCAT_WS(\' \',' . join(',', $select) . ')'
+			? 'CONCAT_WS(\'' . $separator . '\',' . join(',', $select) . ')'
 			: $select[0]) . ' AS ' . $alias;
 	}
 

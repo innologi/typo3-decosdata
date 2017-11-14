@@ -23,12 +23,10 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
- * RestrictByParentId option
+ * RestrictByParentItem option
  *
  * Restricts shown items by a parent item id
  *
@@ -36,13 +34,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class RestrictByParentId extends OptionAbstract {
-
-	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
-	 * @inject
-	 */
-	protected $constraintFactory;
+class RestrictByParentItem extends OptionAbstract {
+	use Traits\Filters;
 
 	/**
 	 * Restricts items by parent item id
@@ -51,22 +44,17 @@ class RestrictByParentId extends OptionAbstract {
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
 	 */
 	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
-		if (!isset($args['parameter'][0])) {
-			throw new MissingArgument(1450794744, array(self::class, 'parameter'));
-		}
-		// @LOW _maybe create some service, use it as a source for every parameter-based action, including in FilterItems? otherwise every TASK applicable to FilterItems is applicable here!
-		$param = GeneralUtility::_GP('tx_decosdata_publish');
-		$itemId = rawurldecode($param[$args['parameter']]);
+		$itemId = $this->getParameterFilterValue($args);
 
-		$alias = 'restrictBy';
+		$alias = 'restrictByParent';
 		$parameterKey = ':' . $alias;
-		$query->getContent('itemID')->getField('')
-			->getFrom($alias, array($alias => 'tx_decosdata_item_item_mm'))
+		$query->getContent('id')->getField('')
+			->getFrom($alias, [$alias => 'tx_decosdata_item_item_mm'])
 			->setJoinType('INNER')->setConstraint(
-				$this->constraintFactory->createConstraintAnd(array(
+				$this->constraintFactory->createConstraintAnd([
 					'relation' => $this->constraintFactory->createConstraintByField('uid_local', $alias, '=', 'uid', 'it'),
 					'restriction' => $this->constraintFactory->createConstraintByValue('uid_foreign', $alias, '=', $parameterKey)
-				))
+				])
 			);
 		$query->addParameter($parameterKey, $itemId);
 	}

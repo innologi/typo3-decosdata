@@ -81,16 +81,18 @@ class QueryBuilder {
 		$query = $this->objectManager->get(Query::class);
 
 		// init query config
-		$queryContent = $query->getContent('itemID');
+		$queryContent = $query->getContent('id');
 		$queryField = $queryContent->getField('');
-		// @TODO ___temporary solution, until I know how I'm going to replace filterView and childView options from tx_decospublisher
-		if (!isset($configuration['noItemId']) || !$configuration['noItemId']) {
+		$queryField->getSelect()
+			->setField('uid')
+			->setTableAlias('it');
+		$queryField->getFrom('item', ['it' => 'tx_decosdata_domain_model_item']);
+		
+		$groupByContent = isset($configuration['groupByContent']) && (bool)$configuration['groupByContent'];
+		if (!$groupByContent) {
+			// if not groupByContent, group by id column first and foremost
 			$queryContent->getGroupBy()->setPriority(0);
-			$queryField->getSelect()
-				->setField('uid')
-				->setTableAlias('it');
 		}
-		$queryField->getFrom('item', array('it' => 'tx_decosdata_domain_model_item'));
 
 		// add xml_id-condition if configured
 		if (!empty($import)) {
@@ -141,7 +143,8 @@ class QueryBuilder {
 				$this->addContentField(
 					$index,
 					$contentConfiguration,
-					$query->getContent('content' . $index)
+					$query->getContent('content' . $index),
+					$groupByContent
 				);
 			}
 		}
@@ -156,7 +159,7 @@ class QueryBuilder {
 
 
 	// @TODO ___rename
-	public function addContentField($index, array $configuration, QueryContent $queryContent) {
+	public function addContentField($index, array $configuration, QueryContent $queryContent, $groupByContent = FALSE) {
 		# @TODO ___remove this and below #s?
 		#$names = array(
 		#	'returnalias' => 'content',
@@ -164,10 +167,16 @@ class QueryBuilder {
 		#	'tablealias' => 'itf'
 		#);
 
+		// if group by content, enforce groupby
+		if ($groupByContent) {
+			$queryContent->getGroupBy()->setPriority(0);
+		}
+
 		if (isset($configuration['content'])) {
 			#$itcol = 'it';
 			#$returnfield = 'field_value';
 			#$tablealias = 'itf';
+			$idAliases = [];
 
 			// @TODO ___so how is group concat going to work? also check how options will handle that
 			foreach ($configuration['content'] as $subIndex => $contentConfiguration) {
@@ -179,11 +188,12 @@ class QueryBuilder {
 					// We could re-introduce document_date for blobs then and make that configurable too, as well as which of multiple blobs to get.
 					// We could then keep field, blob and order keys as shortcuts for TCA/Typoscript configuration, which are transformed by a
 					// future service which translates these to standard options. Do that for all the stuff that is common, like a download link
-					// and restrictById/ParentId, et voila, you combine the ease of use of said shortcuts with the flexibility of queryoption-equivalents.
+					// and restrictByItem/ParentItem, et voila, you combine the ease of use of said shortcuts with the flexibility of queryoption-equivalents.
 					// @LOW ___Now that I think about it, the same goes for itemtype and import.. except I don't think they have anything to gain in flexibility.
 					$tableAlias1 = 'itf' . $index . 's' . $subIndex;
 					$tableAlias2 = 'f' . $index . 's' . $subIndex;
 					$parameterKey = ':' . $tableAlias1 . 'field';
+					$idAliases[] = $tableAlias1;
 					// @TODO ___move to method? wait to see if it really used elsewhere
 					$queryField = $queryContent->getField('field' . $subIndex);
 					$queryField->getSelect()
@@ -213,6 +223,7 @@ class QueryBuilder {
 					$blobAlias1 = 'itb' . $aliasId;
 					$blobAlias2 = 'itb' . $index . 's1';
 					$blobTable = 'tx_decosdata_domain_model_itemblob';
+					$idAliases[] = $blobAlias1;
 
 					$queryField = $queryContent->getField('blob' . $subIndex);
 
@@ -272,6 +283,14 @@ class QueryBuilder {
 				if (isset($contentConfiguration['queryOptions'])) {
 					// @TODO ___throw catchable exception if $queryField is NULL? (which is the case if no field/blob configuration is present)
 					$this->optionService->processFieldOptions($contentConfiguration['queryOptions'], $queryField, $subIndex);
+				}
+			}
+
+			// add content itemfield id's
+			if (!empty($idAliases)) {
+				$idContent = $queryContent->getParent()->getContent('id' . $index)->setFieldSeparator('|');
+				foreach ($idAliases as $i => $idAlias) {
+					$idContent->getField($i)->getSelect()->setField('uid')->setTableAlias($idAlias);
 				}
 			}
 

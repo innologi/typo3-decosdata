@@ -50,17 +50,17 @@ class LinkLevel implements OptionInterface {
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
 		if ( !(isset($args['level']) && is_numeric($args['level'])) ) {
-			throw new MissingArgument(1449048090, array(self::class, 'level'));
+			throw new MissingArgument(1449048090, [self::class, 'level']);
 		}
 		$linkValue = NULL;
+		$item = $service->getItem();
 		if (isset($args['linkItem']) && $args['linkItem']) {
-			$item = $service->getItem();
-			$linkValue = (string) $item['itemID'];
+			$linkValue = (string) $item['id'] ?? '';
 		} elseif (isset($args['linkRelation']) && $args['linkRelation']) {
-			$item = $service->getItem();
-			$linkValue = (string) $item['relation' . $service->getIndex()];
+			$linkValue = (string) $item['relation' . $service->getIndex()] ?? '';
 		} else {
-			$linkValue = $service->getOriginalContent();
+			$linkValue = (string) $item['id' . $service->getIndex()] ?? '';
+			//$linkValue = $service->getOriginalContent();
 		}
 
 		// no linkValue means no uri building, this is not an error
@@ -79,9 +79,11 @@ class LinkLevel implements OptionInterface {
 			->reset()
 			->setAddQueryString(TRUE)
 			// @LOW _if we support a page argument per level, we could maintain current and previous levels through arguments. Another option would be the session
-			->setArgumentsToBeExcludedFromQueryString(array('tx_decosdata_publish[page]'))
-			// @TODO ___test if this should be urlencode, or rawurlencode, or.. whatever. maybe even add htmlspecialchars? Or would uriBuilder already have done that?
-			->uriFor(NULL, array('level' => $args['level'], '_' . $args['level'] => rawurlencode($linkValue)));
+			->setArgumentsToBeExcludedFromQueryString(['tx_decosdata_publish[page]'])
+			->uriFor(NULL, [
+				'level' => $args['level'],
+				'_' . $args['level'] => rawurlencode($linkValue)
+			]);
 
 		// @TODO ___title and or other attributes? in tx_decospublisher, a title could be set through an argument, which would expand the query to include the field containing the title
 		return $service->getTagFactory()->createTag('a', ['href' => $uri], $tag);
