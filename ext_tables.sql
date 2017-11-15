@@ -14,7 +14,7 @@ CREATE TABLE tx_decosdata_domain_model_field (
 
 	PRIMARY KEY (uid),
 	KEY parent (pid),
-	KEY field (field_name)
+	KEY field (field_name,pid)
 );
 
 #
@@ -33,7 +33,7 @@ CREATE TABLE tx_decosdata_domain_model_itemtype (
 
 	PRIMARY KEY (uid),
 	KEY parent (pid),
-	KEY item_type (item_type)
+	KEY item_type (item_type,pid)
 );
 
 #
@@ -84,7 +84,8 @@ CREATE TABLE tx_decosdata_domain_model_item (
 	endtime int(11) unsigned DEFAULT '0' NOT NULL,
 
 	PRIMARY KEY (uid),
-	KEY parent (pid)
+	KEY parent (pid),
+	KEY item_key (item_key,pid)
 );
 
 #
@@ -109,7 +110,8 @@ CREATE TABLE tx_decosdata_domain_model_itemblob (
 
 	PRIMARY KEY (uid),
 	KEY parent (pid),
-	KEY item (item)
+	KEY item (item),
+	KEY item_key (item_key,pid)
 );
 
 #
