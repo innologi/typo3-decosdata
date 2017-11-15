@@ -25,6 +25,8 @@ plugin.tx_decosdata {
 	}
 }
 
+page.includeCSS.decosdataFrontend = {$plugin.tx_decosdata.css.frontendFile}
+
 #@LOW we're forced to use 0,1,2 on arrays that would otherwise expect 10 in TS. This influences the parameter query names, and e.g. 10 causes the original Statement object to fail but not ours. Why is that?
 
 # regelgeving

@@ -1,15 +1,19 @@
 plugin.tx_decosdata {
 	view {
-		# cat=plugin.tx_decosdata/file; type=string; label=Override Templates path (FE)
+		# cat=plugin.tx_decosdata/file/010; type=string; label=Override Templates path (FE)
 		templateRootPath =
-		# cat=plugin.tx_decosdata/file; type=string; label=Override Partials path (FE)
+		# cat=plugin.tx_decosdata/file/020; type=string; label=Override Partials path (FE)
 		partialRootPath =
-		# cat=plugin.tx_decosdata/file; type=string; label=Override Layouts path (FE)
+		# cat=plugin.tx_decosdata/file/030; type=string; label=Override Layouts path (FE)
 		layoutRootPath =
 	}
 	persistence {
 		# cat=plugin.tx_decosdata//a; type=string; label=Default storage PID
 		storagePid =
+	}
+	css {
+		# cat=plugin.tx_decosdata/file/050; type=string; label=Frontend CSS file
+		frontendFile = EXT:decosdata/Resources/Public/Css/frontend.min.css
 	}
 }
 
