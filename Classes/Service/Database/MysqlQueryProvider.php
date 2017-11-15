@@ -39,7 +39,7 @@ class MysqlQueryProvider extends CompatibleQueryProvider {
 
 	/**
 	 * An upsert, or InsertOrUpdateOnDuplicate: will attempt to insert a record,
-	 * or update en existing one if its data matches an existing record.
+	 * or update an existing one if its data matches an existing record.
 	 *
 	 * Optionally, you can provide uniqueProperties which will contain the property
 	 * keynames from $data which define an existing record. This is useful when you

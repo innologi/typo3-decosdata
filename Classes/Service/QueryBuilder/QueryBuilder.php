@@ -87,7 +87,7 @@ class QueryBuilder {
 			->setField('uid')
 			->setTableAlias('it');
 		$queryField->getFrom('item', ['it' => 'tx_decosdata_domain_model_item']);
-		
+
 		$groupByContent = isset($configuration['groupByContent']) && (bool)$configuration['groupByContent'];
 		if (!$groupByContent) {
 			// if not groupByContent, group by id column first and foremost
@@ -96,6 +96,8 @@ class QueryBuilder {
 
 		// add xml_id-condition if configured
 		if (!empty($import)) {
+			// @TODO check on larger datasets, if adding an x table join speeds up the query
+				// initial testing seems to indicate fewer rows through better index-use of x's PRIMARY
 			/*
 			 * making this an INNER rather than LEFT JOIN with WHERE, will allow the eq_ref
 			 * join-type to use only index (also uses where if NULL-values are possible)
@@ -115,6 +117,7 @@ class QueryBuilder {
 			 * as the amount of rows. this inefficiency is partly remedied through automatic
 			 * use of join-buffer.
 			 */
+			// @TODO check if the above text is still true and if it needs further optimization, when testing with large datasets
 		}
 
 		// add itemtypes-condition if configured

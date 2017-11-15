@@ -161,6 +161,7 @@ class PaginateService implements SingletonInterface {
 	 * @throws \Innologi\Decosdata\Exception\PaginationError
 	 */
 	protected function initializeConfiguration(array $configuration) {
+		// @LOW this can be more effective from within the switch
 		if ( isset($configuration['type']) && !in_array($configuration['type'], $this->supportedTypes, TRUE) ) {
 			throw new PaginationError(1449154955, array(
 				'type', $configuration['type'], join('/', $this->supportedTypes)

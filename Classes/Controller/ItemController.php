@@ -39,11 +39,6 @@ class ItemController extends ActionController {
 	 * @inject
 	 */
 	protected $typeProcessor;
-	/**
-	 * @var \Innologi\Decosdata\Domain\Repository\ItemRepository
-	 * @inject
-	 */
-	protected $itemRepository;
 
 	/**
 	 * @var \Innologi\Decosdata\Service\QueryBuilder\QueryBuilder

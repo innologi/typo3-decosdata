@@ -292,6 +292,7 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @return void
 	 */
 	public function commit() {
+		// @TODO what if an import is huge? Why wait this long to persist and still allow huge memory consumption? Perhaps review the placement of commit()!
 		$this->persistenceManager->persistAll();
 	}
 
