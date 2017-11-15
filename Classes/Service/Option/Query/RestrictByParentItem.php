@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\Service\Option\Query;
  ***************************************************************/
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
+use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 /**
  * RestrictByParentItem option
  *
@@ -44,7 +45,10 @@ class RestrictByParentItem extends OptionAbstract {
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
 	 */
 	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
-		$itemId = $this->getParameterFilterValue($args);
+		if (!isset($args['parameter'][0])) {
+			throw new MissingArgument(1450794744, [self::class, 'parameter']);
+		}
+		$itemId = $this->parameterService->getParameterValidated($args['parameter']);
 
 		$alias = 'restrictByParent';
 		$parameterKey = ':' . $alias;

@@ -46,6 +46,12 @@ class PaginateService implements SingletonInterface {
 	// @LOW _note all the MySQL keywords in yearly.. should be supplied by QueryProvider classes
 
 	/**
+	 * @var \Innologi\Decosdata\Service\ParameterService
+	 * @inject
+	 */
+	protected $parameterService;
+
+	/**
 	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
 	 * @inject
 	 */
@@ -165,10 +171,8 @@ class PaginateService implements SingletonInterface {
 				'pageLimit', $configuration['pageLimit'], 100
 			));
 		}
-		// set currentPage if > 1
-		if (isset($configuration['currentPage']) && $configuration['currentPage'] > 1) {
-			$this->currentPage = $configuration['currentPage'];
-		}
+		// sets currentPage to at least 1
+		$this->currentPage = $this->parameterService->getParameterNormalized('page');
 
 		// invalidate any previous configuration, just in case
 		$this->active = FALSE;

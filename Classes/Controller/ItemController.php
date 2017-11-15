@@ -58,6 +58,12 @@ class ItemController extends ActionController {
 	protected $breadcrumbService;
 
 	/**
+	 * @var \Innologi\Decosdata\Service\ParameterService
+	 * @inject
+	 */
+	protected $parameterService;
+
+	/**
 	 * @var array
 	 */
 	protected $activeConfiguration;
@@ -73,19 +79,12 @@ class ItemController extends ActionController {
 	protected $level = 1;
 
 	/**
-	 * @var integer
-	 */
-	protected $page = 1;
-
-	/**
 	 * {@inheritDoc}
 	 * @see \TYPO3\CMS\Extbase\Mvc\Controller\ActionController::initializeAction()
 	 */
 	protected function initializeAction() {
-		// @LOW validate?
-		// set basic parameters
-		$this->level = $this->request->hasArgument('level') ? (int) $this->request->getArgument('level') : 1;
-		$this->page = $this->request->hasArgument('page') ? (int) $this->request->getArgument('page') : 1;
+		$this->parameterService->setRequest($this->request);
+		$this->level = $this->parameterService->getParameterNormalized('level');
 
 		// set imports, stage 1: find flexform override before TS overrides get in effect
 		if (isset($this->settings['override']['import'][0])) {
@@ -150,7 +149,7 @@ class ItemController extends ActionController {
 		$this->view->assign(
 			'items',
 			$this->typeProcessor->processList(
-				$this->activeConfiguration, $this->import, $this->page
+				$this->activeConfiguration, $this->import
 			)
 		);
 	}
@@ -164,7 +163,7 @@ class ItemController extends ActionController {
 		$this->view->assign(
 			'contentSections',
 			$this->typeProcessor->processTypeRecursion(
-				$this->activeConfiguration, $this->import, $this->page
+				$this->activeConfiguration, $this->import
 			)
 		);
 	}

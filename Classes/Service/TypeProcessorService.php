@@ -80,7 +80,7 @@ class TypeProcessorService implements SingletonInterface {
 
 
 
-	public function processTypeRecursion(array $configuration, array $import, $page) {
+	public function processTypeRecursion(array $configuration, array $import) {
 		$content = [];
 
 		// level types are required here
@@ -94,7 +94,7 @@ class TypeProcessorService implements SingletonInterface {
 			switch ($type) {
 				case '_COA':
 					foreach ($configuration as $conf) {
-						$content = array_merge($content, $this->processTypeRecursion($conf, $import, $page));
+						$content = array_merge($content, $this->processTypeRecursion($conf, $import));
 					}
 					break;
 				default:
@@ -106,7 +106,7 @@ class TypeProcessorService implements SingletonInterface {
 					$content[] = [
 						'partial' => 'Item/' . $formattedType,
 						'configuration' => $configuration,
-						'data' => $this->{$method}($configuration, $import, $page)
+						'data' => $this->{$method}($configuration, $import)
 					];
 			}
 		} else {
@@ -125,13 +125,8 @@ class TypeProcessorService implements SingletonInterface {
 		return $content;
 	}
 
-	public function processList(array $configuration, array $import, $page = 1) {
-		// @LOW _consider that said check could throw an exception, and that we could then apply an override somewhere that catches it to produce a 404? (or just generate a flash message, which I think we've done in another extbase ext)
-		if (isset($configuration['paginate']) && $page > 1) {
-			// a valid page-parameter will set current page in configuration
-			$configuration['paginate']['currentPage'] = $page;
-		}
-
+	public function processList(array $configuration, array $import) {
+		# @TODO remove debugging!
 		$items = $this->itemRepository->findWithStatement(
 			($statement = $this->queryBuilder->buildListQuery(
 				$configuration, $import

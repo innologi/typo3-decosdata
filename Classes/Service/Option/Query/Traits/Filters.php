@@ -26,7 +26,6 @@ namespace Innologi\Decosdata\Service\Option\Query\Traits;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Part\From;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Filters Trait
  *
@@ -38,6 +37,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 trait Filters {
 	// @TODO ___base FilterItemContent (items outer join), FilterItemsByRelations (relations inner join) on these
+	/**
+	 * @var \Innologi\Decosdata\Service\ParameterService
+	 * @inject
+	 */
+	protected $parameterService;
+
 	/**
 	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
 	 * @inject
@@ -70,35 +75,14 @@ trait Filters {
 			throw new MissingArgument(1448897878, [self::class, 'filters.operator']);
 		}
 		if (!isset($filter['value'][0])) {
-			$filter['parameter'] = $this->getParameterFilterValue($filter);
-			// @TODO ___throw exception if it does not exist?
+			if (!isset($filter['parameter'][0])) {
+				throw new MissingArgument(1448897891, [self::class, 'filters.value/parameter']);
+			}
+			$filter['parameter'] = $this->parameterService->getMultiParameter($filter['parameter']);
 		}
 		if ($requireField && !isset($filter['field'][0]) ) {
 			throw new MissingArgument(1448898010, [self::class, 'filters.field']);
 		}
-	}
-
-	/**
-	 * Returns parameter filter value
-	 *
-	 * @param array $filter
-	 * @throws MissingArgument
-	 * @return string
-	 */
-	protected function getParameterFilterValue(array $filter) {
-		if (!isset($filter['parameter'][0])) {
-			throw new MissingArgument(1448897891, [self::class, 'filters.value/parameter']);
-		}
-		$parts = explode('.', $filter['parameter']);
-		// @LOW ___add support for other extension parameters?
-		// @TODO ___not validated. shouldn't we get it from controller/request or something? that way we can keep validation on a single location
-		$param = GeneralUtility::_GP('tx_decosdata_publish');
-		$param = rawurldecode($param[$parts[0]]);
-		if (isset($parts[1])) {
-			$paramParts = explode('|', $param);
-			$param = $paramParts[(int) $parts[1]];
-		}
-		return $param;
 	}
 
 	/**
