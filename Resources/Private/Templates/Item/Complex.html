@@ -8,7 +8,9 @@
 
 <d:crumbPath>
 	<f:for each="{contentSections}" as="section">
-		<d:render partial="{section.partial}" arguments="{data:section.data, configuration:section.configuration}" />
+		<div class="section">
+			<d:render partial="{section.partial}" arguments="{data:section.data, configuration:section.configuration}" />
+		</div>
 	</f:for>
 </d:crumbPath>
 
