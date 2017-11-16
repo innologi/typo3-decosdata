@@ -36,10 +36,13 @@
 .tx-decosdata ul.crumbpath-navigation > li,
 .tx-decosdata ul.pagebrowser-navigation > li {
 	display: inline-block;
-	margin-right: 0.4em;
+}
+.tx-decosdata .pagebrowser-navigation > * {
+	margin-right:0.4em;
 }
 .tx-decosdata .crumbpath-navigation > *:after {
-	content:" >";
+	content:">";
+	margin:0 0.2em;
 }
 .tx-decosdata .crumbpath-navigation > *:last-child:after {
 	content:"";
