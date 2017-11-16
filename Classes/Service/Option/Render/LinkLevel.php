@@ -38,6 +38,13 @@ use Innologi\Decosdata\Library\TagBuilder\TagContent;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class LinkLevel implements OptionInterface {
+
+	/**
+	 * @var \Innologi\Decosdata\Service\ParameterService
+	 * @inject
+	 */
+	protected $parameterService;
+
 	// @LOW ___allow this to be set via configuration? TS? or maybe even args?
 	/**
 	 * @var string
@@ -79,8 +86,9 @@ class LinkLevel implements OptionInterface {
 			->reset()
 			->setAddQueryString(TRUE)
 			// @LOW _if we support a page argument per level, we could maintain current and previous levels through arguments. Another option would be the session
-			->setArgumentsToBeExcludedFromQueryString(['tx_decosdata_publish[page]'])
+			->setArgumentsToBeExcludedFromQueryString([$this->parameterService->wrapInPluginNamespace('page')])
 			->uriFor(NULL, [
+				// @LOW don't we want these details to reside in parameterService?
 				'level' => $args['level'],
 				'_' . $args['level'] => rawurlencode($linkValue)
 			]);

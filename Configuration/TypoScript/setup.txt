@@ -1,6 +1,7 @@
 # Plugin configuration
 plugin.tx_decosdata {
 	view {
+		pluginNamespace = tx_decosdata
 		templateRootPaths.0 = EXT:decosdata/Resources/Private/Templates/
 		templateRootPaths.1 = {$plugin.tx_decosdata.view.templateRootPath}
 		partialRootPaths.0 = EXT:decosdata/Resources/Private/Partials/

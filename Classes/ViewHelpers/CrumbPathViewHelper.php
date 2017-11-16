@@ -50,6 +50,12 @@ class CrumbPathViewHelper extends AbstractViewHelper {
 	protected $breadcrumbService;
 
 	/**
+	 * @var \Innologi\Decosdata\Service\ParameterService
+	 * @inject
+	 */
+	protected $parameterService;
+
+	/**
 	 * @var integer
 	 */
 	protected $currentLevel;
@@ -122,10 +128,9 @@ class CrumbPathViewHelper extends AbstractViewHelper {
 	 * @return array
 	 */
 	protected function createCrumbElement($level, $label) {
-		$exclude = ['tx_decosdata_publish[page]'];
+		$exclude = [$this->parameterService->wrapInPluginNamespace('page')];
 		for ($i=$this->currentLevel; $i>$level; $i--) {
-			// @TODO this should be built dynamically from some parameter/validation service class
-			$exclude[] = 'tx_decosdata_publish[_' . $i . ']';
+			$exclude[] = $this->parameterService->wrapInPluginNamespace('_' . $i);
 		}
 		return [
 			'label' => $label,

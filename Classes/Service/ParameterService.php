@@ -38,9 +38,14 @@ use TYPO3\CMS\Core\SingletonInterface;
  */
 class ParameterService implements SingletonInterface {
 	// @LOW ___add support for other extension parameters?
+
+	/**
+	 * @var string
+	 */
+	protected $pluginNameSpace;
+
 	/**
 	 * @var \TYPO3\CMS\Extbase\Mvc\Web\Request
-	 * @inject
 	 */
 	protected $request;
 
@@ -151,5 +156,25 @@ class ParameterService implements SingletonInterface {
 			}
 		}
 		return $this->parameterCache[$name];
+	}
+
+	/**
+	 * Wraps a parameter name in the plugin namespace
+	 *
+	 * @param string $name
+	 * @return string
+	 */
+	public function wrapInPluginNamespace($name) {
+		if ($this->pluginNameSpace === NULL) {
+			/** @var \TYPO3\CMS\Extbase\Service\ExtensionService $extensionService */
+			$extensionService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+				\TYPO3\CMS\Extbase\Object\ObjectManager::class
+			)->get(\TYPO3\CMS\Extbase\Service\ExtensionService::class);
+			$this->pluginNameSpace = $extensionService->getPluginNamespace(
+				$this->request->getControllerExtensionName(),
+				$this->request->getPluginName()
+			);
+		}
+		return $this->pluginNameSpace . '[' . $name . ']';
 	}
 }
