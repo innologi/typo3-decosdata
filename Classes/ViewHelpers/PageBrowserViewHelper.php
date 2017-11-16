@@ -90,14 +90,14 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 			$this->arguments['partial'],
 			NULL,
 			array_merge(
-				array(
+				[
 					'renderAbove' => $this->arguments['renderAbove'],
 					'renderBelow' => $this->arguments['renderBelow'],
 					'pageBrowser' => $this->buildPageBrowserConfiguration(),
 					// requires the use of format.raw VH, which costs us ~1.6 ms on average, but keeps us
 					// from using a marker like ###CONTENT### with str_replace, which can easily be fooled
 					'content' => $this->renderChildren()
-				),
+				],
 				$this->buildResultCountConfiguration()
 			)
 		);
@@ -120,64 +120,69 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 			$pageCount = $this->arguments['pageLimit'];
 		}
 
-		$configuration = array(
+		$configuration = [
 			'currentPage' => $this->createPageElement($currentPage),
-			'pages' => array()
-		);
+			'pages' => []
+		];
 
 		// determine whether scaling is applied
 		if ($this->arguments['scalingStart'] && $pageCount >= $this->arguments['scalingStart']) {
 			$scaleParts = explode('|', $this->arguments['scalingFormat']);
 			if (count($scaleParts) !== 4) {
-				throw new PaginationError(1449155248, array(
+				throw new PaginationError(1449155248, [
 					'ViewHelper.scalingFormat', $this->arguments['scalingFormat'], '1|4|4|1'
-				));
+				]);
 			}
 		} else {
 			// if scaling is not applied, set values that will result in a pagebrowser without scaling
-			$scaleParts = array(
+			$scaleParts = [
 				0 => 0,
 				1 => $currentPage - 1,
 				2 => $pageCount - $currentPage,
 				3 => 0
-			);
+			];
 		}
 
 		// if there are previous pages
 		if ($currentPage > 1) {
-			// @TODO ___llang
-			$configuration['previousPage'] = array('number' => $currentPage - 1, 'label' => 'previous');
+			$configuration['previousPage'] = [
+				'number' => $currentPage - 1,
+				'label' => 'previous'
+			];
 
 			// beforeCurrent starts at page 1, unless beforeScaled is applied
 			$beforeCurrentStart = 1;
 			// only apply beforeScaled if beforeScaled- and beforeCurrent-pages aren't connected
 			if ($currentPage > ($scaleParts[0] + $scaleParts[1] + 1)) {
-				$configuration['pages']['beforeScaled'] = array();
+				$configuration['pages']['beforeScaled'] = [];
 				for ($i=1; $i <= $scaleParts[0]; $i++) {
 					$configuration['pages']['beforeScaled'][] = $this->createPageElement($i);
 				}
 				$beforeCurrentStart = $currentPage - $scaleParts[1];
 			}
-			$configuration['pages']['beforeCurrent'] = array();
+			$configuration['pages']['beforeCurrent'] = [];
 			for ($i = $beforeCurrentStart; $i < $currentPage; $i++) {
 				$configuration['pages']['beforeCurrent'][] = $this->createPageElement($i);
 			}
 		}
 		// if there are more pages following
 		if ($currentPage < $pageCount) {
-			$configuration['nextPage'] = array('number' => $currentPage + 1, 'label' => 'next');
+			$configuration['nextPage'] = [
+				'number' => $currentPage + 1,
+				'label' => 'next'
+			];
 
 			// afterCurrent stops at last page, unless afterScaled is applied
 			$afterCurrentStop = $pageCount;
 			// only apply afterScaled if afterCurrent- and afterScaled pages aren't connected
 			if (($pageCount-$currentPage) > ($scaleParts[2] + $scaleParts[3] + 1)) {
-				$configuration['pages']['afterScaled'] = array();
+				$configuration['pages']['afterScaled'] = [];
 				for ($i=$pageCount-($scaleParts[3]-1); $i <= $pageCount; $i++) {
 					$configuration['pages']['afterScaled'][] = $this->createPageElement($i);
 				}
 				$afterCurrentStop = $currentPage + $scaleParts[2];
 			}
-			$configuration['pages']['afterCurrent'] = array();
+			$configuration['pages']['afterCurrent'] = [];
 			for ($i=$currentPage+1; $i <= $afterCurrentStop; $i++) {
 				$configuration['pages']['afterCurrent'][] = $this->createPageElement($i);
 			}
@@ -195,17 +200,17 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 		$resultCountConfiguration = NULL;
 		$resultCount = $this->paginateService->getResultCount();
 		if ($resultCount !== NULL) {
-			$resultCountConfiguration = array(
+			$resultCountConfiguration = [
 				'includeResultCountAbove' => $this->arguments['includeResultCountAbove'],
 				'includeResultCountBelow' => $this->arguments['includeResultCountBelow'],
 				'resultCount' => $resultCount
-			);
+			];
 		} else {
-			$resultCountConfiguration = array(
+			$resultCountConfiguration = [
 				'includeResultCountAbove' => FALSE,
 				'includeResultCountBelow' => FALSE,
 				'resultCount' => NULL
-			);
+			];
 		}
 		return $resultCountConfiguration;
 	}
@@ -217,12 +222,12 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 	 * @return array
 	 */
 	protected function createPageElement($pageNumber) {
-		return array(
+		return [
 			'number' => $pageNumber,
 			'label' => isset($this->pageLabelMap[$pageNumber])
 				? $this->pageLabelMap[$pageNumber]
 				: $pageNumber
-		);
+		];
 	}
 
 }

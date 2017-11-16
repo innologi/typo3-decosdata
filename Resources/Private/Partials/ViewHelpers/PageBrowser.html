@@ -26,12 +26,14 @@
 <ul class="pagebrowser-navigation">
 	<f:if condition="{configuration.previousPage}">
 		<li class="previous">
-			<f:link.action arguments="{page: configuration.previousPage.number}" addQueryString="TRUE">{configuration.previousPage.label}</f:link.action>
+			<f:link.action arguments="{page: configuration.previousPage.number}" addQueryString="TRUE">
+				<f:translate key="pagebrowser.previous">{configuration.previousPage.label}</f:translate>
+			</f:link.action>
 		</li>
 	</f:if>
 	<f:if condition="{configuration.pages.beforeScaled}">
 		<f:render section="pagenumbers" arguments="{pages: configuration.pages.beforeScaled}" />
-		<li>.....</li>
+		<li><f:translate key="pagebrowser.separator">.....</f:translate></li>
 	</f:if>
 	<f:if condition="{configuration.pages.beforeCurrent}">
 		<f:render section="pagenumbers" arguments="{pages: configuration.pages.beforeCurrent}" />
@@ -43,12 +45,14 @@
 		<f:render section="pagenumbers" arguments="{pages: configuration.pages.afterCurrent}" />
 	</f:if>
 	<f:if condition="{configuration.pages.afterScaled}">
-		<li>.....</li>
+		<li><f:translate key="pagebrowser.separator">.....</f:translate></li>
 		<f:render section="pagenumbers" arguments="{pages: configuration.pages.afterScaled}" />
 	</f:if>
 	<f:if condition="{configuration.nextPage}">
 		<li class="next">
-			<f:link.action arguments="{page: configuration.nextPage.number}" addQueryString="TRUE">{configuration.nextPage.label}</f:link.action>
+			<f:link.action arguments="{page: configuration.nextPage.number}" addQueryString="TRUE">
+				<f:translate key="pagebrowser.next">{configuration.nextPage.label}</f:translate>
+			</f:link.action>
 		</li>
 	</f:if>
 </ul>
@@ -63,7 +67,7 @@
 </f:section>
 
 <f:section name="resultcount">
-<div class="resultcount">Total amount of results: {resultCount}</div>
+<div class="resultcount"><f:translate key="pagebrowser.resultCount" arguments="{0: resultCount}" /></div>
 </f:section>
 
 </html>
