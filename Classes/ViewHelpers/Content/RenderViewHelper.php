@@ -47,18 +47,15 @@ class RenderViewHelper extends AbstractViewHelper {
 	 */
 	protected $optionService;
 
-	// @TODO _______use method initializeArguments() instead
 	/**
-	 * Class constructor
+	 * Initialize arguments
 	 *
 	 * @return void
 	 */
-	public function __construct() {
+	public function initializeArguments() {
 		$this->registerArgument('tag', 'string', 'Wraps content with optional tag.', FALSE);
 		$this->registerArgument('tagAttributes', 'array', 'Sets attributes to optional tag.', FALSE, []);
-
 		$this->registerArgument('options', 'array', 'Configuration directives for rendering content.', FALSE, []);
-		// @FIX ______does this stay FALSE + default or what? If yes, then how to deal with LinkLevel's dependency thereof?
 		$this->registerArgument('item', 'array', 'Complete item.', FALSE, []);
 		$this->registerArgument('index', 'integer', 'Current content index.', TRUE);
 	}

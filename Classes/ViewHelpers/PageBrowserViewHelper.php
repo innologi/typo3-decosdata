@@ -58,11 +58,11 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 	protected $pageLabelMap;
 
 	/**
-	 * Class constructor
+	 * Initialize arguments
 	 *
 	 * @return void
 	 */
-	public function __construct() {
+	public function initializeArguments() {
 		$this->registerArgument('partial', 'string', 'Dedicated partial template override.', FALSE, 'ViewHelpers/PageBrowser');
 		$this->registerArgument('startScalingAtPageCount', 'integer', 'Scaling starts if this many pages are present. 0 disables scaling', FALSE, '21');
 		$this->registerArgument('scalingFormat', 'string', 'Scaling reduces size of a pagebrowser if it has way too many pages. {BeforeScaled}|{BeforeCurrent}|{AfterCurrent}|{AfterScaled}.', FALSE, '1|4|4|1');

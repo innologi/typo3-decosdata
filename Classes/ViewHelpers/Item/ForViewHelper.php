@@ -43,11 +43,11 @@ class ForViewHelper extends AbstractViewHelper {
 	protected $escapeOutput = FALSE;
 
 	/**
-	 * Class constructor
+	 * Initialize arguments
 	 *
 	 * @return void
 	 */
-	public function __construct() {
+	public function initializeArguments() {
 		$this->registerArgument('configuration', 'array', 'Configuration directives for rendering all content fields.', TRUE);
 		$this->registerArgument('item', 'array', 'Item array containing all its content fields.', TRUE);
 		$this->registerArgument('contentAs', 'string', 'Variable name for current content.', FALSE, 'content');

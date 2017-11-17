@@ -61,11 +61,11 @@ class CrumbPathViewHelper extends AbstractViewHelper {
 	protected $currentLevel;
 
 	/**
-	 * Class constructor
+	 * Initialize arguments
 	 *
 	 * @return void
 	 */
-	public function __construct() {
+	public function initializeArguments() {
 		$this->registerArgument('partial', 'string', 'Dedicated partial template override.', FALSE, 'ViewHelpers/CrumbPath');
 		$this->registerArgument('renderAbove', 'boolean', 'Renders crumbpath above content.', FALSE, TRUE);
 		$this->registerArgument('renderBelow', 'boolean', 'Renders crumbpath below content.', FALSE, TRUE);
