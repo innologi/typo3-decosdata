@@ -2,6 +2,7 @@
 	xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
 	xmlns:d="http://typo3.org/ns/Innologi/Decosdata/ViewHelpers">
 
+<f:if condition="{data}">
 <table class="data single item-{data.id}">
 	<tbody>
 		<d:item.for configuration="{configuration.contentField}" item="{data}">
@@ -16,5 +17,6 @@
 		</d:item.for>
 	</tbody>
 </table>
+</f:if>
 
 </html>
