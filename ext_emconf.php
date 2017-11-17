@@ -10,31 +10,31 @@
  * "version" and "dependencies" must not be touched!
  ***************************************************************/
 
-$EM_CONF[$_EXTKEY] = array(
+$EM_CONF[$_EXTKEY] = [
 	'title' => 'Decos Data',
 	'description' => 'Import Decos XML exports locally and flexibly publish their contents. Successor to the \'decospublisher\' extension.',
 	'category' => 'plugin',
 	'author' => 'Frenck Lutke',
 	'author_email' => 'typo3@innologi.nl',
 	'author_company' => 'www.innologi.nl',
-	'state' => 'alpha',
+	'state' => 'beta',
 	'uploadfolder' => 0,
 	'createDirs' => '',
 	'clearCacheOnLoad' => 1,
 	'version' => '0.8.0',
-	'constraints' => array(
-		'depends' => array(
+	'constraints' => [
+		'depends' => [
 			'php' => '7.1',
 			'typo3' => '8.7.0-8.7.99',
-		),
-		'conflicts' => array(
-		),
-		'suggests' => array(
-		),
-	),
-	'autoload' => array(
-		'psr-4' => array(
+		],
+		'conflicts' => [
+		],
+		'suggests' => [
+		],
+	],
+	'autoload' => [
+		'psr-4' => [
 			'Innologi\\Decosdata\\' => 'Classes'
-		)
-	)
-);
+		]
+	]
+];
