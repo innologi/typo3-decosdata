@@ -23,7 +23,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
  /**
  * Abstract File Option class
  *
@@ -65,14 +65,18 @@ abstract class FileOptionAbstract implements OptionInterface {
 	}
 
 	/**
-	 * Returns File Object
+	 * Returns File Object, or NULL if it fails.
 	 *
 	 * @param integer $fileUid
-	 * @return \TYPO3\CMS\Core\Resource\File
+	 * @return \TYPO3\CMS\Core\Resource\File|NULL
 	 */
 	protected function getFileObject($fileUid) {
-		// @TODO ___note that if the file somehow can't be retrieved, we get exceptions, so be on the lookout
-		return $this->resourceFactory->getFileObject($fileUid);
+		try {
+			return $this->resourceFactory->getFileObject($fileUid);
+		} catch (FileDoesNotExistException $e) {
+			// @TODO log this? or does it get logged internally already?
+		}
+		return NULL;
 	}
 
 }

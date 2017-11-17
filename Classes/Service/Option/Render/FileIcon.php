@@ -61,19 +61,16 @@ class FileIcon extends FileOptionAbstract {
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( !$this->isFileHandle($service->getOriginalContent()) ) {
-			return;
+		if ( !$this->isFileHandle($service->getOriginalContent()) || ($file = $this->getFileObject($this->fileUid)) === NULL) {
+			return $tag;
 		}
-
-		$file = $this->getFileObject($this->fileUid);
-		$fileExtension = $file->getExtension();
 
 		// @LOW support setting the size through config?
 		// will always return an icon, even if the extension is unknown
 		// while technically a tag, we have to make do with a string
 			// if we want to make use of the internal API
 		$content = $this->iconFactory->getIconForFileExtension(
-			$fileExtension, Icon::SIZE_SMALL
+			$file->getExtension(), Icon::SIZE_SMALL
 		)->getMarkup();
 		if ($tag instanceof TagContent) {
 			return $tag->reset()->setContent($content);

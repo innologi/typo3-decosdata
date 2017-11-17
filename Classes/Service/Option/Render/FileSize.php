@@ -43,12 +43,12 @@ class FileSize extends FileOptionAbstract {
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( !$this->isFileHandle($service->getOriginalContent()) ) {
-			return;
+		if ( !$this->isFileHandle($service->getOriginalContent()) || ($file = $this->getFileObject($this->fileUid)) === NULL) {
+			return $tag;
 		}
 
 		$content = GeneralUtility::formatSize(
-			$this->getFileObject($this->fileUid)->getSize(),
+			$file->getSize(),
 			// @TODO ___get default format from typoscript?
 			// @LOW ___support formatting argument?
 			'b|kb|MB|GB|TB'

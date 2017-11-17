@@ -53,12 +53,9 @@ class FileDownload extends FileOptionAbstract {
 		// @TODO ___what if the content is empty? Can (and should) we differentiate between originalContent and content? I mean it's clear we shouldn't generate a downloadlink if no file was found
 		// $fileRelativeUrl = $renderer->getFileRelativeUrl();?
 		//if ($fileRelativeUrl === NULL) {
-		$fileHandle = $service->getOriginalContent();
-		if (!$this->isFileHandle($fileHandle)) {
-			return;
+		if (!$this->isFileHandle($service->getOriginalContent()) || ($file = $this->getFileObject($this->fileUid)) === NULL) {
+			return $tag;
 		}
-		// @TODO _____what happens if file id does not exist?
-		$file = $this->getFileObject($this->fileUid);
 
 		return $service->getTagFactory()->createTag('a', [
 			'href' => $file->getPublicUrl()
