@@ -7,12 +7,21 @@
 	<tbody>
 		<d:item.for configuration="{configuration.contentField}" item="{data}">
 			<tr>
-				<d:content.render tag="th" tagAttributes="{scope: 'row'}" options="{contentConfiguration.title.renderOptions}" index="{index}">
-					{contentConfiguration.title.value}
-				</d:content.render>
-				<d:content.render tag="td" options="{contentConfiguration.renderOptions}" item="{data}" index="{index}">
-					{content}
-				</d:content.render>
+				<f:if condition="{contentConfiguration.title}">
+					<f:then>
+						<d:content.render tag="th" tagAttributes="{scope: 'row'}" options="{contentConfiguration.title.renderOptions}" index="{index}">
+							{contentConfiguration.title.value}
+						</d:content.render>
+						<d:content.render tag="td" options="{contentConfiguration.renderOptions}" item="{data}" index="{index}">
+							{content}
+						</d:content.render>
+					</f:then>
+					<f:else>
+						<d:content.render tag="td" tagAttributes="{colspan: 2}" options="{contentConfiguration.renderOptions}" item="{data}" index="{index}">
+							{content}
+						</d:content.render>
+					</f:else>
+				</f:if>
 			</tr>
 		</d:item.for>
 	</tbody>

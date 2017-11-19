@@ -8,9 +8,16 @@
 	<thead>
 		<tr>
 			<f:for each="{configuration.contentField}" as="column" key="index">
-				<d:content.render tag="th" tagAttributes="{scope: 'col'}" options="{column.title.renderOptions}" index="{index}">
-					{column.title.value}
-				</d:content.render>
+				<f:if condition="{column.title}">
+					<f:then>
+						<d:content.render tag="th" tagAttributes="{scope: 'col'}" options="{column.title.renderOptions}" index="{index}">
+							{column.title.value}
+						</d:content.render>
+					</f:then>
+					<f:else>
+						<th scope="col"></th>
+					</f:else>
+				</f:if>
 			</f:for>
 		</tr>
 	</thead>
