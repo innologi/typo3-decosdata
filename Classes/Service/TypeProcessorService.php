@@ -104,7 +104,7 @@ class TypeProcessorService implements SingletonInterface {
 						// @TODO throw exception
 					}
 					$content[] = [
-						'partial' => 'Item/' . $formattedType,
+						'partial' => $configuration['partial'] ?? 'Item/' . $formattedType,
 						'configuration' => $configuration,
 						'data' => $this->{$method}($configuration, $import)
 					];
