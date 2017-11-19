@@ -126,7 +126,7 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 		];
 
 		// determine whether scaling is applied
-		if ($this->arguments['scalingStart'] && $pageCount >= $this->arguments['scalingStart']) {
+		if ($this->arguments['startScalingAtPageCount'] && $pageCount >= $this->arguments['startScalingAtPageCount']) {
 			$scaleParts = explode('|', $this->arguments['scalingFormat']);
 			if (count($scaleParts) !== 4) {
 				throw new PaginationError(1449155248, [
