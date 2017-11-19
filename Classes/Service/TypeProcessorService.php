@@ -116,7 +116,7 @@ class TypeProcessorService implements SingletonInterface {
 			/** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObjectRenderer */
 			$contentObjectRenderer = $GLOBALS['TSFE']->cObj;
 			$content[] = [
-				'partial' => 'ContentObject',
+				'partial' => $configuration['partial'] ?? 'ContentObject',
 				'type' => strtolower($type),
 				'configuration' => $configuration,
 				'data' => $this->getContentObjectRenderer()->cObjGetSingle(
