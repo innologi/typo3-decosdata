@@ -7,7 +7,9 @@
 <f:section name="main">
 
 <d:crumbPath>
-	<f:render partial="Item/Show" arguments="{data:item, configuration:configuration}" />
+	<div class="section section-0 level-{level} show">
+		<f:render partial="Item/Show" arguments="{data:item, configuration:configuration}" />
+	</div>
 </d:crumbPath>
 
 </f:section>

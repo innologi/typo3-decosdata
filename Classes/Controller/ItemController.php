@@ -124,8 +124,8 @@ class ItemController extends ActionController {
 	 * @return void
 	 */
 	public function showAction() {
+		$this->view->assign('level', $this->level);
 		$this->view->assign('configuration', $this->activeConfiguration);
-		// @TODO what if NULL? doesn't the template break?
 		$this->view->assign(
 			'item',
 			$this->typeProcessor->processShow(
@@ -140,6 +140,7 @@ class ItemController extends ActionController {
 	 * @return void
 	 */
 	public function listAction() {
+		$this->view->assign('level', $this->level);
 		$this->view->assign('configuration', $this->activeConfiguration);
 		$this->view->assign(
 			'items',
@@ -155,6 +156,7 @@ class ItemController extends ActionController {
 	 * @return void
 	 */
 	public function complexAction() {
+		$this->view->assign('level', $this->level);
 		$this->view->assign(
 			'contentSections',
 			$this->typeProcessor->processTypeRecursion(

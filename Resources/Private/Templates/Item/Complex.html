@@ -7,8 +7,8 @@
 <f:section name="main">
 
 <d:crumbPath>
-	<f:for each="{contentSections}" as="section">
-		<div class="section">
+	<f:for each="{contentSections}" as="section" key="index">
+		<div class="section section-{index} level-{level} {section.type}">
 			<d:render partial="{section.partial}" arguments="{data:section.data, configuration:section.configuration}" />
 		</div>
 	</f:for>

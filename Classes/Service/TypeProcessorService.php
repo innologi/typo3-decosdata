@@ -98,13 +98,15 @@ class TypeProcessorService implements SingletonInterface {
 					}
 					break;
 				default:
-					$formattedType = ucfirst(strtolower(substr($type, 1)));
+					$lType = strtolower(substr($type, 1));
+					$formattedType = ucfirst($lType);
 					$method = 'process' . $formattedType;
 					if (!method_exists($this, $method)) {
 						// @TODO throw exception
 					}
 					$content[] = [
 						'partial' => $configuration['partial'] ?? 'Item/' . $formattedType,
+						'type' => $lType,
 						'configuration' => $configuration,
 						'data' => $this->{$method}($configuration, $import)
 					];
@@ -115,6 +117,7 @@ class TypeProcessorService implements SingletonInterface {
 			$contentObjectRenderer = $GLOBALS['TSFE']->cObj;
 			$content[] = [
 				'partial' => 'ContentObject',
+				'type' => strtolower($type),
 				'configuration' => $configuration,
 				'data' => $this->getContentObjectRenderer()->cObjGetSingle(
 					$type, $this->getTypoScriptService()->convertPlainArrayToTypoScriptArray($configuration)
