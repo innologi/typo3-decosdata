@@ -128,6 +128,14 @@ class TypeProcessorService implements SingletonInterface {
 		return $content;
 	}
 
+	public function processGallery(array $configuration, array $import) {
+		return $this->itemRepository->findWithStatement(
+			$this->queryBuilder->buildListQuery(
+				$configuration, $import
+			)->createStatement()
+		);
+	}
+
 	public function processList(array $configuration, array $import) {
 		# @TODO remove debugging!
 		$items = $this->itemRepository->findWithStatement(

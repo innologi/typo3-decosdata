@@ -1,5 +1,6 @@
 @charset "UTF-8";
 
+
 .tx-decosdata table {
 	border-collapse: collapse;
 	border-spacing: 0;
@@ -24,6 +25,7 @@
 	padding-right: 0.5em;
 }
 
+
 .tx-decosdata .crumbpath,
 .tx-decosdata .pagebrowser {
 	font-size: 0.8em;
@@ -46,4 +48,13 @@
 }
 .tx-decosdata .crumbpath-navigation > *:last-child:after {
 	content:"";
+}
+
+
+.tx-decosdata .gallery {
+	width: 100%;
+}
+.tx-decosdata .gallery .item {
+	display: inline-block;
+	width: 25%;
 }
