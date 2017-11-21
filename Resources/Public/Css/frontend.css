@@ -58,6 +58,10 @@
 	display: inline-block;
 	width: 25%;
 }
+.tx-decosdata .gallery .item,
+.tx-decosdata .media .item .media-content {
+	text-align: center;
+}
 
 
 .tx-decosdata .obfuscate {
