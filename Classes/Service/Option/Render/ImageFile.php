@@ -35,6 +35,7 @@ use Innologi\Decosdata\Library\TagBuilder\TagInterface;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class ImageFile extends FileOptionAbstract {
+	use Traits\ItemAccess;
 	// @TODO ___Absolute URIs for other contexts than normal HTML?
 
 	/**
@@ -60,7 +61,15 @@ class ImageFile extends FileOptionAbstract {
 		$processedImage = $this->imageService->applyProcessingInstructions($file, $processingInstructions);
 		$imageUri = $this->imageService->getImageUri($processedImage);
 
-		return $service->getTagFactory()->createTag('img', ['src' => $imageUri]);
+		$attributes = [
+			'src' => $imageUri,
+			'class' => 'file-' . $this->fileUid
+		];
+		if (isset($args['alt'][0])) {
+			$attributes['alt'] = $this->itemAccess($args['alt'], $service);
+		}
+
+		return $service->getTagFactory()->createTag('img', $attributes);
 	}
 
 }
