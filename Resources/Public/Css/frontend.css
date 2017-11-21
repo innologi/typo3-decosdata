@@ -58,3 +58,23 @@
 	display: inline-block;
 	width: 25%;
 }
+
+
+.tx-decosdata .obfuscate {
+	display: block;
+	position: relative;
+	/* IE */
+	width: 100%;
+	height: 100%;
+}
+.tx-decosdata .obfuscate-layer {
+	display: block;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	background-image: url(/typo3conf/ext/decosdata/Resources/Public/Image/obfuscate.gif);
+	background-repeat: repeat;
+	background-position: left top;
+}
