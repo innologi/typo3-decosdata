@@ -53,6 +53,7 @@ class ForViewHelper extends AbstractViewHelper {
 		$this->registerArgument('contentAs', 'string', 'Variable name for current content.', FALSE, 'content');
 		$this->registerArgument('configAs', 'string', 'Variable name for current content configuration.', FALSE, 'contentConfiguration');
 		$this->registerArgument('indexAs', 'string', 'Variable name for current content index.', FALSE, 'index');
+		$this->registerArgument('offset', 'integer', 'Start index at', FALSE, 1);
 	}
 
 	/**
@@ -65,6 +66,9 @@ class ForViewHelper extends AbstractViewHelper {
 		$item = $this->arguments['item'];
 		$output = '';
 		foreach ($this->arguments['configuration'] as $index => $config) {
+			if ($index < $this->arguments['offset']) {
+				continue;
+			}
 			if (!isset($item['content' . $index])) {
 				// @TODO ___throw exception 'configuration / content mismatch'
 				// @TODO ___wait, if we do that, don't we have an issue with BIS level 3 field 5?

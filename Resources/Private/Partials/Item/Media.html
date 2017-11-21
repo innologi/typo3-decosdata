@@ -1,0 +1,39 @@
+<html data-namespace-typo3-fluid="true"
+	xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+	xmlns:d="http://typo3.org/ns/Innologi/Decosdata/ViewHelpers">
+
+<f:if condition="{data}">
+<div class="data item item-{data.id}">
+	<div class="media-content">
+		<f:debug>{data}</f:debug>
+		<d:content.render options="{configuration.contentField.1.renderOptions}" item="{data}" index="1">
+			{data.content1}
+		</d:content.render>
+	</div>
+	<table>
+		<tbody>
+			<d:item.for configuration="{configuration.contentField}" item="{data}" offset="2">
+				<tr>
+					<f:if condition="{contentConfiguration.title}">
+						<f:then>
+							<d:content.render tag="th" tagAttributes="{scope: 'row'}" options="{contentConfiguration.title.renderOptions}" index="{index}">
+								{contentConfiguration.title.value}
+							</d:content.render>
+							<d:content.render tag="td" options="{contentConfiguration.renderOptions}" item="{data}" index="{index}">
+								{content}
+							</d:content.render>
+						</f:then>
+						<f:else>
+							<d:content.render tag="td" tagAttributes="{colspan: 2}" options="{contentConfiguration.renderOptions}" item="{data}" index="{index}">
+								{content}
+							</d:content.render>
+						</f:else>
+					</f:if>
+				</tr>
+			</d:item.for>
+		</tbody>
+	</table>
+</div>
+</f:if>
+
+</html>
