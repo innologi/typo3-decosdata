@@ -183,7 +183,7 @@ class Tag extends TagAbstract {
 			$output .= ' ' . $attribute . '="' . htmlspecialchars($value) . '"';
 		}
 		if ($this->hasContent() || $this->forceClosingTag) {
-			$output .= '>' . $this->content->render() . '</' . $this->tagName . '>';
+			$output .= '>' . ($this->content ?? '') . '</' . $this->tagName . '>';
 		} else {
 			$output .= ' />';
 		}
