@@ -177,4 +177,14 @@ class ParameterService implements SingletonInterface {
 		}
 		return $this->pluginNameSpace . '[' . $name . ']';
 	}
+
+	/**
+	 * Encodes a parameter value for usage in URLs.
+	 *
+	 * @param string $value
+	 * @return string
+	 */
+	public function encodeParameter($value) {
+		return rawurlencode($value);
+	}
 }

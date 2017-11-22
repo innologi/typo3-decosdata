@@ -128,14 +128,6 @@ class TypeProcessorService implements SingletonInterface {
 		return $content;
 	}
 
-	public function processGallery(array $configuration, array $import) {
-		return $this->processList($configuration, $import);
-	}
-
-	public function processMedia(array $configuration, array $import) {
-		return $this->processShow($configuration, $import);
-	}
-
 	public function processList(array $configuration, array $import) {
 		# @TODO remove debugging!
 		$items = $this->itemRepository->findWithStatement(
@@ -157,6 +149,23 @@ class TypeProcessorService implements SingletonInterface {
 		);
 
 		return $items[0] ?? NULL;
+	}
+
+	public function processGallery(array $configuration, array $import) {
+		return $this->processList($configuration, $import);
+	}
+
+	public function processMedia(array $configuration, array $import) {
+		return $this->processShow($configuration, $import);
+	}
+
+	public function processSearch(array $configuration) {
+		/** @var \Innologi\Decosdata\Service\SearchService $searchService */
+		$searchService = $this->objectManager->get(\Innologi\Decosdata\Service\SearchService::class);
+		return [
+			'targetLevel' => $configuration['level'] ?? NULL,
+			'search' => $searchService->isActive() ? $searchService->getSearchString() : ''
+		];
 	}
 
 }

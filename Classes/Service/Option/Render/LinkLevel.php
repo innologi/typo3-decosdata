@@ -86,11 +86,14 @@ class LinkLevel implements OptionInterface {
 			->reset()
 			->setAddQueryString(TRUE)
 			// @LOW _if we support a page argument per level, we could maintain current and previous levels through arguments. Another option would be the session
-			->setArgumentsToBeExcludedFromQueryString([$this->parameterService->wrapInPluginNamespace('page')])
+			->setArgumentsToBeExcludedFromQueryString([
+				$this->parameterService->wrapInPluginNamespace('page'),
+				$this->parameterService->wrapInPluginNamespace('search')
+			])
 			->uriFor(NULL, [
 				// @LOW don't we want these details to reside in parameterService?
 				'level' => $args['level'],
-				'_' . $args['level'] => rawurlencode($linkValue)
+				'_' . $args['level'] => $this->parameterService->encodeParameter($linkValue)
 			]);
 
 		// @TODO ___title and or other attributes? in tx_decospublisher, a title could be set through an argument, which would expand the query to include the field containing the title

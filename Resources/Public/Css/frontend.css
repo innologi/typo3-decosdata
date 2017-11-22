@@ -82,3 +82,12 @@
 	background-repeat: repeat;
 	background-position: left top;
 }
+
+
+.tx-decosdata .search {
+	width: 100%;
+}
+.tx-decosdata .search .search-box,
+.tx-decosdata .search .search-submit {
+	font-size: 0.9em;
+}

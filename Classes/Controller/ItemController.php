@@ -24,6 +24,7 @@ namespace Innologi\Decosdata\Controller;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Item controller
@@ -57,6 +58,11 @@ class ItemController extends ActionController {
 	 * @inject
 	 */
 	protected $parameterService;
+
+	/**
+	 * @var \Innologi\Decosdata\Service\SearchService
+	 */
+	protected $searchService;
 
 	/**
 	 * @var array
@@ -116,7 +122,66 @@ class ItemController extends ActionController {
 
 		// @LOW ___will probably require some validation to see if provided level exists in available configuration
 		$this->activeConfiguration = $this->settings['level'][$this->level];
+
+		// validate search
+		if ($this->parameterService->hasParameter('search')) {
+			// @TODO make sure caching is safe before disabling this. GET requests are cached correctly if I do this,
+			// but I seem to be able to manually change the post request for it to contain different search terms
+			// so I'm seeing quite an opportunity for automated cache pollution if I disable this without further changes.
+			// The thing is, I'm caching the search plugin as part of complexAction, so I can't just put a CSRF token in there.
+			// Can I somehow make my sections behave as USER_INT? But then it becomes yet another hacky mess..
+			$contentObject = $this->configurationManager->getContentObject();
+			if ($contentObject->getUserObjectType() === \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::OBJECTTYPE_USER) {
+				$contentObject->convertToUserIntObject();
+				// will recreate the object, so we have to stop the request here
+				throw new StopActionException();
+			}
+
+			$search = $this->parameterService->getParameterRaw('search');
+			/** @var \Innologi\Decosdata\Service\SearchService $searchService */
+			$this->searchService = $this->objectManager->get(\Innologi\Decosdata\Service\SearchService::class);
+			$this->searchService->enableSearch($search);
+		}
 	}
+
+	/**
+	 * Run multiple publish-configurations and/or custom TS elements as a single cohesive content element + overarching template.
+	 *
+	 * @return void
+	 */
+	public function complexAction() {
+		$this->view->assign('level', $this->level);
+		$this->view->assign(
+			'contentSections',
+			$this->typeProcessor->processTypeRecursion(
+				$this->activeConfiguration, $this->import
+			)
+		);
+	}
+
+	/**
+	 * Search request validation and redirect.
+	 *
+	 * @return void
+	 */
+	public function searchAction() {
+		$arguments = [];
+
+		// we're only passing along our search parameter if it is a sensible one
+		if ($this->searchService->isActive()) {
+			$arguments['search'] = $this->parameterService->encodeParameter(
+				$this->searchService->getSearchString()
+			);
+		}
+
+		// if we don't need to pass along the level parameter: don't
+		if ($this->level > 1) {
+			$arguments['level'] = $this->level;
+		}
+		$this->redirect(NULL, NULL, NULL, $arguments);
+	}
+
+
 
 	/**
 	 * Show single item details per publication configuration.
@@ -149,20 +214,4 @@ class ItemController extends ActionController {
 			)
 		);
 	}
-
-	/**
-	 * Run multiple publish-configurations and/or custom TS elements as a single cohesive content element + overarching template.
-	 *
-	 * @return void
-	 */
-	public function complexAction() {
-		$this->view->assign('level', $this->level);
-		$this->view->assign(
-			'contentSections',
-			$this->typeProcessor->processTypeRecursion(
-				$this->activeConfiguration, $this->import
-			)
-		);
-	}
-
 }

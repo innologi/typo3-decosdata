@@ -19,6 +19,13 @@
 			<trans-unit id="pagebrowser.resultCount">
 				<source>Total amount of results: %1$d</source>
 			</trans-unit>
+			
+			<trans-unit id="search.submit">
+				<source>Search</source>
+			</trans-unit>
+			<trans-unit id="search.placeholder">
+				<source>Search</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>
