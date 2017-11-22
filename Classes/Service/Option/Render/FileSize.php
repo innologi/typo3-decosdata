@@ -36,7 +36,8 @@ use Innologi\Decosdata\Library\TagBuilder\TagContent;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileSize extends FileOptionAbstract {
+class FileSize implements OptionInterface {
+	use Traits\FileHandler;
 
 	/**
 	 * {@inheritDoc}

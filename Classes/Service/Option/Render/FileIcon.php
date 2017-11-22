@@ -39,7 +39,8 @@ use Innologi\Decosdata\Library\TagBuilder\TagContent;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileIcon extends FileOptionAbstract {
+class FileIcon implements OptionInterface {
+	use Traits\FileHandler;
 	// @TODO ___Absolute URIs for other contexts than normal HTML?
 
 	/**

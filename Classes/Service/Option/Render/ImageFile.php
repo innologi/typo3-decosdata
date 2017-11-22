@@ -34,7 +34,8 @@ use Innologi\Decosdata\Library\TagBuilder\TagInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ImageFile extends FileOptionAbstract {
+class ImageFile implements OptionInterface {
+	use Traits\FileHandler;
 	use Traits\ItemAccess;
 	// @TODO ___Absolute URIs for other contexts than normal HTML?
 
