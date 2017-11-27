@@ -31,7 +31,7 @@
 				</config>
 			</TCEforms>
 		</settings.override.import>
-		<settings.override.ts>
+		<settings.override.publish>
 			<TCEforms>
 				<label>TypoScript override</label>
 				<config>
@@ -41,7 +41,7 @@
 					<default></default>
 				</config>
 			</TCEforms>
-		</settings.override.ts>
+		</settings.override.publish>
         </el>
       </ROOT>
     </sDEF>

@@ -87,32 +87,29 @@ class ItemController extends ActionController {
 		$this->parameterService->initializeByRequest($this->request);
 		$this->level = $this->parameterService->getParameterNormalized('level');
 
-		// set imports, stage 1: find flexform override before TS overrides get in effect
-		if (isset($this->settings['override']['import'][0])) {
-			$this->import = GeneralUtility::intExplode(',', $this->settings['override']['import'], TRUE);
-		}
-
 		// @LOW cache?
 		// check override TS
-		if (isset(trim($this->settings['override']['ts'])[0])) {
+		if (isset(trim($this->settings['override']['publish'])[0])) {
 			/** @var \TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser $tsParser */
 			$tsParser = GeneralUtility::makeInstance(\TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser::class);
-			$tsParser->parse($this->settings['override']['ts']);
-			// completely replace original settings
-			$this->settings = $this->typeProcessor
+			$tsParser->parse($this->settings['override']['publish']);
+			// completely replace original publicationsettings
+			$this->settings['publish'] = $this->typeProcessor
 				->getTypoScriptService()
 				->convertTypoScriptArrayToPlainArray($tsParser->setup);
 		}
 
-		// set imports, stage 2: no flexform overrides? get it from TS
-		if ($this->import === NULL) {
-			$this->import = $this->settings['import'] ?? [];
+		// set imports, flexform override -> publish ts -> []
+		if (isset($this->settings['override']['import'][0])) {
+			$this->import = GeneralUtility::intExplode(',', $this->settings['override']['import'], TRUE);
+		} else {
+			$this->import = $this->settings['publish']['import'] ?? [];
 		}
 
 		// initialize breadcrumb
-		if (isset($this->settings['breadcrumb']) && is_array($this->settings['breadcrumb'])) {
+		if (isset($this->settings['publish']['breadcrumb']) && is_array($this->settings['publish']['breadcrumb'])) {
 			// @LOW this being optional, means I probably shouldn't inject it
-			$this->breadcrumbService->configureBreadcrumb($this->settings['breadcrumb'], $this->import);
+			$this->breadcrumbService->configureBreadcrumb($this->settings['publish']['breadcrumb'], $this->import);
 		}
 
 		#if ($this->request->hasArgument('_' . $this->level)) {
@@ -121,7 +118,7 @@ class ItemController extends ActionController {
 		#}
 
 		// @LOW ___will probably require some validation to see if provided level exists in available configuration
-		$this->activeConfiguration = $this->settings['level'][$this->level];
+		$this->activeConfiguration = $this->settings['publish']['level'][$this->level];
 
 		// validate search
 		if ($this->parameterService->hasParameter('search')) {
