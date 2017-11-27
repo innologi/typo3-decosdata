@@ -125,7 +125,7 @@ class ItemController extends ActionController {
 			// @TODO make sure caching is safe before disabling this. GET requests are cached correctly if I do this,
 			// but I seem to be able to manually change the post request for it to contain different search terms
 			// so I'm seeing quite an opportunity for automated cache pollution if I disable this without further changes.
-			// The thing is, I'm caching the search plugin as part of complexAction, so I can't just put a CSRF token in there.
+			// The thing is, I'm caching the search plugin as part of defaultAction, so I can't just put a CSRF token in there.
 			// Can I somehow make my sections behave as USER_INT? But then it becomes yet another hacky mess..
 			$contentObject = $this->configurationManager->getContentObject();
 			if ($contentObject->getUserObjectType() === \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::OBJECTTYPE_USER) {
@@ -146,7 +146,7 @@ class ItemController extends ActionController {
 	 *
 	 * @return void
 	 */
-	public function complexAction() {
+	public function defaultAction() {
 		$this->view->assign('level', $this->level);
 		$this->view->assign(
 			'contentSections',
