@@ -84,7 +84,7 @@ class ItemController extends ActionController {
 	 * @see \TYPO3\CMS\Extbase\Mvc\Controller\ActionController::initializeAction()
 	 */
 	protected function initializeAction() {
-		$this->parameterService->setRequest($this->request);
+		$this->parameterService->initializeByRequest($this->request);
 		$this->level = $this->parameterService->getParameterNormalized('level');
 
 		// set imports, stage 1: find flexform override before TS overrides get in effect

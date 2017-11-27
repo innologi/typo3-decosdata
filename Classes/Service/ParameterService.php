@@ -40,14 +40,14 @@ class ParameterService implements SingletonInterface {
 	// @LOW ___add support for other extension parameters?
 
 	/**
+	 * @var boolean
+	 */
+	protected $__initialized = FALSE;
+
+	/**
 	 * @var string
 	 */
 	protected $pluginNameSpace;
-
-	/**
-	 * @var \TYPO3\CMS\Extbase\Mvc\Web\Request
-	 */
-	protected $request;
 
 	/**
 	 * @var array
@@ -55,13 +55,51 @@ class ParameterService implements SingletonInterface {
 	protected $parameterCache = [];
 
 	/**
-	 * Set request object
+	 * @var array
+	 */
+	protected $arguments = [];
+
+	/**
+	 * Initializes through a request object
 	 *
 	 * @param \TYPO3\CMS\Extbase\Mvc\Web\Request $request
 	 * @return $this
 	 */
-	public function setRequest(\TYPO3\CMS\Extbase\Mvc\Web\Request $request) {
-		$this->request = $request;
+	public function initializeByRequest(\TYPO3\CMS\Extbase\Mvc\Web\Request $request) {
+		if ($this->__initialized !== TRUE) {
+			/** @var \TYPO3\CMS\Extbase\Service\ExtensionService $extensionService */
+			$extensionService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+				\TYPO3\CMS\Extbase\Object\ObjectManager::class
+			)->get(\TYPO3\CMS\Extbase\Service\ExtensionService::class);
+			$this->pluginNameSpace = $extensionService->getPluginNamespace(
+				$request->getControllerExtensionName(),
+				$request->getPluginName()
+			);
+
+			$this->arguments = $request->getArguments();
+			$this->__initialized = TRUE;
+		}
+		return $this;
+	}
+
+	/**
+	 * Initializes through given extension and plugin names
+	 *
+	 * @param string $extensionName
+	 * @param string $pluginName
+	 * @return $this
+	 */
+	public function initialize($extensionName, $pluginName) {
+		if ($this->__initialized !== TRUE) {
+			/** @var \TYPO3\CMS\Extbase\Service\ExtensionService $extensionService */
+			$extensionService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+				\TYPO3\CMS\Extbase\Object\ObjectManager::class
+			)->get(\TYPO3\CMS\Extbase\Service\ExtensionService::class);
+			$this->pluginNameSpace = $extensionService->getPluginNamespace($extensionName, $pluginName);
+
+			$this->arguments = \TYPO3\CMS\Core\Utility\GeneralUtility::_GPmerged($this->pluginNamespace);
+			$this->__initialized = TRUE;
+		}
 		return $this;
 	}
 
@@ -73,7 +111,7 @@ class ParameterService implements SingletonInterface {
 	 * @return boolean
 	 */
 	public function hasParameter($name) {
-		return $this->request->hasArgument($name);
+		return isset($this->arguments[$name]);
 	}
 
 	/**
@@ -84,7 +122,7 @@ class ParameterService implements SingletonInterface {
 	 * @return string
 	 */
 	public function getParameterRaw($name) {
-		return rawurldecode($this->request->getArgument($name));
+		return rawurldecode($this->arguments[$name]);
 	}
 
 	/**
@@ -165,16 +203,6 @@ class ParameterService implements SingletonInterface {
 	 * @return string
 	 */
 	public function wrapInPluginNamespace($name) {
-		if ($this->pluginNameSpace === NULL) {
-			/** @var \TYPO3\CMS\Extbase\Service\ExtensionService $extensionService */
-			$extensionService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-				\TYPO3\CMS\Extbase\Object\ObjectManager::class
-			)->get(\TYPO3\CMS\Extbase\Service\ExtensionService::class);
-			$this->pluginNameSpace = $extensionService->getPluginNamespace(
-				$this->request->getControllerExtensionName(),
-				$this->request->getPluginName()
-			);
-		}
 		return $this->pluginNameSpace . '[' . $name . ']';
 	}
 
@@ -186,5 +214,22 @@ class ParameterService implements SingletonInterface {
 	 */
 	public function encodeParameter($value) {
 		return rawurlencode($value);
+	}
+
+	/**
+	 * Returns API query string
+	 *
+	 * @param integer $section
+	 * @param integer $level
+	 * @return string
+	 */
+	public function getApiQueryString($section = 0, $level = 1) {
+		$queryParams = [
+			'eid=decosdata_api',
+			'id=' . (int) $GLOBALS['TSFE']->id,
+			'level=' . (int) $level,
+			'section=' . (int) $section
+		];
+		return '?' . join('&', $queryParams);
 	}
 }
