@@ -101,8 +101,9 @@ class TypeProcessorService implements SingletonInterface {
 			unset($configuration['_typoScriptNodeValue']);
 			switch ($type) {
 				case '_COA':
-					foreach ($configuration as $conf) {
-						$content = array_merge($content, $this->processTypeRecursion($conf, $import));
+					foreach ($configuration as $index => $conf) {
+						// don't use array_merge, so we can keep our indexes
+						$content = $content + $this->processTypeRecursion($conf, $import, $index);
 					}
 					break;
 				default:
@@ -112,7 +113,7 @@ class TypeProcessorService implements SingletonInterface {
 					if (!method_exists($this, $method)) {
 						// @TODO throw exception
 					}
-					$content[] = [
+					$content[$index] = [
 						'partial' => $configuration['partial'] ?? 'Item/' . $formattedType,
 						'type' => $lType,
 						'configuration' => $configuration,
@@ -123,7 +124,7 @@ class TypeProcessorService implements SingletonInterface {
 			// consider this a normal TYPO3 ContentObject
 			/** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObjectRenderer */
 			$contentObjectRenderer = $GLOBALS['TSFE']->cObj;
-			$content[] = [
+			$content[$index] = [
 				'partial' => $configuration['partial'] ?? 'ContentObject',
 				'type' => strtolower($type),
 				'configuration' => $configuration,
