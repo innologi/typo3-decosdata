@@ -144,20 +144,22 @@ class ItemController extends ActionController {
 	/**
 	 * Run multiple publish-configurations and/or custom TS elements as a single cohesive content element + overarching template.
 	 *
+	 * @param integer $section
 	 * @return void
 	 */
-	public function defaultAction() {
+	public function defaultAction($section = NULL) {
 		$this->view->assign('level', $this->level);
 		$this->view->assign(
 			'contentSections',
 			$this->typeProcessor->processTypeRecursion(
-				$this->activeConfiguration, $this->import
+				$this->activeConfiguration, $this->import, 0, $section
 			)
 		);
 	}
 
 	/**
 	 * Search request validation and redirect.
+	 * Search can actually be done in any action, but POST search needs to be done through this one.
 	 *
 	 * @return void
 	 */
@@ -175,6 +177,12 @@ class ItemController extends ActionController {
 		if ($this->level > 1) {
 			$arguments['level'] = $this->level;
 		}
+
+		// pass any section parameter
+		if ($this->parameterService->hasParameter('section')) {
+			$arguments['section'] = $this->parameterService->getParameterValidated('section');
+		}
+
 		$this->redirect(NULL, NULL, NULL, $arguments);
 	}
 

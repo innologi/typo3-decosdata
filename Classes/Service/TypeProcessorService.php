@@ -80,8 +80,16 @@ class TypeProcessorService implements SingletonInterface {
 
 
 
-	public function processTypeRecursion(array $configuration, array $import) {
+	public function processTypeRecursion(array $configuration, array $import, $index = 0, $section = NULL) {
 		$content = [];
+
+		// limit to section if one is requested
+		if ($section !== NULL) {
+			if (!isset($configuration[$section])) {
+				return $content;
+			}
+			$configuration = $configuration[$section];
+		}
 
 		// level types are required here
 		if (!isset($configuration['_typoScriptNodeValue'])) {
@@ -162,10 +170,20 @@ class TypeProcessorService implements SingletonInterface {
 	public function processSearch(array $configuration) {
 		/** @var \Innologi\Decosdata\Service\SearchService $searchService */
 		$searchService = $this->objectManager->get(\Innologi\Decosdata\Service\SearchService::class);
-		return [
+		$data = [
 			'targetLevel' => $configuration['level'] ?? NULL,
 			'search' => $searchService->isActive() ? $searchService->getSearchString() : ''
 		];
+
+		if (isset($configuration['xhr']) && is_array($configuration['xhr'])) {
+			/** @var ParameterService $parameterService */
+			$parameterService = $this->objectManager->get(ParameterService::class);
+			$data['section'] = (int) $configuration['xhr']['source'] ?? 0;
+			$data['xhrUri'] = rtrim(GeneralUtility::getIndpEnv('TYPO3_REQUEST_HOST'), '/') . '/';
+				//$parameterService->getApiQueryString($data['section'], $data['targetLevel']);
+		}
+
+		return $data;
 	}
 
 }
