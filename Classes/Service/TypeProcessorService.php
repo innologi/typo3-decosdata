@@ -80,16 +80,8 @@ class TypeProcessorService implements SingletonInterface {
 
 
 
-	public function processTypeRecursion(array $configuration, array $import, $index = 0, $section = NULL) {
+	public function processTypeRecursion(array $configuration, array $import, $index = 0) {
 		$content = [];
-
-		// limit to section if one is requested
-		if ($section !== NULL) {
-			if (!isset($configuration[$section])) {
-				return $content;
-			}
-			$configuration = $configuration[$section];
-		}
 
 		// level types are required here
 		if (!isset($configuration['_typoScriptNodeValue'])) {

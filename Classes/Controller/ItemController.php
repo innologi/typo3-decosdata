@@ -125,7 +125,7 @@ class ItemController extends ActionController {
 			// @TODO make sure caching is safe before disabling this. GET requests are cached correctly if I do this,
 			// but I seem to be able to manually change the post request for it to contain different search terms
 			// so I'm seeing quite an opportunity for automated cache pollution if I disable this without further changes.
-			// The thing is, I'm caching the search plugin as part of defaultAction, so I can't just put a CSRF token in there.
+			// The thing is, I'm caching the search plugin as part of default action, so I can't just put a CSRF token in there.
 			// Can I somehow make my sections behave as USER_INT? But then it becomes yet another hacky mess..
 			$contentObject = $this->configurationManager->getContentObject();
 			if ($contentObject->getUserObjectType() === \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::OBJECTTYPE_USER) {
@@ -144,15 +144,32 @@ class ItemController extends ActionController {
 	/**
 	 * Run multiple publish-configurations and/or custom TS elements as a single cohesive content element + overarching template.
 	 *
-	 * @param integer $section
 	 * @return void
 	 */
-	public function defaultAction($section = NULL) {
+	public function multiAction() {
 		$this->view->assign('level', $this->level);
 		$this->view->assign(
 			'contentSections',
 			$this->typeProcessor->processTypeRecursion(
-				$this->activeConfiguration, $this->import, 0, $section
+				$this->activeConfiguration, $this->import
+			)
+		);
+	}
+
+	/**
+	 * Run a single out of multiple publish-configurations and/or custom TS elements.
+	 *
+	 * @param integer $section
+	 * @return void
+	 */
+	public function singleAction($section) {
+		$this->view->assign('level', $this->level);
+		$this->view->assign(
+			'section',
+			current(
+				$this->typeProcessor->processTypeRecursion(
+					($this->activeConfiguration[$section] ?? []), $this->import
+				)
 			)
 		);
 	}
@@ -165,6 +182,7 @@ class ItemController extends ActionController {
 	 */
 	public function searchAction() {
 		$arguments = [];
+		$action = 'multi';
 
 		// we're only passing along our search parameter if it is a sensible one
 		if ($this->searchService->isActive()) {
@@ -181,6 +199,7 @@ class ItemController extends ActionController {
 		// pass any section parameter
 		if ($this->parameterService->hasParameter('section')) {
 			$arguments['section'] = $this->parameterService->getParameterValidated('section');
+			$action = 'single';
 		}
 
 		$this->redirect(NULL, NULL, NULL, $arguments);
