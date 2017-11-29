@@ -25,6 +25,8 @@ namespace Innologi\Decosdata\Service;
  ***************************************************************/
 use Innologi\Decosdata\Exception\ConfigurationError;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 /**
  * Item controller
  *
@@ -58,9 +60,10 @@ class TypeProcessorService implements SingletonInterface {
 	protected $typoScriptService;
 
 	/**
-	 * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
+	 * @var ConfigurationManagerInterface
 	 */
-	protected $contentObjectRenderer;
+	protected $configurationManager;
+
 
 	public function getTypoScriptService() {
 		if ($this->typoScriptService === NULL) {
@@ -69,13 +72,11 @@ class TypeProcessorService implements SingletonInterface {
 		return $this->typoScriptService;
 	}
 
-	public function getContentObjectRenderer() {
-		if ($this->contentObjectRenderer === NULL) {
-			$this->contentObjectRenderer = $this->objectManager->get(
-				\TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface::class
-			)->getContentObject();
+	public function getConfigurationManager() {
+		if ($this->configurationManager === NULL) {
+			$this->configurationManager = $this->objectManager->get(ConfigurationManagerInterface::class);
 		}
-		return $this->contentObjectRenderer;
+		return $this->configurationManager;
 	}
 
 
@@ -115,12 +116,11 @@ class TypeProcessorService implements SingletonInterface {
 		} else {
 			// consider this a normal TYPO3 ContentObject
 			/** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObjectRenderer */
-			$contentObjectRenderer = $GLOBALS['TSFE']->cObj;
 			$content[$index] = [
 				'partial' => $configuration['partial'] ?? 'ContentObject',
 				'type' => strtolower($type),
 				'configuration' => $configuration,
-				'data' => $this->getContentObjectRenderer()->cObjGetSingle(
+				'data' => $this->getConfigurationManager()->getContentObject()->cObjGetSingle(
 					$type, $this->getTypoScriptService()->convertPlainArrayToTypoScriptArray($configuration)
 				)
 			];
@@ -164,16 +164,23 @@ class TypeProcessorService implements SingletonInterface {
 		/** @var \Innologi\Decosdata\Service\SearchService $searchService */
 		$searchService = $this->objectManager->get(\Innologi\Decosdata\Service\SearchService::class);
 		$data = [
-			'targetLevel' => $configuration['level'] ?? NULL,
-			'search' => $searchService->isActive() ? $searchService->getSearchString() : ''
+			'search' => ($searchService->isActive() ? $searchService->getSearchString() : ''),
+			'targetLevel' => ($configuration['level'] ?? NULL)
 		];
 
 		if (isset($configuration['xhr']) && is_array($configuration['xhr'])) {
-			/** @var ParameterService $parameterService */
-			$parameterService = $this->objectManager->get(ParameterService::class);
 			$data['section'] = (int) $configuration['xhr']['source'] ?? 0;
-			$data['xhrUri'] = rtrim(GeneralUtility::getIndpEnv('TYPO3_REQUEST_HOST'), '/') . '/';
-				//$parameterService->getApiQueryString($data['section'], $data['targetLevel']);
+
+			$settings = $this->getConfigurationManager()->getConfiguration(
+				ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS
+			);
+
+			/** @var UriBuilder $uriBuilder */
+			$uriBuilder = $this->objectManager->get(UriBuilder::class);
+			$data['xhrUri'] = $uriBuilder->reset()
+				->setCreateAbsoluteUri(TRUE)
+				->setTargetPageType($settings['api']['type'])
+				->uriFor('search', array_diff($data, ['search' => 1]), 'Item', 'Decosdata', 'Publish');
 		}
 
 		return $data;

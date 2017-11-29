@@ -24,6 +24,31 @@ plugin.tx_decosdata {
 		# hacky "SecureParameters" feature from the old decospublisher ext.
 		requireCHashArgumentForActionArguments = 1
 	}
+	
+	settings {
+		# used for API calls
+		api {
+			type = 1511719610
+			defaultFormat = json
+		}
+	}
 }
 
+# API calls, not using eid when requiring plugin context
+decosdata_api = PAGE
+decosdata_api {
+	typeNum < plugin.tx_decosdata.settings.api.type
+	config {
+		disableAllHeaderCode = 1
+		disablePrefixComment = 1
+		xhtml_cleaning = 0
+		admPanel = 0
+		debug = 0
+		# to imply that we want caching wherever possible
+		no_cache = 0
+	}
+	10 < tt_content.list.20.decosdata_publish
+}
+
+# CSS
 page.includeCSS.decosdataFrontend = {$plugin.tx_decosdata.css.frontendFile}

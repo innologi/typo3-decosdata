@@ -80,12 +80,26 @@ class ItemController extends ActionController {
 	protected $level = 1;
 
 	/**
+	 * @var boolean
+	 */
+	protected $apiMode = FALSE;
+
+	/**
 	 * {@inheritDoc}
 	 * @see \TYPO3\CMS\Extbase\Mvc\Controller\ActionController::initializeAction()
 	 */
 	protected function initializeAction() {
 		$this->parameterService->initializeByRequest($this->request);
 		$this->level = $this->parameterService->getParameterNormalized('level');
+
+		// detect and set apiMode defaults
+		$this->apiMode = (int)$GLOBALS['TSFE']->type === (int)$this->settings['api']['type'];
+		if ($this->apiMode && !$this->parameterService->hasParameter('format')) {
+			// default API format
+			$this->request->setFormat(
+				$this->settings['api']['defaultFormat']
+			);
+		}
 
 		// @LOW cache?
 		// check override TS
@@ -202,7 +216,8 @@ class ItemController extends ActionController {
 			$action = 'single';
 		}
 
-		$this->redirect(NULL, NULL, NULL, $arguments);
+		// redirect to default action
+		$this->redirectOrForward($action, NULL, NULL, $arguments);
 	}
 
 
@@ -237,5 +252,20 @@ class ItemController extends ActionController {
 				$this->activeConfiguration, $this->import
 			)
 		);
+	}
+
+	/**
+	 * Redirect wrapper. Detects API-mode and switches to forward() instead
+	 * since API-mode is not compatible with redirects.
+	 *
+	 * {@inheritDoc}
+	 * @see \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController::redirect()
+	 */
+	protected function redirectOrForward(...$args) {
+		if ($this->apiMode) {
+			$this->forward($args[0], $args[1], $args[2], $args[3]);
+		} else {
+			$this->redirect(...$args);
+		}
 	}
 }
