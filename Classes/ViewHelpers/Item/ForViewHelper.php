@@ -43,6 +43,11 @@ class ForViewHelper extends AbstractViewHelper {
 	protected $escapeOutput = FALSE;
 
 	/**
+	 * @var boolean
+	 */
+	protected $escapeChildren = FALSE;
+
+	/**
 	 * Initialize arguments
 	 *
 	 * @return void

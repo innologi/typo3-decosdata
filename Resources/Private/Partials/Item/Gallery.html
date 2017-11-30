@@ -8,9 +8,7 @@
 	<f:for each="{data}" as="item">
 		<div class="item item-{item.id}">
 			<d:item.for configuration="{configuration.contentField}" item="{item}">
-				<d:content.render options="{contentConfiguration.renderOptions}" item="{item}" index="{index}">
-					{content}
-				</d:content.render>
+				<div class="content content-{index}" data-cid="{index}">{content}</div>
 			</d:item.for>
 		</div>
 	</f:for>

@@ -25,9 +25,7 @@
 		<f:for each="{data}" as="item">
 			<tr class="item item-{item.id}">
 				<d:item.for configuration="{configuration.contentField}" item="{item}">
-					<d:content.render tag="td" options="{contentConfiguration.renderOptions}" item="{item}" index="{index}">
-						{content}
-					</d:content.render>
+					<td class="content content-{index}" data-cid="{index}">{content}</td>
 				</d:item.for>
 			</tr>
 		</f:for>

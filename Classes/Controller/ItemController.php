@@ -268,4 +268,14 @@ class ItemController extends ActionController {
 			$this->redirect(...$args);
 		}
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController::buildControllerContext()
+	 */
+	protected function buildControllerContext() {
+		$controllerContext = parent::buildControllerContext();
+		$this->typeProcessor->setControllerContext($controllerContext);
+		return $controllerContext;
+	}
 }

@@ -9,17 +9,15 @@
 			<tr>
 				<f:if condition="{contentConfiguration.title}">
 					<f:then>
-						<d:content.render tag="th" tagAttributes="{scope: 'row'}" options="{contentConfiguration.title.renderOptions}" index="{index}">
-							{contentConfiguration.title.value}
-						</d:content.render>
-						<d:content.render tag="td" options="{contentConfiguration.renderOptions}" item="{data}" index="{index}">
-							{content}
-						</d:content.render>
+						<th scope="row">
+							<d:content.render options="{contentConfiguration.title.renderOptions}" index="{index}">
+								{contentConfiguration.title.value}
+							</d:content.render>
+						</th>
+						<td class="content content-{index}" data-cid="{index}">{content}</td>
 					</f:then>
 					<f:else>
-						<d:content.render tag="td" tagAttributes="{colspan: 2}" options="{contentConfiguration.renderOptions}" item="{data}" index="{index}">
-							{content}
-						</d:content.render>
+						<td class="content content-{index}" data-cid="{index}" colspan="2">{content}</td>
 					</f:else>
 				</f:if>
 			</tr>

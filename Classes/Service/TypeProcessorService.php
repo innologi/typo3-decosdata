@@ -25,8 +25,8 @@ namespace Innologi\Decosdata\Service;
  ***************************************************************/
 use Innologi\Decosdata\Exception\ConfigurationError;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
+use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 /**
  * Item controller
  *
@@ -55,6 +55,12 @@ class TypeProcessorService implements SingletonInterface {
 	protected $queryBuilder;
 
 	/**
+	 * @var \Innologi\Decosdata\Service\Option\RenderOptionService
+	 * @inject
+	 */
+	protected $optionService;
+
+	/**
 	 * @var \TYPO3\CMS\Core\TypoScript\TypoScriptService
 	 */
 	protected $typoScriptService;
@@ -63,6 +69,11 @@ class TypeProcessorService implements SingletonInterface {
 	 * @var ConfigurationManagerInterface
 	 */
 	protected $configurationManager;
+
+	/**
+	 * @var ControllerContext
+	 */
+	protected $controllerContext;
 
 
 	public function getTypoScriptService() {
@@ -79,6 +90,16 @@ class TypeProcessorService implements SingletonInterface {
 		return $this->configurationManager;
 	}
 
+	/**
+	 * Sets controller context
+	 *
+	 * @param ControllerContext $controllerContext
+	 * @return void
+	 */
+	public function setControllerContext(ControllerContext $controllerContext) {
+		$this->controllerContext = $controllerContext;
+		$this->optionService->setControllerContext($controllerContext);
+	}
 
 
 	public function processTypeRecursion(array $configuration, array $import, $index = 0) {
@@ -115,7 +136,6 @@ class TypeProcessorService implements SingletonInterface {
 			}
 		} else {
 			// consider this a normal TYPO3 ContentObject
-			/** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObjectRenderer */
 			$content[$index] = [
 				'partial' => $configuration['partial'] ?? 'ContentObject',
 				'type' => strtolower($type),
@@ -131,22 +151,29 @@ class TypeProcessorService implements SingletonInterface {
 
 	public function processList(array $configuration, array $import) {
 		# @TODO remove debugging!
-		$items = $this->itemRepository->findWithStatement(
-			($statement = $this->queryBuilder->buildListQuery(
-				$configuration, $import
-			)->createStatement())
+		$items = $this->processRenderOptions(
+			$this->itemRepository->findWithStatement(
+				($statement = $this->queryBuilder->buildListQuery(
+					$configuration, $import
+				)->createStatement())
+			),
+			$configuration
 		);
 		$test = $statement->getProcessedQuery();
+
 		return $items;
 	}
 
 	public function processShow(array $configuration, array $import) {
-		$items = $this->itemRepository->findWithStatement(
-			$this->queryBuilder->buildListQuery(
-				$configuration, $import
-			)->setLimit(
-				1
-			)->createStatement()
+		$items = $this->processRenderOptions(
+			$this->itemRepository->findWithStatement(
+				$this->queryBuilder->buildListQuery(
+					$configuration, $import
+				)->setLimit(
+					1
+				)->createStatement()
+			),
+			$configuration
 		);
 
 		return $items[0] ?? NULL;
@@ -170,20 +197,43 @@ class TypeProcessorService implements SingletonInterface {
 
 		if (isset($configuration['xhr']) && is_array($configuration['xhr'])) {
 			$data['section'] = (int) $configuration['xhr']['source'] ?? 0;
-
 			$settings = $this->getConfigurationManager()->getConfiguration(
 				ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS
 			);
-
-			/** @var UriBuilder $uriBuilder */
-			$uriBuilder = $this->objectManager->get(UriBuilder::class);
-			$data['xhrUri'] = $uriBuilder->reset()
+			$data['xhrUri'] = $this->controllerContext->getUriBuilder()->reset()
 				->setCreateAbsoluteUri(TRUE)
 				->setTargetPageType($settings['api']['type'])
-				->uriFor('search', array_diff($data, ['search' => 1]), 'Item', 'Decosdata', 'Publish');
+				->uriFor('search', array_diff($data, ['search' => 1]));
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Iterates through items to process RenderOptions.
+	 *
+	 * @param array $items
+	 * @param array $configuration
+	 * @return array
+	 */
+	protected function processRenderOptions(array $items, array $configuration) {
+		foreach ($items as &$item) {
+			foreach ($configuration['contentField'] as $index => $config) {
+				if (!isset($config['renderOptions'])) {
+					continue;
+				}
+				if (!isset($item['content' . $index])) {
+					// @TODO throw exception
+				}
+				$item['content' . $index] = $this->optionService->processOptions(
+					$config['renderOptions'],
+					$item['content' . $index],
+					$index,
+					$item
+				)->render();
+			}
+		}
+		return $items;
 	}
 
 }
