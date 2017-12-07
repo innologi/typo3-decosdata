@@ -148,10 +148,13 @@ class ItemController extends ActionController {
 				throw new StopActionException();
 			}
 
-			$search = $this->parameterService->getParameterRaw('search');
 			/** @var \Innologi\Decosdata\Service\SearchService $searchService */
 			$this->searchService = $this->objectManager->get(\Innologi\Decosdata\Service\SearchService::class);
-			$this->searchService->enableSearch($search);
+			if (!$this->searchService->isActive()) {
+				$this->searchService->enableSearch(
+					$this->parameterService->getParameterRaw('search')
+				);
+			}
 		}
 	}
 
