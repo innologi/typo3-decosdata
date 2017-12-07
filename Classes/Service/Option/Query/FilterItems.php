@@ -53,14 +53,11 @@ class FilterItems extends OptionAbstract {
 		$conditions = [];
 		foreach ($args['filters'] as $filter) {
 			$this->initializeFilter($filter);
-			if (!isset($filter['value'][0])) {
-				// @TODO throw exception until we support parameter on this level as well
-			}
 			$conditions[] = $this->constraintFactory->createConstraintByValue(
 				$select->getField(),
 				$select->getTableAlias(),
 				$filter['operator'],
-				$filter['value']
+				$filter['value'] ?? $filter['parameter']
 			);
 		}
 

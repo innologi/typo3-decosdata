@@ -74,7 +74,7 @@ trait Filters {
 		if (!isset($filter['operator'][0])) {
 			throw new MissingArgument(1448897878, [self::class, 'filters.operator']);
 		}
-		if (!isset($filter['value'][0])) {
+		if (!isset($filter['value'])) {
 			if (!isset($filter['parameter'][0])) {
 				throw new MissingArgument(1448897891, [self::class, 'filters.value/parameter']);
 			}
