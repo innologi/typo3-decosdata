@@ -108,15 +108,24 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 	protected $sourceExtensionVersion = '0.0.0';
 
 	/**
+	 * If the source extension is not loaded, setting this override will
+	 * ignore the requirement if the extension's tables are found.
+	 *
+	 * @var string
+	 */
+	protected $overrideSourceRequirement = FALSE;
+
+	/**
 	 * Constructor
 	 *
 	 * If called from CLI, the parameter will be used to print messages.
 	 *
 	 * @param \Symfony\Component\Console\Style\SymfonyStyle $io
+	 * @param array $arguments
 	 * @return void
 	 * @throws Exception\NoExtkeySet
 	 */
-	public function __construct(SymfonyStyle $io = NULL) {
+	public function __construct(SymfonyStyle $io = NULL, array $arguments = []) {
 		if ( !isset($this->extensionKey[0]) ) {
 			throw new Exception\NoExtkeySet(1448616492);
 		}
@@ -147,6 +156,7 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 				throw new Exception\ImproperCliInit(1461682094);
 			}
 			$this->io = $io;
+			$this->overrideSourceRequirement = $arguments['overrideSourceRequirement'] ?? FALSE;
 		} else {
 			// in normal (non-CLI) mode, messages are queued
 			$this->flashMessageQueue = $objectManager->get(
@@ -226,8 +236,14 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 			// we don't use em_conf for this, because the requirement is only for
 			// the updater, not the entire extension
 
-			// is source extension is loaded?
+			// is source extension loaded?
 			if (!ExtensionManagementUtility::isLoaded($this->sourceExtensionKey)) {
+				if ($this->overrideSourceRequirement) {
+					if ($this->databaseService->doExtensionTablesExist($this->sourceExtensionKey)) {
+						// found at least one table
+						return;
+					}
+				}
 				throw new Exception\ExtensionNotLoaded(1448616650, array($this->sourceExtensionKey));
 			}
 			// does source extension meet version requirement?

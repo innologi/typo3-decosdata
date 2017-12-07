@@ -25,7 +25,7 @@ namespace Innologi\Decosdata\Library\ExtUpdate;
 use TYPO3\CMS\Extensionmanager\Utility\UpdateScriptUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
- * Ext Update Abstract
+ * Cli-Starter for ExtUpdate
  *
  * @package InnologiLibs
  * @subpackage ExtUpdate
@@ -38,11 +38,13 @@ class CliStarter extends UpdateScriptUtility {
 	 * Returns true, if ext_update class says it wants to run.
 	 *
 	 * @param string $extensionKey extension key
+	 * @param object $io I/O
+	 * @param array $arguments
 	 * @return mixed NULL, if update is not available, else update script return
 	 */
-	public function executeUpdateIfNeeded_cliSupport($extensionKey, $io) {
+	public function executeUpdateIfNeeded_cliSupport($extensionKey, $io, array $arguments = []) {
 		$className = $this->requireUpdateScript($extensionKey);
-		$scriptObject = GeneralUtility::makeInstance($className, $io);
+		$scriptObject = GeneralUtility::makeInstance($className, $io, $arguments);
 		return $scriptObject->access() ? $scriptObject->main() : NULL;
 	}
 

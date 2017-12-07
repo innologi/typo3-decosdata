@@ -73,6 +73,22 @@ class DatabaseService implements SingletonInterface {
 	}
 
 	/**
+	 * Returns whether extension tables exist.
+	 *
+	 * @param string $extensionKey
+	 * @return boolean
+	 */
+	public function doExtensionTablesExist($extensionKey) {
+		$tables = $this->databaseConnection->admin_get_tables();
+		foreach ($tables as $tableName => $tableData) {
+			if (strpos($tableName, 'tx_' . $extensionKey) === 0) {
+				return TRUE;
+			}
+		}
+		return FALSE;
+	}
+
+	/**
 	 * Migrates table data from one table to another.
 	 * Does not touch the source table data except for setting
 	 * a single reference uid property.
