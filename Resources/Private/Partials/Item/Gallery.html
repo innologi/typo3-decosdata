@@ -1,0 +1,19 @@
+<html data-namespace-typo3-fluid="true"
+	xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+	xmlns:d="http://typo3.org/ns/Innologi/Decosdata/ViewHelpers">
+
+<f:if condition="{data}">
+<d:pageBrowser xhrEnabled="{paging.xhr}" more="{paging.more}">
+<div class="data">
+	<f:for each="{data}" as="item">
+		<div class="item item-{item.id}">
+			<d:item.for configuration="{configuration.contentField}" item="{item}">
+				<div class="content content-{index}" data-cid="{index}">{content}</div>
+			</d:item.for>
+		</div>
+	</f:for>
+</div>
+</d:pageBrowser>
+</f:if>
+
+</html>

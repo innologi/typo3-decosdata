@@ -137,11 +137,11 @@ class PaginateService implements SingletonInterface {
 	/**
 	 * Paginate a Query object
 	 *
-	 * @param array $configuration
+	 * @param array &$configuration
 	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Query $query
 	 * @return void
 	 */
-	public function configurePagination(array $configuration, Query $query) {
+	public function configurePagination(array &$configuration, Query $query) {
 		$this->initializeConfiguration($configuration);
 
 		switch ($configuration['type']) {
@@ -151,6 +151,9 @@ class PaginateService implements SingletonInterface {
 			default:
 				$this->configureDefault($configuration, $query);
 		}
+
+		$configuration['resultCount'] = $this->resultCount;
+		$configuration['more'] = $this->active && $this->currentPage < $this->pageCount ? ($this->currentPage+1) : FALSE;
 	}
 
 	/**

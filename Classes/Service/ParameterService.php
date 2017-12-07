@@ -40,14 +40,14 @@ class ParameterService implements SingletonInterface {
 	// @LOW ___add support for other extension parameters?
 
 	/**
+	 * @var boolean
+	 */
+	protected $__initialized = FALSE;
+
+	/**
 	 * @var string
 	 */
 	protected $pluginNameSpace;
-
-	/**
-	 * @var \TYPO3\CMS\Extbase\Mvc\Web\Request
-	 */
-	protected $request;
 
 	/**
 	 * @var array
@@ -55,13 +55,56 @@ class ParameterService implements SingletonInterface {
 	protected $parameterCache = [];
 
 	/**
-	 * Set request object
+	 * @var array
+	 */
+	protected $arguments = [];
+
+	/**
+	 * @var array
+	 */
+	protected $levelParameters;
+
+	/**
+	 * Initializes through a request object
 	 *
 	 * @param \TYPO3\CMS\Extbase\Mvc\Web\Request $request
 	 * @return $this
 	 */
-	public function setRequest(\TYPO3\CMS\Extbase\Mvc\Web\Request $request) {
-		$this->request = $request;
+	public function initializeByRequest(\TYPO3\CMS\Extbase\Mvc\Web\Request $request) {
+		if ($this->__initialized !== TRUE) {
+			/** @var \TYPO3\CMS\Extbase\Service\ExtensionService $extensionService */
+			$extensionService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+				\TYPO3\CMS\Extbase\Object\ObjectManager::class
+			)->get(\TYPO3\CMS\Extbase\Service\ExtensionService::class);
+			$this->pluginNameSpace = $extensionService->getPluginNamespace(
+				$request->getControllerExtensionName(),
+				$request->getPluginName()
+			);
+
+			$this->arguments = $request->getArguments();
+			$this->__initialized = TRUE;
+		}
+		return $this;
+	}
+
+	/**
+	 * Initializes through given extension and plugin names
+	 *
+	 * @param string $extensionName
+	 * @param string $pluginName
+	 * @return $this
+	 */
+	public function initialize($extensionName, $pluginName) {
+		if ($this->__initialized !== TRUE) {
+			/** @var \TYPO3\CMS\Extbase\Service\ExtensionService $extensionService */
+			$extensionService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+				\TYPO3\CMS\Extbase\Object\ObjectManager::class
+			)->get(\TYPO3\CMS\Extbase\Service\ExtensionService::class);
+			$this->pluginNameSpace = $extensionService->getPluginNamespace($extensionName, $pluginName);
+
+			$this->arguments = \TYPO3\CMS\Core\Utility\GeneralUtility::_GPmerged($this->pluginNamespace);
+			$this->__initialized = TRUE;
+		}
 		return $this;
 	}
 
@@ -73,7 +116,7 @@ class ParameterService implements SingletonInterface {
 	 * @return boolean
 	 */
 	public function hasParameter($name) {
-		return $this->request->hasArgument($name);
+		return isset($this->arguments[$name]);
 	}
 
 	/**
@@ -84,7 +127,7 @@ class ParameterService implements SingletonInterface {
 	 * @return string
 	 */
 	public function getParameterRaw($name) {
-		return rawurldecode($this->request->getArgument($name));
+		return rawurldecode($this->arguments[$name]);
 	}
 
 	/**
@@ -165,16 +208,39 @@ class ParameterService implements SingletonInterface {
 	 * @return string
 	 */
 	public function wrapInPluginNamespace($name) {
-		if ($this->pluginNameSpace === NULL) {
-			/** @var \TYPO3\CMS\Extbase\Service\ExtensionService $extensionService */
-			$extensionService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-				\TYPO3\CMS\Extbase\Object\ObjectManager::class
-			)->get(\TYPO3\CMS\Extbase\Service\ExtensionService::class);
-			$this->pluginNameSpace = $extensionService->getPluginNamespace(
-				$this->request->getControllerExtensionName(),
-				$this->request->getPluginName()
-			);
-		}
 		return $this->pluginNameSpace . '[' . $name . ']';
 	}
+
+	/**
+	 * Encodes a parameter value for usage in URLs.
+	 *
+	 * @param string $value
+	 * @return string
+	 */
+	public function encodeParameter($value) {
+		return rawurlencode($value);
+	}
+
+	/**
+	 * Returns level parameters, including 'level'
+	 *
+	 * @return array
+	 */
+	public function getLevelParameters() {
+		if ($this->levelParameters === NULL) {
+			$copyArgs = $this->arguments;
+			$this->levelParameters = [];
+			if (isset($copyArgs['level'])) {
+				$this->levelParameters['level'] = $copyArgs['level'];
+				unset($copyArgs['level']);
+			}
+			foreach ($copyArgs as $name => $value) {
+				if (isset($name[1]) && $name[0] === '_' && is_numeric(substr($value, 1))) {
+					$this->levelParameters[$name] = $value;
+				}
+			}
+		}
+		return $this->levelParameters;
+	}
+
 }

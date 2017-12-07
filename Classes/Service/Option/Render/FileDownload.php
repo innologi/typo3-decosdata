@@ -34,7 +34,8 @@ use Innologi\Decosdata\Library\TagBuilder\TagInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileDownload extends FileOptionAbstract {
+class FileDownload implements OptionInterface {
+	use Traits\FileHandler;
 	// @TODO ___FileDownloadObscure: same file with arg, or different file?
 	// @TODO ___Absolute URIs for other contexts than normal HTML?
 	// @TODO ___add title and class?

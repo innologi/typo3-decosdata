@@ -81,17 +81,15 @@ class LinkLevel implements OptionInterface {
 		}
 
 		// @LOW _if we just read the latest _ argument, can't we derive level from there, so we can get rid of the level arg? we have to be sure that it's not read anywhere else
-		// @LOW _see if addQueryStringMethod is of any use to us
 		$uri = $service->getControllerContext()->getUriBuilder()
 			->reset()
-			->setAddQueryString(TRUE)
-			// @LOW _if we support a page argument per level, we could maintain current and previous levels through arguments. Another option would be the session
-			->setArgumentsToBeExcludedFromQueryString([$this->parameterService->wrapInPluginNamespace('page')])
-			->uriFor(NULL, [
-				// @LOW don't we want these details to reside in parameterService?
-				'level' => $args['level'],
-				'_' . $args['level'] => rawurlencode($linkValue)
-			]);
+			->uriFor(NULL, array_merge(
+				$this->parameterService->getLevelParameters(),
+				[
+					'level' => $args['level'],
+					'_' . $args['level'] => $this->parameterService->encodeParameter($linkValue)
+				]
+			));
 
 		// @TODO ___title and or other attributes? in tx_decospublisher, a title could be set through an argument, which would expand the query to include the field containing the title
 		return $service->getTagFactory()->createTag('a', ['href' => $uri], $tag);

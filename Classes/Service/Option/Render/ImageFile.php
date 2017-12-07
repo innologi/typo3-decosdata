@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -24,42 +24,53 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Innologi\Decosdata\Library\TagBuilder\TagInterface;
-use Innologi\Decosdata\Library\TagBuilder\TagContent;
 /**
- * File Size option
+ * Image File option
  *
- * Renders the filesize of the content, if content represents a valid file.
+ * Renders a file as an Image.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileSize implements OptionInterface {
+class ImageFile implements OptionInterface {
 	use Traits\FileHandler;
+	use Traits\ItemAccess;
+	// @TODO ___Absolute URIs for other contexts than normal HTML?
+
+	/**
+	 * @var \TYPO3\CMS\Extbase\Service\ImageService
+	 * @inject
+	 */
+	protected $imageService;
 
 	/**
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
+	 * @see \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
 		if ( !$this->isFileHandle($service->getOriginalContent()) || ($file = $this->getFileObject($this->fileUid)) === NULL) {
 			return $tag;
 		}
+		// @LOW no check on whether it really is an image?
+		$processingInstructions = [
+			'width' => $args['width'] ?? NULL,
+			'height' => $args['height'] ?? NULL,
+		];
+		$processedImage = $this->imageService->applyProcessingInstructions($file, $processingInstructions);
+		$imageUri = $this->imageService->getImageUri($processedImage);
 
-		$content = GeneralUtility::formatSize(
-			$file->getSize(),
-			// @TODO ___get default format from typoscript?
-			// @LOW ___support formatting argument?
-			'b|kb|MB|GB|TB'
-		);
-
-		if ($tag instanceof TagContent) {
-			return $tag->reset()->setContent($content);
+		$attributes = [
+			'src' => $imageUri,
+			'class' => 'file-' . $this->fileUid
+		];
+		if (isset($args['alt'][0])) {
+			$attributes['alt'] = $this->itemAccess($args['alt'], $service);
 		}
 
-		return $service->getTagFactory()->createTagContent($content);
+		return $service->getTagFactory()->createTag('img', $attributes);
 	}
 
 }

@@ -128,7 +128,11 @@ class CrumbPathViewHelper extends AbstractViewHelper {
 	 * @return array
 	 */
 	protected function createCrumbElement($level, $label) {
-		$exclude = [$this->parameterService->wrapInPluginNamespace('page')];
+		$exclude = [
+			// @TODO I'm doing this on multiple locations, so I should just put it in configuration somewhere and let parameterService do the rest
+			$this->parameterService->wrapInPluginNamespace('page'),
+			$this->parameterService->wrapInPluginNamespace('search')
+		];
 		for ($i=$this->currentLevel; $i>$level; $i--) {
 			$exclude[] = $this->parameterService->wrapInPluginNamespace('_' . $i);
 		}

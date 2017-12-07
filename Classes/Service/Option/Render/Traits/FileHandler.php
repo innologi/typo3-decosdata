@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Service\Option\Render;
+namespace Innologi\Decosdata\Service\Option\Render\Traits;
 /***************************************************************
  *  Copyright notice
  *
@@ -25,16 +25,15 @@ namespace Innologi\Decosdata\Service\Option\Render;
  ***************************************************************/
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
  /**
- * Abstract File Option class
+ * File Handler Trait
  *
- * Offers some basic file-related methods for use by RenderOptions,
- * that can be inherited by extending this abstract.
+ * Offers some basic file-related methods for use by RenderOptions.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-abstract class FileOptionAbstract implements OptionInterface {
+trait FileHandler {
 
 	/**
 	 * @var \TYPO3\CMS\Core\Resource\ResourceFactory

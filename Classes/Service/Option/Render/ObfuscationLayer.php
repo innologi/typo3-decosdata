@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -24,42 +24,35 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Innologi\Decosdata\Library\TagBuilder\TagInterface;
 use Innologi\Decosdata\Library\TagBuilder\TagContent;
 /**
- * File Size option
+ * Obfuscation Layer option
  *
- * Renders the filesize of the content, if content represents a valid file.
+ * Can be used to obfuscate an image, for instance.
+ * Note that this option relies on specific CSS.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileSize implements OptionInterface {
-	use Traits\FileHandler;
+class ObfuscationLayer implements OptionInterface {
 
 	/**
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( !$this->isFileHandle($service->getOriginalContent()) || ($file = $this->getFileObject($this->fileUid)) === NULL) {
-			return $tag;
-		}
-
-		$content = GeneralUtility::formatSize(
-			$file->getSize(),
-			// @TODO ___get default format from typoscript?
-			// @LOW ___support formatting argument?
-			'b|kb|MB|GB|TB'
-		);
-
+		$markLayer = '###LAYER###';
+		$layerTag = [$markLayer => $service->getTagFactory()->createTag('span', ['class' => 'obfuscate-layer'])->forceClosingTag(TRUE)];
 		if ($tag instanceof TagContent) {
-			return $tag->reset()->setContent($content);
+			$tag->setContent($markLayer . $tag->getContent())->addMarkReplacements($layerTag);
+		} else {
+			$markObfuscated = '###OBFUSCATED###';
+			$tag = $service->getTagFactory()->createTagContent($markLayer . $markObfuscated, $layerTag + [$markObfuscated => $tag]);
 		}
 
-		return $service->getTagFactory()->createTagContent($content);
+		return $service->getTagFactory()->createTag('span', ['class' => 'obfuscate'], $tag);
 	}
 
 }

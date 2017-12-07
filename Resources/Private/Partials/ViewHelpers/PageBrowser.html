@@ -4,9 +4,9 @@
 
 <f:if condition="{renderAbove}">
 	<div class="pagebrowser pagebrowser-top">
-		<d:render section="pagebrowser" arguments="{configuration: pageBrowser}" />
+		<d:render section="pagebrowser" arguments="{configuration:pageBrowser}" />
 		<f:if condition="{includeResultCountAbove}">
-			<d:render section="resultcount" arguments="{resultCount: resultCount}" />
+			<d:render section="resultcount" arguments="{resultCount:resultCount}" />
 		</f:if>
 	</div>
 </f:if>
@@ -16,9 +16,9 @@
 <f:if condition="{renderBelow}">
 	<div class="pagebrowser pagebrowser-bottom">
 		<f:if condition="{includeResultCountBelow}">
-			<d:render section="resultcount" arguments="{resultCount: resultCount}" />
+			<d:render section="resultcount" arguments="{resultCount:resultCount}" />
 		</f:if>
-		<d:render section="pagebrowser" arguments="{configuration: pageBrowser}" />
+		<d:render section="pagebrowser" arguments="{configuration:pageBrowser}" />
 	</div>
 </f:if>
 
@@ -67,7 +67,32 @@
 </f:section>
 
 <f:section name="resultcount">
-<div class="resultcount"><f:translate key="pagebrowser.resultCount" arguments="{0: resultCount}" /></div>
+<div class="resultcount" data-count="{resultCount}"><f:translate key="pagebrowser.resultCount" arguments="{0: resultCount}" /></div>
+</f:section>
+
+<f:section name="xhr">
+	<f:if condition="{renderAbove}">
+		<div class="pagebrowser pagebrowser-top">
+			<f:if condition="{includeResultCountAbove}">
+				<d:render section="resultcount" arguments="{resultCount:resultCount}" />
+			</f:if>
+		</div>
+	</f:if>
+	
+	<f:format.raw>{content}</f:format.raw>
+	
+	<f:if condition="{renderBelow}">
+		<div class="pagebrowser pagebrowser-bottom">
+			<f:if condition="{includeResultCountBelow}">
+				<d:render section="resultcount" arguments="{resultCount:resultCount}" />
+			</f:if>
+		</div>
+	</f:if>
+	
+	<f:if condition="{xhrUri}">
+		<a class="xhr-paging loader inactive" title="{f:translate(key:'pagebrowser.next')}"
+			href="{f:uri.action(arguments:{page:nextPage}, addQueryString:1)}" data-xhr="{xhrUri}"></a>
+	</f:if>
 </f:section>
 
 </html>

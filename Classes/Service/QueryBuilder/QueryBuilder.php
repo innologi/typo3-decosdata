@@ -65,6 +65,12 @@ class QueryBuilder {
 	 */
 	protected $paginateService;
 
+	/**
+	 * @var \Innologi\Decosdata\Service\SearchService
+	 * @inject
+	 */
+	protected $searchService;
+
 	// @TODO ___doc?
 	// @TODO ___refactor such huge methods
 	// @LOW ___review the ids/keys given to froms/constraints in all methods?
@@ -76,7 +82,7 @@ class QueryBuilder {
 	 * @param array $import
 	 * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Query
 	 */
-	public function buildListQuery(array $configuration, array $import) {
+	public function buildListQuery(array &$configuration, array $import) {
 		/** @var $query \Innologi\Decosdata\Service\QueryBuilder\Query\Query */
 		$query = $this->objectManager->get(Query::class);
 
@@ -133,8 +139,13 @@ class QueryBuilder {
 			$query->addParameter(':itemtype', $configuration['itemType']);
 		}
 
+		// apply search configuration
+		if (isset($configuration['searchable']) && is_array($configuration['searchable']) && $this->searchService->isActive()) {
+			$configuration['queryOptions'] = $this->searchService->configureSearch($configuration['searchable'], $configuration['queryOptions']);
+		}
+
 		// apply item-wide query options
-		if (isset($configuration['queryOptions'])) {
+		if (isset($configuration['queryOptions']) && is_array($configuration['queryOptions'])) {
 			// @TODO ___item wide options, e.g. filter/child view????
 			$this->optionService->processRowOptions($configuration['queryOptions'], $query);
 		}
@@ -153,7 +164,7 @@ class QueryBuilder {
 		}
 
 		// apply pagination settings
-		if (isset($configuration['paginate'])) {
+		if (isset($configuration['paginate']) && is_array($configuration['paginate'])) {
 			$this->paginateService->configurePagination($configuration['paginate'], $query);
 		}
 

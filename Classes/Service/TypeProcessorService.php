@@ -25,6 +25,8 @@ namespace Innologi\Decosdata\Service;
  ***************************************************************/
 use Innologi\Decosdata\Exception\ConfigurationError;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
+use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 /**
  * Item controller
  *
@@ -53,14 +55,32 @@ class TypeProcessorService implements SingletonInterface {
 	protected $queryBuilder;
 
 	/**
+	 * @var \Innologi\Decosdata\Service\Option\RenderOptionService
+	 * @inject
+	 */
+	protected $optionService;
+	// @LOW don't inject this one
+	/**
+	 * @var \Innologi\Decosdata\Library\AssetProvider\ProviderServiceInterface
+	 * @inject
+	 */
+	protected $assetProviderService;
+
+	/**
 	 * @var \TYPO3\CMS\Core\TypoScript\TypoScriptService
 	 */
 	protected $typoScriptService;
 
 	/**
-	 * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
+	 * @var ConfigurationManagerInterface
 	 */
-	protected $contentObjectRenderer;
+	protected $configurationManager;
+
+	/**
+	 * @var ControllerContext
+	 */
+	protected $controllerContext;
+
 
 	public function getTypoScriptService() {
 		if ($this->typoScriptService === NULL) {
@@ -69,18 +89,26 @@ class TypeProcessorService implements SingletonInterface {
 		return $this->typoScriptService;
 	}
 
-	public function getContentObjectRenderer() {
-		if ($this->contentObjectRenderer === NULL) {
-			$this->contentObjectRenderer = $this->objectManager->get(
-				\TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface::class
-			)->getContentObject();
+	public function getConfigurationManager() {
+		if ($this->configurationManager === NULL) {
+			$this->configurationManager = $this->objectManager->get(ConfigurationManagerInterface::class);
 		}
-		return $this->contentObjectRenderer;
+		return $this->configurationManager;
+	}
+
+	/**
+	 * Sets controller context
+	 *
+	 * @param ControllerContext $controllerContext
+	 * @return void
+	 */
+	public function setControllerContext(ControllerContext $controllerContext) {
+		$this->controllerContext = $controllerContext;
+		$this->optionService->setControllerContext($controllerContext);
 	}
 
 
-
-	public function processTypeRecursion(array $configuration, array $import) {
+	public function processTypeRecursion(array &$configuration, array $import, $index = 0) {
 		$content = [];
 
 		// level types are required here
@@ -93,30 +121,33 @@ class TypeProcessorService implements SingletonInterface {
 			unset($configuration['_typoScriptNodeValue']);
 			switch ($type) {
 				case '_COA':
-					foreach ($configuration as $conf) {
-						$content = array_merge($content, $this->processTypeRecursion($conf, $import));
+					foreach ($configuration as $index => $conf) {
+						// don't use array_merge, so we can keep our indexes
+						$content = $content + $this->processTypeRecursion($conf, $import, $index);
 					}
 					break;
 				default:
-					$formattedType = ucfirst(strtolower(substr($type, 1)));
+					$lType = strtolower(substr($type, 1));
+					$formattedType = ucfirst($lType);
 					$method = 'process' . $formattedType;
 					if (!method_exists($this, $method)) {
 						// @TODO throw exception
 					}
-					$content[] = [
-						'partial' => 'Item/' . $formattedType,
+					$content[$index] = [
+						'partial' => $configuration['partial'] ?? 'Item/' . $formattedType,
+						'type' => $lType,
 						'configuration' => $configuration,
-						'data' => $this->{$method}($configuration, $import)
+						'data' => $this->{$method}($configuration, $import),
+						'paging' => $this->processPaging($configuration, $index)
 					];
 			}
 		} else {
 			// consider this a normal TYPO3 ContentObject
-			/** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $contentObjectRenderer */
-			$contentObjectRenderer = $GLOBALS['TSFE']->cObj;
-			$content[] = [
-				'partial' => 'ContentObject',
+			$content[$index] = [
+				'partial' => $configuration['partial'] ?? 'ContentObject',
+				'type' => strtolower($type),
 				'configuration' => $configuration,
-				'data' => $this->getContentObjectRenderer()->cObjGetSingle(
+				'data' => $this->getConfigurationManager()->getContentObject()->cObjGetSingle(
 					$type, $this->getTypoScriptService()->convertPlainArrayToTypoScriptArray($configuration)
 				)
 			];
@@ -125,27 +156,135 @@ class TypeProcessorService implements SingletonInterface {
 		return $content;
 	}
 
-	public function processList(array $configuration, array $import) {
+	public function processList(array &$configuration, array $import) {
 		# @TODO remove debugging!
-		$items = $this->itemRepository->findWithStatement(
-			($statement = $this->queryBuilder->buildListQuery(
-				$configuration, $import
-			)->createStatement())
+		$items = $this->processRenderOptions(
+			$this->itemRepository->findWithStatement(
+				($statement = $this->queryBuilder->buildListQuery(
+					$configuration, $import
+				)->createStatement())
+			),
+			$configuration
 		);
 		$test = $statement->getProcessedQuery();
+
 		return $items;
 	}
 
-	public function processShow(array $configuration, array $import) {
-		$items = $this->itemRepository->findWithStatement(
-			$this->queryBuilder->buildListQuery(
-				$configuration, $import
-			)->setLimit(
-				1
-			)->createStatement()
+	public function processShow(array &$configuration, array $import) {
+		$items = $this->processRenderOptions(
+			$this->itemRepository->findWithStatement(
+				$this->queryBuilder->buildListQuery(
+					$configuration, $import
+				)->setLimit(
+					1
+				)->createStatement()
+			),
+			$configuration
 		);
 
 		return $items[0] ?? NULL;
 	}
 
+	public function processGallery(array &$configuration, array $import) {
+		return $this->processList($configuration, $import);
+	}
+
+	public function processMedia(array &$configuration, array $import) {
+		return $this->processShow($configuration, $import);
+	}
+
+	public function processSearch(array &$configuration) {
+		/** @var \Innologi\Decosdata\Service\SearchService $searchService */
+		$searchService = $this->objectManager->get(\Innologi\Decosdata\Service\SearchService::class);
+		$data = [
+			'search' => ($searchService->isActive() ? $searchService->getSearchString() : ''),
+			'targetLevel' => ($configuration['level'] ?? NULL)
+		];
+
+		if (isset($configuration['xhr']) && is_array($configuration['xhr'])) {
+			$data['section'] = (int) $configuration['xhr']['source'] ?? 0;
+			$settings = $this->getConfigurationManager()->getConfiguration(
+				ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS
+			);
+			$data['xhrUri'] = $this->controllerContext->getUriBuilder()->reset()
+				->setCreateAbsoluteUri(TRUE)
+				->setTargetPageType($settings['api']['type'])
+				->uriFor('search', array_diff($data, ['search' => 1]));
+
+			if ($this->controllerContext->getRequest()->getFormat() === 'html') {
+				// provide assets as configured per feature
+				$this->assetProviderService->provideAssets('Item', 'xhr');
+			}
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Iterates through items to process RenderOptions.
+	 *
+	 * @param array $items
+	 * @param array $configuration
+	 * @return array
+	 */
+	protected function processRenderOptions(array $items, array $configuration) {
+		foreach ($items as &$item) {
+			foreach ($configuration['contentField'] as $index => $config) {
+				if (!isset($config['renderOptions'])) {
+					continue;
+				}
+				if (!isset($item['content' . $index])) {
+					// @TODO throw exception
+				}
+				$item['content' . $index] = $this->optionService->processOptions(
+					$config['renderOptions'],
+					$item['content' . $index],
+					$index,
+					$item
+				)->render();
+			}
+		}
+		return $items;
+	}
+
+	// @TODO clean up this method, its xhr component is setup inefficiently
+		// also this is really starting to get the opposite from transparent
+		// feels hacky because of the whole forcing single thing
+	protected function processPaging(array $configuration, $section) {
+		$paging = [];
+		if (isset($configuration['paginate']) && is_array($configuration['paginate'])) {
+			$paging = $configuration['paginate'];
+			// @TODO technically, this should be contained in paginateService, but it doesn't have the controllerContext yet
+			if (isset($paging['xhr']) && (bool)$paging['xhr'] && isset($paging['more']) && $paging['more'] !== FALSE) {
+				$arguments = [
+					'page' => $paging['more'],
+					'section' => $section
+				];
+				if ($this->controllerContext->getRequest()->hasArgument('search')) {
+					$arguments['search'] = $this->controllerContext->getRequest()->getArgument('search');
+				}
+				$settings = $this->getConfigurationManager()->getConfiguration(
+					ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS
+				);
+				$paging['more'] = $this->controllerContext->getUriBuilder()->reset()
+					->setCreateAbsoluteUri(TRUE)
+					->setAddQueryString(TRUE)
+					->setTargetPageType($settings['api']['type'])
+					->uriFor(
+						// overrule current action on queryString in case of forward
+						//$this->controllerContext->getRequest()->getControllerActionName(),
+							// is there every any reason this would not be ok?
+						'single',
+						$arguments
+					);
+			}
+
+			if ($this->controllerContext->getRequest()->getFormat() === 'html') {
+				// provide assets as configured per feature
+				$this->assetProviderService->provideAssets('Item', 'xhr');
+			}
+		}
+		return $paging;
+	}
 }

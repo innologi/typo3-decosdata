@@ -39,6 +39,7 @@ use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class AddTagAttributes implements OptionInterface {
+	use Traits\ItemAccess;
 	// @LOW ___allow this to be set via configuration? TS? or maybe even args?
 	/**
 	 * @var string
@@ -52,6 +53,14 @@ class AddTagAttributes implements OptionInterface {
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
 		if ( !(isset($args['attributes']) && is_array($args['attributes'])) ) {
 			throw new MissingArgument(1466180012, array(self::class, 'attributes'));
+		}
+
+		// resolve any attempts for item access
+		if (isset($args['attributes']['alt'])) {
+			$args['attributes']['alt'] = $this->itemAccess($args['attributes']['alt'], $service);
+		}
+		if (isset($args['attributes']['title'])) {
+			$args['attributes']['title'] = $this->itemAccess($args['attributes']['title'], $service);
 		}
 
 		// if not an actual Tag, enclose it with one with all the attributes and return it

@@ -24,6 +24,7 @@ namespace Innologi\Decosdata\Controller;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Item controller
@@ -59,6 +60,11 @@ class ItemController extends ActionController {
 	protected $parameterService;
 
 	/**
+	 * @var \Innologi\Decosdata\Service\SearchService
+	 */
+	protected $searchService;
+
+	/**
 	 * @var array
 	 */
 	protected $activeConfiguration;
@@ -74,39 +80,50 @@ class ItemController extends ActionController {
 	protected $level = 1;
 
 	/**
+	 * @var boolean
+	 */
+	protected $apiMode = FALSE;
+
+	/**
 	 * {@inheritDoc}
 	 * @see \TYPO3\CMS\Extbase\Mvc\Controller\ActionController::initializeAction()
 	 */
 	protected function initializeAction() {
-		$this->parameterService->setRequest($this->request);
+		$this->parameterService->initializeByRequest($this->request);
 		$this->level = $this->parameterService->getParameterNormalized('level');
 
-		// set imports, stage 1: find flexform override before TS overrides get in effect
-		if (isset($this->settings['override']['import'][0])) {
-			$this->import = GeneralUtility::intExplode(',', $this->settings['override']['import'], TRUE);
+		// detect and set apiMode defaults
+		$this->apiMode = (int)$GLOBALS['TSFE']->type === (int)$this->settings['api']['type'];
+		if ($this->apiMode && !$this->parameterService->hasParameter('format')) {
+			// default API format
+			$this->request->setFormat(
+				$this->settings['api']['defaultFormat']
+			);
 		}
 
 		// @LOW cache?
 		// check override TS
-		if (isset(trim($this->settings['override']['ts'])[0])) {
+		if (isset(trim($this->settings['override']['publish'])[0])) {
 			/** @var \TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser $tsParser */
 			$tsParser = GeneralUtility::makeInstance(\TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser::class);
-			$tsParser->parse($this->settings['override']['ts']);
-			// completely replace original settings
-			$this->settings = $this->typeProcessor
+			$tsParser->parse($this->settings['override']['publish']);
+			// completely replace original publicationsettings
+			$this->settings['publish'] = $this->typeProcessor
 				->getTypoScriptService()
 				->convertTypoScriptArrayToPlainArray($tsParser->setup);
 		}
 
-		// set imports, stage 2: no flexform overrides? get it from TS
-		if ($this->import === NULL) {
-			$this->import = $this->settings['import'] ?? [];
+		// set imports, flexform override -> publish ts -> []
+		if (isset($this->settings['override']['import'][0])) {
+			$this->import = GeneralUtility::intExplode(',', $this->settings['override']['import'], TRUE);
+		} else {
+			$this->import = $this->settings['publish']['import'] ?? [];
 		}
 
 		// initialize breadcrumb
-		if (isset($this->settings['breadcrumb']) && is_array($this->settings['breadcrumb'])) {
+		if (isset($this->settings['publish']['breadcrumb']) && is_array($this->settings['publish']['breadcrumb'])) {
 			// @LOW this being optional, means I probably shouldn't inject it
-			$this->breadcrumbService->configureBreadcrumb($this->settings['breadcrumb'], $this->import);
+			$this->breadcrumbService->configureBreadcrumb($this->settings['publish']['breadcrumb'], $this->import);
 		}
 
 		#if ($this->request->hasArgument('_' . $this->level)) {
@@ -115,8 +132,103 @@ class ItemController extends ActionController {
 		#}
 
 		// @LOW ___will probably require some validation to see if provided level exists in available configuration
-		$this->activeConfiguration = $this->settings['level'][$this->level];
+		$this->activeConfiguration = $this->settings['publish']['level'][$this->level];
+
+		// validate search
+		if ($this->parameterService->hasParameter('search')) {
+			// @TODO make sure caching is safe before disabling this. GET requests are cached correctly if I do this,
+			// but I seem to be able to manually change the post request for it to contain different search terms
+			// so I'm seeing quite an opportunity for automated cache pollution if I disable this without further changes.
+			// The thing is, I'm caching the search plugin as part of default action, so I can't just put a CSRF token in there.
+			// Can I somehow make my sections behave as USER_INT? But then it becomes yet another hacky mess..
+			$contentObject = $this->configurationManager->getContentObject();
+			if ($contentObject->getUserObjectType() === \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::OBJECTTYPE_USER) {
+				$contentObject->convertToUserIntObject();
+				// will recreate the object, so we have to stop the request here
+				throw new StopActionException();
+			}
+
+			$search = $this->parameterService->getParameterRaw('search');
+			/** @var \Innologi\Decosdata\Service\SearchService $searchService */
+			$this->searchService = $this->objectManager->get(\Innologi\Decosdata\Service\SearchService::class);
+			$this->searchService->enableSearch($search);
+		}
 	}
+
+	/**
+	 * Run multiple publish-configurations and/or custom TS elements as a single cohesive content element + overarching template.
+	 *
+	 * @return void
+	 */
+	public function multiAction() {
+		$this->view->assign('level', $this->level);
+		$this->view->assign(
+			'contentSections',
+			$this->typeProcessor->processTypeRecursion(
+				$this->activeConfiguration, $this->import
+			)
+		);
+	}
+
+	/**
+	 * Run a single out of multiple publish-configurations and/or custom TS elements.
+	 *
+	 * @param integer $section
+	 * @return void
+	 */
+	public function singleAction($section) {
+		$this->activeConfiguration = $this->activeConfiguration[$section] ?? [];
+
+		// @LOW maybe support non-xhr modes as well?
+		// enable xhr mode on pagination as well
+		if ($this->apiMode && isset($this->activeConfiguration['paginate']) && is_array($this->activeConfiguration['paginate'])) {
+			$this->activeConfiguration['paginate']['xhr'] = TRUE;
+		}
+
+		$this->view->assign('level', $this->level);
+		$this->view->assign(
+			'section',
+			current(
+				$this->typeProcessor->processTypeRecursion(
+					$this->activeConfiguration, $this->import, $section
+				)
+			)
+		);
+	}
+
+	/**
+	 * Search request validation and redirect.
+	 * Search can actually be done in any action, but POST search needs to be done through this one.
+	 *
+	 * @return void
+	 */
+	public function searchAction() {
+		$arguments = [];
+		$action = 'multi';
+
+		// we're only passing along our search parameter if it is a sensible one
+		if ($this->searchService->isActive()) {
+			$arguments['search'] = $this->parameterService->encodeParameter(
+				$this->searchService->getSearchString()
+			);
+		}
+
+		// if we don't need to pass along the level parameter: don't
+		if ($this->level > 1) {
+			$arguments['level'] = $this->level;
+		}
+
+		// pass any section parameter
+		if ($this->parameterService->hasParameter('section')) {
+			$arguments['section'] = $this->parameterService->getParameterValidated('section');
+			$action = 'single';
+		}
+
+		// redirect to default action
+		$this->redirectOrForward($action, NULL, NULL, $arguments);
+	}
+
+
 
 	/**
 	 * Show single item details per publication configuration.
@@ -124,8 +236,8 @@ class ItemController extends ActionController {
 	 * @return void
 	 */
 	public function showAction() {
+		$this->view->assign('level', $this->level);
 		$this->view->assign('configuration', $this->activeConfiguration);
-		// @TODO what if NULL? doesn't the template break?
 		$this->view->assign(
 			'item',
 			$this->typeProcessor->processShow(
@@ -140,6 +252,7 @@ class ItemController extends ActionController {
 	 * @return void
 	 */
 	public function listAction() {
+		$this->view->assign('level', $this->level);
 		$this->view->assign('configuration', $this->activeConfiguration);
 		$this->view->assign(
 			'items',
@@ -150,17 +263,27 @@ class ItemController extends ActionController {
 	}
 
 	/**
-	 * Run multiple publish-configurations and/or custom TS elements as a single cohesive content element + overarching template.
+	 * Redirect wrapper. Detects API-mode and switches to forward() instead
+	 * since API-mode is not compatible with redirects.
 	 *
-	 * @return void
+	 * {@inheritDoc}
+	 * @see \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController::redirect()
 	 */
-	public function complexAction() {
-		$this->view->assign(
-			'contentSections',
-			$this->typeProcessor->processTypeRecursion(
-				$this->activeConfiguration, $this->import
-			)
-		);
+	protected function redirectOrForward(...$args) {
+		if ($this->apiMode) {
+			$this->forward($args[0], $args[1], $args[2], $args[3]);
+		} else {
+			$this->redirect(...$args);
+		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @see \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController::buildControllerContext()
+	 */
+	protected function buildControllerContext() {
+		$controllerContext = parent::buildControllerContext();
+		$this->typeProcessor->setControllerContext($controllerContext);
+		return $controllerContext;
+	}
 }

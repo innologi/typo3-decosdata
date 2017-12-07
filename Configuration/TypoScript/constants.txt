@@ -15,6 +15,10 @@ plugin.tx_decosdata {
 		# cat=plugin.tx_decosdata/file/050; type=string; label=Frontend CSS file
 		frontendFile = EXT:decosdata/Resources/Public/Css/frontend.min.css
 	}
+	javascript {
+		# cat=plugin.tx_decosdata/file/070; type=string; label=Decosdata XHR JS file
+		decosdataXhr = EXT:decosdata/Resources/Private/JavaScript/DecosdataXhr.js
+	}
 }
 
 module.tx_decosdata {

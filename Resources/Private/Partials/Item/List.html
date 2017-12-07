@@ -3,24 +3,29 @@
 	xmlns:d="http://typo3.org/ns/Innologi/Decosdata/ViewHelpers">
 
 <f:if condition="{data}">
-<d:pageBrowser>
-<table class="data list">
+<d:pageBrowser xhrEnabled="{paging.xhr}" more="{paging.more}">
+<table class="data">
 	<thead>
 		<tr>
 			<f:for each="{configuration.contentField}" as="column" key="index">
-				<d:content.render tag="th" tagAttributes="{scope: 'col'}" options="{column.title.renderOptions}" index="{index}">
-					{column.title.value}
-				</d:content.render>
+				<f:if condition="{column.title}">
+					<f:then>
+						<d:content.render tag="th" tagAttributes="{scope: 'col'}" options="{column.title.renderOptions}" index="{index}">
+							{column.title.value}
+						</d:content.render>
+					</f:then>
+					<f:else>
+						<th scope="col"></th>
+					</f:else>
+				</f:if>
 			</f:for>
 		</tr>
 	</thead>
 	<tbody>
 		<f:for each="{data}" as="item">
-			<tr class="item-{item.id}">
+			<tr class="item item-{item.id}">
 				<d:item.for configuration="{configuration.contentField}" item="{item}">
-					<d:content.render tag="td" options="{contentConfiguration.renderOptions}" item="{item}" index="{index}">
-						{content}
-					</d:content.render>
+					<td class="content content-{index}" data-cid="{index}">{content}</td>
 				</d:item.for>
 			</tr>
 		</f:for>

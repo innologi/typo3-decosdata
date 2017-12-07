@@ -1,9 +1,9 @@
 <?php
-namespace Innologi\Decosdata\Service\Option\Render;
+namespace Innologi\Decosdata\Service\Option\Render\Traits;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -24,42 +24,39 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Innologi\Decosdata\Library\TagBuilder\TagInterface;
-use Innologi\Decosdata\Library\TagBuilder\TagContent;
 /**
- * File Size option
+ * Item Access Trait
  *
- * Renders the filesize of the content, if content represents a valid file.
+ * Contains methods and properties used to process item-accessing option arguments.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileSize implements OptionInterface {
-	use Traits\FileHandler;
+trait ItemAccess {
 
 	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
+	 * @var string
 	 */
-	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( !$this->isFileHandle($service->getOriginalContent()) || ($file = $this->getFileObject($this->fileUid)) === NULL) {
-			return $tag;
+	protected $pattern = '^\{item:([a-zA-Z0-9]+)\}$';
+
+	/**
+	 *
+	 * @param string $argValue
+	 * @param RenderOptionService $service
+	 * @return string
+	 */
+	protected function itemAccess($argValue, RenderOptionService $service) {
+		$match = [];
+		if ( !(is_string($argValue) && preg_match('/' . $this->pattern . '/', $argValue, $match)) ) {
+			return $argValue;
 		}
 
-		$content = GeneralUtility::formatSize(
-			$file->getSize(),
-			// @TODO ___get default format from typoscript?
-			// @LOW ___support formatting argument?
-			'b|kb|MB|GB|TB'
-		);
-
-		if ($tag instanceof TagContent) {
-			return $tag->reset()->setContent($content);
+		$item = $service->getItem();
+		if (!isset($item[$match[1]])) {
+			// @TODO throw exception if the field requested does not exist
 		}
-
-		return $service->getTagFactory()->createTagContent($content);
+		return $item[$match[1]];
 	}
 
 }

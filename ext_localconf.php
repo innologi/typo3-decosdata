@@ -8,10 +8,12 @@ $ll = 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_be.xlf:';
 	'Innologi.' . $_EXTKEY,
 	'Publish',
 	[
-		'Item' => 'complex',
+		'Item' => 'multi,single,search'
 	],
 	// non-cacheable actions
-	[]
+	[
+		'Item' => 'search'
+	]
 );
 
 // add scheduler tasks
