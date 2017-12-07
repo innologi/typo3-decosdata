@@ -60,6 +60,11 @@ class ParameterService implements SingletonInterface {
 	protected $arguments = [];
 
 	/**
+	 * @var array
+	 */
+	protected $levelParameters;
+
+	/**
 	 * Initializes through a request object
 	 *
 	 * @param \TYPO3\CMS\Extbase\Mvc\Web\Request $request
@@ -217,19 +222,25 @@ class ParameterService implements SingletonInterface {
 	}
 
 	/**
-	 * Returns API query string
+	 * Returns level parameters, including 'level'
 	 *
-	 * @param integer $section
-	 * @param integer $level
-	 * @return string
+	 * @return array
 	 */
-	public function getApiQueryString($section = 0, $level = 1) {
-		$queryParams = [
-			'eid=decosdata_api',
-			'id=' . (int) $GLOBALS['TSFE']->id,
-			'level=' . (int) $level,
-			'section=' . (int) $section
-		];
-		return '?' . join('&', $queryParams);
+	public function getLevelParameters() {
+		if ($this->levelParameters === NULL) {
+			$copyArgs = $this->arguments;
+			$this->levelParameters = [];
+			if (isset($copyArgs['level'])) {
+				$this->levelParameters['level'] = $copyArgs['level'];
+				unset($copyArgs['level']);
+			}
+			foreach ($copyArgs as $name => $value) {
+				if (isset($name[1]) && $name[0] === '_' && is_numeric(substr($value, 1))) {
+					$this->levelParameters[$name] = $value;
+				}
+			}
+		}
+		return $this->levelParameters;
 	}
+
 }
