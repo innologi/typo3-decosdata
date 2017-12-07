@@ -30,12 +30,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Innologi\Decosdata\Library\ExtUpdate\CliStarter;
 /**
- * Starts Migrate Update script from CLI, if called from the TYPO3 CLI dispatcher.
+ * Migrate Command
  *
- * Example usage:
- * -> php ./typo3/cli_dispatch.phpsh decosdata:migrate
- *
- * @author Frenck Lutke <http://frencklutke.nl/>
+ * @package decosdata
+ * @author Frenck Lutke
+ * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class MigrateCommand extends Command {
 
