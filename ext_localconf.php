@@ -23,10 +23,3 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][\Innologi\Decosd
 	'description'      => $ll . 'task_importer.description',
 	'additionalFields' => \Innologi\Decosdata\Task\ImporterAdditionalFieldProvider::class
 );
-
-// Register CLI keys
-$TYPO3_CONF_VARS['SC_OPTIONS']['GLOBAL']['cliKeys'][$_EXTKEY . ':migrate'] = array(
-	'EXT:' . $_EXTKEY . '/cli/migrate_cli_dispatch.php',
-	// @LOW ___change to relevant user?
-	'_CLI_lowlevel'
-);

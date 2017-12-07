@@ -40,9 +40,9 @@ class CliStarter extends UpdateScriptUtility {
 	 * @param string $extensionKey extension key
 	 * @return mixed NULL, if update is not available, else update script return
 	 */
-	public function executeUpdateIfNeeded($extensionKey, $cli) {
+	public function executeUpdateIfNeeded_cliSupport($extensionKey, $io) {
 		$className = $this->requireUpdateScript($extensionKey);
-		$scriptObject = GeneralUtility::makeInstance($className, $cli);
+		$scriptObject = GeneralUtility::makeInstance($className, $io);
 		return $scriptObject->access() ? $scriptObject->main() : NULL;
 	}
 

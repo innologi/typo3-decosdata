@@ -25,7 +25,7 @@ namespace Innologi\Decosdata\Library\ExtUpdate;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Core\Controller\CommandLineController;
+use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Ext Update Abstract
  *
@@ -43,26 +43,31 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 	protected $flashMessageQueue;
 
 	/**
-	 * @var \TYPO3\CMS\Core\Controller\CommandLineController
+	 * @var \Symfony\Component\Console\Style\SymfonyStyle
 	 */
-	protected $cli;
+	protected $io;
+
+	/**
+	 * @var boolean
+	 */
+	protected $cliMode = FALSE;
 
 	/**
 	 * @var array
 	 */
-	protected $cliAllowedSeverities = array(
-		FlashMessage::OK => TRUE,
-		FlashMessage::WARNING => TRUE,
-		FlashMessage::ERROR => TRUE
-	);
+	protected $cliAllowedSeverities = [
+		FlashMessage::OK => 'success',
+		FlashMessage::WARNING => 'warning',
+		FlashMessage::ERROR => 'error'
+	];
 
 	/**
 	 * @var array
 	 */
-	protected $cliErrorSeverities = array(
+	protected $cliErrorSeverities = [
 		FlashMessage::WARNING => TRUE,
 		FlashMessage::ERROR => TRUE
-	);
+	];
 
 	/**
 	 * @var integer
@@ -107,11 +112,11 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 	 *
 	 * If called from CLI, the parameter will be used to print messages.
 	 *
-	 * @param \TYPO3\CMS\Core\Controller\CommandLineController $cli
+	 * @param \Symfony\Component\Console\Style\SymfonyStyle $io
 	 * @return void
 	 * @throws Exception\NoExtkeySet
 	 */
-	public function __construct(CommandLineController $cli = NULL) {
+	public function __construct(SymfonyStyle $io = NULL) {
 		if ( !isset($this->extensionKey[0]) ) {
 			throw new Exception\NoExtkeySet(1448616492);
 		}
@@ -135,15 +140,13 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 		);
 
 		// determine mode
-		if (!defined('TYPO3_cliMode')) {
-			define('TYPO3_cliMode', FALSE, TRUE);
-		}
-		if (TYPO3_cliMode) {
+		$this->cliMode = TYPO3_REQUESTTYPE & TYPO3_REQUESTTYPE_CLI;
+		if ($this->cliMode) {
 			// in CLI mode, messages are to be printed
-			if ($cli === NULL) {
+			if ($io === NULL) {
 				throw new Exception\ImproperCliInit(1461682094);
 			}
-			$this->cli = $cli;
+			$this->io = $io;
 		} else {
 			// in normal (non-CLI) mode, messages are queued
 			$this->flashMessageQueue = $objectManager->get(
@@ -166,7 +169,7 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 			// CLI mode will loop until finished
 			do {
 				$finished = $this->processUpdates();
-			} while (TYPO3_cliMode && $this->errorCount < 1 && !$finished);
+			} while ($this->cliMode && $this->errorCount < 1 && !$finished);
 
 			// if not finished, we'll add the instruction to run the updater again
 			if ($finished) {
@@ -195,7 +198,7 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 				FlashMessage::ERROR
 			);
 		}
-		return TYPO3_cliMode ? '' : $this->flashMessageQueue->renderFlashMessages();
+		return $this->cliMode ? '' : $this->flashMessageQueue->renderFlashMessages();
 	}
 
 	/**
@@ -249,9 +252,9 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 	 * @return void
 	 */
 	protected function addFlashMessage($messageBody, $messageTitle = '', $severity = \TYPO3\CMS\Core\Messaging\FlashMessage::OK) {
-		if (TYPO3_cliMode) {
+		if ($this->cliMode) {
 			if (isset($this->cliAllowedSeverities[$severity])) {
-				$this->cli->cli_echo($messageBody . PHP_EOL . PHP_EOL);
+				$this->io->{$this->cliAllowedSeverities[$severity]}($messageBody);
 			}
 			if (isset($this->cliErrorSeverities[$severity])) {
 				$this->errorCount++;

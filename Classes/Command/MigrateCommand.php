@@ -1,8 +1,9 @@
 <?php
+namespace Innologi\Decosdata\Command;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2016 Frenck Lutke <http://www.frencklutke.nl>
+ *  (c) 2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -22,7 +23,11 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Controller\CommandLineController;
+use TYPO3\CMS\Core\Core\Bootstrap;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Innologi\Decosdata\Library\ExtUpdate\CliStarter;
 /**
  * Starts Migrate Update script from CLI, if called from the TYPO3 CLI dispatcher.
@@ -32,21 +37,35 @@ use Innologi\Decosdata\Library\ExtUpdate\CliStarter;
  *
  * @author Frenck Lutke <http://frencklutke.nl/>
  */
-if (TYPO3_REQUESTTYPE & TYPO3_REQUESTTYPE_CLI && basename(PATH_thisScript) === 'cli_dispatch.phpsh') {
+class MigrateCommand extends Command {
 
-	/** @var CommandLineController $cli */
-	$cli = GeneralUtility::makeInstance(CommandLineController::class);
-
-	$message = '';
-	try {
-		/** @var CliStarter $extUpdater */
-		$extUpdater = GeneralUtility::makeInstance(CliStarter::class);
-		$extUpdater->executeUpdateIfNeeded('decosdata', $cli);
-	} catch (\Exception $e) {
-		$message = '[' . $e->getCode() . '] ' . $e->getMessage();
-		$cli->cli_echo($message . PHP_EOL);
+	/**
+	 * Configure the command by defining the name, options and arguments
+	 */
+	protected function configure() {
+		$this->setDescription('Migrate decospublisher-data to decosdata');
 	}
 
-} else {
-	die('This script needs to be called from the TYPO3 CLI dispatcher' . PHP_EOL);
+	/**
+	 * Executes the command for adding the lock file
+	 *
+	 * @param InputInterface $input
+	 * @param OutputInterface $output
+	 */
+	protected function execute(InputInterface $input, OutputInterface $output) {
+		// Make sure the _cli_ user is loaded
+		Bootstrap::getInstance()->initializeBackendAuthentication();
+
+		$io = new SymfonyStyle($input, $output);
+		$io->title($this->getDescription());
+
+		try {
+			/** @var CliStarter $extUpdater */
+			$extUpdater = GeneralUtility::makeInstance(CliStarter::class);
+			$extUpdater->executeUpdateIfNeeded_cliSupport('decosdata', $io);
+		} catch (\Exception $e) {
+			$io->error('[' . $e->getCode() . '] ' . $e->getMessage());
+		}
+	}
+
 }
