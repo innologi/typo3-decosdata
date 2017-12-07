@@ -67,7 +67,7 @@ class MigrateController extends ExtUpdateAbstract {
 	 *
 	 * @var array
 	 */
-	protected $lang = array(
+	protected $lang = [
 		// @TODO ___make an entry in the manual explaining how to protect files against unauthorized access
 		'dirMismatch' => 'The document path \'%1$s\' is different from the XML Import path \'%2$s\'. This is no longer supported. If this was applied for security-reasons, read the corresponding entry in the manual for alternatives. %3$s',
 		'dirMoveAutomatic' => 'Please move, copy or symlink the file-directory \'%1$s\' so that it is available at \'%2$s\'. The updater will automatically detect this at the next run.',
@@ -81,10 +81,9 @@ class MigrateController extends ExtUpdateAbstract {
 		'migrateManualTitle' => 'Can not automatically migrate %1$s',
 		'migrateSuccess' => 'Migrated %2$d \'%1$s\' records.',
 		'migrateWait' => 'Prerequisites for \'%1$s\' record migration not yet met.',
-		'nNothing' => 'No %1$s to %2$s.',
 		'pluginCreate' => 'It is recommended to create new plugins and delete the old ones once succesfully re-created. Only then will they disappear from the following list',
 		'profileImport' => 'You will need to re-import the profiles if you wish to use them. The following profiles were found to be not yet re-imported',
-	);
+	];
 
 	/**
 	 * Registers which migrations are finished, so that migrations
@@ -92,7 +91,7 @@ class MigrateController extends ExtUpdateAbstract {
 	 *
 	 * @var array
 	 */
-	protected $finishState = array(
+	protected $finishState = [
 		'blob' => FALSE,
 		'fal_blob' => FALSE,
 		'fal_itemxml' => FALSE,
@@ -104,7 +103,7 @@ class MigrateController extends ExtUpdateAbstract {
 		'itemxml_filedirpath' => FALSE,
 			//'plugins' => FALSE,
 			//'profiles' => FALSE,
-	);
+	];
 	// @LOW can we add x "of Y" migrated records to messages? Helps to show progress
 	/**
 	 * Provides the methods to be executed during update.
@@ -150,11 +149,6 @@ class MigrateController extends ExtUpdateAbstract {
 		$toMigrate = $this->databaseService->selectTableRecords($table, $where);
 		// no results means we're done migrating
 		if (empty($toMigrate)) {
-			$this->addMessage(
-				sprintf($this->lang['nNothing'], 'XML files', 'migrate to FAL'),
-				'',
-				FlashMessage::INFO
-			);
 			$this->finishState['fal_itemxml'] = TRUE;
 			return;
 		}
@@ -291,11 +285,6 @@ class MigrateController extends ExtUpdateAbstract {
 			);
 		} elseif ($errorCount <= 0) {
 			// no results means we're done migrating
-			$this->addMessage(
-				sprintf($this->lang['nNothing'], 'XML filedirpaths', 'correct'),
-				'',
-				FlashMessage::INFO
-			);
 			$this->finishState['itemxml_filedirpath'] = TRUE;
 		}
 	}
@@ -347,7 +336,6 @@ class MigrateController extends ExtUpdateAbstract {
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['itemxml'] = TRUE;
 		}
 	}
@@ -374,15 +362,10 @@ class MigrateController extends ExtUpdateAbstract {
 				ON (itf.item_id=itxr.uid_local
 					AND itxr.uid_foreign=itx.uid AND itxr.current=1)';
 		$where = 'it.no_migrate = 0 AND it.migrated_uid = 0 AND it.migrated_file = 0 AND itf.fieldname = \'FILEPATH\'';
-		# @TODO ___might be too steep a number, dev was busy for almost 5 minutes
+
 		$toMigrate = $this->databaseService->selectTableRecords($from, $where, $select, 1000);
 		// no results means we're done migrating
 		if (empty($toMigrate)) {
-			$this->addMessage(
-				sprintf($this->lang['nNothing'], 'ItemField files', 'migrate to FAL'),
-				'',
-				FlashMessage::INFO
-			);
 			$this->finishState['fal_blob'] = TRUE;
 			return;
 		}
@@ -478,8 +461,6 @@ class MigrateController extends ExtUpdateAbstract {
 				FlashMessage::OK
 			);
 		} catch (NoData $e) {
-			// no data to migrate
-			$this->addMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['item'] = TRUE;
 		}
 	}
@@ -539,11 +520,6 @@ class MigrateController extends ExtUpdateAbstract {
 
 		// no results means we're done migrating
 		if (empty($toMigrate)) {
-			$this->addMessage(
-				sprintf($this->lang['nNothing'], 'BLOB items', 'to migrate'),
-				'',
-				FlashMessage::INFO
-			);
 			$this->finishState['blob'] = TRUE;
 			return;
 		}
@@ -689,7 +665,6 @@ class MigrateController extends ExtUpdateAbstract {
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['itemfield'] = TRUE;
 		}
 	}
@@ -728,7 +703,6 @@ class MigrateController extends ExtUpdateAbstract {
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['item_item_mm'] = TRUE;
 		}
 	}
@@ -769,7 +743,6 @@ class MigrateController extends ExtUpdateAbstract {
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['item_xml_mm'] = TRUE;
 		}
 	}
@@ -816,11 +789,6 @@ class MigrateController extends ExtUpdateAbstract {
 				FlashMessage::WARNING
 			);
 		} else {
-			$this->addMessage(
-				sprintf($this->lang['nNothing'], 'profiles', 'migrate'),
-				'',
-				FlashMessage::INFO
-			);
 			$this->finishState['profiles'] = TRUE;
 		}
 	}
@@ -865,11 +833,6 @@ class MigrateController extends ExtUpdateAbstract {
 				FlashMessage::WARNING
 			);
 		} else {
-			$this->addMessage(
-				sprintf($this->lang['nNothing'], 'outdated plugins', 're-create'),
-				'',
-				FlashMessage::INFO
-			);
 			$this->finishState['plugins'] = TRUE;
 		}
 	}
