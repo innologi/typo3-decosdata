@@ -82,7 +82,7 @@ class QueryBuilder {
 	 * @param array $import
 	 * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Query
 	 */
-	public function buildListQuery(array $configuration, array $import) {
+	public function buildListQuery(array &$configuration, array $import) {
 		/** @var $query \Innologi\Decosdata\Service\QueryBuilder\Query\Query */
 		$query = $this->objectManager->get(Query::class);
 

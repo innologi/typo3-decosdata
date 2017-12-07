@@ -102,7 +102,7 @@ class TypeProcessorService implements SingletonInterface {
 	}
 
 
-	public function processTypeRecursion(array $configuration, array $import, $index = 0) {
+	public function processTypeRecursion(array &$configuration, array $import, $index = 0) {
 		$content = [];
 
 		// level types are required here
@@ -149,7 +149,7 @@ class TypeProcessorService implements SingletonInterface {
 		return $content;
 	}
 
-	public function processList(array $configuration, array $import) {
+	public function processList(array &$configuration, array $import) {
 		# @TODO remove debugging!
 		$items = $this->processRenderOptions(
 			$this->itemRepository->findWithStatement(
@@ -164,7 +164,7 @@ class TypeProcessorService implements SingletonInterface {
 		return $items;
 	}
 
-	public function processShow(array $configuration, array $import) {
+	public function processShow(array &$configuration, array $import) {
 		$items = $this->processRenderOptions(
 			$this->itemRepository->findWithStatement(
 				$this->queryBuilder->buildListQuery(
@@ -179,15 +179,15 @@ class TypeProcessorService implements SingletonInterface {
 		return $items[0] ?? NULL;
 	}
 
-	public function processGallery(array $configuration, array $import) {
+	public function processGallery(array &$configuration, array $import) {
 		return $this->processList($configuration, $import);
 	}
 
-	public function processMedia(array $configuration, array $import) {
+	public function processMedia(array &$configuration, array $import) {
 		return $this->processShow($configuration, $import);
 	}
 
-	public function processSearch(array $configuration) {
+	public function processSearch(array &$configuration) {
 		/** @var \Innologi\Decosdata\Service\SearchService $searchService */
 		$searchService = $this->objectManager->get(\Innologi\Decosdata\Service\SearchService::class);
 		$data = [
