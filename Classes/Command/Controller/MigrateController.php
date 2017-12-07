@@ -60,8 +60,7 @@ class MigrateController extends ExtUpdateAbstract {
 	 *
 	 * @var string
 	 */
-	protected $sourceExtensionVersion = '6.1.0';
-	// @TODO ___update to 6.2.0 once that version is pushed to TER
+	protected $sourceExtensionVersion = '6.2.0';
 
 	/**
 	 * Language labels => messages
