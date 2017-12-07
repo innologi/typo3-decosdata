@@ -40,7 +40,7 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 	/**
 	 * @var \TYPO3\CMS\Core\Messaging\FlashMessageQueue
 	 */
-	protected $flashMessageQueue;
+	private $flashMessageQueue;
 
 	/**
 	 * @var \Symfony\Component\Console\Style\SymfonyStyle
@@ -133,14 +133,9 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 		if ( !isset($this->sourceExtensionKey[0]) ) {
 			$this->sourceExtensionKey = $this->extensionKey;
 		}
+
 		/* @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
 		$objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
-
-		$this->flashMessageQueue = $objectManager->get(
-			\TYPO3\CMS\Core\Messaging\FlashMessageQueue::class,
-			'extbase.flashmessages.tx_' . $this->extensionKey . '_extupdate'
-		);
-
 		$this->databaseService = $objectManager->get(
 			__NAMESPACE__ . '\\Service\\DatabaseService'
 		);
@@ -160,7 +155,7 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 		} else {
 			// in normal (non-CLI) mode, messages are queued
 			$this->flashMessageQueue = $objectManager->get(
-				'TYPO3\\CMS\\Core\\Messaging\\FlashMessageQueue',
+				\TYPO3\CMS\Core\Messaging\FlashMessageQueue::class,
 				'extbase.flashmessages.tx_' . $this->extensionKey . '_extupdate'
 			);
 		}
@@ -183,26 +178,26 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 
 			// if not finished, we'll add the instruction to run the updater again
 			if ($finished) {
-				$this->addFlashMessage(
+				$this->addMessage(
 					'The updater has finished all of its tasks, you don\'t need to run it again until the next extension-update.',
 					'Update complete',
 					FlashMessage::OK
 				);
 			} else {
-				$this->addFlashMessage(
+				$this->addMessage(
 					'Please run the updater again to continue updating and/or follow any remaining instructions, until this message disappears.',
 					'Run updater again',
 					FlashMessage::WARNING
 				);
 			}
 		} catch (Exception\Exception $e) {
-			$this->addFlashMessage(
+			$this->addMessage(
 				$e->getFormattedErrorMessage(),
 				'Update failed',
 				FlashMessage::ERROR
 			);
 		} catch (\Exception $e) {
-			$this->addFlashMessage(
+			$this->addMessage(
 				$e->getMessage(),
 				'Update failed',
 				FlashMessage::ERROR
@@ -258,16 +253,16 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 			}
 		}
 	}
-	// @TODO ___better naming and description
+
 	/**
-	 * Creates a Message object and adds it to the FlashMessageQueue.
+	 * Adds a message to output
 	 *
 	 * @param string $messageBody The message
-	 * @param string $messageTitle Optional message title
+	 * @param string $messageTitle Optional message title (only for non-CLI)
 	 * @param integer $severity Optional severity, must be one of \TYPO3\CMS\Core\Messaging\FlashMessage constants
 	 * @return void
 	 */
-	protected function addFlashMessage($messageBody, $messageTitle = '', $severity = \TYPO3\CMS\Core\Messaging\FlashMessage::OK) {
+	protected function addMessage($messageBody, $messageTitle = '', $severity = \TYPO3\CMS\Core\Messaging\FlashMessage::OK) {
 		if ($this->cliMode) {
 			if (isset($this->cliAllowedSeverities[$severity])) {
 				$this->io->{$this->cliAllowedSeverities[$severity]}($messageBody);

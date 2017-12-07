@@ -151,7 +151,7 @@ class MigrateController extends ExtUpdateAbstract {
 		$toMigrate = $this->databaseService->selectTableRecords($table, $where);
 		// no results means we're done migrating
 		if (empty($toMigrate)) {
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf($this->lang['nNothing'], 'XML files', 'migrate to FAL'),
 				'',
 				FlashMessage::INFO
@@ -181,7 +181,7 @@ class MigrateController extends ExtUpdateAbstract {
 				}
 
 				if ($errorMessage !== NULL) {
-					$this->addFlashMessage(
+					$this->addMessage(
 						$errorMessage . ' ' . $this->lang['falMigrateFail'] . ' ' . sprintf(
 							$this->lang['falMigrateFailCorrect'],
 							$this->fileService->getDefaultStorage()->getName(),
@@ -194,7 +194,7 @@ class MigrateController extends ExtUpdateAbstract {
 			}
 		}
 		if ($count > 0) {
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf($this->lang['falMigrateSuccess'], $table, $count),
 				'',
 				FlashMessage::OK
@@ -252,7 +252,7 @@ class MigrateController extends ExtUpdateAbstract {
 							$table
 						);
 
-					$this->addFlashMessage(
+					$this->addMessage(
 						sprintf(
 							$this->lang['dirMismatch'],
 							$fileDirPath,
@@ -281,7 +281,7 @@ class MigrateController extends ExtUpdateAbstract {
 				);
 			}
 
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf(
 					$this->lang['migrateSuccess'],
 					$table . '.filedirpath',
@@ -292,7 +292,7 @@ class MigrateController extends ExtUpdateAbstract {
 			);
 		} elseif ($errorCount <= 0) {
 			// no results means we're done migrating
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf($this->lang['nNothing'], 'XML filedirpaths', 'correct'),
 				'',
 				FlashMessage::INFO
@@ -341,14 +341,14 @@ class MigrateController extends ExtUpdateAbstract {
 		// attempt migration
 		try {
 			$countRecords = $this->databaseService->migrateTableDataWithReferenceUid($sourceTable, $targetTable, $propertyMap, 'migrated_uid', $evaluation, 500);
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',
 				FlashMessage::OK
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
+			$this->addMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['itemxml'] = TRUE;
 		}
 	}
@@ -379,7 +379,7 @@ class MigrateController extends ExtUpdateAbstract {
 		$toMigrate = $this->databaseService->selectTableRecords($from, $where, $select, 1000);
 		// no results means we're done migrating
 		if (empty($toMigrate)) {
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf($this->lang['nNothing'], 'ItemField files', 'migrate to FAL'),
 				'',
 				FlashMessage::INFO
@@ -402,7 +402,7 @@ class MigrateController extends ExtUpdateAbstract {
 			}
 
 			if ($errorMessage !== NULL) {
-				$this->addFlashMessage(
+				$this->addMessage(
 					$errorMessage . ' ' . $this->lang['falMigrateFail'] . ' ' . $this->lang['falMigrateFailDelete'],
 					sprintf($this->lang['falMigrateFailTitle'], 'Itemfield', 'id ' . $uid),
 					FlashMessage::ERROR
@@ -419,7 +419,7 @@ class MigrateController extends ExtUpdateAbstract {
 			);
 		}
 		if ($count > 0) {
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf($this->lang['falMigrateSuccess'], $table, $count),
 				'',
 				FlashMessage::OK
@@ -473,14 +473,14 @@ class MigrateController extends ExtUpdateAbstract {
 		// attempt migration
 		try {
 			$countRecords = $this->databaseService->migrateTableDataWithReferenceUid($sourceTable, $targetTable, $propertyMap, 'migrated_uid', $evaluation);
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',
 				FlashMessage::OK
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
+			$this->addMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['item'] = TRUE;
 		}
 	}
@@ -540,7 +540,7 @@ class MigrateController extends ExtUpdateAbstract {
 
 		// no results means we're done migrating
 		if (empty($toMigrate)) {
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf($this->lang['nNothing'], 'BLOB items', 'to migrate'),
 				'',
 				FlashMessage::INFO
@@ -626,7 +626,7 @@ class MigrateController extends ExtUpdateAbstract {
 			))
 		);
 
-		$this->addFlashMessage(
+		$this->addMessage(
 			sprintf($this->lang['migrateSuccess'], $targetTable, count($toInsert)),
 			'',
 			FlashMessage::OK
@@ -683,14 +683,14 @@ class MigrateController extends ExtUpdateAbstract {
 		// attempt migration
 		try {
 			$countRecords = $this->databaseService->migrateTableDataWithReferenceUid($sourceTable, $targetTable, $propertyMap, 'migrated_uid', $evaluation, 20000);
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',
 				FlashMessage::OK
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
+			$this->addMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['itemfield'] = TRUE;
 		}
 	}
@@ -722,14 +722,14 @@ class MigrateController extends ExtUpdateAbstract {
 		// attempt migration
 		try {
 			$countRecords = $this->databaseService->migrateMmTableWithReferenceUid($sourceTable, $targetTable, $localConfig, $foreignConfig, $propertyMap, 'migrated');
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',
 				FlashMessage::OK
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
+			$this->addMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['item_item_mm'] = TRUE;
 		}
 	}
@@ -763,14 +763,14 @@ class MigrateController extends ExtUpdateAbstract {
 		// attempt migration
 		try {
 			$countRecords = $this->databaseService->migrateMmTableWithReferenceUid($sourceTable, $targetTable, $localConfig, $foreignConfig, $propertyMap, 'migrated');
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',
 				FlashMessage::OK
 			);
 		} catch (NoData $e) {
 			// no data to migrate
-			$this->addFlashMessage($e->getMessage(), '', FlashMessage::INFO);
+			$this->addMessage($e->getMessage(), '', FlashMessage::INFO);
 			$this->finishState['item_xml_mm'] = TRUE;
 		}
 	}
@@ -806,7 +806,7 @@ class MigrateController extends ExtUpdateAbstract {
 			foreach ($unmatchedProfiles as $profile) {
 				$profiles[] = $profile['name'];
 			}
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf(
 					$this->lang['migrateManual'],
 					'profiles',
@@ -817,7 +817,7 @@ class MigrateController extends ExtUpdateAbstract {
 				FlashMessage::WARNING
 			);
 		} else {
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf($this->lang['nNothing'], 'profiles', 'migrate'),
 				'',
 				FlashMessage::INFO
@@ -855,7 +855,7 @@ class MigrateController extends ExtUpdateAbstract {
 					'<pre class="hidden-info-plugin-text-' . (int) $plugin['uid'] . '" style="display:none;background-color:white;border:1px solid #aaa;">' .
 					htmlspecialchars($plugin['pi_flexform']) . '</pre>';
 			}
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf(
 					$this->lang['migrateManual'],
 					'plugins',
@@ -866,7 +866,7 @@ class MigrateController extends ExtUpdateAbstract {
 				FlashMessage::WARNING
 			);
 		} else {
-			$this->addFlashMessage(
+			$this->addMessage(
 				sprintf($this->lang['nNothing'], 'outdated plugins', 're-create'),
 				'',
 				FlashMessage::INFO
