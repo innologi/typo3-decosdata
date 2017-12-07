@@ -72,6 +72,9 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 		$this->registerArgument('includeResultCountBelow', 'boolean', 'Includes total amount of results with pagebrowser rendered below content.', FALSE, FALSE);
 		$this->registerArgument('renderAlways', 'boolean', 'Renders pagebrowser even if there is only one page.', FALSE, FALSE);
 		$this->registerArgument('pageLimit', 'integer', 'Artificial page limit. Only affects displayed pages, as pagination values have already been applied to Query.');
+		$this->registerArgument('xhrEnabled', 'boolean', 'XHR mode enabled?', FALSE, FALSE);
+		// for now, this only has use for xhr
+		$this->registerArgument('more', 'string', 'Either the next page number or an XHR URL', FALSE, '');
 	}
 
 	/**
@@ -85,21 +88,28 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 			return $this->renderChildren();
 		}
 
+		$section = NULL;
+		$configuration = array_merge([
+			'renderAbove' => $this->arguments['renderAbove'],
+			'renderBelow' => $this->arguments['renderBelow'],
+			//@LOW won't $escapeChildren = FALSE work?
+			// requires the use of format.raw VH, which costs us ~1.6 ms on average, but keeps us
+			// from using a marker like ###CONTENT### with str_replace, which can easily be fooled
+			'content' => $this->renderChildren()
+		], $this->buildResultCountConfiguration());
+		if ($this->arguments['xhrEnabled']) {
+			$configuration['xhrUri'] = $this->arguments['more'];
+			$configuration['nextPage'] = $this->paginateService->getCurrentPage()+1;
+			$section = 'xhr';
+		} else {
+			$configuration['pageBrowser'] = $this->buildPageBrowserConfiguration();
+		}
+
 		// render a specific partial that exists for this sole purpose
 		return $this->viewHelperVariableContainer->getView()->renderPartial(
 			$this->arguments['partial'],
-			NULL,
-			array_merge(
-				[
-					'renderAbove' => $this->arguments['renderAbove'],
-					'renderBelow' => $this->arguments['renderBelow'],
-					'pageBrowser' => $this->buildPageBrowserConfiguration(),
-					// requires the use of format.raw VH, which costs us ~1.6 ms on average, but keeps us
-					// from using a marker like ###CONTENT### with str_replace, which can easily be fooled
-					'content' => $this->renderChildren()
-				],
-				$this->buildResultCountConfiguration()
-			)
+			$section,
+			$configuration
 		);
 	}
 
