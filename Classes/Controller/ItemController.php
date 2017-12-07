@@ -96,9 +96,7 @@ class ItemController extends ActionController {
 		$this->apiMode = (int)$GLOBALS['TSFE']->type === (int)$this->settings['api']['type'];
 		if ($this->apiMode && !$this->parameterService->hasParameter('format')) {
 			// default API format
-			$this->request->setFormat(
-				$this->settings['api']['defaultFormat']
-			);
+			$this->request->setFormat($this->settings['api']['defaultFormat']);
 		}
 
 		// @LOW cache?

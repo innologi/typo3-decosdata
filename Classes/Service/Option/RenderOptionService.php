@@ -161,17 +161,17 @@ class RenderOptionService extends OptionServiceAbstract {
 			if (isset($matches[3][$index][0])) {
 				$argMatch = [];
 				preg_match_all('/' . $this->patternArgumentInline . '/', $matches[3][$index], $argMatch);
-					if (isset($argMatch[1]) && isset($argMatch[2])) {
-						foreach ($argMatch[1] as $argIndex => $arg) {
-							$option['args'][$arg] = $argMatch[2][$argIndex];
-						}
+				if (isset($argMatch[1]) && isset($argMatch[2])) {
+					foreach ($argMatch[1] as $argIndex => $arg) {
+						$option['args'][$arg] = $argMatch[2][$argIndex];
 					}
 				}
-				// note that it will reset original content to the same value,
-				// so until we support utilizing a different content value, no harm is done
-				// @LOW __note that this does not yet cache entries that are set multiple times
-				$replacements[$match] = $this->processOptions([ $option ], $this->originalContent, $this->index, $this->item);
 			}
+			// note that it will reset original content to the same value,
+			// so until we support utilizing a different content value, no harm is done
+			// @LOW __note that this does not yet cache entries that are set multiple times
+			$replacements[$match] = $this->processOptions([ $option ], $this->originalContent, $this->index, $this->item);
+		}
 
 		return $replacements;
 	}
