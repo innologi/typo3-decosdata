@@ -177,12 +177,20 @@ class ItemController extends ActionController {
 	 * @return void
 	 */
 	public function singleAction($section) {
+		$this->activeConfiguration = $this->activeConfiguration[$section] ?? [];
+
+		// @LOW maybe support non-xhr modes as well?
+		// enable xhr mode on pagination as well
+		if ($this->apiMode && isset($this->activeConfiguration['paginate']) && is_array($this->activeConfiguration['paginate'])) {
+			$this->activeConfiguration['paginate']['xhr'] = TRUE;
+		}
+
 		$this->view->assign('level', $this->level);
 		$this->view->assign(
 			'section',
 			current(
 				$this->typeProcessor->processTypeRecursion(
-					($this->activeConfiguration[$section] ?? []), $this->import
+					$this->activeConfiguration, $this->import, $section
 				)
 			)
 		);

@@ -131,7 +131,8 @@ class TypeProcessorService implements SingletonInterface {
 						'partial' => $configuration['partial'] ?? 'Item/' . $formattedType,
 						'type' => $lType,
 						'configuration' => $configuration,
-						'data' => $this->{$method}($configuration, $import)
+						'data' => $this->{$method}($configuration, $import),
+						'paging' => $this->processPaging($configuration, $index)
 					];
 			}
 		} else {
@@ -236,4 +237,38 @@ class TypeProcessorService implements SingletonInterface {
 		return $items;
 	}
 
+	// @TODO clean up this method, its xhr component is setup inefficiently
+		// also this is really starting to get the opposite from transparent
+		// feels hacky because of the whole forcing single thing
+	protected function processPaging(array $configuration, $section) {
+		$paging = [];
+		if (isset($configuration['paginate']) && is_array($configuration['paginate'])) {
+			$paging = $configuration['paginate'];
+			// @TODO technically, this should be contained in paginateService, but it doesn't have the controllerContext yet
+			if (isset($paging['xhr']) && (bool)$paging['xhr'] && isset($paging['more']) && $paging['more'] !== FALSE) {
+				$arguments = [
+					'page' => $paging['more'],
+					'section' => $section
+				];
+				if ($this->controllerContext->getRequest()->hasArgument('search')) {
+					$arguments['search'] = $this->controllerContext->getRequest()->getArgument('search');
+				}
+				$settings = $this->getConfigurationManager()->getConfiguration(
+					ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS
+				);
+				$paging['more'] = $this->controllerContext->getUriBuilder()->reset()
+					->setCreateAbsoluteUri(TRUE)
+					->setAddQueryString(TRUE)
+					->setTargetPageType($settings['api']['type'])
+					->uriFor(
+						// overrule current action on queryString in case of forward
+						//$this->controllerContext->getRequest()->getControllerActionName(),
+							// is there every any reason this would not be ok?
+						'single',
+						$arguments
+					);
+			}
+		}
+		return $paging;
+	}
 }
