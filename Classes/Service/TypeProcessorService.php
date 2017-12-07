@@ -59,6 +59,12 @@ class TypeProcessorService implements SingletonInterface {
 	 * @inject
 	 */
 	protected $optionService;
+	// @LOW don't inject this one
+	/**
+	 * @var \Innologi\Decosdata\Library\AssetProvider\ProviderServiceInterface
+	 * @inject
+	 */
+	protected $assetProviderService;
 
 	/**
 	 * @var \TYPO3\CMS\Core\TypoScript\TypoScriptService
@@ -205,6 +211,11 @@ class TypeProcessorService implements SingletonInterface {
 				->setCreateAbsoluteUri(TRUE)
 				->setTargetPageType($settings['api']['type'])
 				->uriFor('search', array_diff($data, ['search' => 1]));
+
+			if ($this->controllerContext->getRequest()->getFormat() === 'html') {
+				// provide assets as configured per feature
+				$this->assetProviderService->provideAssets('Item', 'xhr');
+			}
 		}
 
 		return $data;
@@ -267,6 +278,11 @@ class TypeProcessorService implements SingletonInterface {
 						'single',
 						$arguments
 					);
+			}
+
+			if ($this->controllerContext->getRequest()->getFormat() === 'html') {
+				// provide assets as configured per feature
+				$this->assetProviderService->provideAssets('Item', 'xhr');
 			}
 		}
 		return $paging;

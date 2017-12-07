@@ -1,6 +1,14 @@
 @charset "UTF-8";
 
 
+.tx-decosdata .section {
+	position: relative;
+}
+.tx-decosdata .invisible {
+	visibility: hidden;
+}
+
+
 .tx-decosdata table {
 	border-collapse: collapse;
 	border-spacing: 0;
@@ -78,7 +86,7 @@
 	height: 100%;
 	left: 0;
 	top: 0;
-	background-image: url(/typo3conf/ext/decosdata/Resources/Public/Image/obfuscate.gif);
+	background-image: url('/typo3conf/ext/decosdata/Resources/Public/Image/obfuscate.gif');
 	background-repeat: repeat;
 	background-position: left top;
 }
@@ -90,4 +98,38 @@
 .tx-decosdata .search .search-box,
 .tx-decosdata .search .search-submit {
 	font-size: 0.9em;
+}
+.tx-decosdata .search-box {
+	background-position: right center;
+	background-repeat: no-repeat;
+}
+.tx-decosdata a.xhr-paging {
+	display: block;
+}
+.tx-decosdata .xhr-paging,
+.tx-decosdata .overlay {
+	width: 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+.tx-decosdata .xhr-paging.loader {
+	height:7em;
+	margin:2em auto;
+	opacity: 0.25;
+}
+.tx-decosdata .overlay.loader {
+	background-color:#bbb;
+	position:absolute;
+	opacity:0.65;
+	margin-top:0;
+	margin-left:0;
+	height:100%;
+	z-index:100;
+}
+.tx-decosdata .loader.active {
+	background-image: url('/typo3conf/ext/decosdata/Resources/Public/Image/spinner.svg');
+}
+.tx-decosdata .xhr-paging.loader.inactive {
+	height:4em;
+	background-image: url('/typo3conf/ext/decosdata/Resources/Public/Image/arrow-down.svg');
 }

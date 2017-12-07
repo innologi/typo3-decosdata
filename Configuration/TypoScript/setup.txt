@@ -25,6 +25,19 @@ plugin.tx_decosdata {
 		requireCHashArgumentForActionArguments = 1
 	}
 	
+	# assets provider configuration, in this case: action=feature
+	assets {
+		controller.Item.action.xhr {
+			javascript {
+				inline.tx_decosdata_xhr {
+					1 = FILE
+					1.file = {$plugin.tx_decosdata.javascript.decosdataXhr}
+					placeInFooter = 1
+				}
+			}
+		}
+	}
+	
 	settings {
 		# used for API calls
 		api {

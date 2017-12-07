@@ -1,11 +1,11 @@
 <html data-namespace-typo3-fluid="true"
 	xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
 	xmlns:d="http://typo3.org/ns/Innologi/Decosdata/ViewHelpers">
-	
+
 <f:form name="decosdatasearch" enctype="multipart/form-data" method="post" class="search-form" action="search" arguments="{level: data.targetLevel, section: data.section}" data="{xhr: data.xhrUri, section: data.section}" >
 	<fieldset>
 		<f:form.textfield class="search-box" name="search" value="{data.search}" placeholder="{f:translate(key:'search.placeholder')}" />
-		<f:form.submit class="search-submit" value="{f:translate(key:'search.submit')}" />
+		<f:form.submit class="search-submit" name="submit" value="{f:translate(key:'search.submit')}" />
 	</fieldset>
 </f:form>
 

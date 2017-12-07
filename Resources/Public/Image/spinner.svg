@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="lds-reload">
+	<g>
+		<path d="M50 15A35 35 0 1 0 74.787 25.213" fill="none" stroke="#666666" stroke-width="8"></path>
+		<path d="M49 4L49 26L60 15L49 4" fill="#666666"></path>
+		<animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 50;360 50 50" keyTimes="0;1" dur="1s" begin="0s" repeatCount="indefinite"></animateTransform>
+	</g>
+</svg>
