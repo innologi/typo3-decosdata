@@ -103,8 +103,8 @@ class MigrateController extends ExtUpdateAbstract {
 		'itemfield' => FALSE,
 		'itemxml' => FALSE,
 		'itemxml_filedirpath' => FALSE,
-		'plugins' => FALSE,
-		'profiles' => FALSE,
+			//'plugins' => FALSE,
+			//'profiles' => FALSE,
 	);
 	// @LOW can we add x "of Y" migrated records to messages? Helps to show progress
 	/**
@@ -128,8 +128,8 @@ class MigrateController extends ExtUpdateAbstract {
 		$this->migrateItemItemMmTable();
 		$this->migrateItemXmlMmTable();
 		// do some checks that give warnings/instructions for some things
-		//$this->checkProfiles();
-		$this->checkPlugins();
+			//$this->checkProfiles();
+			//$this->checkPlugins();
 
 		// if even one finishState is FALSE, we're not finished
 		return !in_array(FALSE, $this->finishState, TRUE);
