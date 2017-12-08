@@ -65,7 +65,6 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 	 * @var array
 	 */
 	protected $cliErrorSeverities = [
-		FlashMessage::WARNING => TRUE,
 		FlashMessage::ERROR => TRUE
 	];
 

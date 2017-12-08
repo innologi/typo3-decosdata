@@ -387,7 +387,7 @@ class MigrateController extends ExtUpdateAbstract {
 				$this->addMessage(
 					$errorMessage . ' ' . $this->lang['falMigrateFail'] . ' ' . $this->lang['falMigrateFailDelete'],
 					sprintf($this->lang['falMigrateFailTitle'], 'Itemfield', 'id ' . $uid),
-					FlashMessage::ERROR
+					FlashMessage::WARNING
 				);
 				$updateValues = array('no_migrate' => 1);
 			}
