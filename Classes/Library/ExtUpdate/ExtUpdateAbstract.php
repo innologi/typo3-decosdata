@@ -35,8 +35,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 abstract class ExtUpdateAbstract implements ExtUpdateInterface {
-	// @LOW ___what about a reload button?
-	// @TODO ___give ext_update a namespace, seems we can get rid of typo3temp version that way!
+	// @LOW ___add a reload button?
 	/**
 	 * @var \TYPO3\CMS\Core\Messaging\FlashMessageQueue
 	 */
@@ -53,6 +52,8 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface {
 	protected $cliMode = FALSE;
 
 	/**
+	 * Allowed severities with mappings to i/o methods for CLI
+	 *
 	 * @var array
 	 */
 	protected $cliAllowedSeverities = [
