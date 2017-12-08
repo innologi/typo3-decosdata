@@ -68,6 +68,7 @@ class MigrateCommand extends Command {
 		// Make sure the _cli_ user is loaded
 		Bootstrap::getInstance()->initializeBackendAuthentication();
 
+		$output->setDecorated(TRUE);
 		$io = new SymfonyStyle($input, $output);
 		$io->title($this->getDescription());
 		$arguments = [
