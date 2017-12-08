@@ -515,7 +515,7 @@ class MigrateController extends ExtUpdateAbstract {
 			AND it.migrated_uid = 0 AND it.no_migrate = 0
 			AND it2.migrated_uid > 0';
 		// note that docdate is only used for extra sorting, if sequence is not provided
-		$orderBy = 'item ASC,sequence ASC,docdate ASC';
+		$orderBy = 'item ASC,sequence ASC,docdate ASC,uid ASC';
 		$toMigrate = $this->databaseService->selectTableRecords($from, $where, $select, 250, $orderBy);
 
 		// no results means we're done migrating
