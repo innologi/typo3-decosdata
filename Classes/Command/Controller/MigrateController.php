@@ -144,54 +144,66 @@ class MigrateController extends ExtUpdateAbstract {
 	protected function migrateXmlToFal() {
 		$table = 'tx_' . $this->sourceExtensionKey . '_itemxml';
 		$where = 'migrated_uid = 0 AND migrated_file = 0';
+		$max = $this->databaseService->countTableRecords($table, $where);
 
-		$count = 0;
-		$toMigrate = $this->databaseService->selectTableRecords($table, $where);
 		// no results means we're done migrating
-		if (empty($toMigrate)) {
+		if ($max === 0) {
 			$this->finishState['fal_itemxml'] = TRUE;
 			return;
 		}
 
-		foreach ($toMigrate as $uid => $row) {
-			if (isset($row['xmlpath'])) {
-				// migrate import file to FAL and set the reference
-				$errorMessage = NULL;
-				try {
-					$file = $this->fileService->retrieveFileObjectByPath($row['xmlpath']);
-					$this->databaseService->updateTableRecords(
-						$table,
-						array(
-							'migrated_file' => $file->getUid()
-						),
-						array(
-							'uid' => $uid
-						)
-					);
-					$count++;
-				} catch (FileException $e) {
-					$errorMessage = $e->getFormattedErrorMessage();
-				}
+		$this->io->text('Migrate file-references from xml table to FAL.');
+		$this->io->progressStart($max);
 
-				if ($errorMessage !== NULL) {
-					$this->addMessage(
-						$errorMessage . ' ' . $this->lang['falMigrateFail'] . ' ' . sprintf(
-							$this->lang['falMigrateFailCorrect'],
-							$this->fileService->getDefaultStorage()->getName(),
-							$table
-						),
-						sprintf($this->lang['falMigrateFailTitle'], 'Import', $row['name']),
-						FlashMessage::ERROR
-					);
+		$count = 0;
+		$errorCount = 0;
+		while($count+$errorCount < $max) {
+			$toMigrate = $this->databaseService->selectTableRecords($table, $where, '*', 1000);
+			foreach ($toMigrate as $uid => $row) {
+				if (isset($row['xmlpath'])) {
+					// migrate import file to FAL and set the reference
+					try {
+						$file = $this->fileService->retrieveFileObjectByPath($row['xmlpath']);
+						$this->databaseService->updateTableRecords(
+							$table,
+							array(
+								'migrated_file' => $file->getUid()
+							),
+							array(
+								'uid' => $uid
+							)
+						);
+						$count++;
+						$this->io->progressAdvance(1);
+					} catch (FileException $e) {
+						$this->addMessage(
+							$e->getFormattedErrorMessage() . ' ' . $this->lang['falMigrateFail'] . ' ' . sprintf(
+								$this->lang['falMigrateFailCorrect'],
+								$this->fileService->getDefaultStorage()->getName(),
+								$table
+								),
+							sprintf($this->lang['falMigrateFailTitle'], 'Import', $row['name']),
+							FlashMessage::ERROR
+						);
+						$errorCount++;
+					}
 				}
 			}
 		}
+
+		$this->io->newLine(2);
+
 		if ($count > 0) {
 			$this->addMessage(
 				sprintf($this->lang['falMigrateSuccess'], $table, $count),
 				'',
 				FlashMessage::OK
 			);
+		}
+
+		if ($errorCount === 0) {
+			$this->finishState['fal_itemxml'] = TRUE;
+			return;
 		}
 	}
 
@@ -209,71 +221,91 @@ class MigrateController extends ExtUpdateAbstract {
 
 		$table = 'tx_' . $this->sourceExtensionKey . '_itemxml';
 		$where = 'migrated_uid = 0 AND migrated_filedir = 0 AND migrated_file > 0';
-		$xmlArray = $this->databaseService->selectTableRecords($table, $where);
+		$max = $this->databaseService->countTableRecords($table, $where);
 
-		$okUidArray = array();
+		// no results means we're done migrating
+		if ($max === 0) {
+			$this->finishState['itemxml_filedirpath'] = TRUE;
+			return;
+		}
+
+		$this->io->text('Migrate XML filedirpaths.');
+		$this->io->progressStart($max);
+
+		$count = 0;
 		$errorCount = 0;
-		foreach ($xmlArray as $uid => $xml) {
-			// get all the necessary paths
-			$file = $this->fileService->getFileObjectByUid($xml['migrated_file']);
-			$xmlPath = pathinfo($file->getPublicUrl());
-			$xmlDirPath = PATH_site . $xmlPath['dirname'] . '/';
-			$fileDirPath = rtrim($xml['filedirpath'], '/') . '/';
+		while ($count+$errorCount < $max) {
 
-			if ($xmlDirPath === $fileDirPath) {
-				$okUidArray[] = $uid;
-			} else {
-				$sourceFileDir = $fileDirPath . $xmlPath['filename'] . '/';
-				$targetFileDir = $xmlDirPath . $xmlPath['filename'] . '/';
+			$okUidArray = array();
+			$xmlArray = $this->databaseService->selectTableRecords($table, $where, '*', 1000);
+			foreach ($xmlArray as $uid => $xml) {
+				// get all the necessary paths
+				$file = $this->fileService->getFileObjectByUid($xml['migrated_file']);
+				$xmlPath = pathinfo($file->getPublicUrl());
+				$xmlDirPath = PATH_site . $xmlPath['dirname'] . '/';
+				$fileDirPath = rtrim($xml['filedirpath'], '/') . '/';
 
-				if (file_exists($targetFileDir)) {
-					// if we get here, the filedir was moved to the correct location, in which case we can automatically fix the filedirpath
+				if ($xmlDirPath === $fileDirPath) {
 					$okUidArray[] = $uid;
 				} else {
-					// if the assumed sourceFileDir exists, we can suggest where to move it next so that this method can fix the issue, but
-					// we will NOT move files automatically, since the reason for its current location may be related to available harddisk space
-					$advice = file_exists($sourceFileDir)
-						? sprintf(
-							$this->lang['dirMoveAutomatic'],
-							$sourceFileDir,
-							$targetFileDir
-						)
-						// otherwise, we can only suggest a fully manual solution..
-						: sprintf(
-							$this->lang['dirMoveManual'],
-							$sourceFileDir,
-							$table
-						);
+					$sourceFileDir = $fileDirPath . $xmlPath['filename'] . '/';
+					$targetFileDir = $xmlDirPath . $xmlPath['filename'] . '/';
 
-					$this->addMessage(
-						sprintf(
-							$this->lang['dirMismatch'],
-							$fileDirPath,
-							$xmlDirPath,
-							$advice
+					if (file_exists($targetFileDir)) {
+						// if we get here, the filedir was moved to the correct location, in which case we can automatically fix the filedirpath
+						$okUidArray[] = $uid;
+					} else {
+						// if the assumed sourceFileDir exists, we can suggest where to move it next so that this method can fix the issue, but
+						// we will NOT move files automatically, since the reason for its current location may be related to available harddisk space
+						$advice = file_exists($sourceFileDir)
+							? sprintf(
+								$this->lang['dirMoveAutomatic'],
+								$sourceFileDir,
+								$targetFileDir
+							)
+							// otherwise, we can only suggest a fully manual solution..
+							: sprintf(
+								$this->lang['dirMoveManual'],
+								$sourceFileDir,
+								$table
+							);
+
+						$this->addMessage(
+							sprintf(
+								$this->lang['dirMismatch'],
+								$fileDirPath,
+								$xmlDirPath,
+								$advice
+							),
+							'',
+							FlashMessage::ERROR
+						);
+						$errorCount++;
+					}
+				}
+			}
+
+			if (!empty($okUidArray)) {
+				// any xml found ok will be marked as such
+				foreach ($okUidArray as $uid) {
+					$this->databaseService->updateTableRecords(
+						$table,
+						array(
+							'migrated_filedir' => 1
 						),
-						'',
-						FlashMessage::ERROR
+						array(
+							'uid' => $uid
+						)
 					);
-					$errorCount++;
+					$count++;
+					$this->io->progressAdvance(1);
 				}
 			}
 		}
 
-		if (!empty($okUidArray)) {
-			// any xml found ok will be marked as such
-			foreach ($okUidArray as $uid) {
-				$this->databaseService->updateTableRecords(
-					$table,
-					array(
-						'migrated_filedir' => 1
-					),
-					array(
-						'uid' => $uid
-					)
-				);
-			}
+		$this->io->newLine(2);
 
+		if ($count > 0) {
 			$this->addMessage(
 				sprintf(
 					$this->lang['migrateSuccess'],
@@ -283,7 +315,9 @@ class MigrateController extends ExtUpdateAbstract {
 				'',
 				FlashMessage::OK
 			);
-		} elseif ($errorCount <= 0) {
+		}
+
+		if ($errorCount <= 0) {
 			// no results means we're done migrating
 			$this->finishState['itemxml_filedirpath'] = TRUE;
 		}
@@ -328,16 +362,17 @@ class MigrateController extends ExtUpdateAbstract {
 
 		// attempt migration
 		try {
-			$countRecords = $this->databaseService->migrateTableDataWithReferenceUid($sourceTable, $targetTable, $propertyMap, 'migrated_uid', $evaluation, 500);
+			$countRecords = $this->databaseService->migrateTableDataWithReferenceUid($sourceTable, $targetTable, $propertyMap, 'migrated_uid', $evaluation, 100, $this->io);
 			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',
 				FlashMessage::OK
 			);
 		} catch (NoData $e) {
-			// no data to migrate
-			$this->finishState['itemxml'] = TRUE;
+			// do nothing
 		}
+
+		$this->finishState['itemxml'] = TRUE;
 	}
 
 	/**
@@ -363,49 +398,65 @@ class MigrateController extends ExtUpdateAbstract {
 					AND itxr.uid_foreign=itx.uid AND itxr.current=1)';
 		$where = 'it.no_migrate = 0 AND it.migrated_uid = 0 AND it.migrated_file = 0 AND itf.fieldname = \'FILEPATH\'';
 
-		$toMigrate = $this->databaseService->selectTableRecords($from, $where, $select, 1000);
+		$max = $this->databaseService->countTableRecords($from, $where);
+
 		// no results means we're done migrating
-		if (empty($toMigrate)) {
+		if ($max === 0) {
 			$this->finishState['fal_blob'] = TRUE;
 			return;
 		}
 
+		$this->io->text('Migrate file-references from BLOB to FAL.');
+		$this->io->progressStart($max);
+
 		$count = 0;
-		$updateValues = array();
-		foreach ($toMigrate as $uid => $row) {
-			// migrate itemfield file to FAL and set the reference
-			$errorMessage = NULL;
-			try {
-				$file = $this->fileService->retrieveFileObjectByPath($row['filepath']);
-				$updateValues = array('migrated_file' => $file->getUid());
-				$count++;
-			} catch (FileException $e) {
-				$errorMessage = $e->getFormattedErrorMessage();
-			}
+		$errorCount = 0;
+		while ($count+$errorCount < $max) {
 
-			if ($errorMessage !== NULL) {
-				$this->addMessage(
-					$errorMessage . ' ' . $this->lang['falMigrateFail'] . ' ' . $this->lang['falMigrateFailDelete'],
-					sprintf($this->lang['falMigrateFailTitle'], 'Itemfield', 'id ' . $uid),
-					FlashMessage::WARNING
+			$updateValues = array();
+			$toMigrate = $this->databaseService->selectTableRecords($from, $where, $select, 100);
+			foreach ($toMigrate as $uid => $row) {
+				// migrate itemfield file to FAL and set the reference
+				$step = 0;
+				try {
+					$file = $this->fileService->retrieveFileObjectByPath($row['filepath']);
+					$updateValues = array('migrated_file' => $file->getUid());
+					$count++;
+					$step = 1;
+				} catch (FileException $e) {
+					$this->addMessage(
+						$e->getFormattedErrorMessage() . ' ' . $this->lang['falMigrateFail'] . ' ' . $this->lang['falMigrateFailDelete'],
+						sprintf($this->lang['falMigrateFailTitle'], 'Itemfield', 'id ' . $uid),
+						FlashMessage::WARNING
+					);
+					$updateValues = array('no_migrate' => 1);
+					$errorCount++;
+				}
+
+				$this->databaseService->updateTableRecords(
+					$refTable,
+					$updateValues,
+					array(
+						'uid' => $uid
+					)
 				);
-				$updateValues = array('no_migrate' => 1);
+				$this->io->progressAdvance($step);
 			}
-
-			$this->databaseService->updateTableRecords(
-				$refTable,
-				$updateValues,
-				array(
-					'uid' => $uid
-				)
-			);
 		}
+
+		$this->io->newLine(2);
+
 		if ($count > 0) {
 			$this->addMessage(
 				sprintf($this->lang['falMigrateSuccess'], $table, $count),
 				'',
 				FlashMessage::OK
 			);
+		}
+
+		if ($errorCount <= 0) {
+			// no errorresults means we're done migrating
+			$this->finishState['fal_blob'] = TRUE;
 		}
 	}
 
@@ -454,15 +505,17 @@ class MigrateController extends ExtUpdateAbstract {
 
 		// attempt migration
 		try {
-			$countRecords = $this->databaseService->migrateTableDataWithReferenceUid($sourceTable, $targetTable, $propertyMap, 'migrated_uid', $evaluation);
+			$countRecords = $this->databaseService->migrateTableDataWithReferenceUid($sourceTable, $targetTable, $propertyMap, 'migrated_uid', $evaluation, 100, $this->io);
 			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',
 				FlashMessage::OK
 			);
 		} catch (NoData $e) {
-			$this->finishState['item'] = TRUE;
+			// do nothing
 		}
+
+		$this->finishState['item'] = TRUE;
 	}
 
 
@@ -516,96 +569,114 @@ class MigrateController extends ExtUpdateAbstract {
 			AND it2.migrated_uid > 0';
 		// note that docdate is only used for extra sorting, if sequence is not provided
 		$orderBy = 'item ASC,sequence ASC,docdate ASC,uid ASC';
-		$toMigrate = $this->databaseService->selectTableRecords($from, $where, $select, 250, $orderBy);
+
+		$max = $this->databaseService->countTableRecords($from, $where);
 
 		// no results means we're done migrating
-		if (empty($toMigrate)) {
+		if ($max === 0) {
 			$this->finishState['blob'] = TRUE;
 			return;
 		}
 
-		// first check for:
-		// - file id's not set to <1, we skip these from insert but not from update
-		// - fields that aren't in propertyMap
-		// - missing sequences and provide them if necessary
+		$this->io->text('Migrate BLOB items to itemblob table.');
+		$this->io->progressStart($max);
+
+		$count = 0;
 		$parentItem = 0;
 		$sequence = 0;
-		$toInsert = array();
-		$remainder = array();
-		$fileUid = array();
-		foreach ($toMigrate as $uid => $row) {
-			if ((int) $row['file'] > 0) {
-				$fileUid[$uid] = (int) $row['file'];
-				// it's a bit hacky, but meh, it's just a few lines in an update script
-				unset($row['file']);
-				unset($row['docdate']);
-				unset($row['uid']);
-				if (isset($row['sequence'])) {
-					$sequence = $row['sequence'];
-					$parentItem = (int) $row['item'];
-				} else {
-					if ($parentItem !== (int) $row['item']) {
-						// it only gets here if the entire parent-item has no blobs with a sequence set
-						$sequence = 1;
+		while ($count < $max) {
+
+			$toMigrate = $this->databaseService->selectTableRecords($from, $where, $select, 5, $orderBy);
+
+			// first check for:
+			// - file id's not set to <1, we skip these from insert but not from update
+			// - fields that aren't in propertyMap
+			// - missing sequences and provide them if necessary
+			$toInsert = array();
+			$remainder = array();
+			$fileUid = array();
+			foreach ($toMigrate as $uid => $row) {
+				if ((int) $row['file'] > 0) {
+					$fileUid[$uid] = (int) $row['file'];
+					// it's a bit hacky, but meh, it's just a few lines in an update script
+					unset($row['file']);
+					unset($row['docdate']);
+					unset($row['uid']);
+					if (isset($row['sequence'])) {
+						$sequence = $row['sequence'];
 						$parentItem = (int) $row['item'];
+					} else {
+						if ($parentItem !== (int) $row['item']) {
+							// it only gets here if the entire parent-item has no blobs with a sequence set
+							$sequence = 1;
+							$parentItem = (int) $row['item'];
+						}
+						// this way, we always start with 1 or do +1 for a single parent-item
+						$row['sequence'] = $sequence++;
 					}
-					// this way, we always start with 1 or do +1 for a single parent-item
-					$row['sequence'] = $sequence++;
+
+					$toInsert[$uid] = $row;
+				} else {
+					// these are registered to flag as no_migrate = 1
+					$remainder[] = $uid;
 				}
-
-				$toInsert[$uid] = $row;
-			} else {
-				// these are registered to flag as no_migrate = 1
-				$remainder[] = $uid;
 			}
-		}
 
-		if (!empty($toInsert)) {
-			// insert!
-			$this->databaseService->insertTableRecords(
-				$targetTable, $propertyMap, $toInsert
-			);
-			// not nice, but it's a very specific part of an update script, I really don't care
-			// get first insert ID
-			$i = $GLOBALS['TYPO3_DB']->sql_insert_id();
-			foreach ($toInsert as $uid => $row) {
-				// update migrated_uid for inserted records
-				$this->databaseService->updateTableRecords($sourceTable, array('migrated_uid' => $i), array('uid' => $uid));
-				// create the file reference
-				$this->fileService->setFileReference($fileUid[$uid], $targetTable, $i++, 'file', (int) $row['pid']);
-				// for every $toInsert, there is a matching $fileUid, so no need for a condition
+			if (!empty($toInsert)) {
+				// insert!
+				$this->databaseService->insertTableRecords(
+					$targetTable, $propertyMap, $toInsert
+				);
+				// not nice, but it's a very specific part of an update script, I really don't care
+				// get first insert ID
+				$i = $GLOBALS['TYPO3_DB']->sql_insert_id();
+				foreach ($toInsert as $uid => $row) {
+					// update migrated_uid for inserted records
+					$this->databaseService->updateTableRecords($sourceTable, array('migrated_uid' => $i), array('uid' => $uid));
+					// create the file reference
+					$this->fileService->setFileReference($fileUid[$uid], $targetTable, $i++, 'file', (int) $row['pid']);
+					// for every $toInsert, there is a matching $fileUid, so no need for a condition
+				}
 			}
-		}
 
-		if (!empty($remainder)) {
-			// set no_migrate to 1 for records that did not meet criteria
+			if (!empty($remainder)) {
+				// set no_migrate to 1 for records that did not meet criteria
+				$this->databaseService->updateTableRecords(
+					$sourceTable,
+					array('no_migrate' => 1),
+					array('uid' => array(
+						'operator' => ' IN (%1$s)',
+						'no_quote' => TRUE,
+						'value' => '\'' . join('\',\'', $remainder) . '\''
+					))
+				);
+			}
+
+			// set no_migrate to 1 for all itemfields of these records
 			$this->databaseService->updateTableRecords(
-				$sourceTable,
+				$sourceDataTable,
 				array('no_migrate' => 1),
-				array('uid' => array(
+				array('item_id' => array(
 					'operator' => ' IN (%1$s)',
 					'no_quote' => TRUE,
-					'value' => '\'' . join('\',\'', $remainder) . '\''
+					'value' => '\'' . join('\',\'', array_keys($toMigrate)) . '\''
 				))
 			);
+
+			$steps = count($toMigrate);
+			$count += $steps;
+			$this->io->progressAdvance($steps);
 		}
 
-		// set no_migrate to 1 for all itemfields of these records
-		$this->databaseService->updateTableRecords(
-			$sourceDataTable,
-			array('no_migrate' => 1),
-			array('item_id' => array(
-				'operator' => ' IN (%1$s)',
-				'no_quote' => TRUE,
-				'value' => '\'' . join('\',\'', array_keys($toMigrate)) . '\''
-			))
-		);
+		$this->io->newLine(2);
 
 		$this->addMessage(
-			sprintf($this->lang['migrateSuccess'], $targetTable, count($toInsert)),
+			sprintf($this->lang['migrateSuccess'], $targetTable, $count),
 			'',
 			FlashMessage::OK
 		);
+
+		$this->finishState['blob'] = TRUE;
 	}
 
 	/**
@@ -657,16 +728,17 @@ class MigrateController extends ExtUpdateAbstract {
 
 		// attempt migration
 		try {
-			$countRecords = $this->databaseService->migrateTableDataWithReferenceUid($sourceTable, $targetTable, $propertyMap, 'migrated_uid', $evaluation, 20000);
+			$countRecords = $this->databaseService->migrateTableDataWithReferenceUid($sourceTable, $targetTable, $propertyMap, 'migrated_uid', $evaluation, 1000, $this->io);
 			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',
 				FlashMessage::OK
 			);
 		} catch (NoData $e) {
-			// no data to migrate
-			$this->finishState['itemfield'] = TRUE;
+			// do nothing
 		}
+
+		$this->finishState['itemfield'] = TRUE;
 	}
 
 	/**
@@ -695,16 +767,17 @@ class MigrateController extends ExtUpdateAbstract {
 
 		// attempt migration
 		try {
-			$countRecords = $this->databaseService->migrateMmTableWithReferenceUid($sourceTable, $targetTable, $localConfig, $foreignConfig, $propertyMap, 'migrated');
+			$countRecords = $this->databaseService->migrateMmTableWithReferenceUid($sourceTable, $targetTable, $localConfig, $foreignConfig, $propertyMap, 'migrated', 100, $this->io);
 			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',
 				FlashMessage::OK
 			);
 		} catch (NoData $e) {
-			// no data to migrate
-			$this->finishState['item_item_mm'] = TRUE;
+			// do nothing
 		}
+
+		$this->finishState['item_item_mm'] = TRUE;
 	}
 
 	/**
@@ -735,16 +808,17 @@ class MigrateController extends ExtUpdateAbstract {
 
 		// attempt migration
 		try {
-			$countRecords = $this->databaseService->migrateMmTableWithReferenceUid($sourceTable, $targetTable, $localConfig, $foreignConfig, $propertyMap, 'migrated');
+			$countRecords = $this->databaseService->migrateMmTableWithReferenceUid($sourceTable, $targetTable, $localConfig, $foreignConfig, $propertyMap, 'migrated', 100, $this->io);
 			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',
 				FlashMessage::OK
 			);
 		} catch (NoData $e) {
-			// no data to migrate
-			$this->finishState['item_xml_mm'] = TRUE;
+			// do nothing
 		}
+
+		$this->finishState['item_xml_mm'] = TRUE;
 	}
 
 	/**
