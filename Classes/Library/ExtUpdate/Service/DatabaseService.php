@@ -73,6 +73,22 @@ class DatabaseService implements SingletonInterface {
 	}
 
 	/**
+	 * Returns whether extension tables exist.
+	 *
+	 * @param string $extensionKey
+	 * @return boolean
+	 */
+	public function doExtensionTablesExist($extensionKey) {
+		$tables = $this->databaseConnection->admin_get_tables();
+		foreach ($tables as $tableName => $tableData) {
+			if (strpos($tableName, 'tx_' . $extensionKey) === 0) {
+				return TRUE;
+			}
+		}
+		return FALSE;
+	}
+
+	/**
 	 * Migrates table data from one table to another.
 	 * Does not touch the source table data except for setting
 	 * a single reference uid property.
@@ -89,47 +105,62 @@ class DatabaseService implements SingletonInterface {
 	 * @return integer Affected record count
 	 * @throws Exception\NoData Nothing to migrate
 	 */
-	public function migrateTableDataWithReferenceUid($sourceTable, $targetTable, array $propertyMap, $sourceReferenceProperty, array $evaluation = array(), $limitRecords = 10000) {
+	public function migrateTableDataWithReferenceUid($sourceTable, $targetTable, array $propertyMap, $sourceReferenceProperty, array $evaluation = array(), $limitRecords = 10000, $io = NULL) {
 		$evaluation[] = $sourceReferenceProperty . '=0';
 		$where = join(' ' . DatabaseConnection::AND_Constraint . ' ', $evaluation);
-		// select all data rows to migrate, set uid as keys
-		$toMigrate = $this->selectTableRecords($sourceTable, $where, '*', $limitRecords);
-		$count = count($toMigrate);
-
-		if ($count <= 0) {
+		$max = $this->countTableRecords($sourceTable, $where);
+		if ($max <= 0) {
 			throw new Exception\NoData(1448612998, array($sourceTable));
 		}
 
-		// translate rows to insertable data according to $propertyMap
-		$fields = array();
-		$toInsert = $this->translatePropertiesOfRows($toMigrate, $propertyMap, $fields);
-
-		// insert
-		$this->insertTableRecords($targetTable, $fields, $toInsert);
-		// retrieve first new uid and use it as a starting point for the reference property
-		$i = $this->databaseConnection->sql_insert_id();
-
-		// depending on any files for reference, we either just update (much quicker), or update and set fileReferences
-		if (empty($this->filesForReference)) {
-			foreach ($toMigrate as $uid => $row) {
-				$this->updateTableRecords($sourceTable, array($sourceReferenceProperty => $i++), array('uid' => $uid));
-			}
-		} else {
-			foreach ($toMigrate as $uid => $row) {
-				$this->updateTableRecords($sourceTable, array($sourceReferenceProperty => $i), array('uid' => $uid));
-				if (isset($this->filesForReference[$uid])) {
-					$this->fileService->setFileReference(
-						$this->filesForReference[$uid]['uid'],
-						$targetTable,
-						$i++,
-						$this->filesForReference[$uid]['field'],
-						(int) $row['pid']
-					);
-				}
-			}
-			// reset
-			$this->filesForReference = array();
+		// @LOW this shouldn't really be here, but for now it works
+		if ($io !== NULL) {
+			$io->text('Migrate data from \'' . $sourceTable . '\' to \'' . $targetTable . '\'.');
+			$io->progressStart($max);
 		}
+		$count = 0;
+		do {
+
+			// select all data rows to migrate, set uid as keys
+			$toMigrate = $this->selectTableRecords($sourceTable, $where, '*', $limitRecords);
+			$count += count($toMigrate);
+
+			// translate rows to insertable data according to $propertyMap
+			$fields = array();
+			$toInsert = $this->translatePropertiesOfRows($toMigrate, $propertyMap, $fields);
+
+			// insert
+			$this->insertTableRecords($targetTable, $fields, $toInsert);
+			// retrieve first new uid and use it as a starting point for the reference property
+			$i = $this->databaseConnection->sql_insert_id();
+
+			// depending on any files for reference, we either just update (much quicker), or update and set fileReferences
+			if (empty($this->filesForReference)) {
+				foreach ($toMigrate as $uid => $row) {
+					$this->updateTableRecords($sourceTable, array($sourceReferenceProperty => $i++), array('uid' => $uid));
+					if ($io !== NULL) $io->progressAdvance(1);
+				}
+			} else {
+				foreach ($toMigrate as $uid => $row) {
+					$this->updateTableRecords($sourceTable, array($sourceReferenceProperty => $i), array('uid' => $uid));
+					if (isset($this->filesForReference[$uid])) {
+						$this->fileService->setFileReference(
+							$this->filesForReference[$uid]['uid'],
+							$targetTable,
+							$i++,
+							$this->filesForReference[$uid]['field'],
+							(int) $row['pid']
+						);
+					}
+					if ($io !== NULL) $io->progressAdvance(1);
+				}
+				// reset
+				$this->filesForReference = array();
+			}
+
+		} while ($io !== NULL && $count < $max);
+
+		if ($io !== NULL) $io->newLine(2);
 
 		return $count;
 	}
@@ -211,7 +242,7 @@ class DatabaseService implements SingletonInterface {
 	 * @return integer Affected record count
 	 * @throws Exception\NoData Nothing to migrate
 	 */
-	public function migrateMmTableWithReferenceUid($sourceTable, $targetTable, array $localConfig, array $foreignConfig, array $propertyMap, $sourceFlagProperty, $limitRecords = 5000) {
+	public function migrateMmTableWithReferenceUid($sourceTable, $targetTable, array $localConfig, array $foreignConfig, array $propertyMap, $sourceFlagProperty, $limitRecords = 5000, $io = NULL) {
 		$select = sprintf(
 			'mm.*, l.%1$s AS new_local, f.%2$s AS new_foreign',
 			$localConfig['uid'],
@@ -223,53 +254,85 @@ class DatabaseService implements SingletonInterface {
 			$localConfig['table'],
 			$foreignConfig['table']
 		);
+		// @TODO ___ why not use AND_Constraint?
 		$where = sprintf(
-			'mm.%3$s=0 AND f.uid=mm.uid_foreign AND l.uid=mm.uid_local AND f.%1$s > 0 AND l.%2$s > 0',
+			'mm.%3$s=0 AND f.uid=mm.uid_foreign AND l.uid=mm.uid_local AND f.%2$s > 0 AND l.%1$s > 0',
 			$localConfig['uid'],
 			$foreignConfig['uid'],
 			$sourceFlagProperty
 		);
+		if (isset($localConfig['evaluation'])) {
+			foreach ($localConfig['evaluation'] as $eval) {
+				$where .= sprintf(
+					' AND l.%1$s',
+					$eval
+				);
+			}
+		}
+		if (isset($foreignConfig['evaluation'])) {
+			foreach ($foreignConfig['evaluation'] as $eval) {
+				$where .= sprintf(
+					' AND f.%1$s',
+					$eval
+				);
+			}
+		}
 
-		// select all data rows to migrate
-		$toMigrate = $this->databaseConnection->exec_SELECTgetRows(
-			$select, $from, $where, '', '', $limitRecords
-		);
-		$count = count($toMigrate);
-
-		if ($count <= 0) {
+		$max = $this->countTableRecords($from, $where);
+		if ($max <= 0) {
 			throw new Exception\NoData(1448613061, array($sourceTable));
 		}
 
-		// translate rows to insertable data according to $propertyMap
-		$propertyMap = array_merge($propertyMap, array(
-			'new_local' => 'uid_local',
-			'new_foreign' => 'uid_foreign'
-		));
-		$fields = array();
-		$toInsert = $this->translatePropertiesOfRows($toMigrate, $propertyMap, $fields);
-
-		// insert
-		$this->insertTableRecords($targetTable, $fields, $toInsert);
-
-		// create a where which only matches the original uid's
-		$whereArray = array();
-		$intersect = array(
-			'uid_local' => 1,
-			'uid_foreign' => 1
-		);
-		foreach ($toMigrate as $row) {
-			$whereArray[] = $this->getWhereFromConditionArray(
-				array_intersect_key($row, $intersect),
-				$sourceTable
-			);
+		// @LOW this shouldn't really be here, but for now it works
+		if ($io !== NULL) {
+			$io->text('Migrate references from \'' . $sourceTable . '\' to \'' . $targetTable . '\'.');
+			$io->progressStart($max);
 		}
+		$count = 0;
+		do {
 
-		// update the $sourceFlagProperty value
-		$this->databaseConnection->exec_UPDATEquery(
-			$sourceTable,
-			'(' . join(') ' . DatabaseConnection::OR_Constraint . ' (', $whereArray) . ')',
-			array($sourceFlagProperty => 1)
-		);
+			// select all data rows to migrate
+			$toMigrate = $this->databaseConnection->exec_SELECTgetRows(
+				$select, $from, $where, '', '', $limitRecords
+			);
+			$count += count($toMigrate);
+
+			// translate rows to insertable data according to $propertyMap
+			$propertyMap = array_merge($propertyMap, array(
+				'new_local' => 'uid_local',
+				'new_foreign' => 'uid_foreign'
+			));
+			$fields = array();
+			$toInsert = $this->translatePropertiesOfRows($toMigrate, $propertyMap, $fields);
+
+			// insert
+			$this->insertTableRecords($targetTable, $fields, $toInsert);
+
+			// create a where which only matches the original uid's
+			$whereArray = array();
+			$intersect = array(
+				'uid_local' => 1,
+				'uid_foreign' => 1
+			);
+			foreach ($toMigrate as $row) {
+				$whereArray[] = $this->getWhereFromConditionArray(
+					array_intersect_key($row, $intersect),
+					$sourceTable
+				);
+			}
+
+			// update the $sourceFlagProperty value
+			$this->databaseConnection->exec_UPDATEquery(
+				$sourceTable,
+				'(' . join(') ' . DatabaseConnection::OR_Constraint . ' (', $whereArray) . ')',
+				array($sourceFlagProperty => 1)
+			);
+
+			if ($io !== NULL) $io->progressAdvance(count($toMigrate));
+
+		} while ($io !== NULL && $count < $max);
+
+		if ($io !== NULL) $io->newLine(2);
 
 		return $count;
 	}
@@ -436,6 +499,17 @@ class DatabaseService implements SingletonInterface {
 		$where = empty($whereArray) ? '' : $this->getWhereFromConditionArray($whereArray, $table);
 		$this->databaseConnection->exec_UPDATEquery($table, $where, $values);
 		return $this->databaseConnection->sql_affected_rows();
+	}
+
+	/**
+	 * Returns total count of selection.
+	 *
+	 * @param string $table
+	 * @param string $where
+	 * @return integer
+	 */
+	public function countTableRecords($table, $where = '', $select='*') {
+		return $this->databaseConnection->exec_SELECTcountRows($select, $table, $where);
 	}
 
 	/**

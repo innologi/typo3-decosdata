@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\Library\ExtUpdate;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Ext Update Abstract
  *
@@ -33,12 +34,45 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-abstract class ExtUpdateAbstract implements ExtUpdateInterface{
-	// @LOW ___what about a reload button?
+abstract class ExtUpdateAbstract implements ExtUpdateInterface {
+	// @LOW ___add a reload button?
 	/**
 	 * @var \TYPO3\CMS\Core\Messaging\FlashMessageQueue
 	 */
-	protected $flashMessageQueue;
+	private $flashMessageQueue;
+
+	/**
+	 * @var \Symfony\Component\Console\Style\SymfonyStyle
+	 */
+	protected $io;
+
+	/**
+	 * @var boolean
+	 */
+	protected $cliMode = FALSE;
+
+	/**
+	 * Allowed severities with mappings to i/o methods for CLI
+	 *
+	 * @var array
+	 */
+	protected $cliAllowedSeverities = [
+		FlashMessage::OK => 'success',
+		FlashMessage::WARNING => 'warning',
+		FlashMessage::ERROR => 'error'
+	];
+
+	/**
+	 * @var array
+	 */
+	protected $cliErrorSeverities = [
+		FlashMessage::ERROR => TRUE
+	];
+
+	/**
+	 * @var integer
+	 */
+	protected $errorCount = 0;
 
 	/**
 	 * @var \Innologi\Decosdata\Library\ExtUpdate\Service\DatabaseService
@@ -74,12 +108,24 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	protected $sourceExtensionVersion = '0.0.0';
 
 	/**
+	 * If the source extension is not loaded, setting this override will
+	 * ignore the requirement if the extension's tables are found.
+	 *
+	 * @var string
+	 */
+	protected $overrideSourceRequirement = FALSE;
+
+	/**
 	 * Constructor
 	 *
+	 * If called from CLI, the parameter will be used to print messages.
+	 *
+	 * @param \Symfony\Component\Console\Style\SymfonyStyle $io
+	 * @param array $arguments
 	 * @return void
 	 * @throws Exception\NoExtkeySet
 	 */
-	public function __construct() {
+	public function __construct(SymfonyStyle $io = NULL, array $arguments = []) {
 		if ( !isset($this->extensionKey[0]) ) {
 			throw new Exception\NoExtkeySet(1448616492);
 		}
@@ -87,20 +133,32 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 		if ( !isset($this->sourceExtensionKey[0]) ) {
 			$this->sourceExtensionKey = $this->extensionKey;
 		}
+
 		/* @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
 		$objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
-
-		$this->flashMessageQueue = $objectManager->get(
-			\TYPO3\CMS\Core\Messaging\FlashMessageQueue::class,
-			'extbase.flashmessages.tx_' . $this->extensionKey . '_extupdate'
-		);
-
 		$this->databaseService = $objectManager->get(
 			__NAMESPACE__ . '\\Service\\DatabaseService'
 		);
 		$this->fileService = $objectManager->get(
 			__NAMESPACE__ . '\\Service\\FileService'
 		);
+
+		// determine mode
+		$this->cliMode = TYPO3_REQUESTTYPE & TYPO3_REQUESTTYPE_CLI;
+		if ($this->cliMode) {
+			// in CLI mode, messages are to be printed
+			if ($io === NULL) {
+				throw new Exception\ImproperCliInit(1461682094);
+			}
+			$this->io = $io;
+			$this->overrideSourceRequirement = $arguments['overrideSourceRequirement'] ?? FALSE;
+		} else {
+			// in normal (non-CLI) mode, messages are queued
+			$this->flashMessageQueue = $objectManager->get(
+				\TYPO3\CMS\Core\Messaging\FlashMessageQueue::class,
+				'extbase.flashmessages.tx_' . $this->extensionKey . '_extupdate'
+			);
+		}
 	}
 
 	/**
@@ -113,21 +171,39 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	public function main() {
 		try {
 			$this->checkPrerequisites();
-			$this->processUpdates();
+			// CLI mode will loop until finished
+			do {
+				$finished = $this->processUpdates();
+			} while ($this->cliMode && $this->errorCount < 1 && !$finished);
+
+			// if not finished, we'll add the instruction to run the updater again
+			if ($finished) {
+				$this->addMessage(
+					'The updater has finished all of its tasks, you don\'t need to run it again until the next extension-update.',
+					'Update complete',
+					FlashMessage::OK
+				);
+			} else {
+				$this->addMessage(
+					'Please run the updater again to continue updating and/or follow any remaining instructions, until this message disappears.',
+					'Run updater again',
+					FlashMessage::WARNING
+				);
+			}
 		} catch (Exception\Exception $e) {
-			$this->addFlashMessage(
+			$this->addMessage(
 				$e->getFormattedErrorMessage(),
 				'Update failed',
 				FlashMessage::ERROR
 			);
 		} catch (\Exception $e) {
-			$this->addFlashMessage(
+			$this->addMessage(
 				$e->getMessage(),
 				'Update failed',
 				FlashMessage::ERROR
 			);
 		}
-		return $this->flashMessageQueue->renderFlashMessages();
+		return $this->cliMode ? '' : $this->flashMessageQueue->renderFlashMessages();
 	}
 
 	/**
@@ -155,8 +231,14 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 			// we don't use em_conf for this, because the requirement is only for
 			// the updater, not the entire extension
 
-			// is source extension is loaded?
+			// is source extension loaded?
 			if (!ExtensionManagementUtility::isLoaded($this->sourceExtensionKey)) {
+				if ($this->overrideSourceRequirement) {
+					if ($this->databaseService->doExtensionTablesExist($this->sourceExtensionKey)) {
+						// found at least one table
+						return;
+					}
+				}
 				throw new Exception\ExtensionNotLoaded(1448616650, array($this->sourceExtensionKey));
 			}
 			// does source extension meet version requirement?
@@ -173,19 +255,28 @@ abstract class ExtUpdateAbstract implements ExtUpdateInterface{
 	}
 
 	/**
-	 * Creates a Message object and adds it to the FlashMessageQueue.
+	 * Adds a message to output
 	 *
 	 * @param string $messageBody The message
-	 * @param string $messageTitle Optional message title
+	 * @param string $messageTitle Optional message title (only for non-CLI)
 	 * @param integer $severity Optional severity, must be one of \TYPO3\CMS\Core\Messaging\FlashMessage constants
 	 * @return void
 	 */
-	protected function addFlashMessage($messageBody, $messageTitle = '', $severity = \TYPO3\CMS\Core\Messaging\FlashMessage::OK) {
-		/* @var $flashMessage \TYPO3\CMS\Core\Messaging\FlashMessage */
-		$flashMessage = GeneralUtility::makeInstance(
-			\TYPO3\CMS\Core\Messaging\FlashMessage::class, $messageBody, $messageTitle, $severity
-		);
-		$this->flashMessageQueue->enqueue($flashMessage);
+	protected function addMessage($messageBody, $messageTitle = '', $severity = \TYPO3\CMS\Core\Messaging\FlashMessage::OK) {
+		if ($this->cliMode) {
+			if (isset($this->cliAllowedSeverities[$severity])) {
+				$this->io->{$this->cliAllowedSeverities[$severity]}($messageBody);
+			}
+			if (isset($this->cliErrorSeverities[$severity])) {
+				$this->errorCount++;
+			}
+		} else {
+			/* @var $flashMessage \TYPO3\CMS\Core\Messaging\FlashMessage */
+			$flashMessage = GeneralUtility::makeInstance(
+				\TYPO3\CMS\Core\Messaging\FlashMessage::class, $messageBody, $messageTitle, $severity
+			);
+			$this->flashMessageQueue->enqueue($flashMessage);
+		}
 	}
 
 }

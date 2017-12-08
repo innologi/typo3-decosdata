@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Library\ExtUpdate;
 /***************************************************************
 *  Copyright notice
 *
-*  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+*  (c) 2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
 *  All rights reserved
 *
 *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -22,22 +22,30 @@ namespace Innologi\Decosdata\Library\ExtUpdate;
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
-
+use TYPO3\CMS\Extensionmanager\Utility\UpdateScriptUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
- * Ext Update Interface
+ * Cli-Starter for ExtUpdate
  *
  * @package InnologiLibs
  * @subpackage ExtUpdate
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-interface ExtUpdateInterface {
-
+class CliStarter extends UpdateScriptUtility {
+	// @TODO ___doc entire class
 	/**
-	 * Provides the methods to be executed during update.
+	 * Returns true, if ext_update class says it wants to run.
 	 *
-	 * @return boolean TRUE on complete, FALSE on incomplete
+	 * @param string $extensionKey extension key
+	 * @param object $io I/O
+	 * @param array $arguments
+	 * @return mixed NULL, if update is not available, else update script return
 	 */
-	public function processUpdates();
+	public function executeUpdateIfNeeded_cliSupport($extensionKey, $io, array $arguments = []) {
+		$className = $this->requireUpdateScript($extensionKey);
+		$scriptObject = GeneralUtility::makeInstance($className, $io, $arguments);
+		return $scriptObject->access() ? $scriptObject->main() : NULL;
+	}
 
 }
