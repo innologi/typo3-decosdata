@@ -158,7 +158,8 @@ class MigrateController extends ExtUpdateAbstract {
 		$count = 0;
 		$errorCount = 0;
 		while($count+$errorCount < $max) {
-			$toMigrate = $this->databaseService->selectTableRecords($table, $where, '*', 1000);
+			$toMigrate = $this->databaseService->selectTableRecords($table, $where, '*', 50);
+			$step = 0;
 			foreach ($toMigrate as $uid => $row) {
 				if (isset($row['xmlpath'])) {
 					// migrate import file to FAL and set the reference
@@ -173,15 +174,15 @@ class MigrateController extends ExtUpdateAbstract {
 								'uid' => $uid
 							)
 						);
-						$count++;
-						$this->io->progressAdvance(1);
+						$step++;
 					} catch (FileException $e) {
+						$this->io->newLine(2);
 						$this->addMessage(
 							$e->getFormattedErrorMessage() . ' ' . $this->lang['falMigrateFail'] . ' ' . sprintf(
 								$this->lang['falMigrateFailCorrect'],
 								$this->fileService->getDefaultStorage()->getName(),
 								$table
-								),
+							),
 							sprintf($this->lang['falMigrateFailTitle'], 'Import', $row['name']),
 							FlashMessage::ERROR
 						);
@@ -189,11 +190,13 @@ class MigrateController extends ExtUpdateAbstract {
 					}
 				}
 			}
+
+			$count += $step;
+			$this->io->progressAdvance($step);
 		}
 
-		$this->io->newLine(2);
-
 		if ($count > 0) {
+			$this->io->newLine(2);
 			$this->addMessage(
 				sprintf($this->lang['falMigrateSuccess'], $table, $count),
 				'',
@@ -237,7 +240,7 @@ class MigrateController extends ExtUpdateAbstract {
 		while ($count+$errorCount < $max) {
 
 			$okUidArray = array();
-			$xmlArray = $this->databaseService->selectTableRecords($table, $where, '*', 1000);
+			$xmlArray = $this->databaseService->selectTableRecords($table, $where, '*', 50);
 			foreach ($xmlArray as $uid => $xml) {
 				// get all the necessary paths
 				$file = $this->fileService->getFileObjectByUid($xml['migrated_file']);
@@ -270,6 +273,7 @@ class MigrateController extends ExtUpdateAbstract {
 								$table
 							);
 
+						$this->io->newLine(2);
 						$this->addMessage(
 							sprintf(
 								$this->lang['dirMismatch'],
@@ -286,6 +290,10 @@ class MigrateController extends ExtUpdateAbstract {
 			}
 
 			if (!empty($okUidArray)) {
+				$step = count($okUidArray);
+				$count += $step;
+				$this->io->progressAdvance($step);
+
 				// any xml found ok will be marked as such
 				foreach ($okUidArray as $uid) {
 					$this->databaseService->updateTableRecords(
@@ -297,20 +305,17 @@ class MigrateController extends ExtUpdateAbstract {
 							'uid' => $uid
 						)
 					);
-					$count++;
-					$this->io->progressAdvance(1);
 				}
 			}
 		}
 
-		$this->io->newLine(2);
-
 		if ($count > 0) {
+			$this->io->newLine(2);
 			$this->addMessage(
 				sprintf(
 					$this->lang['migrateSuccess'],
 					$table . '.filedirpath',
-					count($okUidArray)
+					$count
 				),
 				'',
 				FlashMessage::OK
@@ -362,7 +367,8 @@ class MigrateController extends ExtUpdateAbstract {
 
 		// attempt migration
 		try {
-			$countRecords = $this->databaseService->migrateTableDataWithReferenceUid($sourceTable, $targetTable, $propertyMap, 'migrated_uid', $evaluation, 100, $this->io);
+			$countRecords = $this->databaseService->migrateTableDataWithReferenceUid($sourceTable, $targetTable, $propertyMap, 'migrated_uid', $evaluation, 50, $this->io);
+			$this->io->newLine(2);
 			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',
@@ -413,17 +419,17 @@ class MigrateController extends ExtUpdateAbstract {
 		$errorCount = 0;
 		while ($count+$errorCount < $max) {
 
+			$step = 0;
 			$updateValues = array();
-			$toMigrate = $this->databaseService->selectTableRecords($from, $where, $select, 100);
+			$toMigrate = $this->databaseService->selectTableRecords($from, $where, $select, 25);
 			foreach ($toMigrate as $uid => $row) {
 				// migrate itemfield file to FAL and set the reference
-				$step = 0;
 				try {
 					$file = $this->fileService->retrieveFileObjectByPath($row['filepath']);
 					$updateValues = array('migrated_file' => $file->getUid());
-					$count++;
-					$step = 1;
+					$step++;
 				} catch (FileException $e) {
+					$this->io->newLine(2);
 					$this->addMessage(
 						$e->getFormattedErrorMessage() . ' ' . $this->lang['falMigrateFail'] . ' ' . $this->lang['falMigrateFailDelete'],
 						sprintf($this->lang['falMigrateFailTitle'], 'Itemfield', 'id ' . $uid),
@@ -440,13 +446,13 @@ class MigrateController extends ExtUpdateAbstract {
 						'uid' => $uid
 					)
 				);
-				$this->io->progressAdvance($step);
 			}
+			$count += $step;
+			$this->io->progressAdvance($step);
 		}
 
-		$this->io->newLine(2);
-
 		if ($count > 0) {
+			$this->io->newLine(2);
 			$this->addMessage(
 				sprintf($this->lang['falMigrateSuccess'], $table, $count),
 				'',
@@ -506,6 +512,7 @@ class MigrateController extends ExtUpdateAbstract {
 		// attempt migration
 		try {
 			$countRecords = $this->databaseService->migrateTableDataWithReferenceUid($sourceTable, $targetTable, $propertyMap, 'migrated_uid', $evaluation, 100, $this->io);
+			$this->io->newLine(2);
 			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',
@@ -669,7 +676,6 @@ class MigrateController extends ExtUpdateAbstract {
 		}
 
 		$this->io->newLine(2);
-
 		$this->addMessage(
 			sprintf($this->lang['migrateSuccess'], $targetTable, $count),
 			'',
@@ -728,7 +734,8 @@ class MigrateController extends ExtUpdateAbstract {
 
 		// attempt migration
 		try {
-			$countRecords = $this->databaseService->migrateTableDataWithReferenceUid($sourceTable, $targetTable, $propertyMap, 'migrated_uid', $evaluation, 1000, $this->io);
+			$countRecords = $this->databaseService->migrateTableDataWithReferenceUid($sourceTable, $targetTable, $propertyMap, 'migrated_uid', $evaluation, 100, $this->io);
+			$this->io->newLine(2);
 			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',
@@ -768,6 +775,7 @@ class MigrateController extends ExtUpdateAbstract {
 		// attempt migration
 		try {
 			$countRecords = $this->databaseService->migrateMmTableWithReferenceUid($sourceTable, $targetTable, $localConfig, $foreignConfig, $propertyMap, 'migrated', 100, $this->io);
+			$this->io->newLine(2);
 			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',
@@ -809,6 +817,7 @@ class MigrateController extends ExtUpdateAbstract {
 		// attempt migration
 		try {
 			$countRecords = $this->databaseService->migrateMmTableWithReferenceUid($sourceTable, $targetTable, $localConfig, $foreignConfig, $propertyMap, 'migrated', 100, $this->io);
+			$this->io->newLine(2);
 			$this->addMessage(
 				sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
 				'',

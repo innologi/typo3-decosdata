@@ -105,7 +105,7 @@ class DatabaseService implements SingletonInterface {
 	 * @return integer Affected record count
 	 * @throws Exception\NoData Nothing to migrate
 	 */
-	public function migrateTableDataWithReferenceUid($sourceTable, $targetTable, array $propertyMap, $sourceReferenceProperty, array $evaluation = array(), $limitRecords = 10000, $io = NULL) {
+	public function migrateTableDataWithReferenceUid($sourceTable, $targetTable, array $propertyMap, $sourceReferenceProperty, array $evaluation = array(), $limitRecords = 100, $io = NULL) {
 		$evaluation[] = $sourceReferenceProperty . '=0';
 		$where = join(' ' . DatabaseConnection::AND_Constraint . ' ', $evaluation);
 		$max = $this->countTableRecords($sourceTable, $where);
@@ -123,7 +123,8 @@ class DatabaseService implements SingletonInterface {
 
 			// select all data rows to migrate, set uid as keys
 			$toMigrate = $this->selectTableRecords($sourceTable, $where, '*', $limitRecords);
-			$count += count($toMigrate);
+			$steps = count($toMigrate);
+			$count += $steps;
 
 			// translate rows to insertable data according to $propertyMap
 			$fields = array();
@@ -138,7 +139,6 @@ class DatabaseService implements SingletonInterface {
 			if (empty($this->filesForReference)) {
 				foreach ($toMigrate as $uid => $row) {
 					$this->updateTableRecords($sourceTable, array($sourceReferenceProperty => $i++), array('uid' => $uid));
-					if ($io !== NULL) $io->progressAdvance(1);
 				}
 			} else {
 				foreach ($toMigrate as $uid => $row) {
@@ -152,15 +152,11 @@ class DatabaseService implements SingletonInterface {
 							(int) $row['pid']
 						);
 					}
-					if ($io !== NULL) $io->progressAdvance(1);
 				}
 				// reset
 				$this->filesForReference = array();
 			}
-
-		} while ($io !== NULL && $count < $max);
-
-		if ($io !== NULL) $io->newLine(2);
+		} while ($io !== NULL && $io->progressAdvance($steps) === NULL && $count < $max);
 
 		return $count;
 	}
@@ -242,7 +238,7 @@ class DatabaseService implements SingletonInterface {
 	 * @return integer Affected record count
 	 * @throws Exception\NoData Nothing to migrate
 	 */
-	public function migrateMmTableWithReferenceUid($sourceTable, $targetTable, array $localConfig, array $foreignConfig, array $propertyMap, $sourceFlagProperty, $limitRecords = 5000, $io = NULL) {
+	public function migrateMmTableWithReferenceUid($sourceTable, $targetTable, array $localConfig, array $foreignConfig, array $propertyMap, $sourceFlagProperty, $limitRecords = 100, $io = NULL) {
 		$select = sprintf(
 			'mm.*, l.%1$s AS new_local, f.%2$s AS new_foreign',
 			$localConfig['uid'],
@@ -295,7 +291,8 @@ class DatabaseService implements SingletonInterface {
 			$toMigrate = $this->databaseConnection->exec_SELECTgetRows(
 				$select, $from, $where, '', '', $limitRecords
 			);
-			$count += count($toMigrate);
+			$steps = count($toMigrate);
+			$count += $steps;
 
 			// translate rows to insertable data according to $propertyMap
 			$propertyMap = array_merge($propertyMap, array(
@@ -328,11 +325,7 @@ class DatabaseService implements SingletonInterface {
 				array($sourceFlagProperty => 1)
 			);
 
-			if ($io !== NULL) $io->progressAdvance(count($toMigrate));
-
-		} while ($io !== NULL && $count < $max);
-
-		if ($io !== NULL) $io->newLine(2);
+		} while ($io !== NULL && $io->progressAdvance($steps) === NULL && $count < $max);
 
 		return $count;
 	}
