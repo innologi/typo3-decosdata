@@ -63,7 +63,6 @@ class FileReferenceRepository implements SingletonInterface {
 
 	/**
 	 * @var \TYPO3\CMS\Core\DataHandling\DataHandler
-	 * @inject
 	 */
 	protected $dataHandler;
 
@@ -78,6 +77,31 @@ class FileReferenceRepository implements SingletonInterface {
 	 */
 	protected $beUser;
 
+	/**
+	 * Injects DataHandler
+	 *
+	 * @param \TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler
+	 * @return void
+	 */
+	public function injectDataHandler(\TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler) {
+		/*
+		 * datahandler does resorting of records if they have a sortby,
+		 * which causes a BIG and ever growing delay the larger the table gets,
+		 * completely fucking over our migration speed, but this sorting field
+		 * is never relevant to our usage of sys_file_reference, luckily the
+		 * field is disabled and removed in TYPO3 >8.7
+		 *
+		 * @see https://forge.typo3.org/issues/80800
+		 * @see https://forge.typo3.org/issues/83160
+		 */
+		if (version_compare(TYPO3_branch, '8.7', '<=') && isset($GLOBALS['TCA'][$this->referenceTable]['ctrl']['sortby'])) {
+			unset($GLOBALS['TCA'][$this->referenceTable]['ctrl']['sortby']);
+		}
+
+		// don't need log entries for these
+		$dataHandler->enableLogging = FALSE;
+		$this->dataHandler = $dataHandler;
+	}
 
 	/**
 	 * Class constructor
@@ -125,6 +149,7 @@ class FileReferenceRepository implements SingletonInterface {
 			// immediately update the reference in foreign table
 			$foreignTable => array(
 				$foreignUid => array(
+					'pid' => $this->storagePid,
 					$foreignField => $referenceUid
 				)
 			)
