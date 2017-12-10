@@ -616,15 +616,12 @@ class DatabaseService implements SingletonInterface {
 						// possibly generate your expected value unless you provide it already, which defeats the
 						// purpose of trying to retrieve it
 						$valueReference = $targetProperty['valueReference'];
-						if (!isset($this->referenceUidCache[$valueReference['foreignTable']][$sourceRow[$sourceProperty]])) {
-							$this->referenceUidCache[$valueReference['foreignTable']][$sourceRow[$sourceProperty]] = $this->getReferenceUid(
-								$valueReference,
-								$sourceRow[$sourceProperty],
-								$sourceRow
-							);
-						}
 						// note that the source value will be replaced in target with its new reference uid, effectively creating a 1:N relation
-						$targetRow[$valueReference['targetProperty']] = $this->referenceUidCache[$valueReference['foreignTable']][$sourceRow[$sourceProperty]];
+						$targetRow[$valueReference['targetProperty']] = $this->getReferenceUid(
+							$valueReference,
+							$sourceRow[$sourceProperty],
+							$sourceRow
+						);
 					} elseif (isset($targetProperty['fileReference']) && (int) $sourceRow[$sourceProperty] > 0) {
 						// fileReferences are file uid's to be set in relation to the targetRow
 						$fileReference = $targetProperty['fileReference'];
@@ -671,25 +668,29 @@ class DatabaseService implements SingletonInterface {
 			}
 		}
 
-		$row = $this->databaseConnection->exec_SELECTgetSingleRow(
-			$propertyConfig['foreignField'],
-			$propertyConfig['foreignTable'],
-			$this->getWhereFromConditionArray($values, $propertyConfig['foreignTable']),
-			'',
-			'uid DESC'
-		);
-		if ($row === FALSE) {
-			$this->databaseConnection->exec_INSERTquery($propertyConfig['foreignTable'], $values);
-			$uid = $this->databaseConnection->sql_insert_id();
-		} elseif (isset($row[$propertyConfig['foreignField']])) {
-			$uid = $row[$propertyConfig['foreignField']];
-		} else {
-			throw new Exception\SqlError(1448613495, array(
-				$this->databaseConnection->debug_lastBuiltQuery
-			));
+		$refId = join(';;;', $values);
+		if (!isset($this->referenceUidCache[$propertyConfig['foreignTable']][$refId])) {
+			$row = $this->databaseConnection->exec_SELECTgetSingleRow(
+				$propertyConfig['foreignField'],
+				$propertyConfig['foreignTable'],
+				$this->getWhereFromConditionArray($values, $propertyConfig['foreignTable']),
+				'',
+				'uid DESC'
+			);
+			if ($row === FALSE) {
+				$this->databaseConnection->exec_INSERTquery($propertyConfig['foreignTable'], $values);
+				$uid = $this->databaseConnection->sql_insert_id();
+			} elseif (isset($row[$propertyConfig['foreignField']])) {
+				$uid = $row[$propertyConfig['foreignField']];
+			} else {
+				throw new Exception\SqlError(1448613495, array(
+					$this->databaseConnection->debug_lastBuiltQuery
+				));
+			}
+			$this->referenceUidCache[$propertyConfig['foreignTable']][$refId] = $uid;
 		}
 
-		return $uid;
+		return $this->referenceUidCache[$propertyConfig['foreignTable']][$refId];
 	}
 
 	/**

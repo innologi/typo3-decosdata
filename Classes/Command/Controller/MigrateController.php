@@ -714,7 +714,6 @@ class MigrateController extends ExtUpdateAbstract {
 					'foreignTable' => 'tx_' . $this->extensionKey . '_domain_model_field',
 					'foreignField' => 'uid',
 					'valueField' => 'field_name',
-					// @TODO ___test this
 					'uniqueBy' => array('pid')
 				)
 			),
@@ -728,7 +727,6 @@ class MigrateController extends ExtUpdateAbstract {
 		$evaluation = array(
 			'no_migrate = 0',
 			// exclude empty values, since we no longer import those in decosdata
-			// @TODO ___test this!
 			'fieldvalue != \'\''
 		);
 
