@@ -121,24 +121,7 @@
 		}());
 	}
 
-	var form = document.forms.decosdatasearch,
-		searchBox = form.elements['tx_decosdata[search]'],
-		searchTimeout = null,
-		searchDelay = 600,
-		searchAtLength = 3,
-		submitAllowed = true,
-		lastSearchValue = '',
-		// @LOW what if we can cache results through LocalStorage, or otherwise SessionStorage, with a lifetime of e.g. 1 hour?
-		dataCache = [];
 
-	var	dataElement = null,
-		sectionElement = null,
-		originalSection = null,
-		overlayElement = null,
-		pagingElements = [],
-		countElements = [],
-		templateItem = null,
-		xhrPagingElement = null;
 
 	// @LOW should improve this to be able to track multiple elements, with their own callbacks
 	var onReach = (function() {
@@ -185,6 +168,7 @@
 			},
 			elementPositionReached: function(element) {
 				var isquirks = document.compatMode !== 'BackCompat',
+					// Edge likes to rebel I guess (against doing what it's supposed to do)
 					page = isquirks && !/Edge/.test(navigator.userAgent) ? document.documentElement : document.body,
 					viewportBottomPos = page.scrollTop + ('innerHeight' in window ? window.innerHeight : page.clientHeight),
 					elemTopPos = 0;
@@ -199,6 +183,19 @@
 
 		return __this;
 	})();
+
+	var form = document.forms.decosdatasearch,
+		dataElement = null,
+		sectionElement = null,
+		originalSection = null,
+		overlayElement = null,
+		pagingElements = [],
+		countElements = [],
+		templateItem = null,
+		xhrPagingElement = null,
+		// @LOW what if we can cache results through LocalStorage, or otherwise SessionStorage, with a lifetime of e.g. 1 hour?
+		dataCache = [];
+
 
 	function resetSection() {
 		console.info('[decosdata] resetting section');
@@ -290,80 +287,6 @@
 	}
 
 
-	function doSubmit() {
-		if (!submitAllowed) {
-			// disable visual cue
-			searchBox.className = 'search-box full-width';
-			return false;
-		}
-		// disable form
-		submitAllowed = false;
-
-		// if same as last search: do nothing
-		var searchValue = searchBox.value.trim();
-		if (searchValue.localeCompare(lastSearchValue) === 0) {
-			submitAllowed = true;
-			// disable visual cue
-			searchBox.className = 'search-box full-width';
-			return false;
-		}
-		lastSearchValue = searchValue;
-
-		// make sure we don't keep any old onReach listeners active
-		onReach.disable();
-
-		// if empty search submitted: reset section
-		if (searchValue.length === 0) {
-			resetSection();
-			submitAllowed = true;
-			// disable visual cue
-			searchBox.className = 'search-box full-width';
-			return false;
-		}
-
-		// visual cue
-		dataElement.parentNode.insertBefore(overlayElement, dataElement);
-
-		xhrRequest('POST', form.dataset.xhr, new FormData(form), searchValue, function(response) {
-			initPagingElements();
-			if (response.paging) {
-				initCountChange(response.paging);
-				initXhrPaging(response.paging);
-			}
-			dataElement.innerHTML = getData(response.data);
-		}, function(response) {
-			// disable visual cues
-			searchBox.className = 'search-box full-width';
-			overlayElement.remove();
-			// re-enable form
-			submitAllowed = true;
-		});
-	}
-
-	function searchListener(event) {
-		var length = searchBox.value.trim().length;
-		if (length === 0 || length >= searchAtLength) {
-			// visual cue
-			searchBox.className = 'search-box full-width loader active';
-			// clear previous search-in-wait if any
-			clearTimeout(searchTimeout);
-			// set delay
-			searchTimeout = setTimeout(doSubmit, searchDelay);
-		}
-	}
-
-	function parseSection2(sectionElement) {
-		if (sectionElement !== null) {
-			dataElement = sectionElement.querySelector('.data');
-			if (dataElement !== null) {
-				var itemElement = dataElement.querySelector('.item');
-				if (itemElement !== null) {
-					templateItem = itemElement.cloneNode(true);
-				}
-			}
-		}
-	}
-
 	// @TODO unite this one and #2
 	function parseSection() {
 		if (sectionElement !== null) {
@@ -381,6 +304,19 @@
 			overlayElement.className = 'overlay loader active';
 		}
 	}
+
+	function parseSection2(sectionElement) {
+		if (sectionElement !== null) {
+			dataElement = sectionElement.querySelector('.data');
+			if (dataElement !== null) {
+				var itemElement = dataElement.querySelector('.item');
+				if (itemElement !== null) {
+					templateItem = itemElement.cloneNode(true);
+				}
+			}
+		}
+	}
+
 
 	function initPagingElements() {
 		if (pagingElements.length > 0) {
@@ -492,9 +428,84 @@
 		}
 	}
 
-
 	// @TODO this method is such a hacky mess, so clean it up once time allows it!
 	initNonSearchPaging();
+
+	if (!form) {
+		// no form = no search
+		return;
+	}
+
+	// if we're here, there is a search form
+	var searchBox = form.elements['tx_decosdata[search]'],
+		searchTimeout = null,
+		searchDelay = 600,
+		searchAtLength = 3,
+		submitAllowed = true,
+		lastSearchValue = '';
+
+
+	function doSubmit() {
+		if (!submitAllowed) {
+			// disable visual cue
+			searchBox.className = 'search-box full-width';
+			return false;
+		}
+		// disable form
+		submitAllowed = false;
+
+		// if same as last search: do nothing
+		var searchValue = searchBox.value.trim();
+		if (searchValue.localeCompare(lastSearchValue) === 0) {
+			submitAllowed = true;
+			// disable visual cue
+			searchBox.className = 'search-box full-width';
+			return false;
+		}
+		lastSearchValue = searchValue;
+
+		// make sure we don't keep any old onReach listeners active
+		onReach.disable();
+
+		// if empty search submitted: reset section
+		if (searchValue.length === 0) {
+			resetSection();
+			submitAllowed = true;
+			// disable visual cue
+			searchBox.className = 'search-box full-width';
+			return false;
+		}
+
+		// visual cue
+		dataElement.parentNode.insertBefore(overlayElement, dataElement);
+
+		xhrRequest('POST', form.dataset.xhr, new FormData(form), searchValue, function(response) {
+			initPagingElements();
+			if (response.paging) {
+				initCountChange(response.paging);
+				initXhrPaging(response.paging);
+			}
+			dataElement.innerHTML = getData(response.data);
+		}, function(response) {
+			// disable visual cues
+			searchBox.className = 'search-box full-width';
+			overlayElement.remove();
+			// re-enable form
+			submitAllowed = true;
+		});
+	}
+
+	function searchListener(event) {
+		var length = searchBox.value.trim().length;
+		if (length === 0 || length >= searchAtLength) {
+			// visual cue
+			searchBox.className = 'search-box full-width loader active';
+			// clear previous search-in-wait if any
+			clearTimeout(searchTimeout);
+			// set delay
+			searchTimeout = setTimeout(doSubmit, searchDelay);
+		}
+	}
 
 	if (form.dataset.xhr) {
 		// hide submit button
