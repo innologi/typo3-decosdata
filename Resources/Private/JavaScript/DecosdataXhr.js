@@ -384,6 +384,7 @@
 	if (form.dataset.xhr) {
 		// hide submit button
 		form.elements['tx_decosdata[submit]'].className = 'search-submit invisible';
+		searchBox.className = 'search-box full-width';
 
 		// get item template
 		if (form.dataset.section) {
