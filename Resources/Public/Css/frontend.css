@@ -6,6 +6,7 @@
 }
 .tx-decosdata .invisible {
 	visibility: hidden;
+	display: none;
 }
 
 
