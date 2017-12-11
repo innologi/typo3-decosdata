@@ -199,7 +199,7 @@ class QueryConfigurator implements SingletonInterface {
 
 		return $this->transformWrap($tableAlias . '.' . $field, $select->getWrap(), $select->getWrapDivider());
 	}
-
+	// @TODO shouldn't the separator go through parameters instead?
 	/**
 	 * Joins multiple SELECT fields under a single alias
 	 * through concat mysql function(s).
