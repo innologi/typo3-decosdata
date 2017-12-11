@@ -23,6 +23,7 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+use Innologi\Decosdata\Exception\MissingParameter;
 use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
@@ -37,7 +38,6 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
  */
 class FilterItems extends OptionAbstract {
 	use Traits\Filters;
-	// @TODO ___can we include the quick filters?
 
 	/**
 	 * Filter is applied on current field configuration.
@@ -52,25 +52,31 @@ class FilterItems extends OptionAbstract {
 		$select = $queryField->getSelect();
 		$conditions = [];
 		foreach ($args['filters'] as $filter) {
-			$this->initializeFilter($filter);
-			$conditions[] = isset($filter['value']) ?
-				$this->constraintFactory->createConstraintByValue(
-					$select->getField(),
-					$select->getTableAlias(),
-					$filter['operator'],
-					$filter['value']
-				) : $this->constraintFactory->createConstraintByValue(
-					'uid',
-					$select->getTableAlias(),
-					$filter['operator'],
-					$filter['parameter']
-				);
+			try {
+				$this->initializeFilter($filter);
+				$conditions[] = isset($filter['value']) ?
+					$this->constraintFactory->createConstraintByValue(
+						$select->getField(),
+						$select->getTableAlias(),
+						$filter['operator'],
+						$filter['value']
+					) : $this->constraintFactory->createConstraintByValue(
+						'uid',
+						$select->getTableAlias(),
+						$filter['operator'],
+						$filter['parameter']
+					);
+			} catch (MissingParameter $e) {
+				// do nothing
+			}
 		}
 
-		$queryField->getWhere()->addConstraint(
-			$id,
-			$this->processConditions($args, $conditions)
-		);
+		if (!empty($conditions)) {
+			$queryField->getWhere()->addConstraint(
+				$id,
+				$this->processConditions($args, $conditions)
+			);
+		}
 	}
 
 	/**
@@ -89,16 +95,22 @@ class FilterItems extends OptionAbstract {
 		$queryField = $query->getContent($id)->getField('');
 		$conditions = [];
 		foreach ($args['filters'] as $filter) {
-			$this->initializeFilter($filter, TRUE);
-			// identify by the field, so we don't create redundant joins
-			$alias = $id . $filter['field'];
-			$conditions[] = $this->filterBy($queryField, $filter, $alias, $filter['field']);
+			try {
+				$this->initializeFilter($filter, TRUE);
+				// identify by the field, so we don't create redundant joins
+				$alias = $id . $filter['field'];
+				$conditions[] = $this->filterBy($queryField, $filter, $alias, $filter['field']);
+			} catch (MissingParameter $e) {
+				// do nothing
+			}
 		}
 
-		$queryField->getWhere()->addConstraint(
-			$service->getOptionIndex(),
-			$this->processConditions($args, $conditions)
-		);
+		if (!empty($conditions)) {
+			$queryField->getWhere()->addConstraint(
+				$service->getOptionIndex(),
+				$this->processConditions($args, $conditions)
+			);
+		}
 	}
 
 }
