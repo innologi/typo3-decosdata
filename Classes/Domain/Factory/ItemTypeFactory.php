@@ -72,7 +72,8 @@ class ItemTypeFactory extends FactoryAbstract {
 	 * @return \Innologi\Decosdata\Domain\Model\ItemType
 	 */
 	public function getByItemType($type, $autoInsert = FALSE) {
-		if (!isset($this->objectCache[$type])) {
+		$cacheKey = $type . ';;;' . $this->storagePid;
+		if (!isset($this->objectCache[$cacheKey])) {
 			/* @var $typeObject \Innologi\Decosdata\Domain\Model\ItemType */
 			$typeObject = $this->repository->findOneByItemType($type);
 			if ($typeObject === NULL) {
@@ -81,9 +82,9 @@ class ItemTypeFactory extends FactoryAbstract {
 					? $this->createAndStoreObject($data)
 					: $this->create($data);
 			}
-			$this->objectCache[$type] = $typeObject;
+			$this->objectCache[$cacheKey] = $typeObject;
 		}
-		return $this->objectCache[$type];
+		return $this->objectCache[$cacheKey];
 	}
 
 }

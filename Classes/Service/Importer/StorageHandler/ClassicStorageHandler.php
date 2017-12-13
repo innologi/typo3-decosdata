@@ -274,13 +274,14 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @return integer
 	 */
 	protected function getItemTypeUid($type) {
-		if (!isset($this->itemTypeCache[$type])) {
-			$this->itemTypeCache[$type] = $this->produceValueObjectUid(
+		$cacheKey = $type . ';;;' . $this->propertyDefaults['pid'];
+		if (!isset($this->itemTypeCache[$cacheKey])) {
+			$this->itemTypeCache[$cacheKey] = $this->produceValueObjectUid(
 				'tx_decosdata_domain_model_itemtype',
 				array('item_type' => $type)
 			);
 		}
-		return $this->itemTypeCache[$type];
+		return $this->itemTypeCache[$cacheKey];
 	}
 
 	/**
@@ -290,13 +291,14 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @return integer
 	 */
 	protected function getFieldUid($field) {
-		if (!isset($this->fieldCache[$field])) {
-			$this->fieldCache[$field] = $this->produceValueObjectUid(
+		$cacheKey = $field . ';;;' . $this->propertyDefaults['pid'];
+		if (!isset($this->fieldCache[$cacheKey])) {
+			$this->fieldCache[$cacheKey] = $this->produceValueObjectUid(
 				'tx_decosdata_domain_model_field',
 				array('field_name' => $field)
 			);
 		}
-		return $this->fieldCache[$field];
+		return $this->fieldCache[$cacheKey];
 	}
 
 	/**

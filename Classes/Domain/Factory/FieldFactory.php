@@ -72,7 +72,8 @@ class FieldFactory extends FactoryAbstract {
 	 * @return \Innologi\Decosdata\Domain\Model\Field
 	 */
 	public function getByFieldName($fieldName, $autoInsert = FALSE) {
-		if (!isset($this->objectCache[$fieldName])) {
+		$cacheKey = $fieldName . ';;;' . $this->storagePid;
+		if (!isset($this->objectCache[$cacheKey])) {
 			/* @var $fieldObject \Innologi\Decosdata\Domain\Model\Field */
 			$fieldObject = $this->repository->findOneByFieldName($fieldName);
 			if ($fieldObject === NULL) {
@@ -81,9 +82,9 @@ class FieldFactory extends FactoryAbstract {
 					? $this->createAndStoreObject($data)
 					: $this->create($data);
 			}
-			$this->objectCache[$fieldName] = $fieldObject;
+			$this->objectCache[$cacheKey] = $fieldObject;
 		}
-		return $this->objectCache[$fieldName];
+		return $this->objectCache[$cacheKey];
 	}
 
 }
