@@ -11,4 +11,7 @@ return [
 	'decosdata:migrate' => [
 		'class' => \Innologi\Decosdata\Command\MigrateCommand::class
 	],
+	'decosdata:import:debug' => [
+		'class' => \Innologi\Decosdata\Command\ImportDebugCommand::class
+	],
 ];
