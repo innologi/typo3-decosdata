@@ -30,13 +30,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputArgument;
 /**
- * Import Debug Command
+ * Import Status Command
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ImportDebugCommand extends Command {
+class ImportStatusCommand extends Command {
 
 	/**
 	 * @var array
@@ -53,11 +53,11 @@ class ImportDebugCommand extends Command {
 	 */
 	protected function configure() {
 		$this->setDescription(
-			'Debug imports by uid'
+			'Show status of imports by uid'
 		)->addArgument(
 			'uid-list',
-			InputArgument::IS_ARRAY,
-			'Comma-separated list of import UIDs to debug.'
+			InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
+			'Optional space-separated list of import UIDs to check.'
 		);
 		// @LOW setHelp()
 		// @LOW addUsage()
@@ -75,7 +75,7 @@ class ImportDebugCommand extends Command {
 		// Make sure the _cli_ user is loaded
 		Bootstrap::getInstance()->initializeBackendAuthentication();
 
-		//$output->setDecorated(TRUE);
+		$output->setDecorated(TRUE);
 		$io = new SymfonyStyle($input, $output);
 		$io->title($this->getDescription());
 		$uidArray = $input->getArgument('uid-list');
@@ -85,7 +85,7 @@ class ImportDebugCommand extends Command {
 			$objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
 			/** @var $importRepository \Innologi\Decosdata\Domain\Repository\ImportRepository */
 			$importRepository = $objectManager->get(\Innologi\Decosdata\Domain\Repository\ImportRepository::class);
-			$imports = $importRepository->findInUidEverywhere($uidArray);
+			$imports = empty($uidArray) ? $importRepository->findAllEverywhere() : $importRepository->findInUidEverywhere($uidArray);
 
 			/** @var $import \Innologi\Decosdata\Domain\Model\Import */
 			foreach ($imports as $import) {
@@ -95,13 +95,14 @@ class ImportDebugCommand extends Command {
 				$fileExists = file_exists($filePath);
 				$knownHash = $import->getHash();
 				$newHash = md5_file($filePath);
-				$canBeUpdated = $fileExists && $knownHash === $newHash;
+				$canBeUpdated = $fileExists && $knownHash !== $newHash;
 
 				$io->writeln($prefix . 'file-path: ' . $filePath);
 				$io->writeln($prefix . 'file-exists: ' . $this->answers[(int)$fileExists]);
 				$io->writeln($prefix . 'known-hash: ' . $knownHash);
 				$io->writeln($prefix . 'current-hash: ' . $newHash);
-				$io->writeln($prefix . 'can-be-updated: ' . $this->answers[(int)$canBeUpdated]);
+				$io->writeln($prefix . 'updatable: ' . $this->answers[(int)$canBeUpdated]);
+				$io->newLine();
 			}
 		} catch (\Exception $e) {
 			$io->error('[' . $e->getCode() . '] ' . $e->getMessage());
