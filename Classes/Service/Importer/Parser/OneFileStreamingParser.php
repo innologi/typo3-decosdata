@@ -32,6 +32,8 @@ use Innologi\Decosdata\Service\Importer\Exception\InvalidValidationFile;
 use Innologi\Decosdata\Service\Importer\Exception\ValidationFailed;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
+use Innologi\Decosdata\Library\TraceLogger\TraceLoggerAwareInterface;
+use Innologi\Decosdata\Library\TraceLogger\TraceLoggerInterface;
 /**
  * Importer Parser: One File Imports, Streaming Parser
  *
@@ -47,7 +49,8 @@ use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class OneFileStreamingParser implements ParserInterface,SingletonInterface {
+class OneFileStreamingParser implements ParserInterface,SingletonInterface,TraceLoggerAwareInterface {
+	use \Innologi\Decosdata\Library\TraceLogger\TraceLoggerAware;
 
 	/**
 	 * @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface
@@ -83,6 +86,8 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	 * @return void
 	 */
 	public function processImport(\Innologi\Decosdata\Domain\Model\Import $import) {
+		if($this->logger) $this->logger->logTrace();
+
 		$importFilePath = PATH_site . $import->getFile()->getOriginalResource()->getPublicUrl();
 		$this->baseFilePath = dirname($importFilePath);
 		$this->importObject = $import;
@@ -109,6 +114,8 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	 * @throws \Innologi\Decosdata\Service\Importer\Exception\ValidationFailed
 	 */
 	protected function validateImportFile($importFilePath, $rngFilePath) {
+		if($this->logger) $this->logger->logTrace();
+
 		$reader = new \XMLReader();
 		try {
 			if (!@$reader->open($importFilePath)) {
@@ -147,6 +154,8 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	 * @throws \Innologi\Decosdata\Service\Importer\Exception\UnreadableImportFile
 	 */
 	protected function startParser($importFilePath) {
+		if($this->logger) $this->logger->logTrace();
+
 		$reader = new \XMLReader();
 		if ( !$reader->open($importFilePath) ) {
 			throw new UnreadableImportFile(1448550742, array($importFilePath));
@@ -172,6 +181,8 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	 * @return void
 	 */
 	protected function parseItems(\XMLReader $reader, $parentItem = NULL) {
+		if($this->logger && $this->logger->getLevel() > 1) $this->logger->logTrace();
+
 		$type = strtoupper($reader->getAttribute('TYPE'));
 		// place cursor at the next element (regardless of depth) and get new depth
 		while ($reader->read() && $reader->nodeType != \XMLReader::ELEMENT);
@@ -213,6 +224,8 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	 * @throws \Innologi\Decosdata\Service\Importer\Exception\UnexpectedItemStructure
 	 */
 	protected function parseItem(\XMLReader $reader, $itemType, $parentItem = NULL) {
+		if($this->logger && $this->logger->getLevel() > 1) $this->logger->logTrace();
+
 		$item = NULL;
 
 		// place cursor at the next node (regardless of depth) and get new depth
@@ -264,6 +277,8 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	 * @return void
 	 */
 	protected function parseItemBlob(\XMLReader $reader, $parentItem) {
+		if($this->logger && $this->logger->getLevel() > 1) $this->logger->logTrace();
+
 		$data = array();
 		$fallback = NULL;
 
@@ -342,6 +357,17 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface {
 	 */
 	public function getErrors() {
 		return $this->errors;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see TraceLoggerAwareInterface::setLogger()
+	 */
+	public function setLogger(TraceLoggerInterface $logger) {
+		$this->logger = $logger;
+		if ($this->storageHandler instanceof TraceLoggerAwareInterface) {
+			$this->storageHandler->setLogger($logger);
+		}
 	}
 
 }

@@ -25,6 +25,8 @@ namespace Innologi\Decosdata\Service\Importer;
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use Innologi\Decosdata\Utility\DebugUtility;
+use Innologi\Decosdata\Library\TraceLogger\TraceLoggerAwareInterface;
+use Innologi\Decosdata\Library\TraceLogger\TraceLoggerInterface;
 /**
  * Importer Service
  *
@@ -34,7 +36,8 @@ use Innologi\Decosdata\Utility\DebugUtility;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ImporterService implements SingletonInterface{
+class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
+	use \Innologi\Decosdata\Library\TraceLogger\TraceLoggerAware;
 
 	/**
 	 * @var \Innologi\Decosdata\Domain\Repository\ImportRepository
@@ -70,6 +73,7 @@ class ImporterService implements SingletonInterface{
 	 * @return void
 	 */
 	public function importUidSelection(array $uidArray) {
+		if ($this->logger) $this->logger->logTrace();
 		$importCollection = $this->importRepository->findInUidEverywhere($uidArray);
 		$this->importSelection($importCollection);
 	}
@@ -81,6 +85,7 @@ class ImporterService implements SingletonInterface{
 	 * @return void
 	 */
 	public function importSelection($importCollection) {
+		if ($this->logger) $this->logger->logTrace();
 		/* @var $import \Innologi\Decosdata\Domain\Model\Import */
 		foreach ($importCollection as $import) {
 			try {
@@ -101,6 +106,7 @@ class ImporterService implements SingletonInterface{
 	 * @throws
 	 */
 	public function importSingle(\Innologi\Decosdata\Domain\Model\Import $import) {
+		if ($this->logger) $this->logger->logTrace();
 		$filePath = PATH_site . $import->getFile()->getOriginalResource()->getPublicUrl();
 		if ( ($newHash = $this->getHashIfReadyForProcessing($filePath, $import->getHash())) === FALSE ) {
 			// @LOW consider throwing an exception, which when caught will register the import as notUpdated?
@@ -132,8 +138,8 @@ class ImporterService implements SingletonInterface{
 	 * @return string|boolean
 	 */
 	protected function getHashIfReadyForProcessing($filePath, $knownHash) {
+		if ($this->logger) $this->logger->logTrace();
 		return file_exists($filePath) && ($newHash = md5_file($filePath)) !== $knownHash ? $newHash : FALSE;
-
 	}
 
 	/**
@@ -143,6 +149,17 @@ class ImporterService implements SingletonInterface{
 	 */
 	public function getErrors() {
 		return $this->errors;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see TraceLoggerAwareInterface::setLogger()
+	 */
+	public function setLogger(TraceLoggerInterface $logger) {
+		$this->logger = $logger;
+		if ($this->parser instanceof TraceLoggerAwareInterface) {
+			$this->parser->setLogger($logger);
+		}
 	}
 
 }

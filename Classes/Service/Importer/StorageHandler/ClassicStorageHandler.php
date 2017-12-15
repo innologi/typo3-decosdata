@@ -26,6 +26,7 @@ namespace Innologi\Decosdata\Service\Importer\StorageHandler;
 use TYPO3\CMS\Core\SingletonInterface;
 use Innologi\Decosdata\Exception\SqlError;
 use Innologi\Decosdata\Library\FalApi\Exception\FileException;
+use Innologi\Decosdata\Library\TraceLogger\TraceLoggerAwareInterface;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
 /**
@@ -40,7 +41,8 @@ use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterface {
+class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterface,TraceLoggerAwareInterface {
+	use \Innologi\Decosdata\Library\TraceLogger\TraceLoggerAware;
 
 	/**
 	 * @var \TYPO3\CMS\Core\Database\DatabaseConnection
@@ -107,6 +109,8 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @return void
 	 */
 	public function initialize($pid) {
+		if($this->logger && $this->logger->getLevel() > 1) $this->logger->logTrace();
+
 		$this->propertyDefaults['pid'] = $pid;
 		$this->fileReferenceRepository->setStoragePid($pid);
 	}
@@ -119,6 +123,8 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItem
 	 */
 	public function pushItem(array $data) {
+		if($this->logger && $this->logger->getLevel() > 1) $this->logger->logTrace();
+
 		if (!isset($data['item_key'][0])) {
 			// item key is empty
 			throw new InvalidItem(1448550839, array(
@@ -174,6 +180,8 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob
 	 */
 	public function pushItemBlob(array $data) {
+		if($this->logger && $this->logger->getLevel() > 1) $this->logger->logTrace();
+
 		if (!isset($data['item_key'][0])) {
 			// item key is empty
 			throw new InvalidItemBlob(1448550925, array(
@@ -218,6 +226,8 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @return void
 	 */
 	public function pushItemField(array $data) {
+		if($this->logger && $this->logger->getLevel() > 2) $this->logger->logTrace();
+
 		$table = 'tx_decosdata_domain_model_itemfield';
 		$data = array_merge($this->propertyDefaults, $data);
 		$data['field'] = $this->getFieldUid($data['field']);
@@ -255,6 +265,8 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @return void
 	 */
 	protected function pushFileReference($filePath, $foreignTable, $foreignUid, $foreignField) {
+		if($this->logger && $this->logger->getLevel() > 2) $this->logger->logTrace();
+
 		$this->fileReferenceRepository->upsertRecordByFilePath($filePath, $foreignTable, $foreignUid, $foreignField);
 	}
 
