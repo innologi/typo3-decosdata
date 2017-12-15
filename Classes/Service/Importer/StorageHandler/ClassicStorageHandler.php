@@ -183,9 +183,9 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 		}
 
 		try {
-			if (!isset($data['filepath'][0])) {
-				// filepath missing
-				throw new FileException(1448550944, array('NULL'));
+			if (! (isset($data['filepath'][0]) && is_file($data['filepath'])) ) {
+				// filepath missing or not a file
+				throw new FileException(1448550944, array($data['filepath'] ?? 'NULL'));
 			}
 
 			$filePath = $data['filepath'];

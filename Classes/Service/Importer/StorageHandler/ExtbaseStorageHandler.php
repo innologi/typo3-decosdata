@@ -220,9 +220,9 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 */
 	public function pushItemBlob(array $data) {
 		try {
-			if (!isset($data['filepath'][0])) {
-				// filepath missing
-				throw new FileException(1448551092, array('NULL'));
+			if (! (isset($data['filepath'][0]) && is_file($data['filepath'])) ) {
+				// filepath missing or not a file
+				throw new FileException(1448551092, array($data['filepath'] ?? 'NULL'));
 			}
 
 			/* @var $parentItem \Innologi\Decosdata\Domain\Model\Item */
