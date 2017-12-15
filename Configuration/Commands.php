@@ -14,4 +14,7 @@ return [
 	'decosdata:import:status' => [
 		'class' => \Innologi\Decosdata\Command\ImportStatusCommand::class
 	],
+	'decosdata:import:run' => [
+		'class' => \Innologi\Decosdata\Command\ImportRunCommand::class
+	],
 ];
