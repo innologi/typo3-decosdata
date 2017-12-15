@@ -42,7 +42,7 @@ class DebugUtility {
 	 * @return string
 	 */
 	public static function formatArrayValues(array $array) {
-		$output = "\n- " . join(", \n- ", $array);
+		$output = PHP_EOL . '- ' . join(', ' . PHP_EOL . '- ', $array);
 		return $output;
 	}
 
@@ -55,9 +55,9 @@ class DebugUtility {
 	public static function formatArray(array $array) {
 		$temp = array();
 		foreach ($array as $key => $value) {
-			$temp[] = $key . " \n" . $value;
+			$temp[] = $key . ' ' . PHP_EOL . $value;
 		}
-		$output = "\n" . join(" \n\n", $temp);
+		$output = PHP_EOL . join(' ' . PHP_EOL . PHP_EOL, $temp);
 		return $output;
 	}
 
