@@ -293,7 +293,7 @@
 			originalSection = sectionElement.cloneNode(true);
 			pagingElements = sectionElement.querySelectorAll('.pagebrowser .pagebrowser-navigation');
 			countElements = sectionElement.querySelectorAll('.pagebrowser .resultcount');
-			dataElement = sectionElement.querySelector('.data');
+			dataElement = sectionElement.querySelector('.items');
 			if (dataElement !== null) {
 				var itemElement = dataElement.querySelector('.item');
 				if (itemElement !== null) {
@@ -307,7 +307,7 @@
 
 	function parseSection2(sectionElement) {
 		if (sectionElement !== null) {
-			dataElement = sectionElement.querySelector('.data');
+			dataElement = sectionElement.querySelector('.items');
 			if (dataElement !== null) {
 				var itemElement = dataElement.querySelector('.item');
 				if (itemElement !== null) {
