@@ -63,6 +63,11 @@ class ImportRunCommand extends Command {
 			't',
 			InputOption::VALUE_NONE,
 			'Enables basic trace log. Higher verbosity level logs more details.'
+		)->addOption(
+			'force',
+			'f',
+			InputOption::VALUE_NONE,
+			'Forces (re)processing an import regardless of any changes.'
 		);
 		// @LOW setHelp()
 		// @LOW addUsage()
@@ -101,7 +106,7 @@ class ImportRunCommand extends Command {
 			if ($traceLogEnabled) {
 				$importerService->setLogger($objectManager->get(SymfonyStyleLogger::class, $io));
 			}
-			$importerService->importUidSelection($uidArray);
+			$importerService->importUidSelection($uidArray, (bool) $input->getOption('force'));
 
 			// persist any lingering data
 			/* @var $persistenceManager \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager */

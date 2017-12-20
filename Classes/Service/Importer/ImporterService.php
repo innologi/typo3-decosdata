@@ -61,9 +61,9 @@ class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
 	 *
 	 * @return void
 	 */
-	public function importAll() {
+	public function importAll($force = FALSE) {
 		$importCollection = $this->importRepository->findAllEverywhere();
-		$this->importSelection($importCollection);
+		$this->importSelection($importCollection, $force);
 	}
 
 	/**
@@ -72,10 +72,10 @@ class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
 	 * @param array $uidArray
 	 * @return void
 	 */
-	public function importUidSelection(array $uidArray) {
+	public function importUidSelection(array $uidArray, $force = FALSE) {
 		if ($this->logger) $this->logger->logTrace();
 		$importCollection = $this->importRepository->findInUidEverywhere($uidArray);
-		$this->importSelection($importCollection);
+		$this->importSelection($importCollection, $force);
 	}
 
 	/**
@@ -84,12 +84,12 @@ class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
 	 * @param \TYPO3\CMS\Extbase\Persistence\QueryResultInterface|array $importCollection
 	 * @return void
 	 */
-	public function importSelection($importCollection) {
+	public function importSelection($importCollection, $force = FALSE) {
 		if ($this->logger) $this->logger->logTrace();
 		/* @var $import \Innologi\Decosdata\Domain\Model\Import */
 		foreach ($importCollection as $import) {
 			try {
-				$this->importSingle($import);
+				$this->importSingle($import, $force);
 			} catch (Exception\ImporterError $e) {
 				// register the error and move on
 				$this->errors[$import->getUid() . ':' . $import->getTitle()] = $e->getFormattedErrorMessage();
@@ -105,10 +105,10 @@ class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
 	 * @return void
 	 * @throws
 	 */
-	public function importSingle(\Innologi\Decosdata\Domain\Model\Import $import) {
+	public function importSingle(\Innologi\Decosdata\Domain\Model\Import $import, $force = FALSE) {
 		if ($this->logger) $this->logger->logTrace();
 		$filePath = PATH_site . $import->getFile()->getOriginalResource()->getPublicUrl();
-		if ( ($newHash = $this->getHashIfReadyForProcessing($filePath, $import->getHash())) === FALSE ) {
+		if ( !file_exists($filePath) || (($newHash = $this->getHashIfReadyForProcessing($filePath, $import->getHash())) === FALSE && !$force) ) {
 			// @LOW consider throwing an exception, which when caught will register the import as notUpdated?
 			// either no file present, or the file has seen no change: no sense in continuing
 			return;
@@ -116,7 +116,9 @@ class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
 
 		$this->parser->processImport($import);
 		// not using the File record's hash, because that one is set initially and could be updated by outside sources
-		$import->setHash($newHash);
+		if ($newHash !== FALSE) {
+			$import->setHash($newHash);
+		}
 		// mark as processed
 		$this->importRepository->update($import);
 
@@ -139,7 +141,7 @@ class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
 	 */
 	protected function getHashIfReadyForProcessing($filePath, $knownHash) {
 		if ($this->logger) $this->logger->logTrace();
-		return file_exists($filePath) && ($newHash = md5_file($filePath)) !== $knownHash ? $newHash : FALSE;
+		return ($newHash = md5_file($filePath)) !== $knownHash ? $newHash : FALSE;
 	}
 
 	/**
