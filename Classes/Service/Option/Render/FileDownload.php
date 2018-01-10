@@ -54,7 +54,7 @@ class FileDownload implements OptionInterface {
 		// @TODO ___what if the content is empty? Can (and should) we differentiate between originalContent and content? I mean it's clear we shouldn't generate a downloadlink if no file was found
 		// $fileRelativeUrl = $renderer->getFileRelativeUrl();?
 		//if ($fileRelativeUrl === NULL) {
-		if (!$this->isFileHandle($service->getOriginalContent()) || ($file = $this->getFileObject($this->fileUid)) === NULL) {
+		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL ) {
 			return $tag;
 		}
 
