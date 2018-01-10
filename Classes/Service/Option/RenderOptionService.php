@@ -42,6 +42,11 @@ class RenderOptionService extends OptionServiceAbstract {
 	protected $tagFactory;
 
 	/**
+	 * @var \Innologi\Decosdata\Service\ConditionService
+	 */
+	protected $conditionService;
+
+	/**
 	 * @var \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext
 	 */
 	protected $controllerContext;
@@ -78,6 +83,17 @@ class RenderOptionService extends OptionServiceAbstract {
 		parent::__construct();
 		// PHP < 5.6 does not support concatenation in above variable declarations, hence:
 		$this->patternInline = sprintf($this->patternInline, $this->patternArgumentInline);
+	}
+
+	/**
+	 * Injects ConditionService and sets a reference to this RenderOptionService
+	 *
+	 * @param \Innologi\Decosdata\Service\ConditionService $conditionService
+	 * @return void
+	 */
+	public function injectConditionService(\Innologi\Decosdata\Service\ConditionService $conditionService) {
+		$conditionService->setRenderOptionService($this);
+		$this->conditionService = $conditionService;
 	}
 
 	/**
@@ -195,7 +211,11 @@ class RenderOptionService extends OptionServiceAbstract {
 		$tag = $this->tagFactory->createTagContent($content);
 
 		$lastOptions = [];
-		foreach ($options as $option) {
+		foreach ($options as $optionIndex => $option) {
+			if (isset($option['if']) && is_array($option['if']) && !$this->conditionService->ifMatch($option['if'], $optionIndex, $index)) {
+				// skip if there is an if conf that isn't matched
+				continue;
+			}
 			// if an option has the last attribute, save it for last
 			if (isset($option['last']) && (bool)$option['last']) {
 				$lastOptions[] = $option;
