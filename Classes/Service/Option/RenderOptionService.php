@@ -183,10 +183,8 @@ class RenderOptionService extends OptionServiceAbstract {
 					}
 				}
 			}
-			// note that it will reset original content to the same value,
-			// so until we support utilizing a different content value, no harm is done
 			// @LOW __note that this does not yet cache entries that are set multiple times
-			$replacements[$match] = $this->processOptions([ $option ], $this->originalContent, $this->index, $this->item);
+			$replacements[$match] = $this->processOptions([ $option ], $this->originalContent, $this->index . 'in', $this->item);
 		}
 
 		return $replacements;
@@ -198,13 +196,14 @@ class RenderOptionService extends OptionServiceAbstract {
 	 *
 	 * @param array $options
 	 * @param string $content
-	 * $param integer $index
+	 * $param string $index
 	 * @param array $item
 	 * @return \Innologi\Decosdata\Library\TagBuilder\TagInterface
 	 */
 	public function processOptions(array $options, $content, $index, array $item) {
+		$previously = [$this->item, $this->index, $this->originalContent];
 		$this->item = $item;
-		$this->index = $index;
+		$this->index = (string)$index;
 		$this->originalContent = $content;
 
 		// starting TagInterface instance
@@ -227,6 +226,8 @@ class RenderOptionService extends OptionServiceAbstract {
 		foreach ($lastOptions as $option) {
 			$tag = $this->executeOption('alterContentValue', $option, $tag);
 		}
+
+		list($this->item, $this->index, $this->originalContent) = $previously;
 		return $tag;
 	}
 
