@@ -38,13 +38,7 @@ class FileDownload implements OptionInterface {
 	use Traits\FileHandler;
 	// @TODO ___FileDownloadObscure: same file with arg, or different file?
 	// @TODO ___Absolute URIs for other contexts than normal HTML?
-	// @TODO ___add title and class?
-
-	/**
-	 * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
-	 * @inject
-	 */
-	protected $contentObjectRenderer;
+	// @TODO ___add class?
 
 	/**
 	 * {@inheritDoc}
@@ -59,7 +53,8 @@ class FileDownload implements OptionInterface {
 		}
 
 		return $service->getTagFactory()->createTag('a', [
-			'href' => $file->getPublicUrl()
+			'href' => $file->getPublicUrl(),
+			'title' => $file->getName()
 		], $tag);
 	}
 
