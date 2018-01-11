@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -34,10 +34,14 @@ use Innologi\Decosdata\Library\TagBuilder\TagInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileDownload implements OptionInterface {
+class FileDownloadObscured implements OptionInterface {
 	use Traits\FileHandler;
-	// @TODO ___Absolute URIs for other contexts than normal HTML?
 	// @TODO ___add class?
+	/**
+	 * @var \Innologi\Decosdata\Service\DownloadService
+	 * @inject
+	 */
+	protected $downloadService;
 
 	/**
 	 * {@inheritDoc}
@@ -45,14 +49,18 @@ class FileDownload implements OptionInterface {
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
 		// @TODO ___what if the content is empty? Can (and should) we differentiate between originalContent and content? I mean it's clear we shouldn't generate a downloadlink if no file was found
-		// $fileRelativeUrl = $renderer->getFileRelativeUrl();?
-		//if ($fileRelativeUrl === NULL) {
 		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL ) {
 			return $tag;
 		}
 
+		$item = $service->getItem();
+		$id = 'id' . $service->getIndex();
+		if (!isset($item['id'])) {
+			// @TODO throw exception
+		}
+
 		return $service->getTagFactory()->createTag('a', [
-			'href' => $file->getPublicUrl(),
+			'href' => $this->downloadService->getDownloadUrl($this->fileUid, (int)$item[$id], $item['id']),
 			'title' => $file->getName()
 		], $tag);
 	}
