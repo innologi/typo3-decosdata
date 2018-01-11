@@ -59,11 +59,15 @@ class QueryOptionService extends OptionServiceAbstract {
 	 * @return void
 	 */
 	public function processFieldOptions(array $options, QueryInterface $configuration, $fieldIndex) {
+		$previously = [$this->index, $this->optionIndex];
+
 		$this->index = $fieldIndex;
 		foreach ($options as $index => $option) {
 			$this->optionIndex = $index;
 			$this->executeOption('alterQueryField', $option, $configuration);
 		}
+
+		list($this->index, $this->optionIndex) = $previously;
 	}
 
 	/**
@@ -76,11 +80,15 @@ class QueryOptionService extends OptionServiceAbstract {
 	 * @return void
 	 */
 	public function processColumnOptions(array $options, QueryInterface $configuration, $columnIndex) {
+		$previously = [$this->index, $this->optionIndex];
+
 		$this->index = $columnIndex;
 		foreach ($options as $index => $option) {
 			$this->optionIndex = $index;
 			$this->executeOption('alterQueryColumn', $option, $configuration);
 		}
+
+		list($this->index, $this->optionIndex) = $previously;
 	}
 
 	/**
@@ -92,11 +100,15 @@ class QueryOptionService extends OptionServiceAbstract {
 	 * @return void
 	 */
 	public function processRowOptions(array $options, QueryInterface $configuration) {
+		$previously = [$this->index, $this->optionIndex];
+
 		$this->index = 0;
 		foreach ($options as $index => $option) {
 			$this->optionIndex = $index;
 			$this->executeOption('alterQueryRow', $option, $configuration);
 		}
+
+		list($this->index, $this->optionIndex) = $previously;
 	}
 
 }

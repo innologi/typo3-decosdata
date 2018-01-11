@@ -4,7 +4,7 @@
 
 <f:if condition="{data}">
 <d:pageBrowser xhrEnabled="{paging.xhr}" more="{paging.more}">
-<div class="data">
+<div class="data items">
 	<f:for each="{data}" as="item">
 		<div class="item item-{item.id}">
 			<d:item.for configuration="{configuration.contentField}" item="{item}">

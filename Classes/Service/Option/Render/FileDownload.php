@@ -36,15 +36,8 @@ use Innologi\Decosdata\Library\TagBuilder\TagInterface;
  */
 class FileDownload implements OptionInterface {
 	use Traits\FileHandler;
-	// @TODO ___FileDownloadObscure: same file with arg, or different file?
 	// @TODO ___Absolute URIs for other contexts than normal HTML?
-	// @TODO ___add title and class?
-
-	/**
-	 * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
-	 * @inject
-	 */
-	protected $contentObjectRenderer;
+	// @TODO ___add class?
 
 	/**
 	 * {@inheritDoc}
@@ -54,12 +47,13 @@ class FileDownload implements OptionInterface {
 		// @TODO ___what if the content is empty? Can (and should) we differentiate between originalContent and content? I mean it's clear we shouldn't generate a downloadlink if no file was found
 		// $fileRelativeUrl = $renderer->getFileRelativeUrl();?
 		//if ($fileRelativeUrl === NULL) {
-		if (!$this->isFileHandle($service->getOriginalContent()) || ($file = $this->getFileObject($this->fileUid)) === NULL) {
+		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL ) {
 			return $tag;
 		}
 
 		return $service->getTagFactory()->createTag('a', [
-			'href' => $file->getPublicUrl()
+			'href' => $file->getPublicUrl(),
+			'title' => $file->getName()
 		], $tag);
 	}
 

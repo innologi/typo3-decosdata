@@ -42,6 +42,11 @@ class RenderOptionService extends OptionServiceAbstract {
 	protected $tagFactory;
 
 	/**
+	 * @var \Innologi\Decosdata\Service\ConditionService
+	 */
+	protected $conditionService;
+
+	/**
 	 * @var \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext
 	 */
 	protected $controllerContext;
@@ -78,6 +83,17 @@ class RenderOptionService extends OptionServiceAbstract {
 		parent::__construct();
 		// PHP < 5.6 does not support concatenation in above variable declarations, hence:
 		$this->patternInline = sprintf($this->patternInline, $this->patternArgumentInline);
+	}
+
+	/**
+	 * Injects ConditionService and sets a reference to this RenderOptionService
+	 *
+	 * @param \Innologi\Decosdata\Service\ConditionService $conditionService
+	 * @return void
+	 */
+	public function injectConditionService(\Innologi\Decosdata\Service\ConditionService $conditionService) {
+		$conditionService->setRenderOptionService($this);
+		$this->conditionService = $conditionService;
 	}
 
 	/**
@@ -167,10 +183,8 @@ class RenderOptionService extends OptionServiceAbstract {
 					}
 				}
 			}
-			// note that it will reset original content to the same value,
-			// so until we support utilizing a different content value, no harm is done
 			// @LOW __note that this does not yet cache entries that are set multiple times
-			$replacements[$match] = $this->processOptions([ $option ], $this->originalContent, $this->index, $this->item);
+			$replacements[$match] = $this->processOptions([ $option ], $this->originalContent, $this->index . 'in', $this->item);
 		}
 
 		return $replacements;
@@ -182,20 +196,25 @@ class RenderOptionService extends OptionServiceAbstract {
 	 *
 	 * @param array $options
 	 * @param string $content
-	 * $param integer $index
+	 * $param string $index
 	 * @param array $item
 	 * @return \Innologi\Decosdata\Library\TagBuilder\TagInterface
 	 */
 	public function processOptions(array $options, $content, $index, array $item) {
+		$previously = [$this->item, $this->index, $this->originalContent];
 		$this->item = $item;
-		$this->index = $index;
+		$this->index = (string)$index;
 		$this->originalContent = $content;
 
 		// starting TagInterface instance
 		$tag = $this->tagFactory->createTagContent($content);
 
 		$lastOptions = [];
-		foreach ($options as $option) {
+		foreach ($options as $optionIndex => $option) {
+			if (isset($option['if']) && is_array($option['if']) && !$this->conditionService->ifMatch($option['if'], $optionIndex, $index)) {
+				// skip if there is an if conf that isn't matched
+				continue;
+			}
 			// if an option has the last attribute, save it for last
 			if (isset($option['last']) && (bool)$option['last']) {
 				$lastOptions[] = $option;
@@ -207,6 +226,8 @@ class RenderOptionService extends OptionServiceAbstract {
 		foreach ($lastOptions as $option) {
 			$tag = $this->executeOption('alterContentValue', $option, $tag);
 		}
+
+		list($this->item, $this->index, $this->originalContent) = $previously;
 		return $tag;
 	}
 

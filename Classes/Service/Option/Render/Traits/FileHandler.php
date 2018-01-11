@@ -47,6 +47,20 @@ trait FileHandler {
 	protected $fileUid;
 
 	/**
+	 * Run all the file handler checks and return either a File object or NULL
+	 *
+	 * @param string $content
+	 * @return \TYPO3\CMS\Core\Resource\File|NULL
+	 */
+	protected function getFileObject($content) {
+		$file = NULL;
+		if ($this->isFileHandle($content)) {
+			$file = $this->getFileObjectByUid($this->fileUid);
+		}
+		return $file;
+	}
+
+	/**
 	 * Returns whether the argument is a file handle
 	 *
 	 * @param string $fileHandle
@@ -69,7 +83,7 @@ trait FileHandler {
 	 * @param integer $fileUid
 	 * @return \TYPO3\CMS\Core\Resource\File|NULL
 	 */
-	protected function getFileObject($fileUid) {
+	protected function getFileObjectByUid($fileUid) {
 		try {
 			return $this->resourceFactory->getFileObject($fileUid);
 		} catch (FileDoesNotExistException $e) {
@@ -77,5 +91,4 @@ trait FileHandler {
 		}
 		return NULL;
 	}
-
 }

@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -24,42 +24,45 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Innologi\Decosdata\Library\TagBuilder\TagInterface;
-use Innologi\Decosdata\Library\TagBuilder\TagContent;
 /**
- * File Size option
+ * File Download option
  *
- * Renders the filesize of the content, if content represents a valid file.
+ * Renders a download link of the content, if content represents a valid file.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileSize implements OptionInterface {
+class FileDownloadObscured implements OptionInterface {
 	use Traits\FileHandler;
+	// @TODO ___add class?
+	/**
+	 * @var \Innologi\Decosdata\Service\DownloadService
+	 * @inject
+	 */
+	protected $downloadService;
 
 	/**
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
+		// @TODO ___what if the content is empty? Can (and should) we differentiate between originalContent and content? I mean it's clear we shouldn't generate a downloadlink if no file was found
 		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL ) {
 			return $tag;
 		}
 
-		$content = GeneralUtility::formatSize(
-			$file->getSize(),
-			// @TODO ___get default format from typoscript?
-			// @LOW ___support formatting argument?
-			'b|kb|MB|GB|TB'
-		);
-
-		if ($tag instanceof TagContent) {
-			return $tag->reset()->setContent($content);
+		$item = $service->getItem();
+		$id = 'id' . $service->getIndex();
+		if (!isset($item['id'])) {
+			// @TODO throw exception
 		}
 
-		return $service->getTagFactory()->createTagContent($content);
+		return $service->getTagFactory()->createTag('a', [
+			'href' => $this->downloadService->getDownloadUrl($this->fileUid, (int)$item[$id], $item['id']),
+			'title' => $file->getName()
+		], $tag);
 	}
 
 }

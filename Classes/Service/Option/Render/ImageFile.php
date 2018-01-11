@@ -51,7 +51,7 @@ class ImageFile implements OptionInterface {
 	 * @see \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( !$this->isFileHandle($service->getOriginalContent()) || ($file = $this->getFileObject($this->fileUid)) === NULL) {
+		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL ) {
 			return $tag;
 		}
 		// @LOW no check on whether it really is an image?

@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -24,42 +24,41 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Library\TagBuilder\TagInterface;
 use Innologi\Decosdata\Library\TagBuilder\TagContent;
 /**
- * File Size option
+ * Set Content
  *
- * Renders the filesize of the content, if content represents a valid file.
+ * Replaces the content value.
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileSize implements OptionInterface {
-	use Traits\FileHandler;
+class SetContent implements OptionInterface {
 
 	/**
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
+	 * @throws \Innologi\Decosdata\Service\Option\Exception\MissingArgument
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL ) {
+		$wrap = [];
+		if (!isset($args['content'][0])) {
+			throw new MissingArgument(1515607288, array(self::class, 'content'));
+		}
+
+		if ($tag instanceof TagContent) {
+			$tag->reset();
+			$tag->setContent($args['content']);
 			return $tag;
 		}
 
-		$content = GeneralUtility::formatSize(
-			$file->getSize(),
-			// @TODO ___get default format from typoscript?
-			// @LOW ___support formatting argument?
-			'b|kb|MB|GB|TB'
+		// if $tag is an actual Tag instance, replace its content object (if any)
+		return $tag->setContent(
+			$service->getTagFactory()->createTagContent($args['content'])
 		);
-
-		if ($tag instanceof TagContent) {
-			return $tag->reset()->setContent($content);
-		}
-
-		return $service->getTagFactory()->createTagContent($content);
 	}
 
 }
