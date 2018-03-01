@@ -163,6 +163,17 @@ class QueryBuilder {
 			}
 		}
 
+		// set ordering through any field outside of normal content/fields
+		if (isset($configuration['order']) && isset($configuration['order']['field'])) {
+			// @TODO check if the field exists
+			// @TODO align this with how AddFields and every else works
+			$query->getContent($configuration['order']['field'])
+				->getOrderBy()
+				->setPriority($configuration['order']['priority'])
+				->setSortOrder($configuration['order']['sort'])
+				->setForceNumeric(isset($configuration['order']['forceNumeric']) && (bool)$configuration['order']['forceNumeric']);
+		}
+
 		// apply pagination settings
 		if (isset($configuration['paginate']) && is_array($configuration['paginate'])) {
 			$this->paginateService->configurePagination($configuration['paginate'], $query);
