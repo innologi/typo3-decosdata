@@ -71,6 +71,11 @@ class QueryBuilder {
 	 */
 	protected $searchService;
 
+	/**
+	 * @var integer
+	 */
+	protected $groupByContentPriority;
+
 	// @TODO ___doc?
 	// @TODO ___refactor such huge methods
 	// @LOW ___review the ids/keys given to froms/constraints in all methods?
@@ -95,6 +100,7 @@ class QueryBuilder {
 		$queryField->getFrom('item', ['it' => 'tx_decosdata_domain_model_item']);
 
 		$groupByContent = isset($configuration['groupByContent']) && (bool)$configuration['groupByContent'];
+		$this->groupByContentPriority = 0;
 		if (!$groupByContent) {
 			// if not groupByContent, group by id column first and foremost
 			$queryContent->getGroupBy()->setPriority(0);
@@ -194,7 +200,9 @@ class QueryBuilder {
 
 		// if group by content, enforce groupby
 		if ($groupByContent) {
-			$queryContent->getGroupBy()->setPriority(0);
+			$queryContent->getGroupBy()->setPriority(
+				$this->groupByContentPriority++
+			);
 		}
 
 		if (isset($configuration['content'])) {
