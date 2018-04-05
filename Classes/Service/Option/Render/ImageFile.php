@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\Decosdata\Library\TagBuilder\TagInterface;
+use TYPO3\CMS\Core\Resource\AbstractFile;
 /**
  * Image File option
  *
@@ -51,12 +52,14 @@ class ImageFile implements OptionInterface {
 	 * @see \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL ) {
-			if ( !isset($args['defaultFile']) || ($file = $this->getFileObject($args['defaultFile'])) === NULL ) {
+		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL || !$this->isSupportedFile($file) ) {
+			// if file could not be retrieved or is not of type image, either fall back to a set defaultFile or just return the tag
+			if ( !isset($args['defaultFile']) || ($file = $this->getFileObject($args['defaultFile'])) === NULL || !$this->isSupportedFile($file) ) {
 				return $tag;
 			}
 		}
-		// @LOW no check on whether it really is an image?
+
+
 		$processingInstructions = [
 			'width' => $args['width'] ?? NULL,
 			'height' => $args['height'] ?? NULL,
@@ -73,6 +76,18 @@ class ImageFile implements OptionInterface {
 		}
 
 		return $service->getTagFactory()->createTag('img', $attributes);
+	}
+
+	/**
+	 * Return whether we support this file, i.e. an existing image or PDF
+	 *
+	 * @param AbstractFile $file
+	 * @return boolean
+	 */
+	protected function isSupportedFile(AbstractFile $file) {
+		return $file->exists() && (
+			$file->getType() === AbstractFile::FILETYPE_IMAGE || strpos($file->getMimeType(), '/pdf') !== FALSE
+		);
 	}
 
 }
