@@ -52,7 +52,9 @@ class ImageFile implements OptionInterface {
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
 		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL ) {
-			return $tag;
+			if ( !isset($args['defaultFile']) || ($file = $this->getFileObject($args['defaultFile'])) === NULL ) {
+				return $tag;
+			}
 		}
 		// @LOW no check on whether it really is an image?
 		$processingInstructions = [
