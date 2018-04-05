@@ -1,12 +1,22 @@
 @charset "UTF-8";
 
 
+.tx-decosdata {
+	overflow: hidden;
+}
 .tx-decosdata .section {
 	position: relative;
 }
 .tx-decosdata .invisible {
 	visibility: hidden;
 	display: none;
+}
+
+
+.tx-decosdata .last-updated {
+	float: right;
+	font-size: 0.8em;
+	font-style: italic;
 }
 
 
