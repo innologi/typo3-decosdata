@@ -24,7 +24,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use Innologi\Decosdata\Library\TagBuilder\TagInterface;
+use Innologi\TagBuilder\TagInterface;
 /**
  * File Download option
  *

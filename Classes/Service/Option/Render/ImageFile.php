@@ -24,7 +24,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use Innologi\Decosdata\Library\TagBuilder\TagInterface;
+use Innologi\TagBuilder\TagInterface;
 use TYPO3\CMS\Core\Resource\AbstractFile;
 /**
  * Image File option
@@ -58,7 +58,6 @@ class ImageFile implements OptionInterface {
 				return $tag;
 			}
 		}
-
 
 		$processingInstructions = [
 			'width' => $args['width'] ?? NULL,

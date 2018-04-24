@@ -25,8 +25,8 @@ namespace Innologi\Decosdata\Service\Option\Render;
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
-use Innologi\Decosdata\Library\TagBuilder\TagInterface;
-use Innologi\Decosdata\Library\TagBuilder\TagContent;
+use Innologi\TagBuilder\TagInterface;
+use Innologi\TagBuilder\TagContent;
 /**
  * Set Content
  *

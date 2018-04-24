@@ -36,7 +36,7 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 class RenderOptionService extends OptionServiceAbstract {
 
 	/**
-	 * @var \Innologi\Decosdata\Library\TagBuilder\TagFactory
+	 * @var \Innologi\TagBuilder\TagFactory
 	 * @inject
 	 */
 	protected $tagFactory;
@@ -119,7 +119,7 @@ class RenderOptionService extends OptionServiceAbstract {
 	/**
 	 * Returns tag builder
 	 *
-	 * @return \Innologi\Decosdata\Library\TagBuilder\TagFactory
+	 * @return \Innologi\TagBuilder\TagFactory
 	 */
 	public function getTagFactory() {
 		return $this->tagFactory;
@@ -198,7 +198,7 @@ class RenderOptionService extends OptionServiceAbstract {
 	 * @param string $content
 	 * $param string $index
 	 * @param array $item
-	 * @return \Innologi\Decosdata\Library\TagBuilder\TagInterface
+	 * @return \Innologi\TagBuilder\TagInterface
 	 */
 	public function processOptions(array $options, $content, $index, array $item) {
 		$previously = [$this->item, $this->index, $this->originalContent];

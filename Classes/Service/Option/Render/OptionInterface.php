@@ -24,7 +24,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use Innologi\Decosdata\Library\TagBuilder\TagInterface;
+use Innologi\TagBuilder\TagInterface;
 /**
  * Render Option Interface
  *
@@ -38,9 +38,9 @@ interface OptionInterface {
 	 * Alters content.
 	 *
 	 * @param array $args
-	 * @param \Innologi\Decosdata\Library\TagBuilder\TagInterface $tag
+	 * @param \Innologi\TagBuilder\TagInterface $tag
 	 * @param \Innologi\Decosdata\Service\Option\RenderOptionService $service
-	 * @return \Innologi\Decosdata\Library\TagBuilder\TagInterface
+	 * @return \Innologi\TagBuilder\TagInterface
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service);
 
