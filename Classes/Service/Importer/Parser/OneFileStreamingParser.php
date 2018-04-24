@@ -32,8 +32,8 @@ use Innologi\Decosdata\Service\Importer\Exception\InvalidValidationFile;
 use Innologi\Decosdata\Service\Importer\Exception\ValidationFailed;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
-use Innologi\Decosdata\Library\TraceLogger\TraceLoggerAwareInterface;
-use Innologi\Decosdata\Library\TraceLogger\TraceLoggerInterface;
+use Innologi\TraceLogger\TraceLoggerAwareInterface;
+use Innologi\TraceLogger\TraceLoggerInterface;
 /**
  * Importer Parser: One File Imports, Streaming Parser
  *
@@ -50,7 +50,7 @@ use Innologi\Decosdata\Library\TraceLogger\TraceLoggerInterface;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class OneFileStreamingParser implements ParserInterface,SingletonInterface,TraceLoggerAwareInterface {
-	use \Innologi\Decosdata\Library\TraceLogger\TraceLoggerAware;
+	use \Innologi\TraceLogger\TraceLoggerAware;
 
 	/**
 	 * @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface
@@ -363,7 +363,7 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 	 * {@inheritDoc}
 	 * @see TraceLoggerAwareInterface::setLogger()
 	 */
-	public function setLogger(TraceLoggerInterface $logger) {
+	public function setLogger(TraceLoggerInterface $logger): void {
 		$this->logger = $logger;
 		if ($this->storageHandler instanceof TraceLoggerAwareInterface) {
 			$this->storageHandler->setLogger($logger);

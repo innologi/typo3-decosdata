@@ -26,9 +26,9 @@ namespace Innologi\Decosdata\Service\Importer\StorageHandler;
 use TYPO3\CMS\Core\SingletonInterface;
 use Innologi\Decosdata\Exception\SqlError;
 use Innologi\Decosdata\Library\FalApi\Exception\FileException;
-use Innologi\Decosdata\Library\TraceLogger\TraceLoggerAwareInterface;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
+use Innologi\TraceLogger\TraceLoggerAwareInterface;
 /**
  * Importer Storage Handler: Classic Edition
  *
@@ -42,7 +42,7 @@ use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterface,TraceLoggerAwareInterface {
-	use \Innologi\Decosdata\Library\TraceLogger\TraceLoggerAware;
+	use \Innologi\TraceLogger\TraceLoggerAware;
 
 	/**
 	 * @var \TYPO3\CMS\Core\Database\DatabaseConnection

@@ -25,8 +25,8 @@ namespace Innologi\Decosdata\Service\Importer;
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use Innologi\Decosdata\Utility\DebugUtility;
-use Innologi\Decosdata\Library\TraceLogger\TraceLoggerAwareInterface;
-use Innologi\Decosdata\Library\TraceLogger\TraceLoggerInterface;
+use Innologi\TraceLogger\TraceLoggerAwareInterface;
+use Innologi\TraceLogger\TraceLoggerInterface;
 /**
  * Importer Service
  *
@@ -37,7 +37,7 @@ use Innologi\Decosdata\Library\TraceLogger\TraceLoggerInterface;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
-	use \Innologi\Decosdata\Library\TraceLogger\TraceLoggerAware;
+	use \Innologi\TraceLogger\TraceLoggerAware;
 
 	/**
 	 * @var \Innologi\Decosdata\Domain\Repository\ImportRepository
@@ -157,7 +157,7 @@ class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
 	 * {@inheritDoc}
 	 * @see TraceLoggerAwareInterface::setLogger()
 	 */
-	public function setLogger(TraceLoggerInterface $logger) {
+	public function setLogger(TraceLoggerInterface $logger): void {
 		$this->logger = $logger;
 		if ($this->parser instanceof TraceLoggerAwareInterface) {
 			$this->parser->setLogger($logger);
