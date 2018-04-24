@@ -234,12 +234,19 @@ class TypeProcessorService implements SingletonInterface {
 				if (!isset($config['renderOptions'])) {
 					continue;
 				}
-				if (!isset($item['content' . $index])) {
-					// @TODO throw exception
-				}
+				//if (!isset($item['content' . $index])) {
+					// @TODO throw exception?
+					// we ARE supporting this in configurations that do not offer a contentfield config
+					// but does it have any value to not simply add the field by default?
+					// also, what does this mean for content fields that result in NULL value from DB? (this happens)
+					// should they be identifiable as a NULL value? Why yes? If not, does it matter?
+					//
+					// .. TagBuilder no longer supports NULL $content and with good reason
+					// so for now we just added ?? '' below as a quick fix
+				//}
 				$item['content' . $index] = $this->optionService->processOptions(
 					$config['renderOptions'],
-					$item['content' . $index],
+					$item['content' . $index] ?? '',
 					$index,
 					$item
 				)->render();
