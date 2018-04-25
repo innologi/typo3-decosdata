@@ -13,7 +13,8 @@
 	"require": {
 		"php": "^7.1",
 		"typo3/cms-core": "^8.7",
-		"innologi/tag-builder": "@dev"
+		"innologi/tag-builder": "@dev",
+		"innologi/trace-logger": "@dev"
 	},
 	"autoload": {
 		"psr-4": {
