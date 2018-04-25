@@ -26,9 +26,9 @@ namespace Innologi\Decosdata\Service\Importer\StorageHandler;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
-use Innologi\Decosdata\Library\FalApi\Exception\FileException;
 use Innologi\Decosdata\Exception\MissingObjectProperty;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
+use Innologi\TYPO3FalApi\Exception\FileException;
 /**
  * Importer Storage Handler: Extbase Edition
  *
