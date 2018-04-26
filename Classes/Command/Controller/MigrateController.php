@@ -23,10 +23,10 @@ namespace Innologi\Decosdata\Command\Controller;
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 use TYPO3\CMS\Core\Messaging\FlashMessage;
-use Innologi\Decosdata\Library\ExtUpdate\Service\Exception\NoData;
-use Innologi\Decosdata\Library\ExtUpdate\Service\Exception\FileException;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
-use Innologi\Decosdata\Library\ExtUpdate\ExtUpdateAbstract;
+use Innologi\TYPO3ExtUpdate\Service\Exception\NoData;
+use Innologi\TYPO3ExtUpdate\Service\Exception\FileException;
+use Innologi\TYPO3ExtUpdate\ExtUpdateAbstract;
 /**
  * Migrate Controller
  *
@@ -110,7 +110,7 @@ class MigrateController extends ExtUpdateAbstract {
 	 *
 	 * @return boolean TRUE on complete, FALSE on incomplete
 	 */
-	public function processUpdates() {
+	public function processUpdates(): bool {
 		// the order is important for some of these!
 		// start with the things that can go wrong and should be corrected first
 		$this->migrateXmlToFal();
