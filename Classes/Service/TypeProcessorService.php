@@ -61,7 +61,7 @@ class TypeProcessorService implements SingletonInterface {
 	protected $optionService;
 	// @LOW don't inject this one
 	/**
-	 * @var \Innologi\Decosdata\Library\AssetProvider\ProviderServiceInterface
+	 * @var \Innologi\TYPO3AssetProvider\ProviderServiceInterface
 	 * @inject
 	 */
 	protected $assetProviderService;
@@ -214,7 +214,7 @@ class TypeProcessorService implements SingletonInterface {
 
 			if ($this->controllerContext->getRequest()->getFormat() === 'html') {
 				// provide assets as configured per feature
-				$this->assetProviderService->provideAssets('Item', 'xhr');
+				$this->assetProviderService->provideAssets('decosdata', 'Item', 'xhr');
 			}
 		}
 
@@ -289,7 +289,7 @@ class TypeProcessorService implements SingletonInterface {
 
 			if ($this->controllerContext->getRequest()->getFormat() === 'html') {
 				// provide assets as configured per feature
-				$this->assetProviderService->provideAssets('Item', 'xhr');
+				$this->assetProviderService->provideAssets('decosdata', 'Item', 'xhr');
 			}
 		}
 		return $paging;
