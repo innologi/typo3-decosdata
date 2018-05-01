@@ -16,7 +16,8 @@
 		"innologi/tag-builder": "@dev",
 		"innologi/trace-logger": "@dev",
 		"innologi/typo3-fal-api": "@dev",
-		"innologi/typo3-ext-update": "@dev"
+		"innologi/typo3-ext-update": "@dev",
+		"innologi/typo3-asset-provider": "@dev"
 	},
 	"autoload": {
 		"psr-4": {
