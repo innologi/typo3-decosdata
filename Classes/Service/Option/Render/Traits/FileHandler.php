@@ -34,6 +34,7 @@ use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 trait FileHandler {
+	use MockFileHandler;
 
 	/**
 	 * @var \TYPO3\CMS\Core\Resource\ResourceFactory
@@ -56,6 +57,9 @@ trait FileHandler {
 		$file = NULL;
 		if ($this->isFileHandle($content)) {
 			$file = $this->getFileObjectByUid($this->fileUid);
+		} elseif ($this->isMockFileHandle($content)) {
+			$file = $this->getMockFileObjectByPath($this->mockPath);
+			$this->fileUid = 0;
 		}
 		return $file;
 	}
@@ -91,4 +95,5 @@ trait FileHandler {
 		}
 		return NULL;
 	}
+
 }
