@@ -1,0 +1,10 @@
+  # cat=basic//010; type=text; label= PDF Split command: Command used by the PdfSplit option for splitting multi-page PDF files into multiple single-page PDF files. Supported variables: [$INPUTFILE, $OUTPUTDIR]
+pdf_split_cmd = /usr/bin/pdftk $INPUTFILE burst output $OUTPUTDIRp%04d.pdf dont_ask owner_pw decosdata allow printing
+
+# pdftk is a multi-purpose PDF utility with a commandline binary
+#
+# @install: apt install pdftk
+# @see: https://www.pdflabs.com/tools/pdftk-server/
+
+  # cat=basic//020; type=text; label= PDF Split output path: Directory path for PDF Split output, relative from web root.
+pdf_split_out = fileadmin/decosdata/pdf/
