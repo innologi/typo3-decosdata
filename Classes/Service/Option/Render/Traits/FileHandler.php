@@ -24,6 +24,7 @@ namespace Innologi\Decosdata\Service\Option\Render\Traits;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
  /**
  * File Handler Trait
  *
@@ -96,4 +97,26 @@ trait FileHandler {
 		return NULL;
 	}
 
+	/**
+	 * Checks if a local directory exists. If it doesn't, it attempts to create it one
+	 * directory at a time.
+	 *
+	 * @param string $dirpath The path to the directory
+	 * @return void
+	 */
+	protected function createDirectoryIfNotExists($dirPath) {
+		if (is_dir($dirPath)) {
+			return;
+		}
+
+		$matches = [];
+		// windows-paths are assumed to have been corrected!
+		$pattern = '=^(' . PATH_site . ')(.*)$=i';
+		// split the dirpath for use by mkdir_deep
+		preg_match($pattern, $dirPath, $matches);
+		if (GeneralUtility::mkdir_deep($matches[1], $matches[2]) !== NULL) {
+			// mkdir_deep only returns something on errors
+			// @TODO throw exception
+		}
+	}
 }

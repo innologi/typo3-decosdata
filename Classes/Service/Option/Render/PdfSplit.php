@@ -29,7 +29,6 @@ use Innologi\Decosdata\Service\Option\Exception\OptionException;
 use Innologi\TagBuilder\TagInterface;
 use Innologi\TagBuilder\TagContent;
 use TYPO3\CMS\Core\Resource\AbstractFile;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * PDF Split option
  *
@@ -140,26 +139,4 @@ class PdfSplit implements OptionInterface {
 		return $files;
 	}
 
-	/**
-	 * Checks if a local directory exists. If it doesn't, it attempts to create it one
-	 * directory at a time.
-	 *
-	 * @param string $dirpath The path to the directory
-	 * @return void
-	 */
-	protected function createDirectoryIfNotExists($dirPath) {
-		if (is_dir($dirPath)) {
-			return;
-		}
-
-		$matches = [];
-		// windows-paths are assumed to have been corrected!
-		$pattern = '=^(' . PATH_site . ')(.*)$=i';
-		// split the dirpath for use by mkdir_deep
-		preg_match($pattern, $dirPath, $matches);
-		if (GeneralUtility::mkdir_deep($matches[1], $matches[2]) !== NULL) {
-			// mkdir_deep only returns something on errors
-			// @TODO throw exception
-		}
-	}
 }
