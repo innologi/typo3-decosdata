@@ -76,15 +76,13 @@ class PdfSplit implements OptionInterface {
 		}
 
 		$content = [];
-		$i = 0;
 		/** @var \SplFileInfo $fileInfo */
 		foreach ($files as $filePath => $fileInfo) {
-			$pageIndex = $service->getIndex() . $fileInfo->getBasename('.pdf');
 			$content[] = $service->processOptions(
 				$args['renderOptions'],
 				// @FIX consider that if options fail, this may result in outputted serverpaths. in our use-case, this must never be the case
 				'mockfile:' . $filePath,
-				$pageIndex,
+				$service->getIndex() . $fileInfo->getBasename('.pdf'),
 				$service->getItem()
 			);
 		}
