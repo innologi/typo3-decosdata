@@ -45,7 +45,12 @@ use TYPO3\CMS\Core\Resource\AbstractFile;
 class PdfSplit implements OptionInterface {
 	use Traits\FileHandler;
 	use Traits\ExtensionConfiguration;
-	use Traits\CommandRunner;
+
+	/**
+	 * @var \Innologi\Decosdata\Service\CommandRunService
+	 * @inject
+	 */
+	protected $commandRunService;
 
 	/**
 	 * {@inheritDoc}
@@ -115,19 +120,24 @@ class PdfSplit implements OptionInterface {
 	 * @return \GlobIterator
 	 */
 	protected function splitPdfFile(AbstractFile $inputFile, $outputPath) {
-		$cmdOutput = $this->runCommand(
-			$this->getExtensionConfiguration('pdf_split_cmd'),
-			[
-				'OUTPUTDIR' => $outputPath,
-				'INPUTFILE' => PATH_site . $inputFile->getPublicUrl()
-			]
-		);
+		$cmdOutput = $this->commandRunService
+			->reset()
+			->setAllowBinaries([
+				'pdftk',
+				'pdf*'
+			])->runCommand(
+				$this->getExtensionConfiguration('pdf_split_cmd'),
+				[
+					'OUTPUTDIR' => $outputPath,
+					'INPUTFILE' => PATH_site . $inputFile->getPublicUrl()
+				]
+			);
 
 		// get an iterator containing \SplFileInfo instances
 		$files = new \GlobIterator($outputPath . '*.pdf');
 		if (!$files->valid()) {
 			throw new OptionException(1524141951, ['Failed to retrieve PdfSplit output files.']);
-			// @LOW log $this->lastRunCommand + $cmdOutput
+			// @LOW log lastRunCommand + $cmdOutput
 		}
 		return $files;
 	}

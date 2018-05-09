@@ -1,5 +1,5 @@
 <?php
-namespace Innologi\Decosdata\Service\Option\Render\Traits;
+namespace Innologi\Decosdata\Exception;
 /***************************************************************
  *  Copyright notice
  *
@@ -23,50 +23,19 @@ namespace Innologi\Decosdata\Service\Option\Render\Traits;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\Option\Exception\OptionException;
- /**
- * Command Runner Trait
- *
- * Offers basic functionality to execute a system command and catch its output.
+
+/**
+ * Commandline Error Exception
  *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-trait CommandRunner {
+class CmdError extends Exception {
 
 	/**
 	 * @var string
 	 */
-	protected $lastRunCommand;
-
-	/**
-	 * Run the command with any given variables substituted,
-	 * and return the output.
-	 *
-	 * @param string $cmd
-	 * @param array $variables
-	 * @return array
-	 */
-	protected function runCommand($cmd, array $variables = []) {
-		if (!empty($variables)) {
-			foreach ($variables as $var => $value) {
-				$cmd = str_replace('$' . $var, '\'' . $value . '\'', $cmd);
-			}
-		}
-
-		$this->lastRunCommand = $cmd;
-		$cmdOutput = NULL;
-		$cmdStatus = NULL;
-		exec(escapeshellcmd($cmd), $cmdOutput, $cmdStatus);
-
-		if ($cmdStatus !== 0) {
-			// anything else is an error exit code
-			throw new OptionException(1524141893, ['Failed to run ' . \get_class($this) . ' command.']);
-			// @LOW log $cmd + $cmdOutput + $cmdStatus
-		}
-
-		return $cmdOutput;
-	}
+	protected $message = 'Failed to run command, "%1$s": %2$s';
 
 }
