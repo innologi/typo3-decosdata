@@ -1,5 +1,6 @@
 <?php
 namespace Innologi\Decosdata\Service\Option;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -59,6 +60,11 @@ abstract class OptionServiceAbstract {
 	protected $index;
 
 	/**
+	 * @var array
+	 */
+	protected $optionVariables = [];
+
+	/**
 	 * Class constructor
 	 *
 	 * @return void
@@ -74,6 +80,42 @@ abstract class OptionServiceAbstract {
 	 */
 	public function getIndex() {
 		return $this->index;
+	}
+
+	/**
+	 * Sets option variables
+	 *
+	 * @param string $option
+	 * @param array $vars
+	 * @return void
+	 */
+	public function setOptionVariables($option, array $vars = []) {
+		$this->optionVariables[$option] = $vars;
+	}
+
+	/**
+	 * Unsets option variables
+	 *
+	 * @param string $option
+	 * @return void
+	 */
+	public function unsetOptionVariables($option) {
+		unset($this->optionVariables[$option]);
+	}
+
+	/**
+	 * Returns option variable
+	 *
+	 * @param string $option
+	 * @param string $var
+	 * @return mixed
+	 */
+	public function getOptionVariable($option, $var) {
+		if (!isset($this->optionVariables[$option][$var])) {
+			// @TODO better exception
+			throw new Exception\OptionException(1234, NULL, $option . ':' . $var);
+		}
+		return $this->optionVariables[$option][$var];
 	}
 
 	// @TODO ___debug to see if this is still a valid construction now that Query uses objects as $value
@@ -92,6 +134,13 @@ abstract class OptionServiceAbstract {
 		}
 		if ( !isset($option['args']) ) {
 			$option['args'] = array();
+		} else {
+			// detect and replace references to previously set option vars
+			foreach ($option['args'] as &$arg) {
+				if (is_array($arg) && isset($arg['var'][0]) && is_string($arg['var'])) {
+					$arg = $this->getOptionVariable(...explode(':', $arg['var'], 2));
+				}
+			}
 		}
 		$className = $option['option'];
 		if (!isset($this->objectCache[$className])) {

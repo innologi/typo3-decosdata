@@ -37,7 +37,6 @@ use TYPO3\CMS\Core\Resource\AbstractFile;
  */
 class ImageFile implements OptionInterface {
 	use Traits\FileHandler;
-	use Traits\ItemAccess;
 	// @TODO ___Absolute URIs for other contexts than normal HTML?
 
 	/**
@@ -70,9 +69,6 @@ class ImageFile implements OptionInterface {
 			'src' => $imageUri,
 			'class' => 'file-' . $this->fileUid
 		];
-		if (isset($args['alt'][0])) {
-			$attributes['alt'] = $this->itemAccess($args['alt'], $service);
-		}
 
 		return $service->getTagFactory()->createTag('img', $attributes);
 	}

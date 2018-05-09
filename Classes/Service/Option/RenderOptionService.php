@@ -201,10 +201,13 @@ class RenderOptionService extends OptionServiceAbstract {
 	 * @return \Innologi\TagBuilder\TagInterface
 	 */
 	public function processOptions(array $options, $content, $index, array $item) {
+		// safeguard original values for recursion before overwrite
 		$previously = [$this->item, $this->index, $this->originalContent];
 		$this->item = $item;
 		$this->index = (string)$index;
 		$this->originalContent = $content;
+		// make item results accessible for option arg.var mechanism
+		$this->optionVariables['item'] = $item;
 
 		// starting TagInterface instance
 		$tag = $this->tagFactory->createTagContent($content);
@@ -227,7 +230,9 @@ class RenderOptionService extends OptionServiceAbstract {
 			$tag = $this->executeOption('alterContentValue', $option, $tag);
 		}
 
+		// restore safeguarded original values
 		list($this->item, $this->index, $this->originalContent) = $previously;
+		$this->optionVariables['item'] = $this->item;
 		return $tag;
 	}
 

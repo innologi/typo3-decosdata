@@ -36,7 +36,6 @@ use TYPO3\CMS\Core\SingletonInterface;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class ConditionService implements SingletonInterface {
-	use Option\Render\Traits\ItemAccess;
 
 	/**
 	 * @var \Innologi\Decosdata\Service\Option\RenderOptionService
@@ -98,7 +97,7 @@ class ConditionService implements SingletonInterface {
 				// @TODO throw exception
 			} else {
 				// note that the typecasts will have the effect of NULL === ''
-				$source = (string) $this->itemAccess($constraint['source'], $this->renderOptionService);
+				$source = (string) ($this->renderOptionService->getOptionVariable(...explode(':', $constraint['source'], 2)));
 				$value = (string) ($constraint['value'] === 'NULL' ? NULL : $constraint['value']);
 				switch ($constraint['operator']) {
 					case '=':
