@@ -48,6 +48,13 @@ class ConditionService implements SingletonInterface {
 	 */
 	protected $ifMatch = [];
 
+	// @LOW if RenderOptionService ever becomes a singleton, we should inject it instead
+	/**
+	 * Sets RenderOptionService
+	 *
+	 * @param \Innologi\Decosdata\Service\Option\RenderOptionService $renderOptionService
+	 * @return $this
+	 */
 	public function setRenderOptionService(\Innologi\Decosdata\Service\Option\RenderOptionService $renderOptionService) {
 		$this->renderOptionService = $renderOptionService;
 		return $this;
@@ -70,10 +77,14 @@ class ConditionService implements SingletonInterface {
 		}
 
 		if (isset($if['ifMatch']) && is_array($if['ifMatch'])) {
+			// if we intersect the actual previous if-results with the desired previous if-results,
+			// without losing any of them, we have a complete match
 			$result = count(array_intersect_assoc($this->ifMatch[$cIndex], $if['ifMatch'])) === count($if['ifMatch']);
 		} elseif (isset($if['constraint']) && is_array($if['constraint'])) {
+			// if we have a contraint element containing any number of contraints, process it
 			$result = $this->processConstraint($if['constraint'], isset($if['matchAll']) && (bool)$if['matchAll']);
 		} elseif (isset($if['source'])) {
+			// if we have a direct constraint with a source field, process it (enclosed in an array)
 			$result = $this->processConstraint([$if]);
 		}
 		// we store it in a specific format we can use array_intersect_assoc on
