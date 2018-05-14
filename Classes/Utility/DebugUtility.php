@@ -53,7 +53,7 @@ class DebugUtility {
 	 * @return string
 	 */
 	public static function formatArray(array $array) {
-		$temp = array();
+		$temp = [];
 		foreach ($array as $key => $value) {
 			$temp[] = $key . ' ' . PHP_EOL . $value;
 		}

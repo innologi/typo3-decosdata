@@ -52,7 +52,7 @@ class Statement extends PreparedStatement {
 	/**
 	 * @var array
 	 */
-	protected $usedParameters = array();
+	protected $usedParameters = [];
 
 	/**
 	 * Returns processed query for debugging.
@@ -103,7 +103,7 @@ class Statement extends PreparedStatement {
 	 * {@inheritDoc}
 	 * @see \TYPO3\CMS\Core\Database\PreparedStatement::execute()
 	 */
-	public function execute(array $input_parameters = array()) {
+	public function execute(array $input_parameters = []) {
 		$this->usedParameters = $this->parameters;
 		return parent::execute($input_parameters);
 	}
@@ -141,7 +141,7 @@ class Statement extends PreparedStatement {
 	 */
 	protected function convertNamedPlaceholdersToQuestionMarks(&$query, array &$parameterValues, array &$precompiledQueryParts) {
 		$queryPartsCount = count($precompiledQueryParts['queryParts']);
-		$newParameterValues = array();
+		$newParameterValues = [];
 		$hasNamedPlaceholders = FALSE;
 
 		if ($queryPartsCount === 0) {
@@ -161,7 +161,7 @@ class Statement extends PreparedStatement {
 		}
 
 		// <-- BEGIN ALTERATION
-		$matches = array();
+		$matches = [];
 		// END ALTERATION -->
 		if ($hasNamedPlaceholders) {
 			if ($queryPartsCount === 0) {
@@ -184,10 +184,10 @@ class Statement extends PreparedStatement {
 							// array; add each value as a new parameter
 							// assume all values are of same type
 							$type = parent::guessValueType($par['value'][0]);
-							$parts = array();
+							$parts = [];
 							foreach ($par['value'] as $v) {
 								$parts[] = $replacement;
-								$newParameterValues[] = array('value' => $v, 'type' => $type);
+								$newParameterValues[] = ['value' => $v, 'type' => $type];
 							}
 							// also provides the necessary enclosing parentheses
 							$replacement = '(' . join(',', $parts) . ')';

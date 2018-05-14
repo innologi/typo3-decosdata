@@ -67,7 +67,7 @@ class CompatibleQueryProvider implements QueryProviderInterface,SingletonInterfa
 	 * @param array $uniqueProperties (optional)
 	 * @return string The upsert query
 	 */
-	public function upsertQuery($table, array $data, array $uniqueProperties = array()) {
+	public function upsertQuery($table, array $data, array $uniqueProperties = []) {
 		$query = NULL;
 
 		$matchProperties = empty($uniqueProperties)

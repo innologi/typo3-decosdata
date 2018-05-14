@@ -46,32 +46,32 @@ class QueryConfigurator implements SingletonInterface {
 	/**
 	 * @var array
 	 */
-	protected $supportedSorting = array('ASC', 'DESC');
+	protected $supportedSorting = ['ASC', 'DESC'];
 
 	/**
 	 * @var array
 	 */
-	protected $supportedJoins = array('LEFT', 'RIGHT', 'INNER');
+	protected $supportedJoins = ['LEFT', 'RIGHT', 'INNER'];
 
 	/**
 	 * @var array
 	 */
-	protected $supportedLogic = array('AND', 'OR');
+	protected $supportedLogic = ['AND', 'OR'];
 
 	/**
 	 * @var array
 	 */
-	protected $specialValues = array('NULL', 'NOW()');
+	protected $specialValues = ['NULL', 'NOW()'];
 
 	/**
 	 * @var array
 	 */
-	protected $supportedOperators = array('=', '<', '>', '<=', '>=', '<>', '!=', '<=>', 'IS', 'NOT', 'REGEXP', 'RLIKE', 'LIKE', 'IN');
+	protected $supportedOperators = ['=', '<', '>', '<=', '>=', '<>', '!=', '<=>', 'IS', 'NOT', 'REGEXP', 'RLIKE', 'LIKE', 'IN'];
 
 	/**
 	 * @var array
 	 */
-	protected $addParameters = array();
+	protected $addParameters = [];
 
 	/**
 	 * @var integer
@@ -85,15 +85,15 @@ class QueryConfigurator implements SingletonInterface {
 	 * @return array
 	 */
 	public function transformConfiguration(Query $query) {
-		$queryParts = array();
-		$glue = array(
+		$queryParts = [];
+		$glue = [
 			'SELECT' => ',',
 			'FROM' => "\n",
 			'WHERE' => ' AND ',
 			'GROUPBY' => ',',
 			'ORDERBY' => ','
-		);
-		$this->addParameters = array();
+		];
+		$this->addParameters = [];
 
 		// Query consists of QueryContent with an ID that represents content alias.
 		// This object-approach effectively gives us control to alter specific configuration parts from
@@ -102,7 +102,7 @@ class QueryConfigurator implements SingletonInterface {
 
 		/** @var $queryContent \Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent */
 		foreach ($query as $id => $queryContent) {
-			$concatSelect = array();
+			$concatSelect = [];
 			/** @var $queryField \Innologi\Decosdata\Service\QueryBuilder\Query\QueryField */
 			foreach ($queryContent as $queryField) {
 				// @LOW ___this doesn't look right, I have dedicated methods which should isolate everything pertaining to the object, but I still have to check specific values before executing them
@@ -185,16 +185,16 @@ class QueryConfigurator implements SingletonInterface {
 	protected function transformSelect(Select $select) {
 		$field = $select->getField();
 		if (!isset($field[0])) {
-			throw new Exception\MissingConfigurationProperty(1448552576, array(
+			throw new Exception\MissingConfigurationProperty(1448552576, [
 				'SELECT', 'field', json_encode($select)
-			));
+			]);
 		}
 
 		$tableAlias = $select->getTableAlias();
 		if (!isset($tableAlias[0])) {
-			throw new Exception\MissingConfigurationProperty(1448622360, array(
+			throw new Exception\MissingConfigurationProperty(1448622360, [
 				'SELECT', 'tableAlias', json_encode($select)
-			));
+			]);
 		}
 
 		return $this->transformWrap($tableAlias . '.' . $field, $select->getWrap(), $select->getWrapDivider());
@@ -234,12 +234,12 @@ class QueryConfigurator implements SingletonInterface {
 	protected function transformFrom(From $from) {
 		$tables = $from->getTables();
 		if (!isset($tables) || empty($tables)) {
-			throw new Exception\MissingConfigurationProperty(1448552598, array(
+			throw new Exception\MissingConfigurationProperty(1448552598, [
 				'FROM', 'tables', json_encode($from)
-			));
+			]);
 		}
 
-		$formatTables = array();
+		$formatTables = [];
 		foreach ($tables as $alias => $table) {
 			$formatTables[] = $table . ' ' . $alias;
 		}
@@ -249,9 +249,9 @@ class QueryConfigurator implements SingletonInterface {
 		// @LOW _if joinType is NULL, transformConfiguration will still join the table with "\n" and not with a comma..
 		if ($joinType !== NULL) {
 			if (!in_array($joinType, $this->supportedJoins, TRUE)) {
-				throw new Exception\UnsupportedFeatureType(1448552612, array(
+				throw new Exception\UnsupportedFeatureType(1448552612, [
 					'TABLE JOIN TYPE', $joinType, join('/', $this->supportedJoins)
-				));
+				]);
 			}
 			$string = $joinType . ' JOIN ' . $string;
 			$constraint = $from->getConstraint();
@@ -281,11 +281,11 @@ class QueryConfigurator implements SingletonInterface {
 			$logic = $constraint->getLogic();
 			if (!in_array($logic, $this->supportedLogic, TRUE)) {
 				// @LOW _this doesn't really clarify anything if I don't know which piece of configuration is the cause..
-				throw new Exception\UnsupportedFeatureType(1448552681, array(
+				throw new Exception\UnsupportedFeatureType(1448552681, [
 					'LOGICAL OPERATOR', $logic, join('/', $this->supportedLogic)
-				));
+				]);
 			}
-			$parts = array();
+			$parts = [];
 			// a collection requires recursive use of this method
 			foreach ($constraint as $subConstraint) {
 				$parts[] = $this->transformConstraint($subConstraint);
@@ -296,15 +296,15 @@ class QueryConfigurator implements SingletonInterface {
 		// @LOW should these be validated? as well as foreign field and alias? they're not provided from user-input, but still..
 		$localField = $constraint->getLocalField();
 		if ( !isset($localField[0]) ) {
-			throw new Exception\MissingConfigurationProperty(1448552629, array(
+			throw new Exception\MissingConfigurationProperty(1448552629, [
 				$queryPart, 'constraint.localField', json_encode($constraint)
-			));
+			]);
 		}
 		$localAlias = $constraint->getLocalAlias();
 		if ( !isset($localAlias[0]) ) {
-			throw new Exception\MissingConfigurationProperty(1448552652, array(
+			throw new Exception\MissingConfigurationProperty(1448552652, [
 				$queryPart, 'constraint.localAlias', json_encode($constraint)
-			));
+			]);
 		}
 
 		$string = $this->transformWrap($localAlias . '.' . $localField, $constraint->getWrapLocal(), $constraint->getWrapDivider()) .
@@ -336,9 +336,9 @@ class QueryConfigurator implements SingletonInterface {
 	protected function transformOrderBy(OrderBy $orderBy, $fieldSubstitute = NULL) {
 		// @LOW _of course, this doesn't make sense since we don't get here if it is NULL.. except the outside check needs to be replaced by different logic
 		if ($orderBy->getPriority() === NULL) {
-			throw new Exception\MissingConfigurationProperty(1448552721, array(
+			throw new Exception\MissingConfigurationProperty(1448552721, [
 				'ORDERBY', 'priority', json_encode($orderBy)
-			));
+			]);
 		}
 
 		$string = NULL;
@@ -347,15 +347,15 @@ class QueryConfigurator implements SingletonInterface {
 		} else {
 			$tableAlias = $orderBy->getTableAlias();
 			if (!isset($tableAlias[0])) {
-				throw new Exception\MissingConfigurationProperty(1449052643, array(
+				throw new Exception\MissingConfigurationProperty(1449052643, [
 					'ORDERBY', 'tableAlias', json_encode($orderBy)
-				));
+				]);
 			}
 			$field = $orderBy->getField();
 			if (!isset($field[0])) {
-				throw new Exception\MissingConfigurationProperty(1449052657, array(
+				throw new Exception\MissingConfigurationProperty(1449052657, [
 					'ORDERBY', 'field', json_encode($orderBy)
-				));
+				]);
 			}
 			$string = $tableAlias . '.' . $field;
 		}
@@ -369,9 +369,9 @@ class QueryConfigurator implements SingletonInterface {
 		$sortOrder = $orderBy->getSortOrder();
 		if ($sortOrder !== NULL) {
 			if (!in_array($sortOrder, $this->supportedSorting, TRUE)) {
-				throw new Exception\UnsupportedFeatureType(1448552741, array(
+				throw new Exception\UnsupportedFeatureType(1448552741, [
 					'SORTING ORDER', $sortOrder, join('/', $this->supportedSorting)
-				));
+				]);
 			}
 			$string .= ' ' . $sortOrder;
 		}
@@ -409,9 +409,9 @@ class QueryConfigurator implements SingletonInterface {
 		$operators = explode(' ', strtoupper($operator));
 		foreach ($operators as $operator) {
 			if (!in_array($operator, $this->supportedOperators, TRUE)) {
-				throw new Exception\UnsupportedFeatureType(1448552756, array(
+				throw new Exception\UnsupportedFeatureType(1448552756, [
 					'COMPARISON OPERATOR', $operator, join('/', $this->supportedOperators)
-				));
+				]);
 			}
 		}
 		return join(' ', $operators);

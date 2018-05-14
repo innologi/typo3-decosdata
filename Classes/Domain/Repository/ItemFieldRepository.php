@@ -43,10 +43,10 @@ class ItemFieldRepository extends RepositoryAbstract {
 	public function findOneByFieldAndItem(\Innologi\Decosdata\Domain\Model\Field $field, \Innologi\Decosdata\Domain\Model\Item $item) {
 		$query = $this->createQuery();
 		return $query->matching(
-			$query->logicalAnd(array(
+			$query->logicalAnd([
 				$query->equals('field', $field),
 				$query->equals('item', $item)
-			))
+			])
 		)->execute()->getFirst();
 	}
 

@@ -44,7 +44,7 @@ class CustomImage implements OptionInterface {
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
 		if ( !isset($args['path'][0]) ) {
-			throw new MissingArgument(1462019242, array(self::class, 'path'));
+			throw new MissingArgument(1462019242, [self::class, 'path']);
 		}
 
 		// check requirements

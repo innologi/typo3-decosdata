@@ -114,13 +114,13 @@ class QueryBuilder {
 			 * making this an INNER rather than LEFT JOIN with WHERE, will allow the eq_ref
 			 * join-type to use only index (also uses where if NULL-values are possible)
 			 */
-			$queryField->getFrom('import', array('xmm' => 'tx_decosdata_item_import_mm'))
+			$queryField->getFrom('import', ['xmm' => 'tx_decosdata_item_import_mm'])
 				->setJoinType('INNER')
 				->setConstraint(
-					$this->constraintFactory->createConstraintAnd(array(
+					$this->constraintFactory->createConstraintAnd([
 						$this->constraintFactory->createConstraintByField('uid_local', 'xmm', '=', 'uid', 'it'),
 						$this->constraintFactory->createConstraintByValue('uid_foreign', 'xmm', 'IN', ':import')
-					))
+					])
 				);
 			$query->addParameter(':import', $import);
 			/*
@@ -192,11 +192,11 @@ class QueryBuilder {
 	// @TODO ___rename
 	public function addContentField($index, array $configuration, QueryContent $queryContent, $groupByContent = FALSE) {
 		# @TODO ___remove this and below #s?
-		#$names = array(
+		#$names = [
 		#	'returnalias' => 'content',
 		#	'returnfield' => 'field_value',
 		#	'tablealias' => 'itf'
-		#);
+		#];
 
 		// if group by content, enforce groupby
 		if ($groupByContent) {
@@ -263,21 +263,21 @@ class QueryBuilder {
 					// note that these joins should not be combined into a single JOIN
 
 					// the main join to the blob table
-					$queryField->getFrom('blob1', array($blobAlias1 => $blobTable))
+					$queryField->getFrom('blob1', [$blobAlias1 => $blobTable])
 						->setJoinType('LEFT')
 						->setConstraint(
 							$this->constraintFactory->createConstraintByField('item', $blobAlias1, '=', 'uid', 'it')
 						);
 					// a second join is necessary for a maximum-groupwise comparison to always retrieve the latest file
 						// maximum-groupwise is performance-wise much preferred over subqueries
-					$queryField->getFrom('blob2', array($blobAlias2 => $blobTable))
+					$queryField->getFrom('blob2', [$blobAlias2 => $blobTable])
 						->setJoinType('LEFT')
 						->setConstraint(
-							$this->constraintFactory->createConstraintAnd(array(
+							$this->constraintFactory->createConstraintAnd([
 								$this->constraintFactory->createConstraintByField('item', $blobAlias2, '=', 'uid', 'it'),
 								// @TODO ___note that this does not produce the same result as those that still use document_date. Need to see if Heemskerk is affected with newer tests
 								$this->constraintFactory->createConstraintByField('sequence', $blobAlias2, '>', 'sequence', $blobAlias1)
-							))
+							])
 						);
 					$queryField->getWhere()->setConstraint(
 						$this->constraintFactory->createConstraintByValue('uid', $blobAlias2, 'IS', 'NULL')
@@ -290,13 +290,13 @@ class QueryBuilder {
 						->setTableAlias($fileAlias)
 							// @TODO ___what happens here if we don't have a file uid? do we get a 'file:' ?
 						->addWrap('file', 'CONCAT(\'file:\',|)');
-					$queryField->getFrom('fileref', array($fileAlias => 'sys_file_reference'))
+					$queryField->getFrom('fileref', [$fileAlias => 'sys_file_reference'])
 						->setJoinType('LEFT')
 						->setConstraint(
-							$this->constraintFactory->createConstraintAnd(array(
+							$this->constraintFactory->createConstraintAnd([
 								$this->constraintFactory->createConstraintByField('uid_foreign', $fileAlias, '=', 'uid', $blobAlias1),
 								$this->constraintFactory->createConstraintByValue('tablenames', $fileAlias, '=', $parameterKey)
-							))
+							])
 						);
 					$queryContent->addParameter($parameterKey, $blobTable);
 				}
@@ -330,7 +330,7 @@ class QueryBuilder {
 		// if $valueArray is empty, provide NULL so that at least the alias can exist for compatibility
 		} else {
 			// @TODO ___keep or throw out? do we still support this now that we support options outside of columns? Maybe options that provide a value from somewhere else?
-			#$queryConfiguration[]['SELECT'] = array('field' => 'NULL');
+			#$queryConfiguration[]['SELECT'] = ['field' => 'NULL'];
 		}
 
 		// set content-wide ordering

@@ -93,11 +93,11 @@ class ImportRunCommand extends Command {
 
 		try {
 			$bootstrap = new \TYPO3\CMS\Extbase\Core\Bootstrap();
-			$bootstrap->initialize(array(
+			$bootstrap->initialize([
 				'pluginName' => 'Importer',
 				'extensionName' => $this->extensionName,
 				'vendorName' => 'Innologi'
-			));
+			]);
 
 			/* @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
 			$objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);

@@ -50,7 +50,7 @@ class ConstraintCollection implements ConstraintInterface, \Iterator {
 	 * @param array $constraints
 	 * @return $this
 	 */
-	public function __construct($logic, array $constraints = array()) {
+	public function __construct($logic, array $constraints = []) {
 		$this->logic = $logic;
 		$this->constraints = $constraints;
 		return $this;

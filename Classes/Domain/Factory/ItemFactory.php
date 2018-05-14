@@ -50,10 +50,10 @@ class ItemFactory extends FactoryAbstract {
 	 */
 	protected function setProperties(\Innologi\Decosdata\Domain\Model\Item $object, array $data) {
 		if (!isset($data['item_key'][0])) {
-			throw new MissingObjectProperty(1448549909, array(
+			throw new MissingObjectProperty(1448549909, [
 				'item_key',
 				'Item'
-			));
+			]);
 		}
 		$object->setItemKey($data['item_key']);
 
@@ -96,7 +96,7 @@ class ItemFactory extends FactoryAbstract {
 	 * @param array $data
 	 * @return \Innologi\Decosdata\Domain\Model\Item
 	 */
-	public function getByItemKey($itemKey, array $data = array()) {
+	public function getByItemKey($itemKey, array $data = []) {
 		/* @var $item \Innologi\Decosdata\Domain\Model\Item */
 		$item = $this->repository->findOneByItemKey($itemKey);
 		if ($item === NULL) {

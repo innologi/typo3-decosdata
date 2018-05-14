@@ -79,7 +79,7 @@ class DatabaseHelper implements SingletonInterface {
 	 * @param array $uniqueProperties (optional)
 	 * @return object|boolean Query Result
 	 */
-	public function execUpsertQuery($table, array $data, array $uniqueProperties = array()) {
+	public function execUpsertQuery($table, array $data, array $uniqueProperties = []) {
 		$this->lastUid = NULL;
 		$this->lastUpsertIsNewRecord = FALSE;
 		$res = $this->databaseConnection->sql_query(
@@ -105,10 +105,10 @@ class DatabaseHelper implements SingletonInterface {
 	 */
 	public function insertMmRelationIfNotExists($table, $localUid, $foreignUid) {
 		if (!$this->doesMmMatchExist($table, $localUid, $foreignUid)) {
-			$this->databaseConnection->exec_INSERTquery($table, array(
+			$this->databaseConnection->exec_INSERTquery($table, [
 				'uid_local' => $localUid,
 				'uid_foreign' => $foreignUid
-			));
+			]);
 		}
 	}
 
@@ -121,7 +121,7 @@ class DatabaseHelper implements SingletonInterface {
 	 * @return string
 	 */
 	public function getWhereFromConditionArray(array $conditions, $table = NULL) {
-		$where = array();
+		$where = [];
 		foreach ($conditions as $property => $value) {
 			$where[] = $property . '=' . $this->databaseConnection->fullQuoteStr($value, $table);
 		}
@@ -146,9 +146,9 @@ class DatabaseHelper implements SingletonInterface {
 		);
 
 		if ($row === NULL) {
-			throw new SqlError(1448550406, array(
+			throw new SqlError(1448550406, [
 				$this->databaseConnection->debug_lastBuiltQuery
-			));
+			]);
 		}
 		$this->lastUid = $row === FALSE
 			? NULL
@@ -169,10 +169,10 @@ class DatabaseHelper implements SingletonInterface {
 		$row = $this->databaseConnection->exec_SELECTgetSingleRow(
 			'*',
 			$table,
-			$this->getWhereFromConditionArray(array(
+			$this->getWhereFromConditionArray([
 				'uid_local' => $localUid,
 				'uid_foreign' => $foreignUid
-			)),
+			]),
 			'',
 			'uid_local DESC,uid_foreign DESC'
 		);

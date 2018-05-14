@@ -51,7 +51,7 @@ class From extends ConstraintContainer {
 	 * @param array $tables
 	 * @return $this
 	 */
-	public function __construct(array $tables = array()) {
+	public function __construct(array $tables = []) {
 		return $this->setTables($tables);
 	}
 

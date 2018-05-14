@@ -44,7 +44,7 @@ class ConstraintOr extends ConstraintCollection {
 	 * @param array $constraints
 	 * @return $this
 	 */
-	public function __construct(array $constraints = array()) {
+	public function __construct(array $constraints = []) {
 		$this->constraints = $constraints;
 		return $this;
 	}

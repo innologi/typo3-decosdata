@@ -47,7 +47,7 @@ abstract class OptionServiceAbstract {
 	/**
 	 * @var array
 	 */
-	protected $objectCache = array();
+	protected $objectCache = [];
 
 	/**
 	 * @var string
@@ -111,7 +111,8 @@ abstract class OptionServiceAbstract {
 	 * @return mixed
 	 */
 	public function getOptionVariable($option, $var) {
-		if (!isset($this->optionVariables[$option][$var])) {
+		// array_key_exists makes sure we support returning NULL values for existing $var s
+		if (! (isset($this->optionVariables[$option]) && \array_key_exists($var, $this->optionVariables[$option])) ) {
 			// @TODO better exception
 			throw new Exception\OptionException(1234, NULL, $option . ':' . $var);
 		}
@@ -133,7 +134,7 @@ abstract class OptionServiceAbstract {
 			throw new Exception\MissingOption(1448552481);
 		}
 		if ( !isset($option['args']) ) {
-			$option['args'] = array();
+			$option['args'] = [];
 		} else {
 			// detect and replace references to previously set option vars
 			foreach ($option['args'] as &$arg) {
@@ -148,9 +149,9 @@ abstract class OptionServiceAbstract {
 		}
 
 		return call_user_func_array(
-			array($this->objectCache[$className], $optionMethod),
+			[$this->objectCache[$className], $optionMethod],
 			// @LOW ___if the service becomes a singleton, we could do away with the need to pass $this
-			array($option['args'], $subject, $this)
+			[$option['args'], $subject, $this]
 		);
 	}
 
@@ -169,15 +170,15 @@ abstract class OptionServiceAbstract {
 			$className = $this->optionNamespace . '\\' . $className;
 		}
 		if (!class_exists($className)) {
-			throw new Exception\MissingOptionClass(1448552497, array($className));
+			throw new Exception\MissingOptionClass(1448552497, [$className]);
 		}
 		$object = $this->objectManager->get($className);
 		$interfaceClassName = $this->optionNamespace . '\\OptionInterface';
 		if ( !is_subclass_of($object, $interfaceClassName) ) {
-			throw new Exception\InvalidOptionClass(1449155186, array(
+			throw new Exception\InvalidOptionClass(1449155186, [
 				// since $object was retrieved via objectManager, we're not sure if $object Class === $className
 				get_class($object), $interfaceClassName
-			));
+			]);
 		}
 		return $object;
 	}

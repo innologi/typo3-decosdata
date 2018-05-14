@@ -41,7 +41,7 @@ class ConstraintFactory implements SingletonInterface {
 	 * @param array $constraints
 	 * @return ConstraintCollection
 	 */
-	public function createConstraintCollection($logic, array $constraints = array()) {
+	public function createConstraintCollection($logic, array $constraints = []) {
 		switch ($logic) {
 			case 'AND':
 				return $this->createConstraintAnd($constraints);
@@ -62,7 +62,7 @@ class ConstraintFactory implements SingletonInterface {
 	 * @param array $constraints
 	 * @return ConstraintAnd
 	 */
-	public function createConstraintAnd(array $constraints = array()) {
+	public function createConstraintAnd(array $constraints = []) {
 		return GeneralUtility::makeInstance(
 			ConstraintAnd::class,
 			$constraints
@@ -75,7 +75,7 @@ class ConstraintFactory implements SingletonInterface {
 	 * @param array $constraints
 	 * @return ConstraintOr
 	 */
-	public function createConstraintOr(array $constraints = array()) {
+	public function createConstraintOr(array $constraints = []) {
 		return GeneralUtility::makeInstance(
 			ConstraintOr::class,
 			$constraints

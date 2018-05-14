@@ -77,7 +77,7 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 	/**
 	 * @var array
 	 */
-	protected $errors = array();
+	protected $errors = [];
 
 	/**
 	 * Processes an import for parsing.
@@ -119,16 +119,16 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 		$reader = new \XMLReader();
 		try {
 			if (!@$reader->open($importFilePath)) {
-				throw new UnreadableImportFile(1448550537, array($importFilePath));
+				throw new UnreadableImportFile(1448550537, [$importFilePath]);
 			}
 			if (!@$reader->setRelaxNGSchema($rngFilePath)) {
-				throw new InvalidValidationFile(1448550611, array($rngFilePath));
+				throw new InvalidValidationFile(1448550611, [$rngFilePath]);
 			}
 
 			// skip through the entire import file
 			while ($reader->next());
 			if (!$reader->isValid()) {
-				throw new ValidationFailed(1448550637, array($importFilePath));
+				throw new ValidationFailed(1448550637, [$importFilePath]);
 			}
 		} catch (ValidationFailed $e) {
 			throw $e;
@@ -137,10 +137,10 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 			throw $e;
 		} catch (\Exception $e) {
 			// pass it on as a ValidationFailed exception
-			throw new ValidationFailed(1448550696, array(
+			throw new ValidationFailed(1448550696, [
 				$importFilePath,
 				$e->getMessage()
-			), 'Validation error in %1$s: %2$s');
+			], 'Validation error in %1$s: %2$s');
 		} finally {
 			$reader->close();
 		}
@@ -158,7 +158,7 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 
 		$reader = new \XMLReader();
 		if ( !$reader->open($importFilePath) ) {
-			throw new UnreadableImportFile(1448550742, array($importFilePath));
+			throw new UnreadableImportFile(1448550742, [$importFilePath]);
 		}
 
 		// place cursor at the first (ITEMS) node
@@ -238,16 +238,16 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 			switch ($fieldName) {
 				case 'ITEM_KEY':
 					$itemKey = $this->readNodeValue($reader);
-					$item = $this->storageHandler->pushItem(array(
+					$item = $this->storageHandler->pushItem([
 						'item_key' => $itemKey,
 						'item_type' => $itemType,
-						'import' => array($this->importObject),
+						'import' => [$this->importObject],
 						'parent_item' => $parentItem
-					));
+					]);
 					break;
 				case 'ITEMS':
 					if ($item === NULL) {
-						throw new UnexpectedItemStructure(1448550765, array($fieldName));
+						throw new UnexpectedItemStructure(1448550765, [$fieldName]);
 					}
 					// recursive call to run through child ITEMS-node and its subsequent children
 					$this->parseItems($reader, $item);
@@ -256,13 +256,13 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 				default:
 					if ($item === NULL) {
 						// @LOW if this ever becomes an issue, I should consider storing fields + values in an array first
-						throw new UnexpectedItemStructure(1448550787, array($fieldName));
+						throw new UnexpectedItemStructure(1448550787, [$fieldName]);
 					}
-					$this->storageHandler->pushItemField(array(
+					$this->storageHandler->pushItemField([
 						'item' => $item,
 						'field' => $fieldName,
 						'field_value' => $this->readNodeValue($reader)
-					));
+					]);
 			}
 		}
 	}
@@ -279,7 +279,7 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 	protected function parseItemBlob(\XMLReader $reader, $parentItem) {
 		if($this->logger && $this->logger->getLevel() > 1) $this->logger->logTrace();
 
-		$data = array();
+		$data = [];
 		$fallback = NULL;
 
 		// place cursor at the next element (regardless of depth) and get new depth

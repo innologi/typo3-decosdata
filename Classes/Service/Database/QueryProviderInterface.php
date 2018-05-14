@@ -42,6 +42,6 @@ interface QueryProviderInterface {
 	 * @param array $uniqueProperties (optional)
 	 * @return string The upsert query
 	 */
-	public function upsertQuery($table, array $data, array $uniqueProperties = array());
+	public function upsertQuery($table, array $data, array $uniqueProperties = []);
 
 }

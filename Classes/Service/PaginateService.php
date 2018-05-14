@@ -60,7 +60,7 @@ class PaginateService implements SingletonInterface {
 	/**
 	 * @var array
 	 */
-	protected $supportedTypes = array('default', 'yearly');
+	protected $supportedTypes = ['default', 'yearly'];
 
 	/**
 	 * @var integer
@@ -80,7 +80,7 @@ class PaginateService implements SingletonInterface {
 	/**
 	 * @var array
 	 */
-	protected $pageLabelMap = array();
+	protected $pageLabelMap = [];
 
 	/**
 	 * @var boolean
@@ -166,14 +166,14 @@ class PaginateService implements SingletonInterface {
 	protected function initializeConfiguration(array $configuration) {
 		// @LOW this can be more effective from within the switch
 		if ( isset($configuration['type']) && !in_array($configuration['type'], $this->supportedTypes, TRUE) ) {
-			throw new PaginationError(1449154955, array(
+			throw new PaginationError(1449154955, [
 				'type', $configuration['type'], join('/', $this->supportedTypes)
-			));
+			]);
 		}
 		if ($configuration['pageLimit'] === NULL || $configuration['pageLimit'] <= 0) {
-			throw new PaginationError(1449154970, array(
+			throw new PaginationError(1449154970, [
 				'pageLimit', $configuration['pageLimit'], 100
-			));
+			]);
 		}
 		// sets currentPage to at least 1
 		$this->currentPage = $this->parameterService->getParameterNormalized('page');
@@ -329,9 +329,9 @@ class PaginateService implements SingletonInterface {
 		// check for valid configuration values first
 		$perPageLimit = $configuration['perPageLimit'];
 		if ($perPageLimit === NULL || $perPageLimit <= 0) {
-			throw new PaginationError(1449154988, array(
+			throw new PaginationError(1449154988, [
 				'perPageLimit', $perPageLimit, 20
-			));
+			]);
 		}
 		$pageLimit = $configuration['pageLimit'];
 

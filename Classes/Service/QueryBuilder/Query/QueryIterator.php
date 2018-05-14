@@ -36,7 +36,7 @@ abstract class QueryIterator implements \Iterator {
 	/**
 	 * @var array
 	 */
-	protected $children = array();
+	protected $children = [];
 
 
 

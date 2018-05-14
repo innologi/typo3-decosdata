@@ -167,12 +167,12 @@ class MigrateController extends ExtUpdateAbstract {
 						$file = $this->fileService->retrieveFileObjectByPath($row['xmlpath']);
 						$this->databaseService->updateTableRecords(
 							$table,
-							array(
+							[
 								'migrated_file' => $file->getUid()
-							),
-							array(
+							],
+							[
 								'uid' => $uid
-							)
+							]
 						);
 						$step++;
 					} catch (FileException $e) {
@@ -239,7 +239,7 @@ class MigrateController extends ExtUpdateAbstract {
 		$errorCount = 0;
 		while ($count+$errorCount < $max) {
 
-			$okUidArray = array();
+			$okUidArray = [];
 			$xmlArray = $this->databaseService->selectTableRecords($table, $where, '*', 50);
 			foreach ($xmlArray as $uid => $xml) {
 				// get all the necessary paths
@@ -298,12 +298,12 @@ class MigrateController extends ExtUpdateAbstract {
 				foreach ($okUidArray as $uid) {
 					$this->databaseService->updateTableRecords(
 						$table,
-						array(
+						[
 							'migrated_filedir' => 1
-						),
-						array(
+						],
+						[
 							'uid' => $uid
-						)
+						]
 					);
 				}
 			}
@@ -343,14 +343,14 @@ class MigrateController extends ExtUpdateAbstract {
 		// @TODO ___reference in importrule table?
 		$sourceTable = 'tx_' . $this->sourceExtensionKey . '_itemxml';
 		$targetTable = 'tx_' . $this->extensionKey . '_domain_model_import';
-		$propertyMap = array(
+		$propertyMap = [
 			'pid' => 'pid',
 			'name' => 'title',
-			'migrated_file' => array(
-				'fileReference' => array(
+			'migrated_file' => [
+				'fileReference' => [
 					'targetProperty' => 'file'
-				)
-			),
+				]
+			],
 			'forget' => 'forget_on_update',
 			'md5hash' => 'hash',
 			'tstamp' => 'tstamp',
@@ -360,10 +360,10 @@ class MigrateController extends ExtUpdateAbstract {
 			'hidden' => 'hidden',
 			'starttime' => 'starttime',
 			'endtime' => 'endtime'
-		);
-		$evaluation = array(
+		];
+		$evaluation = [
 			'migrated_file > 0'
-		);
+		];
 
 		// attempt migration
 		try {
@@ -420,13 +420,13 @@ class MigrateController extends ExtUpdateAbstract {
 		while ($count+$errorCount < $max) {
 
 			$step = 0;
-			$updateValues = array();
+			$updateValues = [];
 			$toMigrate = $this->databaseService->selectTableRecords($from, $where, $select, 25);
 			foreach ($toMigrate as $uid => $row) {
 				// migrate itemfield file to FAL and set the reference
 				try {
 					$file = $this->fileService->retrieveFileObjectByPath($row['filepath']);
-					$updateValues = array('migrated_file' => $file->getUid());
+					$updateValues = ['migrated_file' => $file->getUid()];
 					$step++;
 				} catch (FileException $e) {
 					$this->io->newLine(2);
@@ -435,16 +435,16 @@ class MigrateController extends ExtUpdateAbstract {
 						sprintf($this->lang['falMigrateFailTitle'], 'Itemfield', 'id ' . $uid),
 						FlashMessage::WARNING
 					);
-					$updateValues = array('no_migrate' => 1);
+					$updateValues = ['no_migrate' => 1];
 					$errorCount++;
 				}
 
 				$this->databaseService->updateTableRecords(
 					$refTable,
 					$updateValues,
-					array(
+					[
 						'uid' => $uid
-					)
+					]
 				);
 			}
 			$count += $step;
@@ -480,18 +480,18 @@ class MigrateController extends ExtUpdateAbstract {
 		// @TODO ___reference in filehash table? Or are those BLOB-only? find out and see if we need to do things here or in migrateBlobs() or both!
 		$sourceTable = 'tx_' . $this->sourceExtensionKey . '_item';
 		$targetTable = 'tx_' . $this->extensionKey . '_domain_model_item';
-		$propertyMap = array(
+		$propertyMap = [
 			'pid' => 'pid',
 			'itemkey' => 'item_key',
-			'itemtype' => array(
-				'valueReference' => array(
+			'itemtype' => [
+				'valueReference' => [
 					'targetProperty' => 'item_type',
 					'foreignTable' => 'tx_' . $this->extensionKey . '_domain_model_itemtype',
 					'foreignField' => 'uid',
 					'valueField' => 'item_type',
-					'uniqueBy' => array('pid')
-				)
-			),
+					'uniqueBy' => ['pid']
+				]
+			],
 			'itemxml' => 'import',
 			'item_parent' => 'parent_item',
 			'item_child' => 'child_item',
@@ -503,11 +503,11 @@ class MigrateController extends ExtUpdateAbstract {
 			'hidden' => 'hidden',
 			'starttime' => 'starttime',
 			'endtime' => 'endtime'
-		);
-		$evaluation = array(
+		];
+		$evaluation = [
 			'itemtype != \'BLOB\'',
 			'no_migrate = 0'
-		);
+		];
 
 		// attempt migration
 		try {
@@ -541,7 +541,7 @@ class MigrateController extends ExtUpdateAbstract {
 		$sourceDataTable = 'tx_' . $this->sourceExtensionKey . '_itemfield';
 		$sourceMmTable = 'tx_' . $this->sourceExtensionKey . '_item_mm';
 		$targetTable = 'tx_' . $this->extensionKey . '_domain_model_itemblob';
-		$propertyMap = array(
+		$propertyMap = [
 			'pid' => 'pid',
 			'item_key' => 'item_key',
 			'sequence' => 'sequence',
@@ -554,7 +554,7 @@ class MigrateController extends ExtUpdateAbstract {
 			'hidden' => 'hidden',
 			'starttime' => 'starttime',
 			'endtime' => 'endtime'
-		);
+		];
 
 		// query to get all BLOB item records in correct order with all relevant properties attached
 		$select = 'it.pid AS pid,it.itemkey AS item_key,itf1.fieldvalue AS sequence,
@@ -599,9 +599,9 @@ class MigrateController extends ExtUpdateAbstract {
 			// - file id's not set to <1, we skip these from insert but not from update
 			// - fields that aren't in propertyMap
 			// - missing sequences and provide them if necessary
-			$toInsert = array();
-			$remainder = array();
-			$fileUid = array();
+			$toInsert = [];
+			$remainder = [];
+			$fileUid = [];
 			foreach ($toMigrate as $uid => $row) {
 				if ((int) $row['file'] > 0) {
 					$fileUid[$uid] = (int) $row['file'];
@@ -639,7 +639,7 @@ class MigrateController extends ExtUpdateAbstract {
 				$i = $GLOBALS['TYPO3_DB']->sql_insert_id();
 				foreach ($toInsert as $uid => $row) {
 					// update migrated_uid for inserted records
-					$this->databaseService->updateTableRecords($sourceTable, array('migrated_uid' => $i), array('uid' => $uid));
+					$this->databaseService->updateTableRecords($sourceTable, ['migrated_uid' => $i], ['uid' => $uid]);
 					// create the file reference
 					$this->fileService->setFileReference($fileUid[$uid], $targetTable, $i++, 'file', (int) $row['pid']);
 					// for every $toInsert, there is a matching $fileUid, so no need for a condition
@@ -650,24 +650,24 @@ class MigrateController extends ExtUpdateAbstract {
 				// set no_migrate to 1 for records that did not meet criteria
 				$this->databaseService->updateTableRecords(
 					$sourceTable,
-					array('no_migrate' => 1),
-					array('uid' => array(
+					['no_migrate' => 1],
+					['uid' => [
 						'operator' => ' IN (%1$s)',
 						'no_quote' => TRUE,
 						'value' => '\'' . join('\',\'', $remainder) . '\''
-					))
+					]]
 				);
 			}
 
 			// set no_migrate to 1 for all itemfields of these records
 			$this->databaseService->updateTableRecords(
 				$sourceDataTable,
-				array('no_migrate' => 1),
-				array('item_id' => array(
+				['no_migrate' => 1],
+				['item_id' => [
 					'operator' => ' IN (%1$s)',
 					'no_quote' => TRUE,
 					'value' => '\'' . join('\',\'', array_keys($toMigrate)) . '\''
-				))
+				]]
 			);
 
 			$steps = count($toMigrate);
@@ -698,37 +698,37 @@ class MigrateController extends ExtUpdateAbstract {
 
 		$sourceTable = 'tx_' . $this->sourceExtensionKey . '_itemfield';
 		$targetTable = 'tx_' . $this->extensionKey . '_domain_model_itemfield';
-		$propertyMap = array(
+		$propertyMap = [
 			'pid' => 'pid',
-			'item_id' => array(
-				'valueReference' => array(
+			'item_id' => [
+				'valueReference' => [
 					'targetProperty' => 'item',
 					'foreignTable' => 'tx_' . $this->sourceExtensionKey . '_item',
 					'foreignField' => 'migrated_uid',
 					'valueField' => 'uid',
-				)
-			),
-			'fieldname'  => array(
-				'valueReference' => array(
+				]
+			],
+			'fieldname'  => [
+				'valueReference' => [
 					'targetProperty' => 'field',
 					'foreignTable' => 'tx_' . $this->extensionKey . '_domain_model_field',
 					'foreignField' => 'uid',
 					'valueField' => 'field_name',
-					'uniqueBy' => array('pid')
-				)
-			),
+					'uniqueBy' => ['pid']
+				]
+			],
 			'fieldvalue' => 'field_value',
 			'tstamp' => 'tstamp',
 			'crdate' => 'crdate',
 			'cruser_id' => 'cruser_id',
 			'deleted' => 'deleted',
 			'hidden' => 'hidden'
-		);
-		$evaluation = array(
+		];
+		$evaluation = [
 			'no_migrate = 0',
 			// exclude empty values, since we no longer import those in decosdata
 			'fieldvalue != \'\''
-		);
+		];
 
 		// attempt migration
 		try {
@@ -759,16 +759,16 @@ class MigrateController extends ExtUpdateAbstract {
 
 		$sourceTable = 'tx_' . $this->sourceExtensionKey . '_item_mm';
 		$targetTable = 'tx_' . $this->extensionKey . '_item_item_mm';
-		$localConfig = array(
+		$localConfig = [
 			'table' => 'tx_' . $this->sourceExtensionKey . '_item',
 			'uid' => 'migrated_uid',
-			'evaluation' => array('itemtype != \'BLOB\'')
-		);
+			'evaluation' => ['itemtype != \'BLOB\'']
+		];
 		$foreignConfig = $localConfig;
-		$propertyMap = array(
+		$propertyMap = [
 			'sorting' => 'sorting',
 			'sorting_foreign' => 'sorting_foreign'
-		);
+		];
 
 		// attempt migration
 		try {
@@ -799,18 +799,18 @@ class MigrateController extends ExtUpdateAbstract {
 
 		$sourceTable = 'tx_' . $this->sourceExtensionKey . '_item_itemxml_mm';
 		$targetTable = 'tx_' . $this->extensionKey . '_item_import_mm';
-		$localConfig = array(
+		$localConfig = [
 			'table' => 'tx_' . $this->sourceExtensionKey . '_item',
 			'uid' => 'migrated_uid',
-			'evaluation' => array('itemtype != \'BLOB\'')
-		);
-		$foreignConfig = array(
+			'evaluation' => ['itemtype != \'BLOB\'']
+		];
+		$foreignConfig = [
 			'table' => 'tx_' . $this->sourceExtensionKey . '_itemxml',
 			'uid' => 'migrated_uid'
-		);
-		$propertyMap = array(
+		];
+		$propertyMap = [
 			'sorting' => 'sorting'
-		);
+		];
 
 		// attempt migration
 		try {
@@ -846,7 +846,7 @@ class MigrateController extends ExtUpdateAbstract {
 		// select without limit
 		$existingProfiles = $this->databaseService->selectTableRecords($targetTable, '', '*', '');
 		if (!empty($existingProfiles)) {
-			$profileKeys = array();
+			$profileKeys = [];
 			foreach ($existingProfiles as $profile) {
 				$profileKeys[] = $profile['profile_key'];
 			}
@@ -855,7 +855,7 @@ class MigrateController extends ExtUpdateAbstract {
 
 		$unmatchedProfiles = $this->databaseService->selectTableRecords($sourceTable, $where);
 		if (!empty($unmatchedProfiles)) {
-			$profiles = array();
+			$profiles = [];
 			foreach ($unmatchedProfiles as $profile) {
 				$profiles[] = $profile['name'];
 			}
@@ -887,15 +887,15 @@ class MigrateController extends ExtUpdateAbstract {
 
 		$pluginListType = $this->sourceExtensionKey . '_pi1';
 		$table = 'tt_content';
-		$where = implode(' ' . DatabaseConnection::AND_Constraint . ' ', array(
+		$where = implode(' ' . DatabaseConnection::AND_Constraint . ' ', [
 			'deleted=0',
 			'CType=\'list\'',
 			'list_type=\'' . $pluginListType . '\''
-		));
+		]);
 
 		$existingPlugins = $this->databaseService->selectTableRecords($table, $where);
 		if (!empty($existingPlugins)) {
-			$plugins = array();
+			$plugins = [];
 			foreach ($existingPlugins as $plugin) {
 				// ugly hack which gives us easy insight in the flexform values per plugin
 				$plugins[] = '<a href="#" onclick="(function() {jQuery(\'.hidden-info-plugin-text-' . (int) $plugin['uid'] . '\').slideToggle();})();" >' .

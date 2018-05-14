@@ -50,10 +50,10 @@ class FieldFactory extends FactoryAbstract {
 	 */
 	protected function setProperties(\Innologi\Decosdata\Domain\Model\Field $object, array $data) {
 		if (!isset($data['field_name'][0])) {
-			throw new MissingObjectProperty(1448549862, array(
+			throw new MissingObjectProperty(1448549862, [
 				'field_name',
 				'Field'
-			));
+			]);
 		}
 		$object->setFieldName($data['field_name']);
 	}
@@ -77,7 +77,7 @@ class FieldFactory extends FactoryAbstract {
 			/* @var $fieldObject \Innologi\Decosdata\Domain\Model\Field */
 			$fieldObject = $this->repository->findOneByFieldName($fieldName);
 			if ($fieldObject === NULL) {
-				$data = array('field_name' => $fieldName);
+				$data = ['field_name' => $fieldName];
 				$fieldObject = $autoInsert
 					? $this->createAndStoreObject($data)
 					: $this->create($data);

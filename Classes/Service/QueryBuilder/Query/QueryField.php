@@ -57,7 +57,7 @@ class QueryField implements QueryInterface {
 	/**
 	 * @var array
 	 */
-	protected $from = array();
+	protected $from = [];
 
 	/**
 	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Part\Where
@@ -112,7 +112,7 @@ class QueryField implements QueryInterface {
 	 * @param array $tables
 	 * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Part\From
 	 */
-	public function getFrom($id, array $tables = array()) {
+	public function getFrom($id, array $tables = []) {
 		if (!isset($this->from[$id])) {
 			$this->from[$id] = GeneralUtility::makeInstance(From::class, $tables);
 		}

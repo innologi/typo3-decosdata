@@ -50,7 +50,7 @@ class AddTagAttributes implements OptionInterface {
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
 		if ( !(isset($args['attributes']) && is_array($args['attributes'])) ) {
-			throw new MissingArgument(1466180012, array(self::class, 'attributes'));
+			throw new MissingArgument(1466180012, [self::class, 'attributes']);
 		}
 
 		// if not an actual Tag, enclose it with one with all the attributes and return it

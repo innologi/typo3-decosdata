@@ -38,7 +38,7 @@ abstract class WrapContainer {
 	/**
 	 * @var array
 	 */
-	protected $wrap = array();
+	protected $wrap = [];
 
 	/**
 	 * @var string

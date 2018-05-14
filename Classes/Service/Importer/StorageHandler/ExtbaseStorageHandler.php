@@ -143,11 +143,11 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 				$this->configurationManager->getConfiguration(
 					ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK
 				),
-				array(
-					'persistence' => array(
+				[
+					'persistence' => [
 						'storagePid' => $pid
-					)
-				)
+					]
+				]
 			)
 		);
 		// this persists AutoInserted records more quickly
@@ -169,7 +169,7 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 		// during import, finding items / itemblobs / itemfields should happen regardless
 		$this->defaultQuerySettings->getEnableFieldsToBeIgnored(TRUE);
 		// configureStoragePid() suffices, but this speeds up findBy* methods somewhat
-		$this->defaultQuerySettings->setStoragePageIds(array($pid));
+		$this->defaultQuerySettings->setStoragePageIds([$pid]);
 
 		$this->itemRepository->setDefaultQuerySettings($this->defaultQuerySettings);
 		$this->itemFieldRepository->setDefaultQuerySettings($this->defaultQuerySettings);
@@ -205,9 +205,9 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 
 			return $item;
 		} catch (MissingObjectProperty $e) {
-			throw new InvalidItem($e->getCode(), array(
+			throw new InvalidItem($e->getCode(), [
 				$data['item_key'], $e->getMessage()
-			));
+			]);
 		}
 	}
 
@@ -222,7 +222,7 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 		try {
 			if (! (isset($data['filepath'][0]) && is_file($data['filepath'])) ) {
 				// filepath missing or not a file
-				throw new FileException(1448551092, array($data['filepath'] ?? 'NULL'));
+				throw new FileException(1448551092, [$data['filepath'] ?? 'NULL']);
 			}
 
 			/* @var $parentItem \Innologi\Decosdata\Domain\Model\Item */
@@ -238,13 +238,13 @@ class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterfac
 			}
 		} catch (FileException $e) {
 			// if there is no correct file, there is no valid item blob
-			throw new InvalidItemBlob($e->getCode(), array(
+			throw new InvalidItemBlob($e->getCode(), [
 				$data['item_key'], $e->getMessage()
-			));
+			]);
 		} catch (MissingObjectProperty $e) {
-			throw new InvalidItemBlob($e->getCode(), array(
+			throw new InvalidItemBlob($e->getCode(), [
 				$data['item_key'], $e->getMessage()
-			));
+			]);
 		}
 	}
 

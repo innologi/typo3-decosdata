@@ -43,7 +43,7 @@ class AddTag implements OptionInterface {
 	 */
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
 		if ( !isset($args['name'][0]) ) {
-			throw new MissingArgument(1466007305, array(self::class, 'name'));
+			throw new MissingArgument(1466007305, [self::class, 'name']);
 		}
 		return $service->getTagFactory()->createTag(
 			$args['name'],

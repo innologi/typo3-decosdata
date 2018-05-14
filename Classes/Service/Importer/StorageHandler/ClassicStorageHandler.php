@@ -64,22 +64,22 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	/**
 	 * @var array
 	 */
-	protected $propertyDefaults = array();
+	protected $propertyDefaults = [];
 
 	/**
 	 * @var array
 	 */
-	protected $itemFields = array();
+	protected $itemFields = [];
 
 	/**
 	 * @var array
 	 */
-	protected $itemTypeCache = array();
+	protected $itemTypeCache = [];
 
 	/**
 	 * @var array
 	 */
-	protected $fieldCache = array();
+	protected $fieldCache = [];
 
 	/**
 	 * Class constructor
@@ -87,13 +87,13 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @return void
 	 */
 	public function __construct() {
-		$this->propertyDefaults = array(
+		$this->propertyDefaults = [
 			'pid' => 1,
 			'crdate' => $GLOBALS['EXEC_TIME'],
 			'tstamp' => $GLOBALS['EXEC_TIME'],
 			'deleted' => 0
 			// leave enableFields alone, so that an import/update won't affect them
-		);
+		];
 		$this->databaseConnection = $GLOBALS['TYPO3_DB'];
 		$this->databaseConnection->store_lastBuiltQuery = TRUE;
 		// @TODO ___utilize $this->databaseConnection->sql_error() ?
@@ -127,33 +127,33 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 
 		if (!isset($data['item_key'][0])) {
 			// item key is empty
-			throw new InvalidItem(1448550839, array(
+			throw new InvalidItem(1448550839, [
 				'NULL',
 				'no item_key'
-			));
+			]);
 		}
 
 		$table = 'tx_decosdata_domain_model_item';
 		$insert = array_merge(
 			$this->propertyDefaults,
-			array(
+			[
 				'item_key' => $data['item_key'],
 				'item_type' => $this->getItemTypeUid($data['item_type'])
-			)
+			]
 		);
 
-		$this->databaseHelper->execUpsertQuery($table, $insert, array('pid', 'item_key'));
+		$this->databaseHelper->execUpsertQuery($table, $insert, ['pid', 'item_key']);
 		$uid = $this->databaseHelper->getLastUid();
 		if ($uid === NULL) {
-			$uid = $this->databaseHelper->getLastUidOfMatch($table, array(
+			$uid = $this->databaseHelper->getLastUidOfMatch($table, [
 				'pid' => $insert['pid'],
 				'item_key' => $insert['item_key']
-			));
+			]);
 		}
 
 		// retrieves any previously stored itemFields of updated item or none if inserted
 		$this->itemFields = $this->databaseHelper->getLastUpsertIsNewRecord()
-			? array()
+			? []
 			: $this->getItemFields($uid, $insert['pid']);
 
 		// push import-relation
@@ -184,16 +184,16 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 
 		if (!isset($data['item_key'][0])) {
 			// item key is empty
-			throw new InvalidItemBlob(1448550925, array(
+			throw new InvalidItemBlob(1448550925, [
 				'NULL',
 				'no item_key'
-			));
+			]);
 		}
 
 		try {
 			if (! (isset($data['filepath'][0]) && is_file($data['filepath'])) ) {
 				// filepath missing or not a file
-				throw new FileException(1448550944, array($data['filepath'] ?? 'NULL'));
+				throw new FileException(1448550944, [$data['filepath'] ?? 'NULL']);
 			}
 
 			$filePath = $data['filepath'];
@@ -201,21 +201,21 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 
 			$table = 'tx_decosdata_domain_model_itemblob';
 			$data = array_merge($this->propertyDefaults, $data);
-			$this->databaseHelper->execUpsertQuery($table, $data, array('pid', 'item_key'));
+			$this->databaseHelper->execUpsertQuery($table, $data, ['pid', 'item_key']);
 			$uid = $this->databaseHelper->getLastUid();
 			if ($uid === NULL) {
-				$uid = $this->databaseHelper->getLastUidOfMatch($table, array(
+				$uid = $this->databaseHelper->getLastUidOfMatch($table, [
 					'pid' => $data['pid'],
 					'item_key' => $data['item_key']
-				));
+				]);
 			}
 			// @TODO ___note that we can get an exception here, after upsert. So we have to take in account that itemblobs could exist in DB without a file reference
 			$this->pushFileReference($filePath, $table, $uid, 'file');
 		} catch (FileException $e) {
 			// if there is no correct file, there is no valid item blob
-			throw new InvalidItemBlob($e->getCode(), array(
+			throw new InvalidItemBlob($e->getCode(), [
 				$data['item_key'], $e->getMessage()
-			));
+			]);
 		}
 	}
 
@@ -232,11 +232,11 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 		$data = array_merge($this->propertyDefaults, $data);
 		$data['field'] = $this->getFieldUid($data['field']);
 
-		$whereData = array(
+		$whereData = [
 			'field' => $data['field'],
 			'item' => $data['item'],
 			'pid' => $data['pid']
-		);
+		];
 
 		if ($data['field_value'] === NULL) {
 			// if fieldvalue is NULL while the field previously existed with a value for this item, remove it
@@ -290,7 +290,7 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 		if (!isset($this->itemTypeCache[$cacheKey])) {
 			$this->itemTypeCache[$cacheKey] = $this->produceValueObjectUid(
 				'tx_decosdata_domain_model_itemtype',
-				array('item_type' => $type)
+				['item_type' => $type]
 			);
 		}
 		return $this->itemTypeCache[$cacheKey];
@@ -307,7 +307,7 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 		if (!isset($this->fieldCache[$cacheKey])) {
 			$this->fieldCache[$cacheKey] = $this->produceValueObjectUid(
 				'tx_decosdata_domain_model_field',
-				array('field_name' => $field)
+				['field_name' => $field]
 			);
 		}
 		return $this->fieldCache[$cacheKey];
@@ -340,7 +340,7 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	/**
 	 * Returns all known itemfields belonging to the given item and page combination,
 	 * _if_ not marked for deletion, in the format:
-	 * fieldUid => array(`field` => fieldUid,`field_value` => value)
+	 * fieldUid => [`field` => fieldUid,`field_value` => value]
 	 *
 	 * @param integer $itemUid
 	 * @param integer $pageUid
@@ -352,12 +352,12 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 		$rows = $this->databaseConnection->exec_SELECTgetRows(
 			'field, field_value',
 			$table,
-			$this->databaseHelper->getWhereFromConditionArray(array(
+			$this->databaseHelper->getWhereFromConditionArray([
 				'item' => $itemUid,
 				'pid' => $pageUid,
 				// if not 0, the field is no longer relevant
 				'deleted' => 0
-			), $table),
+			], $table),
 			'',
 			'',
 			'',
@@ -365,9 +365,9 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 		);
 
 		if ($rows === NULL) {
-			throw new SqlError(1448551035, array(
+			throw new SqlError(1448551035, [
 				$this->databaseConnection->debug_lastBuiltQuery
-			));
+			]);
 		}
 
 		return $rows;

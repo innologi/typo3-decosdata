@@ -46,7 +46,7 @@ class Query extends QueryIterator implements QueryInterface {
 	/**
 	 * @var array
 	 */
-	protected $parameters = array();
+	protected $parameters = [];
 
 	/**
 	 * {@inheritDoc}
@@ -116,10 +116,10 @@ class Query extends QueryIterator implements QueryInterface {
 			if ($groupBy) $queryContent->getGroupBy()->setPriority(NULL);
 			/** @var $queryField \Innologi\Decosdata\Service\QueryBuilder\Query\QueryField */
 			foreach ($queryContent as $queryField) {
-				if ($select) $queryField->getSelect()->setTableAlias(NULL)->setField(NULL)->setWrap(array());
+				if ($select) $queryField->getSelect()->setTableAlias(NULL)->setField(NULL)->setWrap([]);
 				if ($where) $queryField->getWhere()->setConstraint(NULL);
 				if ($orderBy) $queryField->getOrderBy()->setTableAlias(NULL)->setField(NULL)->setPriority(NULL)->setSortOrder(NULL);
-				if ($from) $queryField->setFrom(array());
+				if ($from) $queryField->setFrom([]);
 			}
 		}
 		return $this;

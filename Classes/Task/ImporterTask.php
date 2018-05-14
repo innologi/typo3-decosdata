@@ -48,7 +48,7 @@ class ImporterTask extends AbstractTask {
 	/**
 	 * @var array
 	 */
-	public $selectedImports = array();
+	public $selectedImports = [];
 
 	/**
 	 * Execute task logic
@@ -58,11 +58,11 @@ class ImporterTask extends AbstractTask {
 	 */
 	public function execute() {
 		$bootstrap = new Bootstrap();
-		$bootstrap->initialize(array(
+		$bootstrap->initialize([
 			'pluginName' => 'Importer',
 			'extensionName' => $this->extensionName,
 			'vendorName' => 'Innologi'
-		));
+		]);
 
 		/* @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
 		$objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);

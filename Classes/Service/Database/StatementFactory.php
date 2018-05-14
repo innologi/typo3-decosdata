@@ -78,7 +78,7 @@ class StatementFactory implements SingletonInterface {
 	 */
 	protected function mergeQueryParts(array $queryParts) {
 		if ( !(isset($queryParts['SELECT'][0]) && isset($queryParts['FROM'][0])) ) {
-			throw new MissingQueryPart(1449155154, array('SELECT, FROM', json_encode($queryParts)));
+			throw new MissingQueryPart(1449155154, ['SELECT, FROM', json_encode($queryParts)]);
 		}
 
 		$query = 'SELECT ' . $queryParts['SELECT'] . "\n" .

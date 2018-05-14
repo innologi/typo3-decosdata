@@ -58,7 +58,7 @@ class ImporterAdditionalFieldProvider implements AdditionalFieldProviderInterfac
 					$taskInfo['selectedImports'] = $task->selectedImports;
 					break;
 				default:
-					$taskInfo['selectedImports'] = array();
+					$taskInfo['selectedImports'] = [];
 			}
 		}
 
@@ -67,14 +67,14 @@ class ImporterAdditionalFieldProvider implements AdditionalFieldProviderInterfac
 		$fieldId = 'task_selectedImports';
 		$fieldOptions = $this->getImportOptions($taskInfo['selectedImports']);
 		$fieldHtml = '<select name="' . $fieldName . '" id="' . $fieldId . '" class="wide" size="10" multiple="multiple">' . $fieldOptions . '</select>';
-		$additionalFields = array(
-			$fieldId => array(
+		$additionalFields = [
+			$fieldId => [
 				'code' => $fieldHtml,
 				'label' => $this->ll . 'task_importer.field.selectImports',
 				'cshKey' => 'tx_decosdata_task_importer',
 				'cshLabel' => $fieldId
-			)
-		);
+			]
+		];
 		return $additionalFields;
 	}
 
@@ -148,8 +148,8 @@ class ImporterAdditionalFieldProvider implements AdditionalFieldProviderInterfac
 	 * @param array $selectedImports Selected imports
 	 * @return string HTML of selectbox options
 	 */
-	protected function getImportOptions(array $selectedImports = array()) {
-		$options = array();
+	protected function getImportOptions(array $selectedImports = []) {
+		$options = [];
 		$imports = $this->findAllImports();
 		foreach ($imports as $uid => $import) {
 			$selected = in_array($uid, $selectedImports) ? ' selected="selected"' : '';

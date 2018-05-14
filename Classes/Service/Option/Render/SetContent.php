@@ -46,7 +46,7 @@ class SetContent implements OptionInterface {
 	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
 		$wrap = [];
 		if (!isset($args['content'][0])) {
-			throw new MissingArgument(1515607288, array(self::class, 'content'));
+			throw new MissingArgument(1515607288, [self::class, 'content']);
 		}
 
 		if ($tag instanceof TagContent) {

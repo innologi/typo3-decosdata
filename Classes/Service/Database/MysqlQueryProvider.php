@@ -54,7 +54,7 @@ class MysqlQueryProvider extends CompatibleQueryProvider {
 	 * @param array $uniqueProperties (optional)
 	 * @return string The upsert query
 	 */
-	public function upsertQuery($table, array $data, array $uniqueProperties = array()) {
+	public function upsertQuery($table, array $data, array $uniqueProperties = []) {
 		if (!empty($uniqueProperties)) {
 			// fallback to compatibleQueryProvider
 			return parent::upsertQuery($table, $data, $uniqueProperties);
@@ -64,7 +64,7 @@ class MysqlQueryProvider extends CompatibleQueryProvider {
 		$data = $this->databaseConnection->fullQuoteArray($data, $table);
 
 		// provide the UPDATE parameters in another format
-		$updateParameters = array();
+		$updateParameters = [];
 		foreach ($data as $property => $value) {
 			$updateParameters[$property] = $property . '=' . $value;
 		}

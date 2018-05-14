@@ -50,10 +50,10 @@ class ItemTypeFactory extends FactoryAbstract {
 	 */
 	protected function setProperties(\Innologi\Decosdata\Domain\Model\ItemType $object, array $data) {
 		if (!isset($data['item_type'][0])) {
-			throw new MissingObjectProperty(1448549941, array(
+			throw new MissingObjectProperty(1448549941, [
 				'item_type',
 				'ItemType'
-			));
+			]);
 		}
 		$object->setItemType($data['item_type']);
 	}
@@ -77,7 +77,7 @@ class ItemTypeFactory extends FactoryAbstract {
 			/* @var $typeObject \Innologi\Decosdata\Domain\Model\ItemType */
 			$typeObject = $this->repository->findOneByItemType($type);
 			if ($typeObject === NULL) {
-				$data = array('item_type' => $type);
+				$data = ['item_type' => $type];
 				$typeObject = $autoInsert
 					? $this->createAndStoreObject($data)
 					: $this->create($data);

@@ -88,10 +88,10 @@ abstract class ConstraintContainer {
 				return $this;
 			} else {
 				// @LOW _note that if $key === 'original', it would overwrite $this->constraint..
-				$constraint = $this->getConstraintFactory()->createConstraintAnd(array(
+				$constraint = $this->getConstraintFactory()->createConstraintAnd([
 					'original' => $this->constraint,
 					$key => $constraint
-				));
+				]);
 			}
 		}
 		return $this->setConstraint($constraint);

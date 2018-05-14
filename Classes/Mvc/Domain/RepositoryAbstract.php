@@ -89,10 +89,10 @@ abstract class RepositoryAbstract extends Repository {
 	 */
 	public function insertRecord(array &$data) {
 		if (isset($data['uid'])) {
-			throw new StaticUidInsertion(1448550380, array(
+			throw new StaticUidInsertion(1448550380, [
 				$this->getTableName(),
 				$data['uid']
-			));
+			]);
 		}
 		if (!isset($data['pid'])) {
 			$data['pid'] = $this->getStoragePid();

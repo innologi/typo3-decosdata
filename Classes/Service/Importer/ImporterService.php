@@ -54,7 +54,7 @@ class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
 	/**
 	 * @var array
 	 */
-	protected $errors = array();
+	protected $errors = [];
 
 	/**
 	 * Will process all available imports, regardless of page uid

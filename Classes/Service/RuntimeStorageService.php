@@ -41,7 +41,7 @@ class RuntimeStorageService implements SingletonInterface {
 	/**
 	 * @var array
 	 */
-	protected $storage = array();
+	protected $storage = [];
 
 
 	/**

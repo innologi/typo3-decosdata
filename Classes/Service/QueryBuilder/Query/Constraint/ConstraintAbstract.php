@@ -51,7 +51,7 @@ abstract class ConstraintAbstract extends WrapContainer implements ConstraintInt
 	/**
 	 * @var array
 	 */
-	protected $wrapLocal = array();
+	protected $wrapLocal = [];
 
 	/**
 	 * Returns Local Field

@@ -61,7 +61,7 @@ abstract class FactoryAbstract implements SingletonInterface {
 	/**
 	 * @var array
 	 */
-	protected $objectCache = array();
+	protected $objectCache = [];
 
 	/**
 	 * Class constructor
@@ -69,13 +69,13 @@ abstract class FactoryAbstract implements SingletonInterface {
 	 * @return void
 	 */
 	public function __construct() {
-		$this->objectType = preg_replace(array(
+		$this->objectType = preg_replace([
 			'/\\\\Factory\\\\(?!.*\\\\Factory\\\\)/',
 			'/Factory$/'
-		), array(
+		], [
 			'\\\\Model\\\\',
 			''
-		), get_class($this));
+		], get_class($this));
 	}
 
 	/**
