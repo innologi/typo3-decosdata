@@ -8,3 +8,12 @@ pdf_split_cmd = /usr/bin/pdftk $INPUTFILE burst output $OUTPUTDIRp%04d.pdf dont_
 
   # cat=basic//020; type=text; label= PDF Split output path: Directory path for PDF Split output, relative from web root.
 pdf_split_out = fileadmin/decosdata/pdf/
+
+  # cat=basic//030; type=text; label= PDF Info command: Command used by the PdfInfo option for determining page counts. Supported variables: [$INPUTFILE]. Supported command substitutes: [$GREP:string, $AWKPRINT:int]
+pdf_info_cmd = /usr/bin/pdftk $INPUTFILE dump_data | $GREP:NumberOfPages | $AWKPRINT:2
+
+# pdfinfo is a good alternative if you don't need pdftk for anything else
+#
+# @install: apt install poppler-utils
+# @see: http://www.xpdfreader.com/download.html
+#pdf_info_cmd = /usr/bin/pdfinfo $INPUTFILE | $GREP:Pages | $AWKPRINT:2
