@@ -61,6 +61,8 @@ class ImageFile implements OptionInterface {
 		$processingInstructions = [
 			'width' => $args['width'] ?? NULL,
 			'height' => $args['height'] ?? NULL,
+			// frame is for multi-page images (e.g. pdf) to determine the index of the page
+			'frame' => $args['frame'] ?? 0,
 		];
 		$processedImage = $this->imageService->applyProcessingInstructions($file, $processingInstructions);
 		$imageUri = $this->imageService->getImageUri($processedImage);
