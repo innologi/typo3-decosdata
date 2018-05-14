@@ -24,7 +24,6 @@ namespace Innologi\Decosdata\Service;
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 /**
@@ -184,21 +183,6 @@ class DownloadService implements SingletonInterface {
 	}
 
 	/**
-	 * Get file object by file uid
-	 *
-	 * @param integer $fileUid
-	 * @return \TYPO3\CMS\Core\Resource\File|NULL
-	 */
-	protected function getFileObjectByUid($fileUid) {
-		try {
-			return $this->getResourceFactory()->getFileObject($fileUid);
-		} catch (FileDoesNotExistException $e) {
-			// @TODO log this? or does it get logged internally already?
-		}
-		return NULL;
-	}
-
-	/**
 	 * Send file to user-agent and exit.
 	 *
 	 * @param boolean $noCache
@@ -209,7 +193,7 @@ class DownloadService implements SingletonInterface {
 			throw new \Exception('The request was not validated', 1515683722);
 		}
 
-		$file = $this->getFileObjectByUid($this->fileUid);
+		$file = $this->getResourceFactory()->getFileObject($this->fileUid);
 		$filepath = PATH_site . $file->getPublicUrl();
 		$filesize = filesize($filepath);
 
