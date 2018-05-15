@@ -281,15 +281,15 @@ class TypeProcessorService implements SingletonInterface {
 					->uriFor(
 						// overrule current action on queryString in case of forward
 						//$this->controllerContext->getRequest()->getControllerActionName(),
-							// is there every any reason this would not be ok?
+						// @LOW is there ever any reason this would not be ok?
 						'single',
 						$arguments
 					);
-			}
 
-			if ($this->controllerContext->getRequest()->getFormat() === 'html') {
-				// provide assets as configured per feature
-				$this->assetProviderService->provideAssets('decosdata', 'Item', 'xhr');
+				if ($this->controllerContext->getRequest()->getFormat() === 'html') {
+					// provide assets as configured per feature
+					$this->assetProviderService->provideAssets('decosdata', 'Item', 'xhr');
+				}
 			}
 		}
 		return $paging;
