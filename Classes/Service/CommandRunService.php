@@ -160,7 +160,7 @@ class CommandRunService implements SingletonInterface {
 			// anything else is an error exit code
 			throw new CmdError(1524141893, [
 				$cmd,
-				'exit code ' . $cmdStatus . ', output: "' . join("\n", $cmdOutput) . '"'
+				'exit code ' . $cmdStatus . ', output: "' . join(PHP_EOL, $cmdOutput) . '"'
 			]);
 			// @LOW log $cmd + $cmdOutput + $cmdStatus
 		}

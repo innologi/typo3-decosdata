@@ -88,7 +88,7 @@ class QueryConfigurator implements SingletonInterface {
 		$queryParts = [];
 		$glue = [
 			'SELECT' => ',',
-			'FROM' => "\n",
+			'FROM' => PHP_EOL,
 			'WHERE' => ' AND ',
 			'GROUPBY' => ',',
 			'ORDERBY' => ','

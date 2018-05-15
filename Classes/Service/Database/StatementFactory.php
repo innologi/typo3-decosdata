@@ -81,24 +81,24 @@ class StatementFactory implements SingletonInterface {
 			throw new MissingQueryPart(1449155154, ['SELECT, FROM', json_encode($queryParts)]);
 		}
 
-		$query = 'SELECT ' . $queryParts['SELECT'] . "\n" .
+		$query = 'SELECT ' . $queryParts['SELECT'] . PHP_EOL .
 			'FROM ' . $queryParts['FROM'];
 
 		if (isset($queryParts['WHERE'][0])) {
-			$query .= "\n" . 'WHERE ' . $queryParts['WHERE'];
+			$query .= PHP_EOL . 'WHERE ' . $queryParts['WHERE'];
 		}
 		if (isset($queryParts['GROUPBY'][0])) {
-			$query .= "\n" . 'GROUP BY ' . $queryParts['GROUPBY'];
+			$query .= PHP_EOL . 'GROUP BY ' . $queryParts['GROUPBY'];
 		}
 		if (isset($queryParts['ORDERBY'][0])) {
-			$query .= "\n" . 'ORDER BY ' . $queryParts['ORDERBY'];
+			$query .= PHP_EOL . 'ORDER BY ' . $queryParts['ORDERBY'];
 		}
 		# @LOW _this is a temporary interface until the relevant FIX task in PaginateService is completed
 		#if (isset($queryParts['LIMIT'][0])) {
-		#	$query .= "\n" . 'LIMIT ' . $queryParts['LIMIT'];
+		#	$query .= PHP_EOL . 'LIMIT ' . $queryParts['LIMIT'];
 		#}
 		if ($this->limit !== NULL) {
-			$query .= "\n" . 'LIMIT ' . $this->limit;
+			$query .= PHP_EOL . 'LIMIT ' . $this->limit;
 			if ($this->offset !== NULL) {
 				$query .= ' OFFSET ' . $this->offset;
 			}
