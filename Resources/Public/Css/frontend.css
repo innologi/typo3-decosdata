@@ -28,26 +28,15 @@
 	text-align: left;
 	font-weight: bold;
 }
-.tx-decosdata .data.list tr {
-	border-bottom: 1px solid #ddd;
-}
-.tx-decosdata .data.list tr th,
-.tx-decosdata .data.list tr td {
-	border-right: 1px solid #ddd;
-	padding: 0.1em 0.5em;
-}
-.tx-decosdata .data.list tr th:last-child,
-.tx-decosdata .data.list tr td:last-child {
-	border-right: 0;
-}
-.tx-decosdata .data.single tr th {
-	padding-right: 0.5em;
+.tx-decosdata .data th[scope=row] {
+	vertical-align: top
 }
 
 
 .tx-decosdata .crumbpath,
 .tx-decosdata .pagebrowser {
 	font-size: 0.8em;
+	padding: 0.8em;
 }
 .tx-decosdata ul.crumbpath-navigation,
 .tx-decosdata ul.pagebrowser-navigation {
@@ -57,6 +46,8 @@
 .tx-decosdata ul.crumbpath-navigation > li,
 .tx-decosdata ul.pagebrowser-navigation > li {
 	display: inline-block;
+	margin: 0;
+	padding: 0;
 }
 .tx-decosdata .pagebrowser-navigation > * {
 	margin-right: 0.4em;
@@ -73,15 +64,20 @@
 .tx-decosdata .gallery {
 	width: 100%;
 }
+.tx-decosdata .gallery .items {
+	overflow: hidden;
+}
 .tx-decosdata .gallery .item {
 	display: inline-block;
-	width: 24.5%;
+	float: left;
+	width: 25%;
 }
 .tx-decosdata .gallery .item,
 .tx-decosdata .media .item .media-content {
 	text-align: center;
 }
-.tx-decosdata .gallery .item img {
+.tx-decosdata .gallery .item img,
+.tx-decosdata .media .item .media-content img {
 	max-width: 100%;
 	max-height: 100%;
 }
