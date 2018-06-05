@@ -139,6 +139,9 @@ class ItemController extends ActionController {
 			// so I'm seeing quite an opportunity for automated cache pollution if I disable this without further changes.
 			// The thing is, I'm caching the search plugin as part of default action, so I can't just put a CSRF token in there.
 			// Can I somehow make my sections behave as USER_INT? But then it becomes yet another hacky mess..
+			// @TODO search action is already USER_INT. Why am I converting the follow-up GET requests to USER_INT again?
+			// @TODO also, can't we get rid of POST here? I remember how we got to using it, but let's face it: a search
+			// request should be GET, or even a POST-redirect-GET, so we should find a way to do so consistently.
 			$contentObject = $this->configurationManager->getContentObject();
 			if ($contentObject->getUserObjectType() === \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::OBJECTTYPE_USER) {
 				$contentObject->convertToUserIntObject();
@@ -200,10 +203,13 @@ class ItemController extends ActionController {
 	/**
 	 * Search request validation and redirect.
 	 * Search can actually be done in any action, but POST search needs to be done through this one.
+	 * Param is set as a requirement, otherwise we did not instantiate searchService and the whole
+	 * action would be useless to go through.
 	 *
+	 * @param string $search
 	 * @return void
 	 */
-	public function searchAction() {
+	public function searchAction($search) {
 		$arguments = [];
 		$action = 'multi';
 
@@ -272,6 +278,8 @@ class ItemController extends ActionController {
 	 */
 	protected function redirectOrForward(...$args) {
 		if ($this->apiMode) {
+			// @TODO why was it not compatible with redirects? I forgot if this is fixable,
+			// but it's in the way of a solution to getting GET search results.
 			$this->forward($args[0], $args[1], $args[2], $args[3]);
 		} else {
 			$this->redirect(...$args);
