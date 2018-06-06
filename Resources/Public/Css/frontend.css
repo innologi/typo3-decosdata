@@ -36,7 +36,7 @@
 .tx-decosdata .crumbpath,
 .tx-decosdata .pagebrowser {
 	font-size: 0.8em;
-	padding: 0.8em;
+	padding: 0.8em 0.5em;
 }
 .tx-decosdata ul.crumbpath-navigation,
 .tx-decosdata ul.pagebrowser-navigation {
@@ -46,6 +46,10 @@
 .tx-decosdata ul.crumbpath-navigation > li,
 .tx-decosdata ul.pagebrowser-navigation > li {
 	display: inline-block;
+}
+
+.tx-decosdata .pagebrowser-navigation > *,
+.tx-decosdata .crumbpath-navigation > * {
 	margin: 0;
 	padding: 0;
 }
