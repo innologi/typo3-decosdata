@@ -39,16 +39,16 @@ class RestrictByItem extends OptionAbstract {
 	use Traits\Filters;
 
 	/**
-	 * Restricts items by parent item id
+	 * Restricts items by item id
 	 *
 	 * {@inheritDoc}
 	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
 	 */
 	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
-		if (!isset($args['parameter'][0])) {
-			throw new MissingArgument(1509374080, [self::class, 'parameter']);
+		if (! (isset($args['id'][0]) || isset($args['parameter'][0])) ) {
+			throw new MissingArgument(1509374080, [self::class, 'id/parameter']);
 		}
-		$itemId = $this->parameterService->getParameterValidated($args['parameter']);
+		$itemId = $args['id'] ?? $this->parameterService->getParameterValidated($args['parameter']);
 
 		// @LOW so how do we solve a conflict with RestrictByParentItem here?
 		$alias = 'restrictBy';
