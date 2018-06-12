@@ -342,7 +342,7 @@ class PaginateService {
 	 *
 	 * @return integer
 	 */
-	public function getIterateIndex() {
+	public function getIterationIndex() {
 		return $this->index;
 	}
 }

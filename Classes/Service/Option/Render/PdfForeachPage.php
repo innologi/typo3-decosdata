@@ -86,7 +86,7 @@ class PdfForeachPage implements OptionInterface {
 	}
 
 	public function paginateIterate(array $args, RenderOptionService $service) {
-		return $this->createContent($service->getPaginator()->getIndex(), $args['renderOptions'], $service);
+		return $this->createContent($service->getPaginator()->getIterationIndex(), $args['renderOptions'], $service);
 	}
 
 	/**
