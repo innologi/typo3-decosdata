@@ -241,7 +241,7 @@ class PaginateService {
 		if (!$this->__initialized) {
 			throw new NotInitialized(1528815881, [self::class]);
 		}
-		if ($this->callback !== NULL) {
+		if ($this->callback === NULL) {
 			throw new PaginationError(1528815938, [],
 				'PaginationService cannot iterate if no callback wass given through initialization.'
 			);
