@@ -168,7 +168,7 @@ class DownloadService implements SingletonInterface {
 		$this->fileUid = (int) GeneralUtility::_GP('f');
 		$blobUid = (int) GeneralUtility::_GP('b');
 		$itemUid = (int) GeneralUtility::_GP('i');
-		$hash = GeneralUtility::_GP('h');
+		$hash = (string) GeneralUtility::_GP('h');
 
 		$this->validRequest = $this->getHashService()->validateHmac(
 			$this->generateHashString($this->fileUid, $blobUid, $itemUid),
@@ -201,8 +201,7 @@ class DownloadService implements SingletonInterface {
 		$headers = [
 			// description of action
 			'Content-Description' => 'File Transfer',
-			// providing the right content type will tell the user-agent what to
-			// do
+			// providing the right content type will tell the user-agent what to do
 			'Content-Type' => $file->getMimeType() . '; charset=utf-8',
 			// provide download dialog info, the quotes take care of spaces
 			'Content-Disposition' => 'attachment; filename="' . $file->getName() . '"',
