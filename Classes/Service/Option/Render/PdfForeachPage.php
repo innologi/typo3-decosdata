@@ -32,7 +32,7 @@ use TYPO3\CMS\Core\Resource\AbstractFile;
  * PDF Foreach Page option
  *
  * Counts the page number and is able to run through given renderOptions
- * for each of these pages. Injects the page index into {PdfForeachPage:page}
+ * for each of these pages. Injects the page index into {PdfForeachPage:index}
  * var in the given renderOptions.
  *
  * Expects extension configuration to contain:
@@ -65,24 +65,17 @@ class PdfForeachPage implements OptionInterface {
 			throw new MissingArgument(1524141815, [self::class, 'renderOptions']);
 		}
 
-		$optionName = (new \ReflectionClass($this))->getShortName();
-
-		$pageCount = $this->getPdfPageCount($file);
 		$content = [];
-		for ($i = 0; $i < $pageCount; $i++) {
-			$service->setOptionVariables($optionName, [
-				'index' => $i,
-				'page' => $i+1,
-				'total' => $pageCount
-			]);
-			$content[] = $service->processOptions(
-				$args['renderOptions'],
-				$service->getOriginalContent(),
-				$service->getIndex() . 'p' . $i,
-				$service->getItem()
-			);
+		$pdfPageCount = $this->getPdfPageCount($file);
+		$paginator = $service->getPaginator();
+		if ($paginator !== NULL) {
+			$content = $paginator->setTotal($pdfPageCount)->execute();
+		} else {
+			for ($i = 0; $i < $pdfPageCount; $i++) {
+				$content[] = $this->createContent($i, $args['renderOptions'], $service);
+			}
 		}
-		$service->unsetOptionVariables($optionName);
+
 		$content = join($args['separator'] ?? '', $content);
 
 		if ($tag instanceof TagContent) {
@@ -90,6 +83,10 @@ class PdfForeachPage implements OptionInterface {
 		}
 
 		return $service->getTagFactory()->createTagContent($content);
+	}
+
+	public function paginateIterate(array $args, RenderOptionService $service) {
+		return $this->createContent($service->getPaginator()->getIndex(), $args['renderOptions'], $service);
 	}
 
 	/**
@@ -136,4 +133,25 @@ class PdfForeachPage implements OptionInterface {
 		return (int) $cmdOutput[0];
 	}
 
+	/**
+	 * Create content through sub-renderOptions
+	 *
+	 * @param integer $pageIndex
+	 * @param array $renderOptions
+	 * @param RenderOptionService $service
+	 * @return \Innologi\TagBuilder\TagInterface
+	 */
+	protected function createContent($pageIndex, array $renderOptions, RenderOptionService $service) {
+		$service->setOptionVariables('PdfForeachPage', [
+			'index' => $pageIndex
+		]);
+		$content = $service->processOptions(
+			$renderOptions,
+			$service->getOriginalContent(),
+			$service->getIndex() . 'p' . $pageIndex,
+			$service->getItem()
+		);
+		$service->unsetOptionVariables('PdfForeachPage');
+		return $content;
+	}
 }

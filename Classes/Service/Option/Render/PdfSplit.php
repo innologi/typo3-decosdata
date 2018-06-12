@@ -62,7 +62,7 @@ class PdfSplit implements OptionInterface {
 		}
 
 		if (! (isset($args['renderOptions']) && is_array($args['renderOptions'])) ) {
-			throw new MissingArgument(1524141815, [self::class, 'renderOptions']);
+			throw new MissingArgument(1524141816, [self::class, 'renderOptions']);
 		}
 
 		$outputPath = PATH_site . rtrim($this->getExtensionConfiguration('pdf_split_out'), '/') . '/' . $file->getSha1() . '/';
@@ -73,6 +73,18 @@ class PdfSplit implements OptionInterface {
 		if (!$files->valid()) {
 			// if files do not exist, create them
 			$files = $this->splitPdfFile($file, $outputPath);
+		}
+
+		// if pagination is active, apply \LimitIterator instead of going through $paginator->execute()
+		$next = NULL;
+		$paginator = $service->getPaginator();
+		if ($paginator !== NULL) {
+			$files = new \LimitIterator(
+				$files,
+				$paginator->setTotal($files->count())->getOffset(),
+				$paginator->getLimit()
+			);
+			$next = $paginator->getNext();
 		}
 
 		$content = [];
@@ -86,6 +98,10 @@ class PdfSplit implements OptionInterface {
 				$service->getItem()
 			);
 		}
+		if ($next !== NULL) {
+			$content[] = $next;
+		}
+
 		$content = join($args['separator'] ?? '', $content);
 
 		if ($tag instanceof TagContent) {
@@ -93,6 +109,10 @@ class PdfSplit implements OptionInterface {
 		}
 
 		return $service->getTagFactory()->createTagContent($content);
+	}
+
+	public function paginateIterate(array $args, RenderOptionService $service) {
+		// do nothing; pagination is based on \LimitIterator in $this->alterContentValue()
 	}
 
 	/**
