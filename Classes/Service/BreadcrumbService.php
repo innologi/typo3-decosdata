@@ -156,9 +156,9 @@ class BreadcrumbService implements SingletonInterface {
 					if (empty($items)) {
 						throw new BreadcrumbError(1509383208, [$level, 'no query-results']);
 					}
-					// somehow erroneous query
+					// somehow erroneous query or NULL value
 					if (!isset($items[0]['content1'])) {
-						throw new BreadcrumbError(1509383681, [$level, 'missing content field 1']);
+						throw new BreadcrumbError(1509383681, [$level, 'missing or empty content field 1']);
 					}
 					$crumb = $items[0]['content1'];
 				}

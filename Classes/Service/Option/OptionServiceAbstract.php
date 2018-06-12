@@ -113,8 +113,7 @@ abstract class OptionServiceAbstract {
 	public function getOptionVariable($option, $var) {
 		// array_key_exists makes sure we support returning NULL values for existing $var s
 		if (! (isset($this->optionVariables[$option]) && \array_key_exists($var, $this->optionVariables[$option])) ) {
-			// @TODO better exception
-			throw new Exception\OptionException(1234, NULL, $option . ':' . $var);
+			throw new Exception\OptionException(1528817379, ['Option variable {' . $option . ':' . $var . '} does not exist.']);
 		}
 		return $this->optionVariables[$option][$var];
 	}
