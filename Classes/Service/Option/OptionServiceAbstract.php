@@ -1,6 +1,5 @@
 <?php
 namespace Innologi\Decosdata\Service\Option;
-
 /***************************************************************
  *  Copyright notice
  *
@@ -122,16 +121,15 @@ abstract class OptionServiceAbstract {
 	/**
 	 * Executes the given optionMethod on the requested option.
 	 *
+	 * $option is passed as reference since args may contain .var elements that
+	 * are resolved when executed.
+	 *
 	 * @param string $optionMethod
 	 * @param array $option
 	 * @param mixed $subject
 	 * @return mixed
-	 * @throws Exception\MissingOption
 	 */
-	protected function executeOption($optionMethod, array $option, $subject) {
-		if ( !isset($option['option']) ) {
-			throw new Exception\MissingOption(1448552481);
-		}
+	protected function executeOption($optionMethod, array &$option, $subject) {
 		if ( !isset($option['args']) ) {
 			$option['args'] = [];
 		} else {
@@ -142,16 +140,30 @@ abstract class OptionServiceAbstract {
 				}
 			}
 		}
+
+		return call_user_func_array(
+			[$this->getOptionObject($option), $optionMethod],
+			// @LOW ___if the service becomes a singleton, we could do away with the need to pass $this
+			[$option['args'], $subject, $this]
+		);
+	}
+
+	/**
+	 * Get Option Object
+	 *
+	 * @param array $option
+	 * @throws Exception\MissingOption
+	 * @return object
+	 */
+	protected function getOptionObject(array $option) {
+		if ( !isset($option['option']) ) {
+			throw new Exception\MissingOption(1448552481);
+		}
 		$className = $option['option'];
 		if (!isset($this->objectCache[$className])) {
 			$this->objectCache[$className] = $this->resolveOptionClass($className);
 		}
-
-		return call_user_func_array(
-			[$this->objectCache[$className], $optionMethod],
-			// @LOW ___if the service becomes a singleton, we could do away with the need to pass $this
-			[$option['args'], $subject, $this]
-		);
+		return $this->objectCache[$className];
 	}
 
 	/**
