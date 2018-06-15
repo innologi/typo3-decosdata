@@ -71,6 +71,9 @@ class ImageFile implements OptionInterface {
 			'src' => $imageUri,
 			'class' => 'file-' . $this->fileUid
 		];
+		if (isset($args['alt'][0]) && is_string($args['alt'])) {
+			$attributes['alt'] = $args['alt'];
+		}
 
 		return $service->getTagFactory()->createTag('img', $attributes);
 	}
