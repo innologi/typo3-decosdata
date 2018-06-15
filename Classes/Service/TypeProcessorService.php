@@ -199,10 +199,15 @@ class TypeProcessorService implements SingletonInterface {
 		$searchService = $this->objectManager->get(\Innologi\Decosdata\Service\SearchService::class);
 		$data = [
 			'search' => ($searchService->isActive() ? $searchService->getSearchString() : ''),
-			'targetLevel' => ($configuration['level'] ?? NULL)
+			'searchArguments' => []
 		];
 
+		if (isset($configuration['level'])) {
+			$data['searchArguments']['targetLevel'] = (int) $configuration['level'];
+		}
+
 		if (isset($configuration['xhr']) && is_array($configuration['xhr'])) {
+			// @LOW if no source given, you should actually throw an exception, otherwise we'll get some other exception that doesn't explain context
 			$data['section'] = (int) $configuration['xhr']['source'] ?? 0;
 			$settings = $this->getConfigurationManager()->getConfiguration(
 				ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS
@@ -210,7 +215,7 @@ class TypeProcessorService implements SingletonInterface {
 			$data['xhrUri'] = $this->controllerContext->getUriBuilder()->reset()
 				->setCreateAbsoluteUri(TRUE)
 				->setTargetPageType($settings['api']['type'])
-				->uriFor('search', array_diff($data, ['search' => 1]));
+				->uriFor('search', $data['searchArguments'] + ['section' => $data['section']]);
 
 			if ($this->controllerContext->getRequest()->getFormat() === 'html') {
 				// provide assets as configured per feature
