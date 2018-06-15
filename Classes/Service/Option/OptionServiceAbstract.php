@@ -130,22 +130,33 @@ abstract class OptionServiceAbstract {
 	 * @return mixed
 	 */
 	protected function executeOption($optionMethod, array &$option, $subject) {
-		if ( !isset($option['args']) ) {
-			$option['args'] = [];
-		} else {
-			// detect and replace references to previously set option vars
-			foreach ($option['args'] as &$arg) {
-				if (is_array($arg) && isset($arg['var'][0]) && is_string($arg['var'])) {
-					$arg = $this->getOptionVariable(...explode(':', $arg['var'], 2));
-				}
-			}
-		}
+		// validate args, detect and replace references to previously set option vars
+		$option['args'] = isset($option['args']) && \is_array($option['args']) ? $this->detectAndReplaceArgumentVariables($option['args']) : [];
 
 		return call_user_func_array(
 			[$this->getOptionObject($option), $optionMethod],
 			// @LOW ___if the service becomes a singleton, we could do away with the need to pass $this
 			[$option['args'], $subject, $this]
 		);
+	}
+
+	/**
+	 * Recursively detects .var elements in option arguments, and replaces it with requested var value
+	 *
+	 * @param array $args
+	 * @return array
+	 */
+	protected function detectAndReplaceArgumentVariables(array $args) {
+		foreach ($args as $name => &$arg) {
+			// go through arrays but only if the arg isn't a renderOptions recursion
+			if (is_array($arg) && $name !== 'renderOptions') {
+				// replace if there is only a .var string element, or recursively continue detection
+				$arg = isset($arg['var'][0]) && is_string($arg['var']) && \count($arg) === 1
+					? $this->getOptionVariable(...explode(':', $arg['var'], 2))
+					: $this->detectAndReplaceArgumentVariables($arg);
+			}
+		}
+		return $args;
 	}
 
 	/**
