@@ -1,14 +1,94 @@
 (function() {
-	// @TODO clean this up / refactor
 	// @TODO minify
-	// @TODO doc
+
+	/*********************/
+	/* BASIC XHR SUPPORT */
+	/*********************/
 
 	if (!window.XMLHttpRequest) {
-		console.info('[decosdata] no xhr support detected, disabling all JS features');
+		console.info('[decosdata] no xhr support detected, cannot enable xhr features');
 		return;
 	}
 
-	// IE11 polyfills
+	// @LOW what if we can cache results through LocalStorage, or otherwise SessionStorage, with a lifetime of e.g. 1 hour?
+	var dataCache = [];
+
+	/**
+	 * XHR request
+	 *
+	 * @param string method
+	 * @param string url
+	 * @param FormData data
+	 * @param string cacheKey
+	 * @param object ondata
+	 * @param object onend
+	 * @return void
+	 */
+	function xhrRequest(method, url, data, cacheKey, ondata, onend) {
+		cacheKey += '-' + url;
+		if (dataCache[cacheKey]) {
+			console.info('[decosdata] data processing from cache');
+			if (ondata !== null) {
+				ondata(dataCache[cacheKey]);
+			}
+			if (onend !== null) {
+				onend(dataCache[cacheKey]);
+			}
+			return;
+		}
+
+		// @TODO maybe we can elevate some caching to the browser with cache control headers?
+		var xhr = new XMLHttpRequest();
+		xhr.open(method, url, true);
+		xhr.responseType = 'json';
+		xhr.onload = function () {
+			if (this.status !== 200) {
+				console.error('[decosdata] ' + this.status + ': ' + this.statusText);
+				console.info(this);
+			}
+			if (this.response) {
+				var response = this.response;
+				// IE doesn't automatically parse responseType json
+				if (typeof(response) !== 'object') response = JSON.parse(response);
+				if (response.data) {
+					// @TODO remove when done
+					console.log(response);
+					dataCache[cacheKey] = response;
+					if (ondata !== null) {
+						ondata(response);
+					}
+					console.info('[decosdata] data processing success')
+				} else {
+					console.error('[decosdata] no valid xhr json response');
+					console.info(response);
+				}
+			} else {
+				console.error('[decosdata] no valid xhr json response');
+				console.info(this);
+			}
+		};
+		xhr.onerror = function() {
+			// @TODO test if getting here this also still does an onload
+			console.error('[decosdata] failed to execute xhr');
+			console.info(this);
+		};
+		xhr.ontimeout = function() {
+			console.error('[decosdata] xhr timeout');
+			console.info(this);
+		};
+		xhr.onloadend = function() {
+			if (onend !== null) {
+				onend(this);
+			}
+		};
+		// @TODO errors should provide visual cue, and probably restore non-xhr process
+		xhr.send(data);
+	}
+
+
+	/******************/
+	/* IE11 POLYFILLS */
+	/******************/
 
 	// @see https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove
 	// from:https://github.com/jserz/js_piece/blob/master/DOM/ChildNode/remove()/remove().md
@@ -122,8 +202,12 @@
 	}
 
 
+	/******************/
+	/* ONREACH OBJECT */
+	/******************/
 
-	// @LOW should improve this to be able to track multiple elements, with their own callbacks
+	// @LOW should improve this to be able to track multiple elements, with their own callbacks, probably by making multiple instances
+	// can track if given element is on screen
 	var onReach = (function() {
 		var isEnabled = false,
 		listenerAllowed = true,
@@ -184,91 +268,62 @@
 		return __this;
 	})();
 
-	var form = document.forms.decosdatasearch,
-		dataElement = null,
+
+	/**************************/
+	/* DATA & SECTION PARSING */
+	/**************************/
+
+	var originalSection = null,
 		sectionElement = null,
-		originalSection = null,
-		overlayElement = null,
-		pagingElements = [],
-		countElements = [],
+		dataElement = null,
 		templateItem = null,
-		xhrPagingElement = null,
-		// @LOW what if we can cache results through LocalStorage, or otherwise SessionStorage, with a lifetime of e.g. 1 hour?
-		dataCache = [];
+		pagingElements = [],
+		countElements = [];
 
+	/**
+	 * Parse the given Section Element to retrieve dataElement and templateItem
+	 *
+	 * @param DOMnode sectionElement
+	 * @param boolean fetchPaging
+	 * @return void
+	 */
+	function parseSection(sectionElement, fetchPaging) {
+		if (sectionElement !== null) {
+			if (fetchPaging) {
+				pagingElements = sectionElement.querySelectorAll('.pagebrowser .pagebrowser-navigation');
+				countElements = sectionElement.querySelectorAll('.pagebrowser .resultcount');
+			}
+			dataElement = sectionElement.querySelector('.items');
+			if (dataElement !== null) {
+				var itemElement = dataElement.querySelector('.item');
+				if (itemElement !== null) {
+					templateItem = itemElement.cloneNode(true);
+				}
+			}
+		}
+	}
 
+	/**
+	 * Resets section to original content
+	 *
+	 * @return void
+	 */
 	function resetSection() {
 		console.info('[decosdata] resetting section');
 		sectionElement.parentNode.insertBefore(originalSection, sectionElement);
 		sectionElement.remove();
-		sectionElement = originalSection;
-		initNonSearchPaging();
-		parseSection();
+		sectionElement = originalSection.cloneNode(true);
+		initXhrPagers();
+		parseSection(sectionElement, true);
 	}
 
-
-	function xhrRequest(method, url, data, cacheKey, ondata, onend) {
-		cacheKey += '-' + url;
-		if (dataCache[cacheKey]) {
-			console.info('[decosdata] data processing from cache');
-			if (ondata !== null) {
-				ondata(dataCache[cacheKey]);
-			}
-			if (onend !== null) {
-				onend(dataCache[cacheKey]);
-			}
-			return;
-		}
-
-		// @TODO maybe we can elevate some caching to the browser with cache control headers?
-		var xhr = new XMLHttpRequest();
-		xhr.open(method, url, true);
-		xhr.responseType = 'json';
-		xhr.onload = function () {
-			if (this.status !== 200) {
-				console.error('[decosdata] ' + this.status + ': ' + this.statusText);
-				console.info(this);
-			}
-			if (this.response) {
-				var response = this.response;
-				// IE doesn't automatically parse responseType json
-				if (typeof(response) !== 'object') response = JSON.parse(response);
-				if (response.data) {
-					console.log(response);
-					dataCache[cacheKey] = response;
-					if (ondata !== null) {
-						ondata(response);
-					}
-					console.info('[decosdata] data processing success')
-				} else {
-					console.error('[decosdata] no valid xhr json response');
-					console.info(response);
-				}
-			} else {
-				console.error('[decosdata] no valid xhr json response');
-				console.info(this);
-			}
-		};
-		xhr.onerror = function() {
-			// @TODO test if getting here this also still does an onload
-			console.error('[decosdata] failed to execute xhr');
-			console.info(this);
-		};
-		xhr.ontimeout = function() {
-			console.error('[decosdata] xhr timeout');
-			console.info(this);
-		};
-		xhr.onloadend = function() {
-			if (onend !== null) {
-				onend(this);
-			}
-		};
-		// @TODO errors should provide visual cue, and probably restore non-xhr process
-		xhr.send(data);
-	}
-
-
-	function getData(data) {
+	/**
+	 * Formats raw data into usable HTML
+	 *
+	 * @param array data
+	 * @return string
+	 */
+	function getDataHtml(data) {
 		var newData = '';
 		//for (var item of data) {
 		data.forEach(function(item) {
@@ -287,37 +342,18 @@
 	}
 
 
-	// @TODO unite this one and #2
-	function parseSection() {
-		if (sectionElement !== null) {
-			originalSection = sectionElement.cloneNode(true);
-			pagingElements = sectionElement.querySelectorAll('.pagebrowser .pagebrowser-navigation');
-			countElements = sectionElement.querySelectorAll('.pagebrowser .resultcount');
-			dataElement = sectionElement.querySelector('.items');
-			if (dataElement !== null) {
-				var itemElement = dataElement.querySelector('.item');
-				if (itemElement !== null) {
-					templateItem = itemElement.cloneNode(true);
-				}
-			}
-			overlayElement = document.createElement('div');
-			overlayElement.className = 'overlay loader active';
-		}
-	}
+	/**************/
+	/* XHR PAGING */
+	/**************/
 
-	function parseSection2(sectionElement) {
-		if (sectionElement !== null) {
-			dataElement = sectionElement.querySelector('.items');
-			if (dataElement !== null) {
-				var itemElement = dataElement.querySelector('.item');
-				if (itemElement !== null) {
-					templateItem = itemElement.cloneNode(true);
-				}
-			}
-		}
-	}
+	// @TODO check if this can't be done smarter
+	var xhrPagingElement = null;
 
-
+	/**
+	 * Initializes xhr-paging element and removes any other paging elements
+	 *
+	 * @return void
+	 */
 	function initPagingElements() {
 		if (pagingElements.length > 0) {
 			if (xhrPagingElement === null) {
@@ -330,12 +366,17 @@
 		} else if (xhrPagingElement === null) {
 			xhrPagingElement = document.createElement('div');
 		}
-		xhrPagingElement.className = 'xhr-paging';
-		delete xhrPagingElement.dataset.xhr;
+		resetXhrPaging(xhrPagingElement);
 		dataElement.parentNode.appendChild(xhrPagingElement);
 	}
 
-	function initCountChange(paging) {
+	/**
+	 * Changes paging count number in any paging count-elements found during initialization
+	 *
+	 * @param object paging
+	 * @return void
+	 */
+	function changePagingCount(paging) {
 		if ( countElements.length > 0 && paging.resultCount !== null ) {
 			// replace counts
 			var newCount = parseInt(paging.resultCount);
@@ -346,54 +387,52 @@
 		}
 	}
 
-	// @TODO unite this one and #2
-	function initXhrPaging(paging) {
+	/**
+	 * Resets XHR paging element to default attributes
+	 *
+	 * @param DOMnode xhrPagingElement
+	 * @return void
+	 */
+	function resetXhrPaging(xhrPagingElement) {
+		xhrPagingElement.className = 'xhr-paging';
+		delete xhrPagingElement.dataset.xhr;
+	}
+
+	/**
+	 * Enables XHR paging
+	 *
+	 * @param DOMnode xhrPagingElement
+	 * @param mixed uri String or boolean false
+	 * @return void
+	 */
+	function enableXhrPaging(xhrPagingElement, uri) {
 		if (xhrPagingElement !== null) {
-			if (paging.more !== false) {
+			if (uri !== false) {
 				xhrPagingElement.className = 'xhr-paging loader inactive';
-				xhrPagingElement.dataset.xhr = paging.more;
+				xhrPagingElement.dataset.xhr = uri;
 				onReach.enable(xhrPagingElement, function() {
 					console.info('[decosdata] paging in reach');
 					xhrPagingElement.className = 'xhr-paging loader active';
 					xhrRequest('GET', xhrPagingElement.dataset.xhr, null, null, function(response) {
-						dataElement.innerHTML += getData(response.data);
+						dataElement.innerHTML += getDataHtml(response.data);
 						if (response.paging) {
-							initXhrPaging(response.paging);
+							enableXhrPaging(xhrPagingElement, response.paging.more);
 						}
 					}, null);
-					// @LOW if paging does not exist, we can end up with an forever active xhr paging loader without an onend()
+					// @LOW if paging does not exist, we can end up with an forever active xhr paging loader, if no onend()
 				});
 			} else {
-				xhrPagingElement.className = 'xhr-paging';
-				delete xhrPagingElement.dataset.xhr;
+				resetXhrPaging(xhrPagingElement);
 			}
 		}
 	}
 
-	function initXhrPaging2(xhrPagingElement, more) {
-		if (xhrPagingElement !== null) {
-			if (more !== false) {
-				xhrPagingElement.className = 'xhr-paging loader inactive';
-				xhrPagingElement.dataset.xhr = more;
-				onReach.enable(xhrPagingElement, function() {
-					console.info('[decosdata] paging in reach');
-					xhrPagingElement.className = 'xhr-paging loader active';
-					xhrRequest('GET', xhrPagingElement.dataset.xhr, null, null, function(response) {
-						dataElement.innerHTML += getData(response.data);
-						if (response.paging) {
-							initXhrPaging2(xhrPagingElement, response.paging.more);
-						}
-					}, null);
-					// @LOW if paging does not exist, we can end up with an forever active xhr paging loader without an onend()
-				});
-			} else {
-				xhrPagingElement.className = 'xhr-paging';
-				delete xhrPagingElement.dataset.xhr;
-			}
-		}
-	}
-
-	function initNonSearchPaging() {
+	/**
+	 * Initializes (pre-)existing XHR pagers
+	 *
+	 * @return void
+	 */
+	function initXhrPagers() {
 		var xhrPagingElements = document.querySelectorAll('.tx-decosdata .section .xhr-paging');
 		if (xhrPagingElements.length > 0) {
 			Array.from(xhrPagingElements).forEach(function(x) {
@@ -406,60 +445,63 @@
 					do {
 						sectionElement = x.parentNode;
 					} while ( !(sectionElement === null || sectionElement.classList.contains('section')) );
-					parseSection2(sectionElement);
+					parseSection(sectionElement, false);
 					if (dataElement !== null) {
-						x.href = '#';
+						if (x.href) x.href = '#';
 						// @TODO if we have more than one, this is going to break (depends on config)
 							// so best to make an object class which contains these for every xhr-paging instance
-						onReach.enable(x, function() {
-							console.info('[decosdata] paging in reach');
-							x.className = 'xhr-paging loader active';
-							xhrRequest('GET', x.dataset.xhr, null, null, function(response) {
-								dataElement.innerHTML += getData(response.data);
-								if (response.paging) {
-									initXhrPaging2(x, response.paging.more);
-								}
-							}, null);
-							// @LOW if paging does not exist, we can end up with a forever active xhr paging loader
-						});
+						enableXhrPaging(x, x.dataset.xhr);
 					}
 				}
 			});
 		}
 	}
 
-	// @TODO this method is such a hacky mess, so clean it up once time allows it!
-	initNonSearchPaging();
+	initXhrPagers();
 
-	if (!form) {
-		// no form = no search
+
+	/**************/
+	/* XHR SEARCH */
+	/**************/
+
+	// currently we support only 1 searchform on a single page
+	var form = document.forms.decosdatasearch;
+
+	// no form or no data-xhr === no xhr search
+	if (!(form && form.dataset.xhr)) {
 		return;
 	}
 
 	// if we're here, there is a search form
 	var searchBox = form.elements['tx_decosdata[search]'],
 		searchTimeout = null,
+		// set to Nms delay after input
 		searchDelay = 600,
+		// minimum input length (trimmed) for search
 		searchAtLength = 3,
 		submitAllowed = true,
-		lastSearchValue = '';
+		lastSearchValue = '',
+		overlayElement = null;
 
-
+	/**
+	 * Submit search form
+	 *
+	 * @return boolean
+	 */
 	function doSubmit() {
+		// disable submit while a submit is still in progress
 		if (!submitAllowed) {
-			// disable visual cue
-			searchBox.className = 'search-box full-width';
+			// @LOW why disable cue if a submit was still in progress?
+			disableSearchBoxCue();
 			return false;
 		}
-		// disable form
 		submitAllowed = false;
 
 		// if same as last search: do nothing
 		var searchValue = searchBox.value.trim();
 		if (searchValue.localeCompare(lastSearchValue) === 0) {
+			disableSearchBoxCue();
 			submitAllowed = true;
-			// disable visual cue
-			searchBox.className = 'search-box full-width';
 			return false;
 		}
 		lastSearchValue = searchValue;
@@ -470,32 +512,54 @@
 		// if empty search submitted: reset section
 		if (searchValue.length === 0) {
 			resetSection();
+			disableSearchBoxCue();
 			submitAllowed = true;
-			// disable visual cue
-			searchBox.className = 'search-box full-width';
 			return false;
 		}
 
 		// visual cue
 		dataElement.parentNode.insertBefore(overlayElement, dataElement);
-
+		// search request
 		xhrRequest('POST', form.dataset.xhr, new FormData(form), searchValue, function(response) {
+			// on data
 			initPagingElements();
 			if (response.paging) {
-				initCountChange(response.paging);
-				initXhrPaging(response.paging);
+				// @FIX I've been able to reproduce (FF60) once the issue where 0 items should have been displayed (as accurately portrayed by count), but some data DID load (non-repeatable)
+				changePagingCount(response.paging);
+				enableXhrPaging(xhrPagingElement, response.paging.more);
 			}
-			dataElement.innerHTML = getData(response.data);
+			dataElement.innerHTML = getDataHtml(response.data);
 		}, function(response) {
-			// disable visual cues
-			searchBox.className = 'search-box full-width';
+			// on end
 			overlayElement.remove();
-			// re-enable form
+			disableSearchBoxCue();
 			submitAllowed = true;
 		});
+
+		// @FIX test this in:
+			// FF ok
+			// Chrome ??
+			// IE11 ??
+			// Edge ??
+		return true;
 	}
 
-	function searchListener(event) {
+	/**
+	 * Disables visual cue on searchbox
+	 *
+	 * @return void
+	 */
+	function disableSearchBoxCue() {
+		// disable visual cue
+		searchBox.className = 'search-box full-width';
+	}
+
+	/**
+	 * Event listener for automatic search based on input length
+	 *
+	 * @return void
+	 */
+	function inputSearchListener(event) {
 		var length = searchBox.value.trim().length;
 		if (length === 0 || length >= searchAtLength) {
 			// visual cue
@@ -507,33 +571,40 @@
 		}
 	}
 
-	if (form.dataset.xhr) {
-		// hide submit button
-		form.elements['tx_decosdata[submit]'].className = 'search-submit invisible';
-		searchBox.className = 'search-box full-width';
 
-		// get item template
-		if (form.dataset.section) {
-			// @LOW replace once element.closest() is fully supported on every major browser
-			sectionElement = document.querySelector('.tx-decosdata .section-' + form.dataset.section);
-			parseSection();
-		} else {
-			// @TODO create a custom templateItem and dataElement?
-			console.info('[decosdata] no section set for search xhr');
-			return;
-		}
+	// hide submit button
+	form.elements['tx_decosdata[submit]'].className = 'search-submit invisible';
+	// ensure search box has the right (lack of) visual cues at start
+	disableSearchBoxCue();
 
-		// @TODO should test if dataElement, overlayElement, templateItem exist
-		form.addEventListener('submit', function (e) {
-			e.preventDefault();
-			// if a submit occurs while a timeout is in progress..
-			clearTimeout(searchTimeout);
-			return doSubmit();
-		});
-
-		//searchBox.addEventListener('keypress', searchListener);
-		//searchBox.addEventListener('cut', searchListener);
-		//searchBox.addEventListener('paste', searchListener);
-		searchBox.addEventListener('input', searchListener);
+	// initialize section + template
+	if (form.dataset.section) {
+		// @LOW replace once element.closest() is fully supported on every major browser
+		sectionElement = document.querySelector('.tx-decosdata .section-' + form.dataset.section);
+		originalSection = sectionElement.cloneNode(true);
+		parseSection(sectionElement, true);
+		// create overlay for use in search submit
+		overlayElement = document.createElement('div');
+		overlayElement.className = 'overlay loader active';
+	} else {
+		// @TODO create a custom templateItem and dataElement so we can support xhr search on pages that initially show 0 data?
+		console.info('[decosdata] no section set for search xhr');
+		return;
 	}
+
+	// @TODO should test if dataElement, overlayElement, templateItem exist
+	// replace default submit by our own
+	form.addEventListener('submit', function (e) {
+		e.preventDefault();
+		// clear previous search-in-wait if any
+		clearTimeout(searchTimeout);
+		return doSubmit();
+	});
+
+	// also submit on input
+	//searchBox.addEventListener('keypress', inputSearchListener);
+	//searchBox.addEventListener('cut', inputSearchListener);
+	//searchBox.addEventListener('paste', inputSearchListener);
+	searchBox.addEventListener('input', inputSearchListener);
+
 })();
