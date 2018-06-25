@@ -1,12 +1,13 @@
 (function() {
 	// @TODO minify
+	// @TODO refactor into modules
 
 	/*********************/
 	/* BASIC XHR SUPPORT */
 	/*********************/
 
 	if (!window.XMLHttpRequest) {
-		console.info('[decosdata] no xhr support detected, cannot enable xhr features');
+		console.warn('[decosdata] no xhr support detected, cannot enable xhr features');
 		return;
 	}
 
@@ -25,16 +26,18 @@
 	 * @return void
 	 */
 	function xhrRequest(method, url, data, cacheKey, ondata, onend) {
-		cacheKey += '-' + url;
-		if (dataCache[cacheKey]) {
-			console.info('[decosdata] data processing from cache');
-			if (ondata !== null) {
-				ondata(dataCache[cacheKey]);
+		if (cacheKey !== null) {
+			cacheKey += '-' + url;
+			if (dataCache[cacheKey]) {
+				console.info('[decosdata] data processing from cache');
+				if (ondata !== null) {
+					ondata(dataCache[cacheKey]);
+				}
+				if (onend !== null) {
+					onend(dataCache[cacheKey]);
+				}
+				return;
 			}
-			if (onend !== null) {
-				onend(dataCache[cacheKey]);
-			}
-			return;
 		}
 
 		// @TODO maybe we can elevate some caching to the browser with cache control headers?
@@ -51,8 +54,6 @@
 				// IE doesn't automatically parse responseType json
 				if (typeof(response) !== 'object') response = JSON.parse(response);
 				if (response.data) {
-					// @TODO remove when done
-					console.log(response);
 					dataCache[cacheKey] = response;
 					if (ondata !== null) {
 						ondata(response);
@@ -202,15 +203,59 @@
 	}
 
 
-	/******************/
-	/* ONREACH OBJECT */
-	/******************/
 
-	// @LOW should improve this to be able to track multiple elements, with their own callbacks, probably by making multiple instances
+	/****************/
+	/* DATA PARSING */
+	/****************/
+
+	/**
+	 * Formats raw data into usable HTML
+	 *
+	 * @param array data
+	 * @return string
+	 */
+	function getDataHtml(itemTemplate, data) {
+		var newData = '';
+		//for (var item of data) {
+		data.forEach(function(item) {
+			var contentElements = itemTemplate.getElementsByClassName('content');
+			//for (var content of contentElements) {
+			Array.from(contentElements).forEach(function(content) {
+				if (content.dataset.cid && item['content' + content.dataset.cid]) {
+					content.innerHTML = item['content' + content.dataset.cid];
+				}
+			});
+			// @LOW what if I have multiple classes? using classList.toggle/add/remove is not supported on IE11
+			itemTemplate.className = 'item item-' + item.id;
+			newData += itemTemplate.outerHTML;
+		});
+		return newData;
+	}
+
+	function getItemTemplate(dataContainer) {
+		if (dataContainer === null) {
+			throw 'no valid data container.'
+		}
+		var itemElement = dataContainer.querySelector('.item');
+		return itemElement === null ? null : itemElement.cloneNode(true);
+	}
+
+
+	/**************/
+	/* XHR PAGING */
+	/**************/
+
 	// can track if given element is on screen
-	var onReach = (function() {
+	var OnReach = (function() {
 		var isEnabled = false,
 		listenerAllowed = true,
+		onReachCallback = null,
+		areWeThereYet = function() {
+			if (__this.elementPositionReached(__this.element)) {
+				__this.disable();
+				onReachCallback();
+			}
+		},
 		listener = function(event) {
 			if (listenerAllowed) {
 				listenerAllowed = false;
@@ -221,13 +266,6 @@
 				});
 			}
 		},
-		areWeThereYet = function() {
-			if (__this.elementPositionReached(__this.element)) {
-				__this.disable();
-				onReachCallback();
-			}
-		},
-		onReachCallback = null,
 		__this = {
 			element: null,
 			enable: function(element, callback) {
@@ -235,7 +273,7 @@
 					console.warn('[decosdata] onReach-feature cannot be enabled twice!');
 					return;
 				}
-				this.element = element;
+				__this.element = element;
 				onReachCallback = callback;
 				isEnabled = true;
 				window.addEventListener('scroll', listener);
@@ -268,115 +306,119 @@
 		return __this;
 	})();
 
+	/**
+	 * XHR Pager Object constructor
+	 *
+	 * @param DOMNode Xhr Pager element
+	 * @return XhrPager
+	 */
+	function XhrPager(elem) {
+		// initialize elem
+		this.element = elem;
+		this.more = false;
+		this.first = false;
+		if (elem.dataset.xhr) {
+			this.more = elem.dataset.xhr;
+			this.first = elem.dataset.xhr;
+			delete elem.dataset.xhr;
+		}
+		if (elem.href) elem.href = '#';
 
-	/**************************/
-	/* DATA & SECTION PARSING */
-	/**************************/
 
-	var originalSection = null,
-		sectionElement = null,
-		dataElement = null,
-		templateItem = null,
-		pagingElements = [],
-		countElements = [];
+		// determine section, dataContainer and itemTemplate
+		var sectionContainer = null;
+		do {
+			sectionContainer = elem.parentNode;
+		} while ( !(sectionContainer === null || sectionContainer.classList.contains('section')) );
+		if (sectionContainer === null || !sectionContainer.dataset.section) {
+			throw 'xhr pager is not in anything designated "section"';
+		}
+		this.section = sectionContainer.dataset.section;
+		var dataContainer = sectionContainer.querySelector('.items'),
+			itemTemplate = getItemTemplate(dataContainer);
+
+
+		// every xhr pager gets its own OnReach instance
+		this.onReach = Object.create(OnReach);
+
+
+		// disables the xhr pager
+		this.disable = function() {
+			elem.className = 'xhr-paging';
+			this.onReach.disable();
+		};
+
+
+		// enables the xhr pager
+		this.enable = function(uri) {
+			if (uri === false) {
+				this.disable();
+				return;
+			}
+
+			elem.className = 'xhr-paging loader inactive';
+			this.more = uri;
+
+			var _that = this;
+			this.onReach.enable(elem, function() {
+				console.info('[decosdata] paging in reach');
+				elem.className = 'xhr-paging loader active';
+				xhrRequest('GET', _that.more, null, null, function(response) {
+					dataContainer.innerHTML += getDataHtml(itemTemplate, response.data);
+					if (response.paging) {
+						_that.enable(response.paging.more);
+					}
+				}, null);
+				// @LOW if paging does not exist, we can end up with an forever active xhr paging loader, if no onend()
+			});
+		};
+
+
+		// enable!
+		this.enable(this.more);
+	}
+
+	var xhrPagingRegister = {};
 
 	/**
-	 * Parse the given Section Element to retrieve dataElement and templateItem
+	 * Initializes (pre-)existing XHR pagers
 	 *
-	 * @param DOMnode sectionElement
-	 * @param boolean fetchPaging
+	 * @param DOMNode container
 	 * @return void
 	 */
-	function parseSection(sectionElement, fetchPaging) {
-		if (sectionElement !== null) {
-			if (fetchPaging) {
-				pagingElements = sectionElement.querySelectorAll('.pagebrowser .pagebrowser-navigation');
-				countElements = sectionElement.querySelectorAll('.pagebrowser .resultcount');
-			}
-			dataElement = sectionElement.querySelector('.items');
-			if (dataElement !== null) {
-				var itemElement = dataElement.querySelector('.item');
-				if (itemElement !== null) {
-					templateItem = itemElement.cloneNode(true);
+	function initXhrPagers(container) {
+		var xhrPagingElements = container.querySelectorAll('.tx-decosdata .xhr-paging');
+		if (xhrPagingElements.length > 0) {
+			Array.from(xhrPagingElements).forEach(function(x) {
+				try {
+					var xhrPager = new XhrPager(x);
+					// if xhrPager won't have a valid more-url, see if a previous incarnation exists and did
+					if (!x.dataset.xhr && xhrPagingRegister[xhrPager.section]) {
+						xhrPager.enable(xhrPagingRegister[xhrPager.section].first);
+					}
+					xhrPagingRegister[xhrPager.section] = xhrPager;
+				} catch (e) {
+					console.warn('[decosdata] ' + e);
 				}
-			}
+			});
 		}
 	}
 
-	/**
-	 * Resets section to original content
-	 *
-	 * @return void
-	 */
-	function resetSection() {
-		console.info('[decosdata] resetting section');
-		sectionElement.parentNode.insertBefore(originalSection, sectionElement);
-		sectionElement.remove();
-		sectionElement = originalSection.cloneNode(true);
-		initXhrPagers();
-		parseSection(sectionElement, true);
-	}
-
-	/**
-	 * Formats raw data into usable HTML
-	 *
-	 * @param array data
-	 * @return string
-	 */
-	function getDataHtml(data) {
-		var newData = '';
-		//for (var item of data) {
-		data.forEach(function(item) {
-			var contentElements = templateItem.getElementsByClassName('content');
-			//for (var content of contentElements) {
-			Array.from(contentElements).forEach(function(content) {
-				if (content.dataset.cid && item['content' + content.dataset.cid]) {
-					content.innerHTML = item['content' + content.dataset.cid];
-				}
-			});
-			// @LOW what if I have multiple classes? using classList.toggle/add/remove is not supported on IE11
-			templateItem.className = 'item item-' + item.id;
-			newData += templateItem.outerHTML;
-		});
-		return newData;
-	}
+	initXhrPagers(document);
 
 
 	/**************/
-	/* XHR PAGING */
+	/* XHR SEARCH */
 	/**************/
 
-	// @TODO check if this can't be done smarter
-	var xhrPagingElement = null;
-
 	/**
-	 * Initializes xhr-paging element and removes any other paging elements
+	 * Changes paging count number in count-elements
 	 *
-	 * @return void
-	 */
-	function initPagingElements() {
-		if (pagingElements.length > 0) {
-			if (xhrPagingElement === null) {
-				xhrPagingElement = pagingElements[0].parentNode.cloneNode();
-			}
-			Array.from(pagingElements).forEach(function(p) {
-				p.remove();
-			});
-			pagingElements = [];
-		} else if (xhrPagingElement === null) {
-			xhrPagingElement = document.createElement('div');
-		}
-		resetXhrPaging(xhrPagingElement);
-		dataElement.parentNode.appendChild(xhrPagingElement);
-	}
-
-	/**
-	 * Changes paging count number in any paging count-elements found during initialization
-	 *
+	 * @param array countElements
 	 * @param object paging
 	 * @return void
 	 */
-	function changePagingCount(paging) {
+	function changePagingCount(countElements, paging) {
 		if ( countElements.length > 0 && paging.resultCount !== null ) {
 			// replace counts
 			var newCount = parseInt(paging.resultCount);
@@ -388,223 +430,199 @@
 	}
 
 	/**
-	 * Resets XHR paging element to default attributes
+	 * SearchForm object constructor
 	 *
-	 * @param DOMnode xhrPagingElement
+	 * @param DOMNode elem
+	 * @param int searchDelay
+	 * @param int searchAtLength
 	 * @return void
 	 */
-	function resetXhrPaging(xhrPagingElement) {
-		xhrPagingElement.className = 'xhr-paging';
-		delete xhrPagingElement.dataset.xhr;
-	}
+	function SearchForm(elem, searchDelay, searchAtLength) {
+		// initialize elem
+		this.element = elem;
+		if (!elem.dataset.xhr) {
+			throw 'searchform is not xhr-enabled';
+		}
+		this.action = elem.dataset.xhr;
+		delete elem.dataset.xhr;
 
-	/**
-	 * Enables XHR paging
-	 *
-	 * @param DOMnode xhrPagingElement
-	 * @param mixed uri String or boolean false
-	 * @return void
-	 */
-	function enableXhrPaging(xhrPagingElement, uri) {
-		if (xhrPagingElement !== null) {
-			if (uri !== false) {
-				xhrPagingElement.className = 'xhr-paging loader inactive';
-				xhrPagingElement.dataset.xhr = uri;
-				onReach.enable(xhrPagingElement, function() {
-					console.info('[decosdata] paging in reach');
-					xhrPagingElement.className = 'xhr-paging loader active';
-					xhrRequest('GET', xhrPagingElement.dataset.xhr, null, null, function(response) {
-						dataElement.innerHTML += getDataHtml(response.data);
-						if (response.paging) {
-							enableXhrPaging(xhrPagingElement, response.paging.more);
-						}
-					}, null);
-					// @LOW if paging does not exist, we can end up with an forever active xhr paging loader, if no onend()
+
+		// hide submit button
+		elem.elements['tx_decosdata[submit]'].className = 'search-submit invisible';
+
+
+		// reset searchBox
+		this.searchBox = elem.elements['tx_decosdata[search]'];
+		// disable visual cues
+		this.resetSearchBoxCues = function() {
+			this.searchBox.className = 'search-box full-width';
+		};
+		this.resetSearchBoxCues();
+
+
+		// initialize section container
+		if (!elem.dataset.section) {
+			// @TODO create a custom templateItem and dataElement so we can support xhr search on pages that initially show 0 data?
+			throw 'no section set for search xhr';
+		}
+		// @LOW replace once element.closest() is fully supported on every major browser
+		var sectionContainer = document.querySelector('.tx-decosdata .section-' + elem.dataset.section);
+		if (sectionContainer === null) {
+			throw 'search form could not find its designated "section"';
+		}
+
+
+		// is there already a XhrPager?
+		this.xhrPager = xhrPagingRegister[elem.dataset.section] ? xhrPagingRegister[elem.dataset.section] : null;
+
+
+		// create overlay for use in search submit
+		var overlay = document.createElement('div');
+		overlay.className = 'overlay loader active';
+
+
+		// parse section
+		var originalSection = null,
+			pagingElements = [],
+			countElements = [],
+			dataContainer = null,
+			itemTemplate = null;
+		// parses sectionContainer
+		function parseSection() {
+			originalSection = sectionContainer.cloneNode(true);
+			pagingElements = sectionContainer.querySelectorAll('.pagebrowser .pagebrowser-navigation');
+			countElements = sectionContainer.querySelectorAll('.pagebrowser .resultcount');
+			dataContainer = sectionContainer.querySelector('.items');
+			itemTemplate = getItemTemplate(dataContainer);
+		}
+		parseSection();
+
+
+		// clears paging elements
+		function clearPagingElements() {
+			if (pagingElements.length > 0) {
+				Array.from(pagingElements).forEach(function(p) {
+					p.remove();
 				});
-			} else {
-				resetXhrPaging(xhrPagingElement);
+				pagingElements = [];
 			}
 		}
-	}
-
-	/**
-	 * Initializes (pre-)existing XHR pagers
-	 *
-	 * @return void
-	 */
-	function initXhrPagers() {
-		var xhrPagingElements = document.querySelectorAll('.tx-decosdata .section .xhr-paging');
-		if (xhrPagingElements.length > 0) {
-			Array.from(xhrPagingElements).forEach(function(x) {
-				// @TODO if we have more than one, this is going to break (depends on config)
-					// so best to make an object class which contains these for every xhr-paging instance
-				xhrPagingElement = x;
-				if (x.dataset.xhr) {
-					sectionElement = null;
-					dataElement = null;
-					do {
-						sectionElement = x.parentNode;
-					} while ( !(sectionElement === null || sectionElement.classList.contains('section')) );
-					parseSection(sectionElement, false);
-					if (dataElement !== null) {
-						if (x.href) x.href = '#';
-						// @TODO if we have more than one, this is going to break (depends on config)
-							// so best to make an object class which contains these for every xhr-paging instance
-						enableXhrPaging(x, x.dataset.xhr);
-					}
-				}
-			});
-		}
-	}
-
-	initXhrPagers();
 
 
-	/**************/
-	/* XHR SEARCH */
-	/**************/
+		// resets section
+		this.resetSection = function() {
+			console.info('[decosdata] resetting section');
+			sectionContainer.parentNode.insertBefore(originalSection, sectionContainer);
+			sectionContainer.remove();
+			sectionContainer = originalSection;
+			initXhrPagers(sectionContainer);
+			this.xhrPager = xhrPagingRegister[elem.dataset.section] ? xhrPagingRegister[elem.dataset.section] : null;
+			parseSection();
+		};
 
-	// currently we support only 1 searchform on a single page
-	var form = document.forms.decosdatasearch;
 
-	// no form or no data-xhr === no xhr search
-	if (!(form && form.dataset.xhr)) {
-		return;
-	}
+		// define internal search vars
+		var submitAllowed = true,
+			lastSearchValue = '',
+			searchTimeout = null,
+			_that = this;
 
-	// if we're here, there is a search form
-	var searchBox = form.elements['tx_decosdata[search]'],
-		searchTimeout = null,
-		// set to Nms delay after input
-		searchDelay = 600,
-		// minimum input length (trimmed) for search
-		searchAtLength = 3,
-		submitAllowed = true,
-		lastSearchValue = '',
-		overlayElement = null;
 
-	/**
-	 * Submit search form
-	 *
-	 * @return boolean
-	 */
-	function doSubmit() {
-		// disable submit while a submit is still in progress
-		if (!submitAllowed) {
-			// @LOW why disable cue if a submit was still in progress?
-			disableSearchBoxCue();
-			return false;
-		}
-		submitAllowed = false;
-
-		// if same as last search: do nothing
-		var searchValue = searchBox.value.trim();
-		if (searchValue.localeCompare(lastSearchValue) === 0) {
-			disableSearchBoxCue();
-			submitAllowed = true;
-			return false;
-		}
-		lastSearchValue = searchValue;
-
-		// make sure we don't keep any old onReach listeners active
-		onReach.disable();
-
-		// if empty search submitted: reset section
-		if (searchValue.length === 0) {
-			resetSection();
-			disableSearchBoxCue();
-			submitAllowed = true;
-			return false;
-		}
-
-		// visual cue
-		dataElement.parentNode.insertBefore(overlayElement, dataElement);
-		// search request
-		xhrRequest('POST', form.dataset.xhr, new FormData(form), searchValue, function(response) {
-			// on data
-			initPagingElements();
-			if (response.paging) {
-				// @FIX I've been able to reproduce (FF60) once the issue where 0 items should have been displayed (as accurately portrayed by count), but some data DID load (non-repeatable)
-				changePagingCount(response.paging);
-				enableXhrPaging(xhrPagingElement, response.paging.more);
+		// submits form the xhr way
+		// needs to refer to _that everywhere because it's also called in EventHandler contexts
+		this.submit = function() {
+			// disable submit while a submit is still in progress
+			if (!submitAllowed) {
+				// @LOW why disable cue if a submit was still in progress?
+				_that.resetSearchBoxCues();
+				return false;
 			}
-			dataElement.innerHTML = getDataHtml(response.data);
-		}, function(response) {
-			// on end
-			overlayElement.remove();
-			disableSearchBoxCue();
-			submitAllowed = true;
-		});
+			submitAllowed = false;
 
-		// @FIX test this in:
-			// FF ok
-			// Chrome ??
-			// IE11 ??
-			// Edge ??
-		return true;
-	}
+			// if same as last search: do nothing
+			var searchValue = _that.searchBox.value.trim();
+			if (searchValue.localeCompare(lastSearchValue) === 0) {
+				_that.resetSearchBoxCues();
+				submitAllowed = true;
+				return false;
+			}
+			lastSearchValue = searchValue;
 
-	/**
-	 * Disables visual cue on searchbox
-	 *
-	 * @return void
-	 */
-	function disableSearchBoxCue() {
-		// disable visual cue
-		searchBox.className = 'search-box full-width';
-	}
+			// make sure we don't continue with an active xhr pager
+			if (_that.xhrPager) {
+				_that.xhrPager.disable();
+			}
 
-	/**
-	 * Event listener for automatic search based on input length
-	 *
-	 * @return void
-	 */
-	function inputSearchListener(event) {
-		var length = searchBox.value.trim().length;
-		if (length === 0 || length >= searchAtLength) {
+			// if empty search submitted: reset section
+			if (searchValue.length === 0) {
+				_that.resetSection();
+				_that.resetSearchBoxCues();
+				submitAllowed = true;
+				return false;
+			}
+
 			// visual cue
-			searchBox.className = 'search-box full-width loader active';
+			dataContainer.parentNode.insertBefore(overlay, dataContainer);
+			// search request
+			xhrRequest('POST', _that.action, new FormData(_that.element), searchValue, function(response) {
+				// on data
+				clearPagingElements();
+				dataContainer.innerHTML = getDataHtml(itemTemplate, response.data);
+				if (response.paging) {
+					changePagingCount(countElements, response.paging);
+					if (_that.xhrPager === null) {
+						// create and register an xhr pager if none was bound to the searchform before
+						var xhrPagingElement = document.createElement('div');
+						dataContainer.parentNode.appendChild(xhrPagingElement);
+						_that.xhrPager = new XhrPager(xhrPagingElement);
+						xhrPagingRegister[_that.xhrPager.section] = _that.xhrPager;
+					}
+					_that.xhrPager.enable(response.paging.more);
+				}
+			}, function(response) {
+				// on end
+				overlay.remove();
+				_that.resetSearchBoxCues();
+				submitAllowed = true;
+			});
+
+			return true;
+		};
+
+
+		// replace default submit by our own
+		elem.addEventListener('submit', function (e) {
+			e.preventDefault();
 			// clear previous search-in-wait if any
 			clearTimeout(searchTimeout);
-			// set delay
-			searchTimeout = setTimeout(doSubmit, searchDelay);
+			// if the submit did not complete, don't pass this event on to other listeners
+			if (! _that.submit() ) e.stopImmediatePropagation();
+		});
+
+
+		// submit on input
+		function inputSearchListener(event) {
+			var length = _that.searchBox.value.trim().length;
+			if (length === 0 || length >= searchAtLength) {
+				// visual cue
+				_that.searchBox.className = 'search-box full-width loader active';
+				// clear previous search-in-wait if any
+				clearTimeout(searchTimeout);
+				// set delay
+				searchTimeout = setTimeout(_that.submit, searchDelay);
+			}
 		}
+		// trigger on any type of input
+		this.searchBox.addEventListener('input', inputSearchListener);
 	}
 
 
-	// hide submit button
-	form.elements['tx_decosdata[submit]'].className = 'search-submit invisible';
-	// ensure search box has the right (lack of) visual cues at start
-	disableSearchBoxCue();
-
-	// initialize section + template
-	if (form.dataset.section) {
-		// @LOW replace once element.closest() is fully supported on every major browser
-		sectionElement = document.querySelector('.tx-decosdata .section-' + form.dataset.section);
-		originalSection = sectionElement.cloneNode(true);
-		parseSection(sectionElement, true);
-		// create overlay for use in search submit
-		overlayElement = document.createElement('div');
-		overlayElement.className = 'overlay loader active';
-	} else {
-		// @TODO create a custom templateItem and dataElement so we can support xhr search on pages that initially show 0 data?
-		console.info('[decosdata] no section set for search xhr');
-		return;
+	// currently we support only 1 searchform on a single page
+	var searchForm = null;
+	try {
+		if (document.forms.decosdatasearch) searchForm = new SearchForm(document.forms.decosdatasearch, 600, 3);
+	} catch (e) {
+		console.warn('[decosdata] ' + e);
 	}
-
-	// @TODO should test if dataElement, overlayElement, templateItem exist
-	// replace default submit by our own
-	form.addEventListener('submit', function (e) {
-		e.preventDefault();
-		// clear previous search-in-wait if any
-		clearTimeout(searchTimeout);
-		return doSubmit();
-	});
-
-	// also submit on input
-	//searchBox.addEventListener('keypress', inputSearchListener);
-	//searchBox.addEventListener('cut', inputSearchListener);
-	//searchBox.addEventListener('paste', inputSearchListener);
-	searchBox.addEventListener('input', inputSearchListener);
 
 })();
