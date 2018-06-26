@@ -26,16 +26,15 @@
 	 * @return void
 	 */
 	function xhrRequest(method, url, data, cacheKey, ondata, onend) {
+		var disallowOnEnd = true;
+
+		// get from local cache?
 		if (cacheKey !== null) {
 			cacheKey += '-' + url;
 			if (dataCache[cacheKey]) {
 				console.info('[decosdata] data processing from cache');
-				if (ondata !== null) {
-					ondata(dataCache[cacheKey]);
-				}
-				if (onend !== null) {
-					onend(dataCache[cacheKey]);
-				}
+				if (ondata !== null) disallowOnEnd = ondata(dataCache[cacheKey]) === false;
+				if (!disallowOnEnd && onend !== null) onend(dataCache[cacheKey]);
 				return;
 			}
 		}
@@ -55,9 +54,8 @@
 				if (typeof(response) !== 'object') response = JSON.parse(response);
 				if (response.data) {
 					dataCache[cacheKey] = response;
-					if (ondata !== null) {
-						ondata(response);
-					}
+					// if ondata returns false, disallowOnEnd becomes true
+					if (ondata !== null) disallowOnEnd = ondata(response) === false;
 					console.info('[decosdata] data processing success')
 				} else {
 					console.error('[decosdata] no valid xhr json response');
@@ -78,9 +76,8 @@
 			console.info(this);
 		};
 		xhr.onloadend = function() {
-			if (onend !== null) {
-				onend(this);
-			}
+			// only execute onend if disallowOnEnd is false
+			if (!disallowOnEnd && onend !== null) onend(this);
 		};
 		// @TODO errors should provide visual cue, and probably restore non-xhr process
 		xhr.send(data);
@@ -233,9 +230,7 @@
 	}
 
 	function getItemTemplate(dataContainer) {
-		if (dataContainer === null) {
-			throw 'no valid data container.'
-		}
+		if (dataContainer === null) throw 'no valid data container.'
 		var itemElement = dataContainer.querySelector('.item');
 		return itemElement === null ? null : itemElement.cloneNode(true);
 	}
@@ -246,47 +241,60 @@
 	/**************/
 
 	// can track if given element is on screen
+		// when calling enable(), we do explicitly disable all listeners,
+		// but timing flukes are possible due to async behavior, so we stay vigilant
+		// with additional validity checks on every level
 	var OnReach = (function() {
 		var isEnabled = false,
-		listenerAllowed = true,
-		onReachCallback = null,
-		areWeThereYet = function() {
-			if (__this.elementPositionReached(__this.element)) {
-				__this.disable();
-				onReachCallback();
-			}
-		},
-		listener = function(event) {
-			if (listenerAllowed) {
-				listenerAllowed = false;
-				// https://developer.mozilla.org/en-US/docs/Web/Events/scroll
-				window.requestAnimationFrame(function() {
-					areWeThereYet();
-					listenerAllowed = true;
-				});
-			}
+		listeners = {},
+		areWeThereYet = function(id, onReachCallback) {
+			// if yes, then we halt listener before calling the callback, however:
+			// callback will not be called if the listener this call originates from was previously disabled
+			if (__this.elementPositionReached(__this.element) && __this.haltListener(id)) onReachCallback();
 		},
 		__this = {
+			id: null,
 			element: null,
-			enable: function(element, callback) {
-				if (isEnabled) {
-					console.warn('[decosdata] onReach-feature cannot be enabled twice!');
-					return;
-				}
+			enable: function(element, id, callback) {
+				// disable all known listeners
+				if (isEnabled) __this.disable();
+				__this.id = id;
 				__this.element = element;
-				onReachCallback = callback;
-				isEnabled = true;
+
+				var listenerAllowed = true;
+				var listener = function(event) {
+					if (listenerAllowed) {
+						listenerAllowed = false;
+						// make sure this listener only runs as long as id remains valid
+						if (id.localeCompare(__this.id) !== 0) return __this.haltListener(id);
+
+						// https://developer.mozilla.org/en-US/docs/Web/Events/scroll
+						window.requestAnimationFrame(function() {
+							areWeThereYet(id, callback);
+							listenerAllowed = true;
+						});
+					}
+				};
 				window.addEventListener('scroll', listener);
 				window.addEventListener('resize', listener);
+				listeners[id] = listener;
+				isEnabled = true;
+
 				// we may already be there, before any scrolling or resizing :o)
-				areWeThereYet();
+				areWeThereYet(id, callback);
+			},
+			haltListener: function(id) {
+				if (listeners[id]) {
+					window.removeEventListener('scroll', listeners[id]);
+					window.removeEventListener('resize', listeners[id]);
+					delete listeners[id];
+					return true;
+				}
+				return false;
 			},
 			disable: function() {
-				if (isEnabled) {
-					window.removeEventListener('scroll', listener);
-					window.removeEventListener('resize', listener);
-					isEnabled = false;
-				}
+				for (id in listeners) __this.haltListener(id);
+				isEnabled = false;
 			},
 			elementPositionReached: function(element) {
 				var isquirks = document.compatMode !== 'BackCompat',
@@ -358,18 +366,21 @@
 
 			elem.className = 'xhr-paging loader inactive';
 			this.more = uri;
-
 			var _that = this;
-			this.onReach.enable(elem, function() {
+			this.onReach.enable(elem, uri, function() {
 				console.info('[decosdata] paging in reach');
 				elem.className = 'xhr-paging loader active';
-				xhrRequest('GET', _that.more, null, null, function(response) {
-					dataContainer.innerHTML += getDataHtml(itemTemplate, response.data);
-					if (response.paging) {
-						_that.enable(response.paging.more);
+				xhrRequest('GET', uri, null, null, function(response) {
+					// only execute if onReach has not changed id, in case of timing flukes
+					if (uri.localeCompare(_that.onReach.id) !== 0) {
+						console.warn('[decosdata] out-of-sync xhr paging request');
+						console.info({'request': uri});
+						return false;
 					}
+					dataContainer.innerHTML += getDataHtml(itemTemplate, response.data);
+					if (response.paging) _that.enable(response.paging.more);
 				}, null);
-				// @LOW if paging does not exist, we can end up with an forever active xhr paging loader, if no onend()
+				// @LOW we can end up with a forever active xhr paging loader, if an unexpected error ensues
 			});
 		};
 
@@ -440,9 +451,7 @@
 	function SearchForm(elem, searchDelay, searchAtLength) {
 		// initialize elem
 		this.element = elem;
-		if (!elem.dataset.xhr) {
-			throw 'searchform is not xhr-enabled';
-		}
+		if (!elem.dataset.xhr) throw 'searchform is not xhr-enabled';
 		this.action = elem.dataset.xhr;
 		delete elem.dataset.xhr;
 
@@ -467,9 +476,7 @@
 		}
 		// @LOW replace once element.closest() is fully supported on every major browser
 		var sectionContainer = document.querySelector('.tx-decosdata .section-' + elem.dataset.section);
-		if (sectionContainer === null) {
-			throw 'search form could not find its designated "section"';
-		}
+		if (sectionContainer === null) throw 'search form could not find its designated "section"';
 
 
 		// is there already a XhrPager?
@@ -528,8 +535,8 @@
 			_that = this;
 
 
-		// submits form the xhr way
-		// needs to refer to _that everywhere because it's also called in EventHandler contexts
+		// submits form the xhr way, returns true if a request is triggered, false if not
+		// needs to refer to _that everywhere because it's also called in EventListener contexts
 		this.submit = function() {
 			// disable submit while a submit is still in progress
 			if (!submitAllowed) {
@@ -549,9 +556,7 @@
 			lastSearchValue = searchValue;
 
 			// make sure we don't continue with an active xhr pager
-			if (_that.xhrPager) {
-				_that.xhrPager.disable();
-			}
+			if (_that.xhrPager) _that.xhrPager.disable();
 
 			// if empty search submitted: reset section
 			if (searchValue.length === 0) {
@@ -565,6 +570,13 @@
 			dataContainer.parentNode.insertBefore(overlay, dataContainer);
 			// search request
 			xhrRequest('POST', _that.action, new FormData(_that.element), searchValue, function(response) {
+				// only execute if this is still the last processed search
+				if (searchValue.localeCompare(lastSearchValue) !== 0) {
+					console.warn('[decosdata] out-of-sync xhr search request');
+					console.info({'search': searchValue});
+					// prevents onend callback
+					return false;
+				}
 				// on data
 				clearPagingElements();
 				dataContainer.innerHTML = getDataHtml(itemTemplate, response.data);
