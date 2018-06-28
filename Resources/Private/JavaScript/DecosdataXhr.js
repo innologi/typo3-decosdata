@@ -49,7 +49,7 @@
 				console.info(this);
 			}
 			if (this.response) {
-				var response = this.response;
+				let response = this.response;
 				// IE doesn't automatically parse responseType json
 				if (typeof(response) !== 'object') response = JSON.parse(response);
 				if (response.data) {
@@ -84,9 +84,12 @@
 	}
 
 
-	/******************/
-	/* IE11 POLYFILLS */
-	/******************/
+	/*********************************************************************/
+	/* IE11 POLYFILLS                                                    */
+	/* --------------                                                    */
+	/* Serving the Array.from().forEach() alternative to the unsupported */
+	/* for .. of iteration of Array-like elements such as NodeLists.     */
+	/*********************************************************************/
 
 	// @see https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove
 	// from:https://github.com/jserz/js_piece/blob/master/DOM/ChildNode/remove()/remove().md
@@ -208,15 +211,15 @@
 	/**
 	 * Formats raw data into usable HTML
 	 *
-	 * @param array data
+	 * @param Element itemTemplate
+	 * @param mixed data
 	 * @return string
 	 */
 	function getDataHtml(itemTemplate, data) {
 		var newData = '';
-		//for (var item of data) {
 		data.forEach(function(item) {
 			var contentElements = itemTemplate.getElementsByClassName('content');
-			//for (var content of contentElements) {
+			//for (let content of contentElements) {
 			Array.from(contentElements).forEach(function(content) {
 				if (content.dataset.cid && item['content' + content.dataset.cid]) {
 					content.innerHTML = item['content' + content.dataset.cid];
@@ -229,6 +232,12 @@
 		return newData;
 	}
 
+	/**
+	 * Returns the element/item template from the datacontainer
+	 *
+	 * @param Element dataContainer
+	 * @return Element
+	 */
 	function getItemTemplate(dataContainer) {
 		if (dataContainer === null) throw 'no valid data container.'
 		var itemElement = dataContainer.querySelector('.item');
@@ -293,7 +302,7 @@
 				return false;
 			},
 			disable: function() {
-				for (id in listeners) __this.haltListener(id);
+				for (let id in listeners) __this.haltListener(id);
 				isEnabled = false;
 			},
 			elementPositionReached: function(element) {
@@ -317,7 +326,7 @@
 	/**
 	 * XHR Pager Object constructor
 	 *
-	 * @param DOMNode Xhr Pager element
+	 * @param Element elem
 	 * @return XhrPager
 	 */
 	function XhrPager(elem) {
@@ -394,12 +403,13 @@
 	/**
 	 * Initializes (pre-)existing XHR pagers
 	 *
-	 * @param DOMNode container
+	 * @param Element container
 	 * @return void
 	 */
 	function initXhrPagers(container) {
 		var xhrPagingElements = container.querySelectorAll('.tx-decosdata .xhr-paging');
 		if (xhrPagingElements.length > 0) {
+			//for (let x of xhrPagingElements) {
 			Array.from(xhrPagingElements).forEach(function(x) {
 				try {
 					var xhrPager = new XhrPager(x);
@@ -432,7 +442,8 @@
 	function changePagingCount(countElements, paging) {
 		if ( countElements.length > 0 && paging.resultCount !== null ) {
 			// replace counts
-			var newCount = parseInt(paging.resultCount);
+			let newCount = parseInt(paging.resultCount);
+			//for (let c of countElements) {
 			Array.from(countElements).forEach(function(c) {
 				c.innerHTML = c.innerHTML.replace(c.dataset.count, newCount);
 				c.dataset.count = newCount;
@@ -443,7 +454,7 @@
 	/**
 	 * SearchForm object constructor
 	 *
-	 * @param DOMNode elem
+	 * @param Element elem
 	 * @param int searchDelay
 	 * @param int searchAtLength
 	 * @return void
@@ -508,6 +519,7 @@
 		// clears paging elements
 		function clearPagingElements() {
 			if (pagingElements.length > 0) {
+				//for (let p of pagingElements) {
 				Array.from(pagingElements).forEach(function(p) {
 					p.remove();
 				});
@@ -584,7 +596,7 @@
 					changePagingCount(countElements, response.paging);
 					if (_that.xhrPager === null) {
 						// create and register an xhr pager if none was bound to the searchform before
-						var xhrPagingElement = document.createElement('div');
+						let xhrPagingElement = document.createElement('div');
 						dataContainer.parentNode.appendChild(xhrPagingElement);
 						_that.xhrPager = new XhrPager(xhrPagingElement);
 						xhrPagingRegister[_that.xhrPager.section] = _that.xhrPager;

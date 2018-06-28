@@ -198,6 +198,7 @@ class ItemController extends ActionController {
 				)
 			)
 		);
+		$this->view->assign('sectionIndex', $section);
 	}
 
 	/**

@@ -7,7 +7,7 @@
 <f:section name="main">
 
 <d:crumbPath>
-	<div class="section section-0 level-{level} {section.type}">
+	<div class="section section-{sectionIndex} level-{level} {section.type}" data-section="{sectionIndex}">
 		<d:render partial="{section.partial}" arguments="{data:section.data, configuration:section.configuration, paging:section.paging}" />
 	</div>
 </d:crumbPath>
