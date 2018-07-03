@@ -63,6 +63,9 @@ class ForViewHelper extends AbstractViewHelper {
 		$this->registerArgument('configAs', 'string', 'Variable name for current content configuration.', FALSE, 'contentConfiguration');
 		$this->registerArgument('indexAs', 'string', 'Variable name for current content index.', FALSE, 'index');
 		$this->registerArgument('offset', 'integer', 'Start index at', FALSE, 1);
+		// for content paging
+		$this->registerArgument('pagingPartial', 'string', 'Partial for rendering contentpaging', FALSE, 'ViewHelpers/PageBrowser');
+		$this->registerArgument('includeXhrPagingResultCount', 'boolean', 'Includes resultcount for contentpaging', FALSE, TRUE);
 	}
 
 	/**
@@ -111,9 +114,8 @@ class ForViewHelper extends AbstractViewHelper {
 	 */
 	protected function addContentPager($content, array $paging) {
 		// we use the default pagebrowser VH partial for consistency
-		// @LOW although it should be configurable same as for the pagebrowser VH
 		return $this->viewHelperVariableContainer->getView()->renderPartial(
-			'ViewHelpers/PageBrowser',
+			$this->arguments['pagingPartial'],
 			'contentpaging',
 			[
 				'nextPageArgs' => ['page' . $paging['id'] => $paging['page']+1],
@@ -121,7 +123,7 @@ class ForViewHelper extends AbstractViewHelper {
 				'xhrAutoload' => $paging['autoload'] ? 1 : 0,
 				'xhrTarget' => 'content',
 				'resultCount' => $paging['total'],
-				'includeXhrPagingResultCount' => TRUE,
+				'includeXhrPagingResultCount' => $this->arguments['includeXhrPagingResultCount'],
 				'content' => $content
 			]
 		);
