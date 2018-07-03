@@ -8,7 +8,7 @@
 	<f:for each="{data}" as="item">
 		<div class="item item-{item.id} xhr-element">
 			<d:item.for configuration="{configuration.contentField}" item="{item}">
-				<div class="content content-{index}" data-cid="{index}">{content}</div>
+				<div class="content content-{index}" data-id="{index}" data-item="{item.id}">{content}</div>
 			</d:item.for>
 		</div>
 	</f:for>
