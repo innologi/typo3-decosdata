@@ -238,7 +238,7 @@
 						}
 					});
 					// @LOW what if I have multiple classes? using classList.toggle/add/remove is not supported on IE11
-					itemTemplate.className = 'item item-' + item.id;
+					itemTemplate.className = 'item item-' + item.id + ' xhr-element';
 					newData += itemTemplate.outerHTML;
 				});
 		}
