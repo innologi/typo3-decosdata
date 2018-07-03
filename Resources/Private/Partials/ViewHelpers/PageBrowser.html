@@ -95,8 +95,18 @@
 </f:section>
 
 <f:section name="xhrpager">
-<a class="xhr-paging loader inactive" title="{f:translate(key:'pagebrowser.next')}"
-	href="{f:uri.action(arguments:nextPageArgs, addQueryString:1)}" data-xhr="{xhrUri}" data-target="{xhrTarget}" data-autoload="{xhrAutoload}"></a>
+<div class="xhr-paging loader inactive" data-xhr="{xhrUri}" data-target="{xhrTarget}" data-autoload="{xhrAutoload}">
+	<a class="more" title="{f:translate(key:'xhrpaging.more')}" href="{f:uri.action(arguments:nextPageArgs, addQueryString:1)}">
+		<f:translate key="xhrpaging.more"/>
+	</a>
+</div>
+</f:section>
+
+<f:section name="contentpaging">
+	<f:format.raw>{content}</f:format.raw>
+	<f:if condition="{xhrUri}">
+		<d:render section="xhrpager" arguments="{_all}" />
+	</f:if>
 </f:section>
 
 </html>

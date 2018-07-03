@@ -350,7 +350,6 @@
 			this.first = elem.dataset.xhr;
 			delete elem.dataset.xhr;
 		}
-		if (elem.href) elem.href = '#';
 		this.target = elem.dataset.target ? elem.dataset.target : 'section';
 		this.autoload = elem.dataset.autoload ? elem.dataset.autoload.toLowerCase() === 'true' || elem.dataset.autoload === '1' : false;
 		var pagingAllowed = false;
@@ -422,12 +421,20 @@
 		};
 
 
-		// add on click listener
-		elem.addEventListener('click', function(e) {
+		// add button behavior (if any)
+		var button = elem.querySelector('.more');
+		if (!button) {
+			button = document.createElement('a');
+			button.className = 'more';
+			// in this case we just give it a placeholder name
+			button.innerHTML = 'more';
+			elem.appendChild(button);
+		}
+		if (button.href) button.href = '#';
+		button.addEventListener('click', function(e) {
 			e.preventDefault();
 			firePaging();
 		});
-
 
 		// enable!
 		this.enable(this.more);
@@ -637,6 +644,8 @@
 						let xhrPagingElement = document.createElement('div');
 						dataContainer.parentNode.appendChild(xhrPagingElement);
 						_that.xhrPager = new XhrPager(xhrPagingElement);
+						// @TODO should we? in this case the autoload property is never set b/c there's no paginate settings, but the button will contain placeholder text, so we set it anyway
+						_that.xhrPager.autoload = true;
 						xhrPagingRegister['section'][_that.xhrPager.id] = _that.xhrPager;
 					}
 					_that.xhrPager.enable(response.paging.more);

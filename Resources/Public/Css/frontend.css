@@ -129,19 +129,54 @@
 .tx-decosdata .search .search-submit {
 	width: 25%;
 }
-.tx-decosdata a.xhr-paging {
-	display: block;
+
+
+.tx-decosdata .xhr-paging > a,
+.tx-decosdata .xhr-paging > a:hover
+.tx-decosdata .xhr-paging > a:active
+.tx-decosdata .xhr-paging > a:focus {
+	text-decoration: none;
+	color: #222;
 }
 .tx-decosdata .xhr-paging,
 .tx-decosdata .overlay {
 	width: 100%;
 	background-position: center center;
 	background-repeat: no-repeat;
+	color: #222;
 }
 .tx-decosdata .xhr-paging.loader {
 	height: 7em;
 	margin: 2em auto;
 	opacity: 0.25;
+}
+.tx-decosdata .content .xhr-paging.loader {
+	height: 3em;
+	margin: .6em auto;
+	font-size: .8em;
+}
+.tx-decosdata .section .xhr-paging.inactive {
+	height: auto;
+	opacity: 1;
+	text-align: center;
+}
+.tx-decosdata .xhr-paging > * {
+	display: none;
+}
+.tx-decosdata .xhr-paging.inactive > * {
+	display: block;
+}
+.tx-decosdata .xhr-paging.inactive > .more {
+	display: inline-block;
+}
+.tx-decosdata .xhr-paging.inactive .more {
+	cursor: pointer;
+	background-color: #c0c0c0;
+	box-shadow: 2px 2px 2px #ddd;
+	border-radius: 1em;
+	padding: .5em 1em;
+	color: #fff;
+	text-shadow: 1px 1px 3px #222;
 }
 .tx-decosdata .overlay.loader {
 	background-color: #bbb;
@@ -154,8 +189,4 @@
 }
 .tx-decosdata .loader.active {
 	background-image: url('/typo3conf/ext/decosdata/Resources/Public/Image/spinner.svg');
-}
-.tx-decosdata .xhr-paging.loader.inactive {
-	height: 4em;
-	background-image: url('/typo3conf/ext/decosdata/Resources/Public/Image/arrow-down.svg');
 }
