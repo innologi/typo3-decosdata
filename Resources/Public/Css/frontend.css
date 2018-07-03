@@ -160,6 +160,9 @@
 	opacity: 1;
 	text-align: center;
 }
+.tx-decosdata .content .resultcount {
+	margin: .3em auto;
+}
 .tx-decosdata .xhr-paging > * {
 	display: none;
 }

@@ -112,14 +112,17 @@ class ForViewHelper extends AbstractViewHelper {
 	protected function addContentPager($content, array $paging) {
 		// we use the default pagebrowser VH partial for consistency
 		// @LOW although it should be configurable same as for the pagebrowser VH
-		return $content . $this->viewHelperVariableContainer->getView()->renderPartial(
+		return $this->viewHelperVariableContainer->getView()->renderPartial(
 			'ViewHelpers/PageBrowser',
-			'xhrpager',
+			'contentpaging',
 			[
 				'nextPageArgs' => ['page' . $paging['id'] => $paging['page']+1],
 				'xhrUri' => $paging['more'],
-				'xhrAutoload' => $paging['autoload'] ? 1 : 0,,
-				'xhrTarget' => 'content'
+				'xhrAutoload' => $paging['autoload'] ? 1 : 0,
+				'xhrTarget' => 'content',
+				'resultCount' => $paging['total'],
+				'includeXhrPagingResultCount' => TRUE,
+				'content' => $content
 			]
 		);
 	}

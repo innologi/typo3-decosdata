@@ -337,7 +337,7 @@ class PaginateService {
 			'pageLimit' => $this->pageLimit,
 			'perPageLimit' => $this->limit,
 			'page' => $this->page,
-			'resultCount' => $this->total,
+			'total' => $this->total,
 			'xhr' => $this->xhrEnabled,
 			'autoload' => $this->xhrAutoload,
 			'more' => $this->hasNext() ? $this->buildNextUri($this->xhrEnabled) : FALSE

@@ -6,7 +6,7 @@
 	<div class="pagebrowser pagebrowser-top">
 		<d:render section="pagebrowser" arguments="{configuration:pageBrowser}" />
 		<f:if condition="{includeResultCountAbove}">
-			<d:render section="resultcount" arguments="{resultCount:resultCount}" />
+			<d:render section="resultcount" arguments="{resultCount:resultCount, langKey:'pagebrowser.resultCount'}" />
 		</f:if>
 	</div>
 </f:if>
@@ -16,7 +16,7 @@
 <f:if condition="{renderBelow}">
 	<div class="pagebrowser pagebrowser-bottom">
 		<f:if condition="{includeResultCountBelow}">
-			<d:render section="resultcount" arguments="{resultCount:resultCount}" />
+			<d:render section="resultcount" arguments="{resultCount:resultCount, langKey:'pagebrowser.resultCount'}" />
 		</f:if>
 		<d:render section="pagebrowser" arguments="{configuration:pageBrowser}" />
 	</div>
@@ -67,14 +67,14 @@
 </f:section>
 
 <f:section name="resultcount">
-<div class="resultcount" data-count="{resultCount}"><f:translate key="pagebrowser.resultCount" arguments="{0: resultCount}" /></div>
+<div class="resultcount" data-count="{resultCount}"><f:translate key="{langKey}" arguments="{0: resultCount}" /></div>
 </f:section>
 
 <f:section name="xhr">
 	<f:if condition="{renderAbove}">
 		<div class="pagebrowser pagebrowser-top">
 			<f:if condition="{includeResultCountAbove}">
-				<d:render section="resultcount" arguments="{resultCount:resultCount}" />
+				<d:render section="resultcount" arguments="{resultCount:resultCount, langKey:'pagebrowser.resultCount'}" />
 			</f:if>
 		</div>
 	</f:if>
@@ -84,7 +84,7 @@
 	<f:if condition="{renderBelow}">
 		<div class="pagebrowser pagebrowser-bottom">
 			<f:if condition="{includeResultCountBelow}">
-				<d:render section="resultcount" arguments="{resultCount:resultCount}" />
+				<d:render section="resultcount" arguments="{resultCount:resultCount, langKey:'pagebrowser.resultCount'}" />
 			</f:if>
 		</div>
 	</f:if>
@@ -99,6 +99,9 @@
 	<a class="more" title="{f:translate(key:'xhrpaging.more')}" href="{f:uri.action(arguments:nextPageArgs, addQueryString:1)}">
 		<f:translate key="xhrpaging.more"/>
 	</a>
+	<f:if condition="{includeXhrPagingResultCount}">
+		<d:render section="resultcount" arguments="{resultCount:resultCount, langKey:'xhrpaging.resultCount'}" />
+	</f:if>
 </div>
 </f:section>
 
