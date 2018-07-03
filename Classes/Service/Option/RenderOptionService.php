@@ -23,8 +23,8 @@ namespace Innologi\Decosdata\Service\Option;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\Paginate\PaginateServiceFactory;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
+use Innologi\Decosdata\Service\Paginate\PaginateService;
 /**
  * Render Option Service
  *
@@ -41,11 +41,6 @@ class RenderOptionService extends OptionServiceAbstract {
 	 * @inject
 	 */
 	protected $tagFactory;
-
-	/**
-	 * @var \Innologi\Decosdata\Service\Paginate\PaginateServiceFactory
-	 */
-	protected $paginatorFactory;
 
 	/**
 	 * @var \Innologi\Decosdata\Service\ConditionService
@@ -117,19 +112,6 @@ class RenderOptionService extends OptionServiceAbstract {
 		$this->controllerContext = $controllerContext;
 		return $this;
 	}
-
-	/**
-	 * Returns Paginator Factory
-	 *
-	 * @return \Innologi\Decosdata\Service\Paginate\PaginateServiceFactory
-	 */
-	protected function getPaginatorFactory() {
-		if ($this->paginatorFactory === NULL) {
-			$this->paginatorFactory = $this->objectManager->get(PaginateServiceFactory::class);
-		}
-		return $this->paginatorFactory;
-	}
-
 
 	/**
 	 * Returns controller context
@@ -231,15 +213,15 @@ class RenderOptionService extends OptionServiceAbstract {
 	 * @param string $content
 	 * $param string $index
 	 * @param array $item
+	 * @param PaginateService $paginator
 	 * @return \Innologi\TagBuilder\TagInterface
 	 */
-	public function processOptions(array $options, $content, $index, array $item) {
+	public function processOptions(array $options, $content, $index, array $item, PaginateService $paginator = NULL) {
 		// safeguard original values for recursion before overwrite
 		$previously = [$this->item, $this->index, $this->originalContent, $this->paginator];
 		$this->item = $item;
 		$this->index = (string)$index;
 		$this->originalContent = $content;
-		$this->paginator = NULL;
 
 		// make item results accessible for option arg.var mechanism
 		$this->optionVariables['item'] = $item;
@@ -261,17 +243,13 @@ class RenderOptionService extends OptionServiceAbstract {
 			// @LOW I would prefer forcing the method to exist through OptionInterface and throw a NotSupported exception from the abstract
 				// this would require me to change the RenderOption classes to extend the abstract instead, just as how QueryOptions work
 			// if the option is set to paginate and supports it, prepare pagination
-			if (isset($option['paginate']) && is_array($option['paginate']) && \method_exists($this->getOptionObject($option), 'paginateIterate')) {
-				$this->paginator = $this->getPaginatorFactory()
-					->get([$option, $index, $item['id']])
-					->addSectionParameter($item['id'])
-					->initialize(
-						$option['paginate'],
-						$this->controllerContext,
-						[$this->getOptionObject($option), 'paginateIterate'],
-						// args can contain resolved vars through executeOption, so pass as reference
-						[&$option['args'], $this]
-					);
+			$this->paginator = NULL;
+			if ($paginator !== NULL && isset($option['paginate']) && (bool) $option['paginate'] && \method_exists($this->getOptionObject($option), 'paginateIterate')) {
+				$this->paginator = $paginator->setCallback(
+					[$this->getOptionObject($option), 'paginateIterate'],
+					// args can contain resolved vars through executeOption, so pass as reference
+					[&$option['args'], $this]
+				);
 			}
 
 			$tag = $this->executeOption('alterContentValue', $option, $tag);

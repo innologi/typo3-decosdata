@@ -81,6 +81,22 @@ class TypeProcessorService implements SingletonInterface {
 	 */
 	protected $controllerContext;
 
+	/**
+	 * @var \Innologi\Decosdata\Service\Paginate\PaginateServiceFactory
+	 */
+	protected $paginatorFactory;
+
+	/**
+	 * Returns Paginator Factory
+	 *
+	 * @return \Innologi\Decosdata\Service\Paginate\PaginateServiceFactory
+	 */
+	protected function getPaginatorFactory() {
+		if ($this->paginatorFactory === NULL) {
+			$this->paginatorFactory = $this->objectManager->get(\Innologi\Decosdata\Service\Paginate\PaginateServiceFactory::class);
+		}
+		return $this->paginatorFactory;
+	}
 
 	public function getTypoScriptService() {
 		if ($this->typoScriptService === NULL) {
@@ -137,7 +153,7 @@ class TypeProcessorService implements SingletonInterface {
 						'partial' => $configuration['partial'] ?? 'Item/' . $formattedType,
 						'type' => $lType,
 						'configuration' => $configuration,
-						'data' => $this->{$method}($configuration, $import),
+						'data' => $this->{$method}($configuration, $import, $index),
 						'paging' => isset($configuration['paginate']) && is_array($configuration['paginate'])
 							? $this->processPaging($configuration['paginate'], $index)
 							: NULL
@@ -158,7 +174,7 @@ class TypeProcessorService implements SingletonInterface {
 		return $content;
 	}
 
-	public function processList(array &$configuration, array $import) {
+	public function processList(array &$configuration, array $import, $section = 0) {
 		# @TODO remove debugging!
 		$items = $this->processRenderOptions(
 			$this->itemRepository->findWithStatement(
@@ -166,14 +182,15 @@ class TypeProcessorService implements SingletonInterface {
 					$configuration, $import
 				)->createStatement())
 			),
-			$configuration
+			$configuration,
+			$section
 		);
 		$test = $statement->getProcessedQuery();
 
 		return $items;
 	}
 
-	public function processShow(array &$configuration, array $import) {
+	public function processShow(array &$configuration, array $import, $section = 0) {
 		$items = $this->processRenderOptions(
 			$this->itemRepository->findWithStatement(
 				$this->queryBuilder->buildListQuery(
@@ -182,18 +199,19 @@ class TypeProcessorService implements SingletonInterface {
 					1
 				)->createStatement()
 			),
-			$configuration
+			$configuration,
+			$section
 		);
 
 		return $items[0] ?? NULL;
 	}
 
-	public function processGallery(array &$configuration, array $import) {
-		return $this->processList($configuration, $import);
+	public function processGallery(array &$configuration, array $import, $section = 0) {
+		return $this->processList($configuration, $import, $section);
 	}
 
-	public function processMedia(array &$configuration, array $import) {
-		return $this->processShow($configuration, $import);
+	public function processMedia(array &$configuration, array $import, $section = 0) {
+		return $this->processShow($configuration, $import, $section);
 	}
 
 	public function processSearch(array &$configuration) {
@@ -233,9 +251,10 @@ class TypeProcessorService implements SingletonInterface {
 	 *
 	 * @param array $items
 	 * @param array $configuration
+	 * @param integer $section
 	 * @return array
 	 */
-	protected function processRenderOptions(array $items, array $configuration) {
+	protected function processRenderOptions(array $items, array $configuration, $section = 0) {
 		foreach ($items as &$item) {
 			foreach ($configuration['contentField'] as $index => $config) {
 				if (!isset($config['renderOptions'])) {
@@ -251,12 +270,28 @@ class TypeProcessorService implements SingletonInterface {
 					// .. TagBuilder no longer supports NULL $content and with good reason
 					// so for now we just added ?? '' below as a quick fix
 				//}
+
+				$paginator = NULL;
+				if (isset($config['paginate']) && is_array($config['paginate'])) {
+					$paginator = $this->getPaginatorFactory()
+						->get([$section, $item['id'], $index])
+						->initialize(
+							$config['paginate'],
+							$this->controllerContext
+						);
+				}
+
 				$item['content' . $index] = $this->optionService->processOptions(
 					$config['renderOptions'],
 					$item['content' . $index] ?? '',
 					$index,
-					$item
+					$item,
+					$paginator
 				)->render();
+
+				if ($paginator !== NULL) {
+					$item['paging' . $index] = $paginator->getPaginationData();
+				}
 			}
 		}
 		return $items;
@@ -265,7 +300,7 @@ class TypeProcessorService implements SingletonInterface {
 	// @TODO clean up this method, its xhr component is setup inefficiently
 		// also this is really starting to get the opposite from transparent
 		// feels hacky because of the whole forcing single thing
-	protected function processPaging(array $paging, $section) {
+	protected function processPaging(array $paging, $section = 0) {
 		// @TODO technically, this should be contained in paginateService, but it doesn't have the controllerContext yet
 		if (isset($paging['xhr']) && (bool)$paging['xhr'] && isset($paging['more']) && $paging['more'] !== FALSE) {
 			$arguments = [
