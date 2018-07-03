@@ -9,7 +9,7 @@
 <d:crumbPath>
 	<f:for each="{contentSections}" as="section" key="index">
 		<div class="section section-{index} level-{level} {section.type}" data-section="{index}">
-			<d:render partial="{section.partial}" arguments="{data:section.data, configuration:section.configuration, paging:section.paging}" />
+			<d:render partial="{section.partial}" arguments="{data:section.data, configuration:section.configuration, paging:section.paging, sectionId:index}" />
 		</div>
 	</f:for>
 </d:crumbPath>

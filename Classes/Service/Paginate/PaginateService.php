@@ -38,6 +38,11 @@ class PaginateService {
 	// @LOW we should consider using an instance of this in the original paginateService as well
 
 	/**
+	 * @var string
+	 */
+	protected $id;
+
+	/**
 	 * @var integer
 	 */
 	protected $total;
@@ -68,9 +73,9 @@ class PaginateService {
 	protected $index = 0;
 
 	/**
-	 * @var array
+	 * @var boolean
 	 */
-	protected $xhrConfiguration = [];
+	protected $xhrEnabled = FALSE;
 
 	/**
 	 * @var boolean
@@ -95,6 +100,13 @@ class PaginateService {
 	 */
 	protected $parameterService;
 
+	// @LOW don't inject this one
+	/**
+	 * @var \Innologi\TYPO3AssetProvider\ProviderServiceInterface
+	 * @inject
+	 */
+	protected $assetProviderService;
+
 	/**
 	 * @var ControllerContext
 	 */
@@ -118,7 +130,19 @@ class PaginateService {
 	/**
 	 * @var array
 	 */
-	protected $addedSectionParameters = [];
+	protected $sectionParameters = [];
+
+	/**
+	 * Class constructor
+	 *
+	 * @param string $id
+	 * @param array $parameters
+	 * @return void
+	 */
+	public function __construct($id, array $parameters) {
+		$this->id = $id;
+		$this->sectionParameters = $parameters;
+	}
 
 	/**
 	 * Returns Configuration Manager
@@ -135,45 +159,38 @@ class PaginateService {
 	/**
 	 * Initialize the pagination service with all the necessary parameters
 	 *
-	 * If you intend to use this Service by letting it iterate through specific code,
-	 * be sure to pass along a callback.
-	 *
 	 * @param array $configuration
 	 * @param ControllerContext $controllerContext
-	 * @param callable $iterateCallback
-	 * @param array $callbackArgs
 	 * @return $this
 	 */
-	public function initialize(array $configuration, ControllerContext $controllerContext, callable $iterateCallback = NULL, array $callbackArgs = []) {
+	public function initialize(array $configuration, ControllerContext $controllerContext) {
 		$this->controllerContext = $controllerContext;
-		$this->callback = $iterateCallback;
-		$this->callbackArgs = $callbackArgs;
 		$this->parameterService->initializeByRequest($controllerContext->getRequest());
 
 		// note that these are all not based on an actual total
 		$this->pageLimit = (int) ($configuration['pageLimit'] ?? 100);
 		$this->limit = (int) ($configuration['perPageLimit'] ?? 100);
 		$this->total = $this->pageLimit * $this->limit;
-		$currentPage = $this->parameterService->getParameterNormalized('cpage');
+		$currentPage = $this->parameterService->getParameterNormalized('page' . $this->id);
 		$this->page = $currentPage > $this->pageLimit ? $this->pageLimit : $currentPage;
 		$this->offset = $this->limit * ($this->page-1);
 
-		#if (isset($configuration['xhr']) && is_array($configuration['xhr'])) {
-		#	$this->xhrConfiguration = $configuration['xhr'];
-		#}
+		$this->xhrEnabled = isset($configuration['xhr']) && (bool) $configuration['xhr'];
 
 		$this->__initialized = TRUE;
 		return $this;
 	}
 
 	/**
-	 * Adds a section-parameter-segment for next URI
+	 * Sets callback for use by iterate() method
 	 *
-	 * @param integer $sectionParameter
+	 * @param callable $iterateCallback
+	 * @param array $args
 	 * @return $this
 	 */
-	public function addSectionParameter($sectionParameter) {
-		$this->addedSectionParameters[] = $sectionParameter;
+	public function setCallback(callable $iterateCallback, array $args = []) {
+		$this->callback = $iterateCallback;
+		$this->callbackArgs = $args;
 		return $this;
 	}
 
@@ -213,20 +230,21 @@ class PaginateService {
 	}
 
 	/**
-	 * Execute pagination and generate more parameter if applicable.
+	 * Execute all steps of pagination, add XHR tags if relevant,
+	 * and return as string.
 	 *
+	 * @param string $separator
 	 * @throws NotInitialized
-	 * @return array
+	 * @return string
 	 */
-	public function execute() {
+	public function execute($separator = '') {
 		if (!$this->__initialized) {
 			throw new NotInitialized(1528815842, [self::class]);
 		}
 
 		$result = $this->iterate();
-		if ($this->hasNext()) {
-			$result[] = $this->getNext();
-		}
+		$result = $this->xhrEnabled ? $this->xhrWrapping($result, $separator) : join($separator, $result);
+
 		return $result;
 	}
 
@@ -243,7 +261,7 @@ class PaginateService {
 		}
 		if ($this->callback === NULL) {
 			throw new PaginationError(1528815938, [],
-				'PaginationService cannot iterate if no callback wass given through initialization.'
+				'PaginationService cannot iterate if no callback was given.'
 			);
 		}
 
@@ -260,63 +278,61 @@ class PaginateService {
 	 * @throws NotInitialized
 	 * @return boolean
 	 */
-	public function hasNext() {
-		if (!$this->__initialized) {
-			throw new NotInitialized(1528816720, [self::class]);
-		}
-
+	protected function hasNext() {
 		return $this->page < $this->pageLimit;
-	}
-
-	/**
-	 * Returns next page link
-	 *
-	 * @throws NotInitialized
-	 * @return \Innologi\TagBuilder\Tag|NULL
-	 */
-	public function getNext() {
-		if (!$this->__initialized) {
-			throw new NotInitialized(1528816720, [self::class]);
-		}
-
-		return $this->hasNext() ? $this->tagFactory->createTag(
-			'a',
-			['href' => $this->buildNextUri()],
-			$this->tagFactory->createTagContent('more')
-		) : NULL;
 	}
 
 	/**
 	 * Builds next page URI
 	 *
+	 * @param boolean $xhr
 	 * @return string
 	 */
-	protected function buildNextUri() {
-		$arguments = [ 'cpage' => $this->page+1 ];
-		#if (isset($this->xhrConfiguration['source'])) {
-		#	$arguments['section'] = join('|',
-		#		\array_merge([(int)$this->xhrConfiguration['source']], $this->addedSectionParameters)
-		#	);
-		#}
-
-		$settings = $this->getConfigurationManager()->getConfiguration(
-			ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS
-		);
-		return $this->controllerContext->getUriBuilder()->reset()
+	protected function buildNextUri($xhr = FALSE) {
+		$uriBuilder = $this->controllerContext->getUriBuilder()->reset()
 			->setCreateAbsoluteUri(TRUE)
-			->setAddQueryString(TRUE)
-			#->setTargetPageType($settings['api']['type'])
-			->uriFor(
-				$this->controllerContext->getRequest()->getControllerActionName(),
-				#'single',
-				$arguments
-			);
+			->setAddQueryString(TRUE);
 
-		// @TODO where to do this?
-		#if ($this->controllerContext->getRequest()->getFormat() === 'html') {
-			// provide assets as configured per feature
-		#	$this->assetProviderService->provideAssets('decosdata', 'Item', 'xhr');
-		#}
+		$arguments = [ 'page' . $this->id => $this->page+1 ];
+		if ($xhr && $this->xhrEnabled) {
+			$arguments['section'] = join('|', $this->sectionParameters);
+
+			// @TODO where to do this?
+			if ($this->controllerContext->getRequest()->getFormat() === 'html') {
+				// provide assets as configured per feature
+				$this->assetProviderService->provideAssets('decosdata', 'Item', 'xhr');
+			}
+
+			$settings = $this->getConfigurationManager()->getConfiguration(
+				ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS
+			);
+			$uriBuilder->setTargetPageType($settings['api']['type']);
+		}
+
+		return $uriBuilder->uriFor(
+			$xhr ? 'single' : $this->controllerContext->getRequest()->getControllerActionName(),
+			$arguments
+		);
+	}
+
+	/**
+	 * Get pagination data
+	 *
+	 * @return array
+	 */
+	public function getPaginationData() {
+		if (!$this->__initialized) {
+			throw new NotInitialized(1530544297, [self::class]);
+		}
+		return [
+			'id' => $this->id,
+			'pageLimit' => $this->pageLimit,
+			'perPageLimit' => $this->limit,
+			'page' => $this->page,
+			'resultCount' => $this->total,
+			'xhr' => $this->xhrEnabled,
+			'more' => $this->hasNext() ? $this->buildNextUri($this->xhrEnabled) : FALSE
+		];
 	}
 
 	/**
@@ -338,11 +354,52 @@ class PaginateService {
 	}
 
 	/**
+	 * Returns current page number
+	 *
+	 * @return integer
+	 */
+	public function getCurrentPage() {
+		return $this->page;
+	}
+
+	/**
 	 * Returns index of current iteration
 	 *
 	 * @return integer
 	 */
 	public function getIterationIndex() {
 		return $this->index;
+	}
+
+	/**
+	 * Is XHR enabled?
+	 *
+	 * @return boolean
+	 */
+	public function isXhrEnabled() {
+		return $this->xhrEnabled;
+	}
+
+	// @TODO I would prefer to replace this with something that does not change our original output this way,
+		// AND allows us to more easily implement a JSON-aware solution that does not strictly return a string,
+		// but otherwise, doc this!
+	public function xhrWrapping(array $data, $separator = '') {
+		foreach ($data as &$value) {
+			$value = $this->xhrElement($value);
+		}
+		return $this->xhrContainer( \join($separator, $data) );
+	}
+	protected function xhrElement($data) {
+		return $this->wrapInTag($data, 'span', 'xhr-element');
+	}
+	protected function xhrContainer($data) {
+		return $this->wrapInTag($data, 'span', 'xhr-container');
+	}
+	protected function wrapInTag($data, $element = 'span', $class = NULL) {
+		return $this->tagFactory->createTag(
+			$element,
+			isset($class[0]) ? ['class' => $class] : [],
+			$data instanceof \Innologi\TagBuilder\TagInterface ? $data : $this->tagFactory->createTagContent($data)
+		);
 	}
 }

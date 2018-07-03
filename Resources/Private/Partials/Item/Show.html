@@ -3,7 +3,8 @@
 	xmlns:d="http://typo3.org/ns/Innologi/Decosdata/ViewHelpers">
 
 <f:if condition="{data}">
-<table class="data item item-{data.id}">
+<div class="data xhr-container">
+<table class="item item-{data.id} xhr-element">
 	<tbody class="items">
 		<d:item.for configuration="{configuration.contentField}" item="{data}">
 			<tr>
@@ -24,6 +25,7 @@
 		</d:item.for>
 	</tbody>
 </table>
+</div>
 </f:if>
 
 </html>

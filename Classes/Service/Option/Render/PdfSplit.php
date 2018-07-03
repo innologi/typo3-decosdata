@@ -76,7 +76,6 @@ class PdfSplit implements OptionInterface {
 		}
 
 		// if pagination is active, apply \LimitIterator instead of going through $paginator->execute()
-		$next = NULL;
 		$paginator = $service->getPaginator();
 		if ($paginator !== NULL) {
 			$files = new \LimitIterator(
@@ -84,9 +83,9 @@ class PdfSplit implements OptionInterface {
 				$paginator->setTotal($files->count())->getOffset(),
 				$paginator->getLimit()
 			);
-			$next = $paginator->getNext();
 		}
 
+		$separator = $args['separator'] ?? '';
 		$content = [];
 		/** @var \SplFileInfo $fileInfo */
 		foreach ($files as $filePath => $fileInfo) {
@@ -98,11 +97,9 @@ class PdfSplit implements OptionInterface {
 				$service->getItem()
 			);
 		}
-		if ($next !== NULL) {
-			$content[] = $next;
-		}
 
-		$content = join($args['separator'] ?? '', $content);
+		// if pagination is active, apply XHR elements and next link
+		$content = $paginator !== NULL && $paginator->isXhrEnabled() ? $paginator->xhrWrapping($content, $separator) : \join($separator, $content);
 
 		if ($tag instanceof TagContent) {
 			return $tag->reset()->setContent($content);

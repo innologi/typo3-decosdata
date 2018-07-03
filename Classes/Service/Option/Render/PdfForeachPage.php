@@ -65,18 +65,20 @@ class PdfForeachPage implements OptionInterface {
 			throw new MissingArgument(1524141815, [self::class, 'renderOptions']);
 		}
 
+		$separator = $args['separator'] ?? '';
 		$content = [];
 		$pdfPageCount = $this->getPdfPageCount($file);
 		$paginator = $service->getPaginator();
 		if ($paginator !== NULL) {
-			$content = $paginator->setTotal($pdfPageCount)->execute();
+			// returns a complete and paginated result
+			$content = $paginator->setTotal($pdfPageCount)->execute($separator);
 		} else {
+			// unpaginated result
 			for ($i = 0; $i < $pdfPageCount; $i++) {
 				$content[] = $this->createContent($i, $args['renderOptions'], $service);
 			}
+			$content = join($separator, $content);
 		}
-
-		$content = join($args['separator'] ?? '', $content);
 
 		if ($tag instanceof TagContent) {
 			return $tag->reset()->setContent($content);

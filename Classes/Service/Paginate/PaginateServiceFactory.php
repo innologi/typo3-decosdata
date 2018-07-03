@@ -24,6 +24,7 @@ namespace Innologi\Decosdata\Service\Paginate;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
+use Innologi\Decosdata\Exception\NotInitialized;
 /**
  * Pagination Service Factory
  *
@@ -48,16 +49,29 @@ class PaginateServiceFactory implements SingletonInterface {
 	protected $instances = [];
 
 	/**
-	 * Retrieve the PaginateService instance that is identified by the combined
-	 * content of $instanceId
+	 * Create / retrieve the PaginateService instance that is identified by its parameters
 	 *
-	 * @param array $instanceId
+	 * @param array $parameters
 	 * @return PaginateService
 	 */
-	public function get(array $instanceId) {
-		$id = \md5(\json_encode($instanceId));
+	public function get(array $parameters) {
+		$id = \substr(\md5(\json_encode($parameters)), 0, 8);
 		if (!isset($this->instances[$id])) {
-			$this->instances[$id] = $this->objectManager->get(PaginateService::class);
+			$this->instances[$id] = $this->objectManager->get(PaginateService::class, $id, $parameters);
+		}
+		return $this->instances[$id];
+	}
+
+	/**
+	 * Retrieve already existing instance
+	 *
+	 * @param string $id
+	 * @throws NotInitialized
+	 * @return PaginateService
+	 */
+	public function getById($id) {
+		if (!isset($this->instances[$id])) {
+			throw new NotInitialized(1530549752, ['PaginateService[' . $id . ']']);
 		}
 		return $this->instances[$id];
 	}

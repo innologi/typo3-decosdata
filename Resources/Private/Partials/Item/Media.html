@@ -3,7 +3,8 @@
 	xmlns:d="http://typo3.org/ns/Innologi/Decosdata/ViewHelpers">
 
 <f:if condition="{data}">
-<div class="data item item-{data.id}">
+<div class="data xhr-container">
+<div class="item item-{data.id} xhr-element">
 	<div class="media-content">
 		<div class="content content-1" data-cid="1">{data.content1 -> f:format.raw()}</div>
 	</div>

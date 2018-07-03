@@ -21,9 +21,9 @@
 			</f:for>
 		</tr>
 	</thead>
-	<tbody class="items">
+	<tbody class="items xhr-container">
 		<f:for each="{data}" as="item">
-			<tr class="item item-{item.id}">
+			<tr class="item item-{item.id} xhr-element">
 				<d:item.for configuration="{configuration.contentField}" item="{item}">
 					<td class="content content-{index}" data-cid="{index}">{content}</td>
 				</d:item.for>
