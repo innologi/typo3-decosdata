@@ -366,6 +366,8 @@ class TypeProcessorService implements SingletonInterface {
 				// provide assets as configured per feature
 				$this->assetProviderService->provideAssets('decosdata', 'Item', 'xhr');
 			}
+		} else {
+			$paging['xhr'] = FALSE;
 		}
 		return $paging;
 	}
