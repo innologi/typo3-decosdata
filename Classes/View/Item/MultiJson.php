@@ -44,7 +44,7 @@ class MultiJson extends \TYPO3\CMS\Extbase\Mvc\View\JsonView {
 	protected $configuration = [
 		'contentSections' => [
 			'_descendAll' => [
-				'_only' => ['data','paging']
+				'_only' => ['type', 'data', 'paging']
 			]
 		]
 	];

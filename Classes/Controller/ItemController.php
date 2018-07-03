@@ -173,31 +173,54 @@ class ItemController extends ActionController {
 			)
 		);
 	}
-
+	// @FIX rename to apiAction?
+	// @FIX force api mode?
+	// @FIX add direct parameters like section, (optional) itemId, (optional) contentId?
+	// @FIX make HTML empty, assign proper variables, adjust ApiJson view?
 	/**
 	 * Run a single out of multiple publish-configurations and/or custom TS elements.
 	 *
-	 * @param integer $section
 	 * @return void
 	 */
-	public function singleAction($section) {
+	public function singleAction() {
+		$data = NULL;
+		$section = $this->parameterService->getMultiParameter('section.0');
 		$this->activeConfiguration = $this->activeConfiguration[$section] ?? [];
 
 		// @LOW maybe support non-xhr modes as well?
 		// enable xhr mode on pagination as well
 		if ($this->apiMode && isset($this->activeConfiguration['paginate']) && is_array($this->activeConfiguration['paginate'])) {
+			// @LOW maybe if the paging service has its own apimode-detection, it can set the appropriate parameters by itself
 			$this->activeConfiguration['paginate']['xhr'] = TRUE;
 		}
 
-		$this->view->assign('level', $this->level);
-		$this->view->assign(
-			'section',
-			current(
+		try {
+			// if section includes an item ID, force the configuration to be of type SHOW for this item
+			$showItemId = $this->parameterService->getMultiParameter('section.1');
+			try {
+				// if section includes a content ID, force the configuration to only list that content
+				$contentId = $this->parameterService->getMultiParameter('section.2');
+				$data = $this->typeProcessor->processContent(
+					$this->activeConfiguration, $this->import, $section, $showItemId, $contentId
+				);
+			} catch (\Innologi\Decosdata\Exception\MissingParameter $e) {
+				// section does not include content ID
+				// @TODO we don't have a use-case yet but once we do, we should look into what is missing here, i.e. $data only consists of $item
+				$data = $this->typeProcessor->processShow(
+					$this->activeConfiguration, $import, $section, $showItemId
+				);
+			}
+		} catch (\Innologi\Decosdata\Exception\MissingParameter $e) {
+			// section does not include item ID
+			$data = current(
 				$this->typeProcessor->processTypeRecursion(
 					$this->activeConfiguration, $this->import, $section
 				)
-			)
-		);
+			);
+		}
+
+		$this->view->assign('level', $this->level);
+		$this->view->assign('section', $data);
 		$this->view->assign('sectionIndex', $section);
 	}
 

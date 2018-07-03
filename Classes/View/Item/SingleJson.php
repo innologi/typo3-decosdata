@@ -43,7 +43,7 @@ class SingleJson extends \TYPO3\CMS\Extbase\Mvc\View\JsonView {
 	 */
 	protected $configuration = [
 		'section' => [
-			'_only' => ['data', 'paging']
+			'_only' => ['type', 'data', 'paging']
 		]
 	];
 

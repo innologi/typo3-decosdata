@@ -6,7 +6,7 @@
 <div class="data xhr-container">
 <div class="item item-{data.id} xhr-element">
 	<div class="media-content">
-		<div class="content content-1" data-cid="1">{data.content1 -> f:format.raw()}</div>
+		<div class="content content-1" data-id="1"  data-item="{data.id}">{data.content1 -> f:format.raw()}</div>
 	</div>
 	<table>
 		<tbody class="items">
@@ -19,16 +19,17 @@
 									{contentConfiguration.title.value}
 								</d:content.render>
 							</th>
-							<td class="content content-{index}" data-cid="{index}">{content}</td>
+							<td class="content content-{index}" data-id="{index}" data-item="{data.id}">{content}</td>
 						</f:then>
 						<f:else>
-							<td class="content content-{index}" data-cid="{index}" colspan="2">{content}</td>
+							<td class="content content-{index}" data-id="{index}" data-item="{data.id}" colspan="2">{content}</td>
 						</f:else>
 					</f:if>
 				</tr>
 			</d:item.for>
 		</tbody>
 	</table>
+</div>
 </div>
 </f:if>
 

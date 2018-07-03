@@ -98,6 +98,7 @@ class TypeProcessorService implements SingletonInterface {
 		return $this->paginatorFactory;
 	}
 
+
 	public function getTypoScriptService() {
 		if ($this->typoScriptService === NULL) {
 			$this->typoScriptService = $this->objectManager->get(\TYPO3\CMS\Core\TypoScript\TypoScriptService::class);
@@ -190,7 +191,18 @@ class TypeProcessorService implements SingletonInterface {
 		return $items;
 	}
 
-	public function processShow(array &$configuration, array $import, $section = 0) {
+	public function processShow(array &$configuration, array $import, $section = 0, $restrictItemId = NULL) {
+		if ($restrictItemId !== NULL) {
+			if (!isset($configuration['queryOptions'])) {
+				$configuration['queryOptions'] = [];
+			}
+			// restrict results to this specific item id
+			$configuration['queryOptions'][] = [
+				'option' => 'RestrictByItem',
+				'args' => ['id' => (string)$restrictItemId]
+			];
+		}
+
 		$items = $this->processRenderOptions(
 			$this->itemRepository->findWithStatement(
 				$this->queryBuilder->buildListQuery(
@@ -212,6 +224,28 @@ class TypeProcessorService implements SingletonInterface {
 
 	public function processMedia(array &$configuration, array $import, $section = 0) {
 		return $this->processShow($configuration, $import, $section);
+	}
+
+	public function processContent(array &$configuration, array $import, $section, $restrictItemId, $contentId) {
+		// @LOW throw exception if not apiMode?
+		$item = $this->processShow($configuration, $import, $section, $restrictItemId);
+
+		if (!\array_key_exists('content' . $contentId, $item)) {
+			throw new ConfigurationError(1530603857, 'Contentfield ' . $contentId . ' is not properly configured, therefore cannot be retrieved');
+		}
+
+		return [
+			'type' => 'content',
+			// @LOW it would be nice if type content returns the given content field as array,
+				// it would mean cleaner, smaller JSON output, and having an actual use for itemTemplate in the XHR JS,
+				// however, RenderOptions currently returns a TagBuilder/TagInterface which is designed to
+				// render as string always, and I don't want to mess with that piece of clean code,
+				// so would RenderOptions need to change by returning something else? Or would paginateService
+				// need to be API-aware (which is something I already may do) and add a divider instead of
+				// XhrContainer/Elements tags, which we could explode on here?
+			'data' => $item['content' . $contentId],
+			'paging' => $item['paging' . $contentId] ?? NULL
+		];
 	}
 
 	public function processSearch(array &$configuration) {
@@ -260,6 +294,7 @@ class TypeProcessorService implements SingletonInterface {
 				if (!isset($config['renderOptions'])) {
 					continue;
 				}
+
 				//if (!isset($item['content' . $index])) {
 					// @TODO throw exception?
 					// we ARE supporting this in configurations that do not offer a contentfield config

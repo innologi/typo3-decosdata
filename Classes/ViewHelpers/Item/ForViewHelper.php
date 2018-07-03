@@ -31,6 +31,10 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
  * Loops through every content element (skipping other essential elements),
  * and passes the element and the applicable configuration to new variables.
  *
+ * Since this is already a specialized decosdata item content VH and I don't
+ * want to add another one, this VH also takes care of any contentpaging if
+ * applicable.
+ *
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
@@ -78,15 +82,45 @@ class ForViewHelper extends AbstractViewHelper {
 				// @TODO ___throw exception 'configuration / content mismatch'
 				// @TODO ___wait, if we do that, don't we have an issue with BIS level 3 field 5?
 			}
+			$content = $item['content' . $index];
 			$this->templateVariableContainer->add($this->arguments['indexAs'], $index);
 			$this->templateVariableContainer->add($this->arguments['configAs'], $config);
-			$this->templateVariableContainer->add($this->arguments['contentAs'], $item['content' . $index]);
+			$this->templateVariableContainer->add(
+				$this->arguments['contentAs'],
+				// if content has its own paging, concatenate the paging
+				isset($item['paging' . $index]['more']) && $item['paging' . $index]['more'] !== FALSE
+					? $this->addContentPager($content, $item['paging' . $index])
+					: $content
+			);
 			$output .= $this->renderChildren();
 			$this->templateVariableContainer->remove($this->arguments['contentAs']);
 			$this->templateVariableContainer->remove($this->arguments['configAs']);
 			$this->templateVariableContainer->remove($this->arguments['indexAs']);
 		}
 		return $output;
+	}
+
+	/**
+	 * Adds content-specific paging to the given content
+	 *
+	 * For content-specific paging, we ONLY support the XHR pager!
+	 *
+	 * @param string $content
+	 * @param array $paging
+	 * @return string
+	 */
+	protected function addContentPager($content, array $paging) {
+		// we use the default pagebrowser VH partial for consistency
+		// @LOW although it should be configurable same as for the pagebrowser VH
+		return $content . $this->viewHelperVariableContainer->getView()->renderPartial(
+			'ViewHelpers/PageBrowser',
+			'xhrpager',
+			[
+				'nextPageArgs' => ['page' . $paging['id'] => $paging['page']+1],
+				'xhrUri' => $paging['more'],
+				'xhrTarget' => 'content'
+			]
+		);
 	}
 
 }

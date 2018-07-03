@@ -4,9 +4,9 @@
 
 <f:if condition="{data}">
 <d:pageBrowser xhrEnabled="{paging.xhr}" more="{paging.more}">
-<div class="data items">
+<div class="data items xhr-container">
 	<f:for each="{data}" as="item">
-		<div class="item item-{item.id}">
+		<div class="item item-{item.id} xhr-element">
 			<d:item.for configuration="{configuration.contentField}" item="{item}">
 				<div class="content content-{index}" data-cid="{index}">{content}</div>
 			</d:item.for>

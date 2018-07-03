@@ -213,22 +213,35 @@
 	 *
 	 * @param Element itemTemplate
 	 * @param mixed data
+	 * @param string type
 	 * @return string
 	 */
-	function getDataHtml(itemTemplate, data) {
+	function getDataHtml(itemTemplate, data, type) {
 		var newData = '';
-		data.forEach(function(item) {
-			var contentElements = itemTemplate.getElementsByClassName('content');
-			//for (let content of contentElements) {
-			Array.from(contentElements).forEach(function(content) {
-				if (content.dataset.cid && item['content' + content.dataset.cid]) {
-					content.innerHTML = item['content' + content.dataset.cid];
-				}
-			});
-			// @LOW what if I have multiple classes? using classList.toggle/add/remove is not supported on IE11
-			itemTemplate.className = 'item item-' + item.id;
-			newData += itemTemplate.outerHTML;
-		});
+		switch (type) {
+			case 'content':
+				let dataElement = document.createElement('div');
+				dataElement.innerHTML = data.trim();
+				let xhrElements = dataElement.getElementsByClassName('xhr-element');
+				Array.from(xhrElements).forEach(function(element) {
+					newData += element.outerHTML;
+				});
+				break;
+			// items
+			default:
+				data.forEach(function(item) {
+					var contentElements = itemTemplate.getElementsByClassName('content');
+					//for (let content of contentElements) {
+					Array.from(contentElements).forEach(function(content) {
+						if (content.dataset.id && item['content' + content.dataset.id]) {
+							content.innerHTML = item['content' + content.dataset.id];
+						}
+					});
+					// @LOW what if I have multiple classes? using classList.toggle/add/remove is not supported on IE11
+					itemTemplate.className = 'item item-' + item.id;
+					newData += itemTemplate.outerHTML;
+				});
+		}
 		return newData;
 	}
 
@@ -240,7 +253,7 @@
 	 */
 	function getItemTemplate(dataContainer) {
 		if (dataContainer === null) throw 'no valid data container.'
-		var itemElement = dataContainer.querySelector('.item');
+		var itemElement = dataContainer.querySelector('.xhr-element');
 		return itemElement === null ? null : itemElement.cloneNode(true);
 	}
 
@@ -253,75 +266,73 @@
 		// when calling enable(), we do explicitly disable all listeners,
 		// but timing flukes are possible due to async behavior, so we stay vigilant
 		// with additional validity checks on every level
-	var OnReach = (function() {
-		var isEnabled = false,
+	function OnReach() {
+		var _that = this,
+		isEnabled = false,
 		listeners = {},
 		areWeThereYet = function(id, onReachCallback) {
 			// if yes, then we halt listener before calling the callback, however:
 			// callback will not be called if the listener this call originates from was previously disabled
-			if (__this.elementPositionReached(__this.element) && __this.haltListener(id)) onReachCallback();
-		},
-		__this = {
-			id: null,
-			element: null,
-			enable: function(element, id, callback) {
-				// disable all known listeners
-				if (isEnabled) __this.disable();
-				__this.id = id;
-				__this.element = element;
-
-				var listenerAllowed = true;
-				var listener = function(event) {
-					if (listenerAllowed) {
-						listenerAllowed = false;
-						// make sure this listener only runs as long as id remains valid
-						if (id.localeCompare(__this.id) !== 0) return __this.haltListener(id);
-
-						// https://developer.mozilla.org/en-US/docs/Web/Events/scroll
-						window.requestAnimationFrame(function() {
-							areWeThereYet(id, callback);
-							listenerAllowed = true;
-						});
-					}
-				};
-				window.addEventListener('scroll', listener);
-				window.addEventListener('resize', listener);
-				listeners[id] = listener;
-				isEnabled = true;
-
-				// we may already be there, before any scrolling or resizing :o)
-				areWeThereYet(id, callback);
-			},
-			haltListener: function(id) {
-				if (listeners[id]) {
-					window.removeEventListener('scroll', listeners[id]);
-					window.removeEventListener('resize', listeners[id]);
-					delete listeners[id];
-					return true;
-				}
-				return false;
-			},
-			disable: function() {
-				for (let id in listeners) __this.haltListener(id);
-				isEnabled = false;
-			},
-			elementPositionReached: function(element) {
-				var isquirks = document.compatMode !== 'BackCompat',
-					// Edge likes to rebel I guess (against doing what it's supposed to do)
-					page = isquirks && !/Edge/.test(navigator.userAgent) ? document.documentElement : document.body,
-					viewportBottomPos = page.scrollTop + ('innerHeight' in window ? window.innerHeight : page.clientHeight),
-					elemTopPos = 0;
-				while (element.offsetParent !== null) {
-					elemTopPos += element.offsetTop;
-					element = element.offsetParent;
-				}
-				// pos is counted from the top, so higher number means lower position vertically
-				return viewportBottomPos >= elemTopPos;
-			}
+			if (_that.elementPositionReached(_that.element) && _that.haltListener(id)) onReachCallback();
 		};
 
-		return __this;
-	})();
+		this.id = null;
+		this.element = null;
+		this.enable = function(element, id, callback) {
+			// disable all known listeners
+			if (isEnabled) this.disable();
+			this.id = id;
+			this.element = element;
+
+			var listenerAllowed = true;
+			var listener = function(event) {
+				if (listenerAllowed) {
+					listenerAllowed = false;
+					// make sure this listener only runs as long as id remains valid
+					if (id.localeCompare(_that.id) !== 0) return _that.haltListener(id);
+
+					// https://developer.mozilla.org/en-US/docs/Web/Events/scroll
+					window.requestAnimationFrame(function() {
+						areWeThereYet(id, callback);
+						listenerAllowed = true;
+					});
+				}
+			};
+			window.addEventListener('scroll', listener);
+			window.addEventListener('resize', listener);
+			listeners[id] = listener;
+			isEnabled = true;
+
+			// we may already be there, before any scrolling or resizing :o)
+			areWeThereYet(id, callback);
+		};
+		this.haltListener = function(id) {
+			if (listeners[id]) {
+				window.removeEventListener('scroll', listeners[id]);
+				window.removeEventListener('resize', listeners[id]);
+				delete listeners[id];
+				return true;
+			}
+			return false;
+		};
+		this.disable = function() {
+			for (let id in listeners) this.haltListener(id);
+			isEnabled = false;
+		};
+		this.elementPositionReached = function(element) {
+			var isquirks = document.compatMode !== 'BackCompat',
+				// Edge likes to rebel I guess (against doing what it's supposed to do)
+				page = isquirks && !/Edge/.test(navigator.userAgent) ? document.documentElement : document.body,
+				viewportBottomPos = page.scrollTop + ('innerHeight' in window ? window.innerHeight : page.clientHeight),
+				elemTopPos = 0;
+			while (element.offsetParent !== null) {
+				elemTopPos += element.offsetTop;
+				element = element.offsetParent;
+			}
+			// pos is counted from the top, so higher number means lower position vertically
+			return viewportBottomPos >= elemTopPos;
+		};
+	}
 
 	/**
 	 * XHR Pager Object constructor
@@ -340,23 +351,24 @@
 			delete elem.dataset.xhr;
 		}
 		if (elem.href) elem.href = '#';
+		this.target = elem.dataset.target ? elem.dataset.target : 'section';
 
 
-		// determine section, dataContainer and itemTemplate
-		var sectionContainer = null;
+		// determine overall container, dataContainer and itemTemplate
+		var container = null;
 		do {
-			sectionContainer = elem.parentNode;
-		} while ( !(sectionContainer === null || sectionContainer.classList.contains('section')) );
-		if (sectionContainer === null || !sectionContainer.dataset.section) {
-			throw 'xhr pager is not in anything designated "section"';
+			container = elem.parentNode;
+		} while ( !(container === null || container.classList.contains(this.target)) );
+		if (container === null || !container.dataset.id) {
+			throw 'xhr pager is not in anything designated "' + this.target + '"';
 		}
-		this.section = sectionContainer.dataset.section;
-		var dataContainer = sectionContainer.querySelector('.items'),
+		this.id = (container.dataset.item ? (container.dataset.item + '_') : '') + container.dataset.id;
+		var dataContainer = container.querySelector('.xhr-container'),
 			itemTemplate = getItemTemplate(dataContainer);
 
 
 		// every xhr pager gets its own OnReach instance
-		this.onReach = Object.create(OnReach);
+		this.onReach = new OnReach();
 
 
 		// disables the xhr pager
@@ -368,7 +380,7 @@
 
 		// enables the xhr pager
 		this.enable = function(uri) {
-			if (uri === false) {
+			if (typeof uri !== 'string') {
 				this.disable();
 				return;
 			}
@@ -386,7 +398,7 @@
 						console.info({'request': uri});
 						return false;
 					}
-					dataContainer.innerHTML += getDataHtml(itemTemplate, response.data);
+					dataContainer.innerHTML += getDataHtml(itemTemplate, response.data, response.type);
 					if (response.paging) _that.enable(response.paging.more);
 				}, null);
 				// @LOW we can end up with a forever active xhr paging loader, if an unexpected error ensues
@@ -398,7 +410,10 @@
 		this.enable(this.more);
 	}
 
-	var xhrPagingRegister = {};
+	var xhrPagingRegister = {
+		'section': {},
+		'content': {}
+	};
 
 	/**
 	 * Initializes (pre-)existing XHR pagers
@@ -414,10 +429,10 @@
 				try {
 					var xhrPager = new XhrPager(x);
 					// if xhrPager won't have a valid more-url, see if a previous incarnation exists and did
-					if (!x.dataset.xhr && xhrPagingRegister[xhrPager.section]) {
-						xhrPager.enable(xhrPagingRegister[xhrPager.section].first);
+					if (!x.dataset.xhr && xhrPagingRegister[xhrPager.target][xhrPager.id]) {
+						xhrPager.enable(xhrPagingRegister[xhrPager.target][xhrPager.id].first);
 					}
-					xhrPagingRegister[xhrPager.section] = xhrPager;
+					xhrPagingRegister[xhrPager.target][xhrPager.id] = xhrPager;
 				} catch (e) {
 					console.warn('[decosdata] ' + e);
 				}
@@ -491,7 +506,7 @@
 
 
 		// is there already a XhrPager?
-		this.xhrPager = xhrPagingRegister[elem.dataset.section] ? xhrPagingRegister[elem.dataset.section] : null;
+		this.xhrPager = xhrPagingRegister['section'][elem.dataset.section] ? xhrPagingRegister['section'][elem.dataset.section] : null;
 
 
 		// create overlay for use in search submit
@@ -510,7 +525,7 @@
 			originalSection = sectionContainer.cloneNode(true);
 			pagingElements = sectionContainer.querySelectorAll('.pagebrowser .pagebrowser-navigation');
 			countElements = sectionContainer.querySelectorAll('.pagebrowser .resultcount');
-			dataContainer = sectionContainer.querySelector('.items');
+			dataContainer = sectionContainer.querySelector('.xhr-container');
 			itemTemplate = getItemTemplate(dataContainer);
 		}
 		parseSection();
@@ -535,7 +550,7 @@
 			sectionContainer.remove();
 			sectionContainer = originalSection;
 			initXhrPagers(sectionContainer);
-			this.xhrPager = xhrPagingRegister[elem.dataset.section] ? xhrPagingRegister[elem.dataset.section] : null;
+			this.xhrPager = xhrPagingRegister['section'][elem.dataset.section] ? xhrPagingRegister['section'][elem.dataset.section] : null;
 			parseSection();
 		};
 
@@ -599,7 +614,7 @@
 						let xhrPagingElement = document.createElement('div');
 						dataContainer.parentNode.appendChild(xhrPagingElement);
 						_that.xhrPager = new XhrPager(xhrPagingElement);
-						xhrPagingRegister[_that.xhrPager.section] = _that.xhrPager;
+						xhrPagingRegister['section'][_that.xhrPager.id] = _that.xhrPager;
 					}
 					_that.xhrPager.enable(response.paging.more);
 				}

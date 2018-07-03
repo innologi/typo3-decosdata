@@ -15,10 +15,10 @@
 								{contentConfiguration.title.value}
 							</d:content.render>
 						</th>
-						<td class="content content-{index}" data-cid="{index}">{content}</td>
+						<td class="content content-{index}" data-id="{index}" data-item="{data.id}">{content}</td>
 					</f:then>
 					<f:else>
-						<td class="content content-{index}" data-cid="{index}" colspan="2">{content}</td>
+						<td class="content content-{index}" data-id="{index}" data-item="{data.id}" colspan="2">{content}</td>
 					</f:else>
 				</f:if>
 			</tr>
