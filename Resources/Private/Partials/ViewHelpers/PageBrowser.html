@@ -90,13 +90,13 @@
 	</f:if>
 	
 	<f:if condition="{xhrUri}">
-		<d:render section="xhrpager" arguments="{xhrUri:xhrUri, nextPageArgs:nextPageArgs}" />
+		<d:render section="xhrpager" arguments="{_all}" />
 	</f:if>
 </f:section>
 
 <f:section name="xhrpager">
 <a class="xhr-paging loader inactive" title="{f:translate(key:'pagebrowser.next')}"
-	href="{f:uri.action(arguments:nextPageArgs, addQueryString:1)}" data-xhr="{xhrUri}" data-target="{xhrTarget}"></a>
+	href="{f:uri.action(arguments:nextPageArgs, addQueryString:1)}" data-xhr="{xhrUri}" data-target="{xhrTarget}" data-autoload="{xhrAutoload}"></a>
 </f:section>
 
 </html>
