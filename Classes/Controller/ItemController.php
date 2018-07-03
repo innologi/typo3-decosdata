@@ -265,7 +265,7 @@ class ItemController extends ActionController {
 	}
 
 
-
+	// @TODO once you support these directly via flexform with default configs, review the templating stuff
 	/**
 	 * Show single item details per publication configuration.
 	 *
@@ -302,7 +302,6 @@ class ItemController extends ActionController {
 	 * Redirect wrapper. Detects API-mode and switches to forward() instead
 	 * since API-mode is not compatible with redirects.
 	 *
-	 * {@inheritDoc}
 	 * @see \TYPO3\CMS\Extbase\Mvc\Controller\AbstractController::redirect()
 	 */
 	protected function redirectOrForward(...$args) {

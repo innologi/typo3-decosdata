@@ -36,7 +36,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 trait FileHandler {
 	use MockFileHandler;
-
+	// @LOW should not inject what isn't necessarily used (check everywhere)
 	/**
 	 * @var \TYPO3\CMS\Core\Resource\ResourceFactory
 	 * @inject
