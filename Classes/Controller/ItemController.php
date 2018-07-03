@@ -217,6 +217,11 @@ class ItemController extends ActionController {
 					$this->activeConfiguration, $this->import, $section
 				)
 			);
+
+			// we only really need the content fields, other query-added fields will only pad the JSON size
+			if ($this->view instanceof \Innologi\Decosdata\View\Item\SingleJson) {
+				$this->view->addContentFieldsToConfiguration(\count($this->activeConfiguration['contentField']));
+			}
 		}
 
 		$this->view->assign('level', $this->level);

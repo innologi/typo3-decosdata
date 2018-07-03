@@ -47,4 +47,22 @@ class SingleJson extends \TYPO3\CMS\Extbase\Mvc\View\JsonView {
 		]
 	];
 
+	/**
+	 * Limits section.data to contentfields
+	 *
+	 * @param integer $contentFieldCount
+	 * @return void
+	 */
+	public function addContentFieldsToConfiguration($contentFieldCount) {
+		$this->configuration['section']['data'] = [
+			'_descendAll' => [
+				'_only' => ['id']
+			]
+		];
+
+		// we only really need the content fields, not other query-added fields that really pad the JSON size
+		for ($i=1; $i<=$contentFieldCount; $i++) {
+			$this->configuration['section']['data']['_descendAll']['_only'][] = 'content' . $i;
+		}
+	}
 }
