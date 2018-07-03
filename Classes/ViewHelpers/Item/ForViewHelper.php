@@ -118,7 +118,7 @@ class ForViewHelper extends AbstractViewHelper {
 			[
 				'nextPageArgs' => ['page' . $paging['id'] => $paging['page']+1],
 				'xhrUri' => $paging['more'],
-				'xhrAutoload' => $paging['autoload'],
+				'xhrAutoload' => $paging['autoload'] ? 1 : 0,,
 				'xhrTarget' => 'content'
 			]
 		);
