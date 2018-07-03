@@ -3,7 +3,7 @@
 	xmlns:d="http://typo3.org/ns/Innologi/Decosdata/ViewHelpers">
 
 <f:if condition="{data}">
-<d:pageBrowser xhrEnabled="{paging.xhr}" more="{paging.more}">
+<d:pageBrowser xhrEnabled="{paging.xhr}" more="{paging.more}" autoload="{paging.autoload}">
 <div class="data items xhr-container">
 	<f:for each="{data}" as="item">
 		<div class="item item-{item.id} xhr-element">

@@ -191,7 +191,9 @@ class ItemController extends ActionController {
 		// enable xhr mode on pagination as well
 		if ($this->apiMode && isset($this->activeConfiguration['paginate']) && is_array($this->activeConfiguration['paginate'])) {
 			// @LOW maybe if the paging service has its own apimode-detection, it can set the appropriate parameters by itself
-			$this->activeConfiguration['paginate']['xhr'] = TRUE;
+			if (! (isset($this->activeConfiguration['paginate']['xhr']['enable']) && (bool)$this->activeConfiguration['paginate']['xhr']['enable']) ) {
+				$this->activeConfiguration['paginate']['xhr']['enable'] = TRUE;
+			}
 		}
 
 		try {

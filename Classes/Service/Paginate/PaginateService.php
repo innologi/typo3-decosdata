@@ -80,6 +80,11 @@ class PaginateService {
 	/**
 	 * @var boolean
 	 */
+	protected $xhrAutoload = FALSE;
+
+	/**
+	 * @var boolean
+	 */
 	protected $__initialized = FALSE;
 
 	/**
@@ -175,7 +180,10 @@ class PaginateService {
 		$this->page = $currentPage > $this->pageLimit ? $this->pageLimit : $currentPage;
 		$this->offset = $this->limit * ($this->page-1);
 
-		$this->xhrEnabled = isset($configuration['xhr']) && (bool) $configuration['xhr'];
+		$this->xhrEnabled = isset($configuration['xhr']['enable']) && (bool) $configuration['xhr']['enable'];
+		if ($this->xhrEnabled) {
+			$this->xhrAutoload = isset($configuration['xhr']['autoload']) && (bool) $configuration['xhr']['autoload'];
+		}
 
 		$this->__initialized = TRUE;
 		return $this;
@@ -331,6 +339,7 @@ class PaginateService {
 			'page' => $this->page,
 			'resultCount' => $this->total,
 			'xhr' => $this->xhrEnabled,
+			'autoload' => $this->xhrAutoload,
 			'more' => $this->hasNext() ? $this->buildNextUri($this->xhrEnabled) : FALSE
 		];
 	}

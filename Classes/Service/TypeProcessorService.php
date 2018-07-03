@@ -259,7 +259,7 @@ class TypeProcessorService implements SingletonInterface {
 		if (isset($configuration['level'])) {
 			$data['searchArguments']['targetLevel'] = (int) $configuration['level'];
 		}
-
+		// @TODO might want to make this consistent with the paging way of xhr.enable
 		if (isset($configuration['xhr']) && is_array($configuration['xhr'])) {
 			// @LOW if no source given, you should actually throw an exception, otherwise we'll get some other exception that doesn't explain context
 			$data['section'] = (int) $configuration['xhr']['source'] ?? 0;
@@ -337,7 +337,9 @@ class TypeProcessorService implements SingletonInterface {
 		// feels hacky because of the whole forcing single thing
 	protected function processPaging(array $paging, $section = 0) {
 		// @TODO technically, this should be contained in paginateService, but it doesn't have the controllerContext yet
-		if (isset($paging['xhr']) && (bool)$paging['xhr'] && isset($paging['more']) && $paging['more'] !== FALSE) {
+		if (isset($paging['xhr']['enable']) && (bool)$paging['xhr']['enable'] && isset($paging['more']) && $paging['more'] !== FALSE) {
+			$paging['autoload'] = (bool) ($paging['xhr']['autoload'] ?? FALSE);
+			$paging['xhr'] = TRUE;
 			$arguments = [
 				'page' => $paging['more'],
 				'section' => $section

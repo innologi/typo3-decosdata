@@ -352,6 +352,8 @@
 		}
 		if (elem.href) elem.href = '#';
 		this.target = elem.dataset.target ? elem.dataset.target : 'section';
+		this.autoload = elem.dataset.autoload ? elem.dataset.autoload.toLowerCase() === 'true' || elem.dataset.autoload === '1' : false;
+		var pagingAllowed = false;
 
 
 		// determine overall container, dataContainer and itemTemplate
@@ -373,8 +375,35 @@
 
 		// disables the xhr pager
 		this.disable = function() {
+			pagingAllowed = false;
 			elem.className = 'xhr-paging';
 			this.onReach.disable();
+		};
+
+
+		// the trigger to starting a paging request
+		var _that = this;
+		var firePaging = function() {
+			if (!pagingAllowed) return;
+			pagingAllowed = false;
+
+			console.info('[decosdata] paging fired');
+			elem.className = 'xhr-paging loader active';
+			xhrRequest('GET', _that.more, null, null, function(response) {
+				// only execute if onReach has not changed id, in case of timing flukes
+				if (_that.autoload && _that.more.localeCompare(_that.onReach.id) !== 0) {
+					console.warn('[decosdata] out-of-sync xhr paging request');
+					console.info({'request': _that.more});
+					return false;
+				}
+				dataContainer.innerHTML += getDataHtml(itemTemplate, response.data, response.type);
+				if (response.paging) {
+					// if started once, enable autoloading if it wasn't already
+					_that.autoload = true;
+					_that.enable(response.paging.more);
+				}
+			}, null);
+			// @LOW we can end up with a forever active xhr paging loader, if an unexpected error ensues
 		};
 
 
@@ -384,26 +413,20 @@
 				this.disable();
 				return;
 			}
-
+			pagingAllowed = true;
 			elem.className = 'xhr-paging loader inactive';
 			this.more = uri;
-			var _that = this;
-			this.onReach.enable(elem, uri, function() {
-				console.info('[decosdata] paging in reach');
-				elem.className = 'xhr-paging loader active';
-				xhrRequest('GET', uri, null, null, function(response) {
-					// only execute if onReach has not changed id, in case of timing flukes
-					if (uri.localeCompare(_that.onReach.id) !== 0) {
-						console.warn('[decosdata] out-of-sync xhr paging request');
-						console.info({'request': uri});
-						return false;
-					}
-					dataContainer.innerHTML += getDataHtml(itemTemplate, response.data, response.type);
-					if (response.paging) _that.enable(response.paging.more);
-				}, null);
-				// @LOW we can end up with a forever active xhr paging loader, if an unexpected error ensues
-			});
+			if (this.autoload) {
+				this.onReach.enable(elem, uri, firePaging);
+			}
 		};
+
+
+		// add on click listener
+		elem.addEventListener('click', function(e) {
+			e.preventDefault();
+			firePaging();
+		});
 
 
 		// enable!
