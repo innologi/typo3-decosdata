@@ -74,6 +74,8 @@ class ImageFile implements OptionInterface {
 		if (isset($args['alt'][0]) && is_string($args['alt'])) {
 			$attributes['alt'] = $args['alt'];
 		}
+		$attributes['width'] = $processedImage->getProperty('width');
+		$attributes['height'] = $processedImage->getProperty('height');
 
 		return $service->getTagFactory()->createTag('img', $attributes);
 	}

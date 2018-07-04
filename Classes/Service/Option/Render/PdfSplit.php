@@ -74,19 +74,22 @@ class PdfSplit implements OptionInterface {
 			// if files do not exist, create them
 			$files = $this->splitPdfFile($file, $outputPath);
 		}
+		$pdfPageCount = $files->count();
 
 		// if pagination is active, apply \LimitIterator instead of going through $paginator->execute()
 		$paginator = $service->getPaginator();
 		if ($paginator !== NULL) {
 			$files = new \LimitIterator(
 				$files,
-				$paginator->setTotal($files->count())->getOffset(),
+				$paginator->setTotal($pdfPageCount)->getOffset(),
 				$paginator->getLimit()
 			);
 		}
 
-		$separator = $args['separator'] ?? '';
 		$content = [];
+		$service->setOptionVariables('PdfSplit', [
+			'total' => $pdfPageCount
+		]);
 		/** @var \SplFileInfo $fileInfo */
 		foreach ($files as $filePath => $fileInfo) {
 			$content[] = $service->processOptions(
@@ -97,8 +100,10 @@ class PdfSplit implements OptionInterface {
 				$service->getItem()
 			);
 		}
+		$service->unsetOptionVariables('PdfSplit');
 
 		// if pagination is active, apply XHR elements and next link
+		$separator = $args['separator'] ?? '';
 		$content = $paginator !== NULL && $paginator->isXhrEnabled() ? $paginator->xhrWrapping($content, $separator) : \join($separator, $content);
 
 		if ($tag instanceof TagContent) {

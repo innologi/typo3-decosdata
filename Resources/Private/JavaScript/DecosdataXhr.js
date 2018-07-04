@@ -208,6 +208,8 @@
 	/* DATA PARSING */
 	/****************/
 
+	var imageNumberMap = new Map();
+
 	/**
 	 * Formats raw data into usable HTML
 	 *
@@ -220,12 +222,19 @@
 		var newData = '';
 		switch (type) {
 			case 'content':
+				let number = getImageNumber(itemTemplate);
 				let dataElement = document.createElement('div');
 				dataElement.innerHTML = data.trim();
 				let xhrElements = dataElement.getElementsByClassName('xhr-element');
 				Array.from(xhrElements).forEach(function(element) {
+					// replace number, if any
+					if (number !== null) {
+						setImageNumber(++number, element);
+					}
 					newData += element.outerHTML;
 				});
+				// store number for follow ups
+				imageNumberMap.set(itemTemplate, number);
 				break;
 			// items
 			default:
@@ -253,8 +262,42 @@
 	 */
 	function getItemTemplate(dataContainer) {
 		if (dataContainer === null) throw 'no valid data container.'
-		var itemElement = dataContainer.querySelector('.xhr-element');
+		var itemElement = dataContainer.querySelector('.xhr-element:last-child');
 		return itemElement === null ? null : itemElement.cloneNode(true);
+	}
+
+	/**
+	 * Gets image number from content element
+	 *
+	 * @param Element element
+	 * @return int|null
+	 */
+	function getImageNumber(element) {
+		var number = null;
+		if (!imageNumberMap.has(element)) {
+			var numberElement = element.querySelector('.image-number')
+			if (numberElement && numberElement.dataset.number) {
+				number = parseInt(numberElement.dataset.number, 10);
+			}
+		} else {
+			number = imageNumberMap.get(element);
+		}
+		return number;
+	}
+
+	/**
+	 * Sets image number on content element
+	 *
+	 * @param int number
+	 * @param Element element
+	 * @return void
+	 */
+	function setImageNumber(number, element) {
+		var numberElement = element.querySelector('.image-number')
+		if (numberElement && numberElement.dataset.number) {
+			numberElement.dataset.number = number;
+			numberElement.innerHTML = number;
+		}
 	}
 
 

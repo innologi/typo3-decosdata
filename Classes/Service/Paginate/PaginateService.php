@@ -363,6 +363,15 @@ class PaginateService {
 	}
 
 	/**
+	 * Returns total result count
+	 *
+	 * @return integer
+	 */
+	public function getTotal() {
+		return $this->total;
+	}
+
+	/**
 	 * Returns current page number
 	 *
 	 * @return integer

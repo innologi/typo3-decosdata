@@ -87,26 +87,6 @@
 }
 
 
-.tx-decosdata .obfuscate {
-	display: block;
-	position: relative;
-	/* IE */
-	width: 100%;
-	height: 100%;
-}
-.tx-decosdata .obfuscate-layer {
-	display: block;
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	left: 0;
-	top: 0;
-	background-image: url('/typo3conf/ext/decosdata/Resources/Public/Image/obfuscate.gif');
-	background-repeat: repeat;
-	background-position: left top;
-}
-
-
 .tx-decosdata .search fieldset {
 	border: 0;
 	padding: 0.1em 0;
@@ -192,4 +172,59 @@
 }
 .tx-decosdata .loader.active {
 	background-image: url('/typo3conf/ext/decosdata/Resources/Public/Image/spinner.svg');
+}
+
+
+.tx-decosdata .image-container {
+	position: relative;
+	display: inline-block;
+}
+.tx-decosdata .image-number {
+	position: absolute;
+	font-size: 2em;
+	bottom: 0.5em;
+	right: 0.3em;
+	color: #f00;
+	text-shadow: 1px 1px 1px #999;
+}
+.tx-decosdata .obfuscate {
+	display: block;
+	position: relative;
+	/* IE */
+	width: 100%;
+	height: 100%;
+}
+.tx-decosdata .obfuscate-layer {
+	display: block;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	background-image: url('/typo3conf/ext/decosdata/Resources/Public/Image/obfuscate.gif');
+	background-repeat: repeat;
+	background-position: left top;
+}
+.tx-decosdata .scale img {
+	transition: 0.2s linear;
+	-webkit-transition: 0.2s linear;
+	transform-origin: top left;
+	-webkit-transform-origin: top left;
+}
+.tx-decosdata .items > *:first-child .scale img {
+	transform-origin: top left;
+	-webkit-transform-origin: top left;
+}
+.tx-decosdata .items > *:last-child .scale img {
+	transform-origin: bottom left;
+	-webkit-transform-origin: bottom left;
+}
+.tx-decosdata .scale:hover img {
+	transition: 0.2s linear;
+	-webkit-transition: 0.2s linear;
+	transform: scale(2.0);
+	-webkit-transform: scale(2.0);
+	z-index: 1000;
+	border: 1px solid #333;
+	box-shadow: 2px 2px 2px #333;
 }

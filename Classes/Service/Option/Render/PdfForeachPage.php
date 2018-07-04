@@ -75,7 +75,7 @@ class PdfForeachPage implements OptionInterface {
 		} else {
 			// unpaginated result
 			for ($i = 0; $i < $pdfPageCount; $i++) {
-				$content[] = $this->createContent($i, $args['renderOptions'], $service);
+				$content[] = $this->createContent($i, $pdfPageCount, $args['renderOptions'], $service);
 			}
 			$content = join($separator, $content);
 		}
@@ -88,7 +88,12 @@ class PdfForeachPage implements OptionInterface {
 	}
 
 	public function paginateIterate(array $args, RenderOptionService $service) {
-		return $this->createContent($service->getPaginator()->getIterationIndex(), $args['renderOptions'], $service);
+		return $this->createContent(
+			$service->getPaginator()->getIterationIndex(),
+			$service->getPaginator()->getTotal(),
+			$args['renderOptions'],
+			$service
+		);
 	}
 
 	/**
@@ -139,13 +144,15 @@ class PdfForeachPage implements OptionInterface {
 	 * Create content through sub-renderOptions
 	 *
 	 * @param integer $pageIndex
+	 * @param integer $total
 	 * @param array $renderOptions
 	 * @param RenderOptionService $service
 	 * @return \Innologi\TagBuilder\TagInterface
 	 */
-	protected function createContent($pageIndex, array $renderOptions, RenderOptionService $service) {
+	protected function createContent($pageIndex, $total, array $renderOptions, RenderOptionService $service) {
 		$service->setOptionVariables('PdfForeachPage', [
-			'index' => $pageIndex
+			'index' => $pageIndex,
+			'total' => $total
 		]);
 		$content = $service->processOptions(
 			$renderOptions,
