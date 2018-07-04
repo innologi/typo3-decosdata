@@ -399,9 +399,9 @@
 
 
 		// determine overall container, dataContainer and itemTemplate
-		var container = null;
+		var container = elem;
 		do {
-			container = elem.parentNode;
+			container = container.parentNode;
 		} while ( !(container === null || container.classList.contains(this.target)) );
 		if (container === null || !container.dataset.id) {
 			throw 'xhr pager is not in anything designated "' + this.target + '"';
@@ -445,7 +445,7 @@
 					_that.enable(response.paging.more);
 				}
 			}, null);
-			// @LOW we can end up with a forever active xhr paging loader, if an unexpected error ensues
+			// @LOW we can end up with a forever active xhr paging loader, if an unexpected error ensues or enable(false) is never called
 		};
 
 
@@ -682,16 +682,18 @@
 				dataContainer.innerHTML = getDataHtml(itemTemplate, response.data);
 				if (response.paging) {
 					changePagingCount(countElements, response.paging);
-					if (_that.xhrPager === null) {
-						// create and register an xhr pager if none was bound to the searchform before
-						let xhrPagingElement = document.createElement('div');
-						dataContainer.parentNode.appendChild(xhrPagingElement);
-						_that.xhrPager = new XhrPager(xhrPagingElement);
-						// @TODO should we? in this case the autoload property is never set b/c there's no paginate settings, but the button will contain placeholder text, so we set it anyway
-						_that.xhrPager.autoload = true;
-						xhrPagingRegister['section'][_that.xhrPager.id] = _that.xhrPager;
+					if (response.paging.more) {
+						if (_that.xhrPager === null) {
+							// create and register an xhr pager if none was bound to the searchform before
+							let xhrPagingElement = document.createElement('div');
+							dataContainer.parentNode.appendChild(xhrPagingElement);
+							_that.xhrPager = new XhrPager(xhrPagingElement);
+							// @TODO should we? in this case the autoload property is never set b/c there's no paginate settings, but the button will contain placeholder text, so we set it anyway
+							_that.xhrPager.autoload = true;
+							xhrPagingRegister['section'][_that.xhrPager.id] = _that.xhrPager;
+						}
+						_that.xhrPager.enable(response.paging.more);
 					}
-					_that.xhrPager.enable(response.paging.more);
 				}
 			}, function(response) {
 				// on end
