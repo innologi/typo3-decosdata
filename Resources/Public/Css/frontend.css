@@ -56,12 +56,34 @@
 .tx-decosdata .pagebrowser-navigation > * {
 	margin-right: 0.4em;
 }
-.tx-decosdata .crumbpath-navigation > *:after {
+
+
+.tx-decosdata ul.crumbpath-navigation {
+	display: flex;
+}
+.tx-decosdata .crumbpath-navigation > *{
+	text-overflow: ellipsis;
+	-ms-text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	flex: 0 100 auto;
+	-webkit-flex: 0 100 auto;
+}
+.tx-decosdata .crumbpath-navigation > *:first-child {
+	flex-shrink: 0;
+	-webkit-flex-shrink: 0;
+}
+.tx-decosdata .crumbpath-navigation > .current {
+	flex: 1 1 auto;
+	-webkit-flex: 1 1 auto;
+}
+.tx-decosdata .crumbpath-navigation > *:before {
 	content: ">";
 	margin: 0 0.2em;
 }
-.tx-decosdata .crumbpath-navigation > *:last-child:after {
+.tx-decosdata .crumbpath-navigation > *:first-child:before {
 	content: "";
+	margin: 0;
 }
 
 
