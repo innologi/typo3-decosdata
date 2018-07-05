@@ -179,6 +179,7 @@
 	background-color: #c0c0c0;
 	box-shadow: 2px 2px 2px #ddd;
 	border-radius: 1em;
+	-webkit-border-radius: 1em;
 	padding: .5em 1em;
 	color: #fff;
 	text-shadow: 1px 1px 3px #222;
@@ -233,10 +234,6 @@
 	transform-origin: top left;
 	-webkit-transform-origin: top left;
 }
-.tx-decosdata .items > *:first-child .scale img {
-	transform-origin: top left;
-	-webkit-transform-origin: top left;
-}
 .tx-decosdata .items > *:last-child .scale img {
 	transform-origin: bottom left;
 	-webkit-transform-origin: bottom left;
@@ -246,7 +243,9 @@
 	-webkit-transition: 0.2s linear;
 	transform: scale(2.0);
 	-webkit-transform: scale(2.0);
-	z-index: 1000;
 	border: 1px solid #333;
 	box-shadow: 2px 2px 2px #333;
+	z-index: 1000;
+	/* webkit won't apply z-index on static */
+	position: relative;
 }
