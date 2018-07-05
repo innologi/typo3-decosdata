@@ -17,7 +17,7 @@ plugin.tx_decosdata {
 	}
 	javascript {
 		# cat=plugin.tx_decosdata/file/070; type=string; label=Decosdata XHR JS file
-		decosdataXhr = EXT:decosdata/Resources/Private/JavaScript/DecosdataXhr.js
+		decosdataXhr = EXT:decosdata/Resources/Private/JavaScript/DecosdataXhr.closure.js
 	}
 }
 

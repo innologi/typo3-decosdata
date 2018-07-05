@@ -1,5 +1,4 @@
 (function() {
-	// @TODO minify
 	// @TODO refactor into modules
 
 	/*********************/
@@ -49,7 +48,7 @@
 				console.info(this);
 			}
 			if (this.response) {
-				let response = this.response;
+				var response = this.response;
 				// IE doesn't automatically parse responseType json
 				if (typeof(response) !== 'object') response = JSON.parse(response);
 				if (response.data) {
@@ -222,10 +221,10 @@
 		var newData = '';
 		switch (type) {
 			case 'content':
-				let number = getImageNumber(itemTemplate);
-				let dataElement = document.createElement('div');
+				var number = getImageNumber(itemTemplate);
+				var dataElement = document.createElement('div');
 				dataElement.innerHTML = data.trim();
-				let xhrElements = dataElement.getElementsByClassName('xhr-element');
+				var xhrElements = dataElement.getElementsByClassName('xhr-element');
 				Array.from(xhrElements).forEach(function(element) {
 					// replace number, if any
 					if (number !== null) {
@@ -359,7 +358,7 @@
 			return false;
 		};
 		this.disable = function() {
-			for (let id in listeners) this.haltListener(id);
+			for (var id in listeners) this.haltListener(id);
 			isEnabled = false;
 		};
 		this.elementPositionReached = function(element) {
@@ -530,7 +529,7 @@
 	function changePagingCount(countElements, paging) {
 		if ( countElements.length > 0 && paging.resultCount !== null ) {
 			// replace counts
-			let newCount = parseInt(paging.resultCount);
+			var newCount = parseInt(paging.resultCount);
 			//for (let c of countElements) {
 			Array.from(countElements).forEach(function(c) {
 				c.innerHTML = c.innerHTML.replace(c.dataset.count, newCount);
@@ -685,7 +684,7 @@
 					if (response.paging.more) {
 						if (_that.xhrPager === null) {
 							// create and register an xhr pager if none was bound to the searchform before
-							let xhrPagingElement = document.createElement('div');
+							var xhrPagingElement = document.createElement('div');
 							dataContainer.parentNode.appendChild(xhrPagingElement);
 							_that.xhrPager = new XhrPager(xhrPagingElement);
 							// @TODO should we? in this case the autoload property is never set b/c there's no paginate settings, but the button will contain placeholder text, so we set it anyway
