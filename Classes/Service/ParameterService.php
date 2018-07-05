@@ -228,15 +228,14 @@ class ParameterService implements SingletonInterface {
 	 */
 	public function getLevelParameters() {
 		if ($this->levelParameters === NULL) {
-			$copyArgs = $this->arguments;
 			$this->levelParameters = [];
-			if (isset($copyArgs['level'])) {
-				$this->levelParameters['level'] = $copyArgs['level'];
-				unset($copyArgs['level']);
+			if ($this->hasParameter('level')) {
+				$this->levelParameters['level'] = $this->getParameterValidated('level');
 			}
-			foreach ($copyArgs as $name => $value) {
-				if (isset($name[1]) && $name[0] === '_' && is_numeric(substr($value, 1))) {
-					$this->levelParameters[$name] = $value;
+			$args = \array_keys($this->arguments);
+			foreach ($args as $name) {
+				if (isset($name[1]) && $name[0] === '_' && is_numeric(substr($name, 1))) {
+					$this->levelParameters[$name] = $this->getParameterValidated($name);
 				}
 			}
 		}
