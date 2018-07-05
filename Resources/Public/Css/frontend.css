@@ -202,6 +202,12 @@
 	position: relative;
 	display: inline-block;
 }
+.tx-decosdata .image-container img {
+	/* IE */
+	z-index: 1;
+	/* webkit won't apply z-index on static */
+	position: relative;
+}
 .tx-decosdata .image-number {
 	position: absolute;
 	font-size: 2em;
@@ -209,6 +215,8 @@
 	right: 0.3em;
 	color: #f00;
 	text-shadow: 1px 1px 1px #999;
+	/* IE */
+	z-index: 2;
 }
 .tx-decosdata .obfuscate {
 	display: block;
@@ -227,6 +235,8 @@
 	background-image: url('/typo3conf/ext/decosdata/Resources/Public/Image/obfuscate.gif');
 	background-repeat: repeat;
 	background-position: left top;
+	/* IE */
+	z-index: 3;
 }
 .tx-decosdata .scale img {
 	transition: 0.2s linear;
@@ -245,7 +255,7 @@
 	-webkit-transform: scale(2.0);
 	border: 1px solid #333;
 	box-shadow: 2px 2px 2px #333;
-	z-index: 1000;
+	z-index: 100;
 	/* webkit won't apply z-index on static */
 	position: relative;
 }
