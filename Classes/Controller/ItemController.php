@@ -173,10 +173,8 @@ class ItemController extends ActionController {
 			)
 		);
 	}
-	// @FIX rename to apiAction?
-	// @FIX force api mode?
+
 	// @FIX add direct parameters like section, (optional) itemId, (optional) contentId?
-	// @FIX make HTML empty, assign proper variables, adjust ApiJson view?
 	/**
 	 * Run a single out of multiple publish-configurations and/or custom TS elements.
 	 *
@@ -273,7 +271,7 @@ class ItemController extends ActionController {
 	 *
 	 * @return void
 	 */
-	public function showAction() {
+	public function singleShowAction() {
 		$this->view->assign('level', $this->level);
 		$this->view->assign('configuration', $this->activeConfiguration);
 		$this->view->assign(
@@ -289,7 +287,7 @@ class ItemController extends ActionController {
 	 *
 	 * @return void
 	 */
-	public function listAction() {
+	public function singleListAction() {
 		$this->view->assign('level', $this->level);
 		$this->view->assign('configuration', $this->activeConfiguration);
 		$this->view->assign(
