@@ -174,15 +174,16 @@ class ItemController extends ActionController {
 		);
 	}
 
-	// @FIX add direct parameters like section, (optional) itemId, (optional) contentId?
 	/**
 	 * Run a single out of multiple publish-configurations and/or custom TS elements.
 	 *
+	 * @param integer $section
+	 * @param integer $item
+	 * @param integer $content
 	 * @return void
 	 */
-	public function singleAction() {
+	public function singleAction($section, $item = NULL, $content = NULL) {
 		$data = NULL;
-		$section = $this->parameterService->getMultiParameter('section.0');
 		$this->activeConfiguration = $this->activeConfiguration[$section] ?? [];
 
 		// @LOW maybe support non-xhr modes as well?
@@ -194,30 +195,25 @@ class ItemController extends ActionController {
 			}
 		}
 
-		try {
-			// if section includes an item ID, force the configuration to be of type SHOW for this item
-			$showItemId = $this->parameterService->getMultiParameter('section.1');
-			try {
-				// if section includes a content ID, force the configuration to only list that content
-				$contentId = $this->parameterService->getMultiParameter('section.2');
+		if ($item !== NULL) {
+			if ($content !== NULL) {
+				// section -> item -> content
 				$data = $this->typeProcessor->processContent(
-					$this->activeConfiguration, $this->import, $section, $showItemId, $contentId
+					$this->activeConfiguration, $this->import, $section, $item, $content
 				);
-			} catch (\Innologi\Decosdata\Exception\MissingParameter $e) {
-				// section does not include content ID
-				// @TODO we don't have a use-case yet but once we do, we should look into what is missing here, i.e. $data only consists of $item
+			} else {
+				// section -> item
 				$data = $this->typeProcessor->processShow(
-					$this->activeConfiguration, $import, $section, $showItemId
+					$this->activeConfiguration, $this->import, $section, $item
 				);
 			}
-		} catch (\Innologi\Decosdata\Exception\MissingParameter $e) {
-			// section does not include item ID
+		} else {
+			// section
 			$data = current(
 				$this->typeProcessor->processTypeRecursion(
 					$this->activeConfiguration, $this->import, $section
 				)
 			);
-
 			// we only really need the content fields, other query-added fields will only pad the JSON size
 			if ($this->view instanceof \Innologi\Decosdata\View\Item\SingleJson) {
 				$this->view->addContentFieldsToConfiguration(\count($this->activeConfiguration['contentField']));

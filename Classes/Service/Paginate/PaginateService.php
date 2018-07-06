@@ -303,7 +303,7 @@ class PaginateService {
 
 		$arguments = [ 'page' . $this->id => $this->page+1 ];
 		if ($xhr && $this->xhrEnabled) {
-			$arguments['section'] = join('|', $this->sectionParameters);
+			list($arguments['section'], $arguments['item'], $arguments['content']) = $this->sectionParameters;
 
 			// @TODO where to do this?
 			if ($this->controllerContext->getRequest()->getFormat() === 'html') {
