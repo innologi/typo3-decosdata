@@ -12,12 +12,12 @@
 	],
 	"require": {
 		"php": "^7.1",
-		"typo3/cms-core": "^8.7",
-		"innologi/tag-builder": "@dev",
-		"innologi/trace-logger": "@dev",
-		"innologi/typo3-fal-api": "@dev",
-		"innologi/typo3-ext-update": "@dev",
-		"innologi/typo3-asset-provider": "@dev"
+		"typo3/cms-core": "8.7.*",
+		"innologi/tag-builder": "0.1.0",
+		"innologi/trace-logger": "0.1.0",
+		"innologi/typo3-fal-api": "0.1.0",
+		"innologi/typo3-ext-update": "0.5.0",
+		"innologi/typo3-asset-provider": "0.3.0"
 	},
 	"autoload": {
 		"psr-4": {
@@ -27,9 +27,5 @@
 	"replace": {
 		"decosdata": "self.version",
 		"typo3-ter/decosdata": "self.version"
-	},
-	"config": {
-		"vendor-dir": ".Build/vendor",
-		"bin-dir": ".Build/bin"
 	}
 }
