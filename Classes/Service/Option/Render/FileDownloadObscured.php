@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\TagBuilder\TagInterface;
+use Innologi\Decosdata\Service\Option\Exception\MockFileUnsupported;
 /**
  * File Download option
  *
@@ -51,6 +52,10 @@ class FileDownloadObscured implements OptionInterface {
 		// @TODO ___what if the content is empty? Can (and should) we differentiate between originalContent and content? I mean it's clear we shouldn't generate a downloadlink if no file was found
 		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL ) {
 			return $tag;
+		}
+
+		if ( !($this->fileUid > 0) ) {
+			throw new MockFileUnsupported(1537371733, ['FileDownloadObscured']);
 		}
 
 		$item = $service->getItem();
