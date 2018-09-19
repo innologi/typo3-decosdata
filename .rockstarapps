@@ -19,4 +19,21 @@
         </dependencies>
         <properties/>
     </file>
+<file name="Resources/Private/JavaScript/DecosdataXhr.js">
+        <min>false</min>
+        <comp>false</comp>
+        <closureCompiler>true</closureCompiler>
+        <gZip>false</gZip>
+        <resolveImports>false</resolveImports>
+        <urlRewriting>false</urlRewriting>
+        <autoBuild>false</autoBuild>
+        <lineLength>-1</lineLength>
+        <autoTimestamps>false</autoTimestamps>
+        <removeLogs>true</removeLogs>
+        <oldFileNames>false</oldFileNames>
+        <dependencies>
+            <file>Resources/Private/JavaScript/DecosdataXhr.js</file>
+        </dependencies>
+        <properties/>
+    </file>
 </rockstarapps>
