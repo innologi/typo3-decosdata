@@ -52,7 +52,7 @@ class FileDownload implements OptionInterface {
 		}
 
 		return $service->getTagFactory()->createTag('a', [
-			'href' => $file->getPublicUrl(),
+			'href' => $GLOBALS['TSFE']->absRefPrefix . $file->getPublicUrl(),
 			'title' => $file->getName()
 		], $tag);
 	}
