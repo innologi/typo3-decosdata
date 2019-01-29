@@ -267,7 +267,6 @@ class TypeProcessorService implements SingletonInterface {
 				ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS
 			);
 			$data['xhrUri'] = $this->controllerContext->getUriBuilder()->reset()
-				->setCreateAbsoluteUri(TRUE)
 				->setTargetPageType($settings['api']['type'])
 				->uriFor('search', $data['searchArguments'] + ['section' => $data['section']]);
 
@@ -351,7 +350,6 @@ class TypeProcessorService implements SingletonInterface {
 				ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS
 			);
 			$paging['more'] = $this->controllerContext->getUriBuilder()->reset()
-				->setCreateAbsoluteUri(TRUE)
 				->setAddQueryString(TRUE)
 				->setTargetPageType($settings['api']['type'])
 				->uriFor(

@@ -145,7 +145,6 @@ class DownloadService implements SingletonInterface {
 	public function getDownloadUrl($fileUid, $blobUid, $itemUid) {
 		return $this->getUriBuilder()
 			->reset()
-			->setCreateAbsoluteUri(TRUE)
 			->setUseCacheHash(FALSE)
 			->setArguments([
 				'eID' => $this->eID,

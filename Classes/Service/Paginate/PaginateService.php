@@ -298,7 +298,6 @@ class PaginateService {
 	 */
 	protected function buildNextUri($xhr = FALSE) {
 		$uriBuilder = $this->controllerContext->getUriBuilder()->reset()
-			->setCreateAbsoluteUri(TRUE)
 			->setAddQueryString(TRUE);
 
 		$arguments = [ 'page' . $this->id => $this->page+1 ];
