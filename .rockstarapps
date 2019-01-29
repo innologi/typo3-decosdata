@@ -26,7 +26,7 @@
         <gZip>false</gZip>
         <resolveImports>false</resolveImports>
         <urlRewriting>false</urlRewriting>
-        <autoBuild>false</autoBuild>
+        <autoBuild>true</autoBuild>
         <lineLength>-1</lineLength>
         <autoTimestamps>false</autoTimestamps>
         <removeLogs>true</removeLogs>
