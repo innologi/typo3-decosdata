@@ -140,16 +140,16 @@ class Statement extends PreparedStatement {
 	 * @return void
 	 */
 	protected function convertNamedPlaceholdersToQuestionMarks(&$query, array &$parameterValues, array &$precompiledQueryParts) {
-		$queryPartsCount = count($precompiledQueryParts['queryParts']);
+		$queryPartsCount = is_array($precompiledQueryParts['queryParts']) ? count($precompiledQueryParts['queryParts']) : 0;
 		$newParameterValues = [];
-		$hasNamedPlaceholders = FALSE;
+		$hasNamedPlaceholders = false;
 
 		if ($queryPartsCount === 0) {
 			$hasNamedPlaceholders = $this->hasNamedPlaceholders($query);
 			if ($hasNamedPlaceholders) {
 				$query = $this->tokenizeQueryParameterMarkers($query, $parameterValues);
 			}
-		} elseif (count($parameterValues) > 0) {
+		} elseif (!empty($parameterValues)) {
 			$hasNamedPlaceholders = !is_int(key($parameterValues));
 			if ($hasNamedPlaceholders) {
 				for ($i = 1; $i < $queryPartsCount; $i += 2) {
@@ -171,38 +171,38 @@ class Statement extends PreparedStatement {
 					'/' . $quotedParamWrapToken . '(.*?)' . $quotedParamWrapToken . '/',
 					$query,
 					$matches
-					)) {
-						$key = $matches[1];
+				)) {
+					$key = $matches[1];
 
-						// <-- BEGIN ALTERATION
-						$replacement = '?';
-						$par = $parameterValues[$key];
-						if ($par['type'] !== self::PARAM_ARRAY) {
-							// not an array; behave as parent method
-							$newParameterValues[] = $par;
-						}  else {
-							// array; add each value as a new parameter
-							// assume all values are of same type
-							$type = parent::guessValueType($par['value'][0]);
-							$parts = [];
-							foreach ($par['value'] as $v) {
-								$parts[] = $replacement;
-								$newParameterValues[] = ['value' => $v, 'type' => $type];
-							}
-							// also provides the necessary enclosing parentheses
-							$replacement = '(' . join(',', $parts) . ')';
+					// <-- BEGIN ALTERATION
+					$replacement = '?';
+					$par = $parameterValues[$key];
+					if ($par['type'] !== self::PARAM_ARRAY) {
+						// not an array; behave as parent method
+						$newParameterValues[] = $par;
+					} else {
+						// array; add each value as a new parameter
+						// assume all values are of same type
+						$type = parent::guessValueType($par['value'][0]);
+						$parts = [];
+						foreach ($par['value'] as $v) {
+							$parts[] = $replacement;
+							$newParameterValues[] = ['value' => $v, 'type' => $type];
 						}
-						// END ALTERATION -->
-
-						$query = preg_replace(
-							'/' . $quotedParamWrapToken . $key . $quotedParamWrapToken . '/',
-							// <-- BEGIN ALTERATION
-							$replacement,
-							// END ALTERATION -->
-							$query,
-							1
-						);
+						// also provides the necessary enclosing parentheses
+						$replacement = '(' . join(',', $parts) . ')';
 					}
+					// END ALTERATION -->
+
+					$query = preg_replace(
+						'/' . $quotedParamWrapToken . $key . $quotedParamWrapToken . '/',
+						// <-- BEGIN ALTERATION
+						$replacement,
+						// END ALTERATION -->
+						$query,
+						1
+					);
+				}
 			}
 
 			$parameterValues = $newParameterValues;
