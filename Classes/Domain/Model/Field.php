@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Domain\Model;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -37,7 +37,9 @@ class Field extends AbstractValueObject {
 	 * Field Name
 	 *
 	 * @var string
+	 * @extensionScannerIgnoreLine
 	 * @validate NotEmpty
+	 * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
 	 */
 	protected $fieldName;
 
