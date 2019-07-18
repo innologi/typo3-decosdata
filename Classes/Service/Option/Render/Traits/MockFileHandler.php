@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Render\Traits;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2018 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2018-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -23,7 +23,7 @@ namespace Innologi\Decosdata\Service\Option\Render\Traits;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use Innologi\TYPO3FalApi\MockFileFactory;
  /**
  * Mock File Handler Trait
  *
@@ -38,8 +38,7 @@ trait MockFileHandler {
 
 	/**
 	 *
-	 * @var \Innologi\TYPO3FalApi\MockFileFactory
-	 * @inject
+	 * @var MockFileFactory
 	 */
 	protected $mockFileFactory;
 
@@ -47,6 +46,16 @@ trait MockFileHandler {
 	 * @var string
 	 */
 	protected $mockPath;
+
+	/**
+	 *
+	 * @param MockFileFactory $mockFileFactory
+	 * @return void
+	 */
+	public function injectMockFileFactory(MockFileFactory $mockFileFactory)
+	{
+		$this->mockFileFactory = $mockFileFactory;
+	}
 
 	/**
 	 * Returns whether the argument is a mockfile handle

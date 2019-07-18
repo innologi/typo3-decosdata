@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -26,6 +26,7 @@ namespace Innologi\Decosdata\Service;
 use TYPO3\CMS\Core\SingletonInterface;
 use Innologi\Decosdata\Exception\PaginationError;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory;
 /**
  * Pagination Service
  *
@@ -46,14 +47,12 @@ class PaginateService implements SingletonInterface {
 	// @LOW _note all the MySQL keywords in yearly.. should be supplied by QueryProvider classes
 
 	/**
-	 * @var \Innologi\Decosdata\Service\ParameterService
-	 * @inject
+	 * @var ParameterService
 	 */
 	protected $parameterService;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
-	 * @inject
+	 * @var ConstraintFactory
 	 */
 	protected $constraintFactory;
 
@@ -86,6 +85,26 @@ class PaginateService implements SingletonInterface {
 	 * @var boolean
 	 */
 	protected $active = FALSE;
+
+	/**
+	 *
+	 * @param ParameterService $parameterService
+	 * @return void
+	 */
+	public function injectParameterService(ParameterService $parameterService)
+	{
+		$this->parameterService = $parameterService;
+	}
+
+	/**
+	 *
+	 * @param ConstraintFactory $constraintFactory
+	 * @return void
+	 */
+	public function injectConstraintFactory(ConstraintFactory $constraintFactory)
+	{
+		$this->constraintFactory = $constraintFactory;
+	}
 
 	/**
 	 * Returns current page number

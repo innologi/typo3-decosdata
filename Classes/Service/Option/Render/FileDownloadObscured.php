@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2017-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -26,6 +26,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\TagBuilder\TagInterface;
 use Innologi\Decosdata\Service\Option\Exception\MockFileUnsupported;
+use Innologi\Decosdata\Service\DownloadService;
 /**
  * File Download option
  *
@@ -39,10 +40,19 @@ class FileDownloadObscured implements OptionInterface {
 	use Traits\FileHandler;
 	// @TODO ___add class?
 	/**
-	 * @var \Innologi\Decosdata\Service\DownloadService
-	 * @inject
+	 * @var DownloadService
 	 */
 	protected $downloadService;
+
+	/**
+	 *
+	 * @param DownloadService $downloadService
+	 * @return void
+	 */
+	public function injectDownloadService(DownloadService $downloadService)
+	{
+		$this->downloadService = $downloadService;
+	}
 
 	/**
 	 * {@inheritDoc}

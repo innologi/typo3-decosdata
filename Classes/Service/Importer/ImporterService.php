@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Importer;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -25,6 +25,8 @@ namespace Innologi\Decosdata\Service\Importer;
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use Innologi\Decosdata\Utility\DebugUtility;
+use Innologi\Decosdata\Domain\Repository\ImportRepository;
+use Innologi\Decosdata\Service\Importer\Parser\ParserInterface;
 use Innologi\TraceLogger\TraceLoggerAwareInterface;
 use Innologi\TraceLogger\TraceLoggerInterface;
 /**
@@ -40,14 +42,12 @@ class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
 	use \Innologi\TraceLogger\TraceLoggerAware;
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Repository\ImportRepository
-	 * @inject
+	 * @var ImportRepository
 	 */
 	protected $importRepository;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\Importer\Parser\ParserInterface
-	 * @inject
+	 * @var ParserInterface
 	 */
 	protected $parser;
 
@@ -55,6 +55,26 @@ class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
 	 * @var array
 	 */
 	protected $errors = [];
+
+	/**
+	 *
+	 * @param ImportRepository $importRepository
+	 * @return void
+	 */
+	public function injectImportRepository(ImportRepository $importRepository)
+	{
+		$this->importRepository = $importRepository;
+	}
+
+	/**
+	 *
+	 * @param ParserInterface $parser
+	 * @return void
+	 */
+	public function injectParser(ParserInterface $parser)
+	{
+		$this->parser = $parser;
+	}
 
 	/**
 	 * Will process all available imports, regardless of page uid

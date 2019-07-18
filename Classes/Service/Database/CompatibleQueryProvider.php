@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Database;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -43,10 +43,19 @@ class CompatibleQueryProvider implements QueryProviderInterface,SingletonInterfa
 	protected $databaseConnection;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\Database\DatabaseHelper
-	 * @inject
+	 * @var DatabaseHelper
 	 */
 	protected $databaseHelper;
+
+	/**
+	 *
+	 * @param DatabaseHelper $databaseHelper
+	 * @return void
+	 */
+	public function injectDatabaseHelper(DatabaseHelper $databaseHelper)
+	{
+		$this->databaseHelper = $databaseHelper;
+	}
 
 	/**
 	 * Class constructor

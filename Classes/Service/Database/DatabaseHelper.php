@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Database;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -44,8 +44,7 @@ class DatabaseHelper implements SingletonInterface {
 	protected $databaseConnection;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\Database\QueryProviderInterface
-	 * @inject
+	 * @var QueryProviderInterface
 	 */
 	protected $queryProvider;
 
@@ -58,6 +57,16 @@ class DatabaseHelper implements SingletonInterface {
 	 * @var boolean
 	 */
 	protected $lastUpsertIsNewRecord = FALSE;
+
+	/**
+	 *
+	 * @param QueryProviderInterface $queryProvider
+	 * @return void
+	 */
+	public function injectQueryProvider(QueryProviderInterface $queryProvider)
+	{
+		$this->queryProvider = $queryProvider;
+	}
 
 	/**
 	 * Class constructor

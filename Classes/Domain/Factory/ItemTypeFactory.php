@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Domain\Factory;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\Domain\Factory;
  ***************************************************************/
 use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
 use Innologi\Decosdata\Exception\MissingObjectProperty;
+use Innologi\Decosdata\Domain\Repository\ItemTypeRepository;
 /**
  * ItemType factory
  *
@@ -35,10 +36,19 @@ use Innologi\Decosdata\Exception\MissingObjectProperty;
 class ItemTypeFactory extends FactoryAbstract {
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Repository\ItemTypeRepository
-	 * @inject
+	 * @var ItemTypeRepository
 	 */
 	protected $repository;
+
+	/**
+	 *
+	 * @param ItemTypeRepository $repository
+	 * @return void
+	 */
+	public function injectRepository(ItemTypeRepository $repository)
+	{
+		$this->repository = $repository;
+	}
 
 	/**
 	 * Sets properties of domain object

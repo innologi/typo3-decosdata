@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Query\Traits;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015-2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -26,6 +26,8 @@ namespace Innologi\Decosdata\Service\Option\Query\Traits;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Part\From;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory;
+use Innologi\Decosdata\Service\ParameterService;
 /**
  * Filters Trait
  *
@@ -38,16 +40,34 @@ use Innologi\Decosdata\Service\QueryBuilder\Query\Part\From;
 trait Filters {
 	// @TODO ___base FilterItemContent (items outer join), FilterItemsByRelations (relations inner join) on these
 	/**
-	 * @var \Innologi\Decosdata\Service\ParameterService
-	 * @inject
+	 * @var ParameterService
 	 */
 	protected $parameterService;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
-	 * @inject
+	 * @var ConstraintFactory
 	 */
 	protected $constraintFactory;
+
+	/**
+	 *
+	 * @param ParameterService $parameterService
+	 * @return void
+	 */
+	public function injectParameterService(ParameterService $parameterService)
+	{
+		$this->parameterService = $parameterService;
+	}
+
+	/**
+	 *
+	 * @param ConstraintFactory $constraintFactory
+	 * @return void
+	 */
+	public function injectConstraintFactory(ConstraintFactory $constraintFactory)
+	{
+		$this->constraintFactory = $constraintFactory;
+	}
 
 	/**
 	 * Initializes public methods by providing shared logic

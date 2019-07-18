@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Domain\Factory;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -25,6 +25,8 @@ namespace Innologi\Decosdata\Domain\Factory;
  ***************************************************************/
 use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
 use Innologi\Decosdata\Exception\MissingObjectProperty;
+use Innologi\Decosdata\Domain\Repository\ItemBlobRepository;
+use Innologi\TYPO3FalApi\FileReferenceFactory;
 /**
  * ItemBlob factory
  *
@@ -35,16 +37,34 @@ use Innologi\Decosdata\Exception\MissingObjectProperty;
 class ItemBlobFactory extends FactoryAbstract {
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Repository\ItemBlobRepository
-	 * @inject
+	 * @var ItemBlobRepository
 	 */
 	protected $repository;
 
 	/**
-	 * @var \Innologi\TYPO3FalApi\FileReferenceFactory
-	 * @inject
+	 * @var FileReferenceFactory
 	 */
 	protected $fileReferenceFactory;
+
+	/**
+	 *
+	 * @param ItemBlobRepository $repository
+	 * @return void
+	 */
+	public function injectRepository(ItemBlobRepository $repository)
+	{
+		$this->repository = $repository;
+	}
+
+	/**
+	 *
+	 * @param FileReferenceFactory $repository
+	 * @return void
+	 */
+	public function injectRepository(FileReferenceFactory $repository)
+	{
+		$this->repository = $repository;
+	}
 
 	/**
 	 * Sets properties of domain object

@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Query;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\Service\Option\Query;
  ***************************************************************/
 use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory;
 /**
  * ParentInParent option
  *
@@ -40,10 +41,19 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
 class ParentInParent extends OptionAbstract {
 
 	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
-	 * @inject
+	 * @var ConstraintFactory
 	 */
 	protected $constraintFactory;
+
+	/**
+	 *
+	 * @param ConstraintFactory $constraintFactory
+	 * @return void
+	 */
+	public function injectConstraintFactory(ConstraintFactory $constraintFactory)
+	{
+		$this->constraintFactory = $constraintFactory;
+	}
 
 	/**
 	 * {@inheritDoc}

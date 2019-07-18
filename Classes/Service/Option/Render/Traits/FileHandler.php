@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Render\Traits;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\Service\Option\Render\Traits;
  ***************************************************************/
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
  /**
  * File Handler Trait
  *
@@ -38,8 +39,7 @@ trait FileHandler {
 	use MockFileHandler;
 	// @LOW should not inject what isn't necessarily used (check everywhere)
 	/**
-	 * @var \TYPO3\CMS\Core\Resource\ResourceFactory
-	 * @inject
+	 * @var ResourceFactory
 	 */
 	protected $resourceFactory;
 
@@ -47,6 +47,16 @@ trait FileHandler {
 	 * @var integer
 	 */
 	protected $fileUid;
+
+	/**
+	 *
+	 * @param ResourceFactory $resourceFactory
+	 * @return void
+	 */
+	public function injectResourceFactory(ResourceFactory $resourceFactory)
+	{
+		$this->resourceFactory = $resourceFactory;
+	}
 
 	/**
 	 * Run all the file handler checks and return either a File object or NULL

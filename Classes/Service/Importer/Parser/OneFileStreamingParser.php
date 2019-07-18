@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Importer\Parser;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -32,6 +32,7 @@ use Innologi\Decosdata\Service\Importer\Exception\InvalidValidationFile;
 use Innologi\Decosdata\Service\Importer\Exception\ValidationFailed;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
+use Innologi\Decosdata\Service\Importer\StorageHandler\StorageHandlerInterface;
 use Innologi\TraceLogger\TraceLoggerAwareInterface;
 use Innologi\TraceLogger\TraceLoggerInterface;
 /**
@@ -53,14 +54,12 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 	use \Innologi\TraceLogger\TraceLoggerAware;
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface
-	 * @inject
+	 * @var ConfigurationManagerInterface
 	 */
 	protected $configurationManager;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\Importer\StorageHandler\StorageHandlerInterface
-	 * @inject
+	 * @var StorageHandlerInterface
 	 */
 	protected $storageHandler;
 
@@ -78,6 +77,26 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 	 * @var array
 	 */
 	protected $errors = [];
+
+	/**
+	 *
+	 * @param ConfigurationManagerInterface $configurationManager
+	 * @return void
+	 */
+	public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager)
+	{
+		$this->configurationManager = $configurationManager;
+	}
+
+	/**
+	 *
+	 * @param StorageHandlerInterface $storageHandler
+	 * @return void
+	 */
+	public function injectStorageHandler(StorageHandlerInterface $storageHandler)
+	{
+		$this->storageHandler = $storageHandler;
+	}
 
 	/**
 	 * Processes an import for parsing.

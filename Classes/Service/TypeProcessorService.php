@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2017-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -27,6 +27,11 @@ use Innologi\Decosdata\Exception\ConfigurationError;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
+use Innologi\TYPO3AssetProvider\ProviderServiceInterface;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
+use Innologi\Decosdata\Domain\Repository\ItemRepository;
+use Innologi\Decosdata\Service\Option\RenderOptionService;
 /**
  * Item controller
  *
@@ -37,32 +42,27 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 class TypeProcessorService implements SingletonInterface {
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Object\ObjectManager
-	 * @inject
+	 * @var ObjectManager
 	 */
 	protected $objectManager;
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Repository\ItemRepository
-	 * @inject
+	 * @var ItemRepository
 	 */
 	protected $itemRepository;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\QueryBuilder
-	 * @inject
+	 * @var QueryBuilder
 	 */
 	protected $queryBuilder;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\Option\RenderOptionService
-	 * @inject
+	 * @var RenderOptionService
 	 */
 	protected $optionService;
 	// @LOW don't inject this one
 	/**
-	 * @var \Innologi\TYPO3AssetProvider\ProviderServiceInterface
-	 * @inject
+	 * @var ProviderServiceInterface
 	 */
 	protected $assetProviderService;
 
@@ -85,6 +85,56 @@ class TypeProcessorService implements SingletonInterface {
 	 * @var \Innologi\Decosdata\Service\Paginate\PaginateServiceFactory
 	 */
 	protected $paginatorFactory;
+
+	/**
+	 *
+	 * @param ObjectManager $objectManager
+	 * @return void
+	 */
+	public function injectObjectManager(ObjectManager $objectManager)
+	{
+		$this->objectManager = $objectManager;
+	}
+
+	/**
+	 *
+	 * @param ItemRepository $itemRepository
+	 * @return void
+	 */
+	public function injectItemRepository(ItemRepository $itemRepository)
+	{
+		$this->itemRepository = $itemRepository;
+	}
+
+	/**
+	 *
+	 * @param QueryBuilder $queryBuilder
+	 * @return void
+	 */
+	public function injectQueryBuilder(QueryBuilder $queryBuilder)
+	{
+		$this->queryBuilder = $queryBuilder;
+	}
+
+	/**
+	 *
+	 * @param RenderOptionService $optionService
+	 * @return void
+	 */
+	public function injectOptionService(RenderOptionService $optionService)
+	{
+		$this->optionService = $optionService;
+	}
+
+	/**
+	 *
+	 * @param ProviderServiceInterface $assetProviderService
+	 * @return void
+	 */
+	public function injectAssetProviderService(ProviderServiceInterface $assetProviderService)
+	{
+		$this->assetProviderService = $assetProviderService;
+	}
 
 	/**
 	 * Returns Paginator Factory

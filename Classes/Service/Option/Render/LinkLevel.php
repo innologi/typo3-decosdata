@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -27,6 +27,7 @@ use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\TagBuilder\TagInterface;
 use Innologi\TagBuilder\TagContent;
+use Innologi\Decosdata\Service\ParameterService;
 
 /**
  * Link Level option
@@ -40,8 +41,7 @@ use Innologi\TagBuilder\TagContent;
 class LinkLevel implements OptionInterface {
 
 	/**
-	 * @var \Innologi\Decosdata\Service\ParameterService
-	 * @inject
+	 * @var ParameterService
 	 */
 	protected $parameterService;
 
@@ -50,6 +50,16 @@ class LinkLevel implements OptionInterface {
 	 * @var string
 	 */
 	protected $defaultContent = 'link';
+
+	/**
+	 *
+	 * @param ParameterService $parameterService
+	 * @return void
+	 */
+	public function injectParameterService(ParameterService $parameterService)
+	{
+		$this->parameterService = $parameterService;
+	}
 
 	/**
 	 * {@inheritDoc}

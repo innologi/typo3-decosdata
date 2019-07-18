@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Paginate;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2018 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2018-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -27,6 +27,10 @@ use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 use Innologi\Decosdata\Exception\NotInitialized;
 use Innologi\Decosdata\Exception\PaginationError;
+use Innologi\TagBuilder\TagFactory;
+use Innologi\Decosdata\Service\ParameterService;
+use Innologi\TYPO3AssetProvider\ProviderServiceInterface;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 /**
  * Paginate Service
  *
@@ -88,27 +92,23 @@ class PaginateService {
 	protected $__initialized = FALSE;
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Object\ObjectManager
-	 * @inject
+	 * @var ObjectManager
 	 */
 	protected $objectManager;
 
 	/**
-	 * @var \Innologi\TagBuilder\TagFactory
-	 * @inject
+	 * @var TagFactory
 	 */
 	protected $tagFactory;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\ParameterService
-	 * @inject
+	 * @var ParameterService
 	 */
 	protected $parameterService;
 
 	// @LOW don't inject this one
 	/**
-	 * @var \Innologi\TYPO3AssetProvider\ProviderServiceInterface
-	 * @inject
+	 * @var ProviderServiceInterface
 	 */
 	protected $assetProviderService;
 
@@ -136,6 +136,46 @@ class PaginateService {
 	 * @var array
 	 */
 	protected $sectionParameters = [];
+
+	/**
+	 *
+	 * @param ObjectManager $objectManager
+	 * @return void
+	 */
+	public function injectObjectManager(ObjectManager $objectManager)
+	{
+		$this->objectManager = $objectManager;
+	}
+
+	/**
+	 *
+	 * @param TagFactory $tagFactory
+	 * @return void
+	 */
+	public function injectTagFactory(TagFactory $tagFactory)
+	{
+		$this->tagFactory = $tagFactory;
+	}
+
+	/**
+	 *
+	 * @param ParameterService $parameterService
+	 * @return void
+	 */
+	public function injectParameterService(ParameterService $parameterService)
+	{
+		$this->parameterService = $parameterService;
+	}
+
+	/**
+	 *
+	 * @param ProviderServiceInterface $assetProviderService
+	 * @return void
+	 */
+	public function injectAssetProviderService(ProviderServiceInterface $assetProviderService)
+	{
+		$this->assetProviderService = $assetProviderService;
+	}
 
 	/**
 	 * Class constructor

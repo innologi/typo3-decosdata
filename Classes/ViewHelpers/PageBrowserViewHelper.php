@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\ViewHelpers;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\ViewHelpers;
  ***************************************************************/
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
 use Innologi\Decosdata\Exception\PaginationError;
+use Innologi\Decosdata\Service\PaginateService;
 // @LOW ___use \TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface ?
 /**
  * PageBrowser ViewHelper
@@ -47,8 +48,7 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 	protected $escapeOutput = FALSE;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\PaginateService
-	 * @inject
+	 * @var PaginateService
 	 */
 	protected $paginateService;
 
@@ -56,6 +56,16 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 	 * @var array
 	 */
 	protected $pageLabelMap;
+
+	/**
+	 *
+	 * @param PaginateService $paginateService
+	 * @return void
+	 */
+	public function injectPaginateService(PaginateService $paginateService)
+	{
+		$this->paginateService = $paginateService;
+	}
 
 	/**
 	 * Initialize arguments

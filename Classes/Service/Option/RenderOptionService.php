@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015-2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\Service\Option;
  ***************************************************************/
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 use Innologi\Decosdata\Service\Paginate\PaginateService;
+use Innologi\TagBuilder\TagFactory;
 /**
  * Render Option Service
  *
@@ -37,8 +38,7 @@ use Innologi\Decosdata\Service\Paginate\PaginateService;
 class RenderOptionService extends OptionServiceAbstract {
 
 	/**
-	 * @var \Innologi\TagBuilder\TagFactory
-	 * @inject
+	 * @var TagFactory
 	 */
 	protected $tagFactory;
 
@@ -79,6 +79,16 @@ class RenderOptionService extends OptionServiceAbstract {
 	 * @var string
 	 */
 	protected $patternInline = '{render:([a-zA-Z]+)(\(((%1$s)*)\))?}';
+
+	/**
+	 *
+	 * @param TagFactory $tagFactory
+	 * @return void
+	 */
+	public function injectTagFactory(TagFactory $tagFactory)
+	{
+		$this->tagFactory = $tagFactory;
+	}
 
 	/**
 	 * Public class constructor

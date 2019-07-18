@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Controller;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015-2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -26,6 +26,10 @@ namespace Innologi\Decosdata\Controller;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Innologi\Decosdata\Service\TypeProcessorService;
+use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
+use Innologi\Decosdata\Service\BreadcrumbService;
+use Innologi\Decosdata\Service\ParameterService;
 /**
  * Item controller
  *
@@ -36,26 +40,22 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class ItemController extends ActionController {
 
 	/**
-	 * @var \Innologi\Decosdata\Service\TypeProcessorService
-	 * @inject
+	 * @var TypeProcessorService
 	 */
 	protected $typeProcessor;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\QueryBuilder
-	 * @inject
+	 * @var QueryBuilder
 	 */
 	protected $queryBuilder;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\BreadcrumbService
-	 * @inject
+	 * @var BreadcrumbService
 	 */
 	protected $breadcrumbService;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\ParameterService
-	 * @inject
+	 * @var ParameterService
 	 */
 	protected $parameterService;
 
@@ -83,6 +83,46 @@ class ItemController extends ActionController {
 	 * @var boolean
 	 */
 	protected $apiMode = FALSE;
+
+	/**
+	 *
+	 * @param TypeProcessorService $typeProcessor
+	 * @return void
+	 */
+	public function injectTypeProcessor(TypeProcessorService $typeProcessor)
+	{
+		$this->typeProcessor = $typeProcessor;
+	}
+
+	/**
+	 *
+	 * @param QueryBuilder $queryBuilder
+	 * @return void
+	 */
+	public function injectQueryBuilder(QueryBuilder $queryBuilder)
+	{
+		$this->queryBuilder = $queryBuilder;
+	}
+
+	/**
+	 *
+	 * @param BreadcrumbService $breadcrumbService
+	 * @return void
+	 */
+	public function injectBreadcrumbService(BreadcrumbService $breadcrumbService)
+	{
+		$this->breadcrumbService = $breadcrumbService;
+	}
+
+	/**
+	 *
+	 * @param ParameterService $parameterService
+	 * @return void
+	 */
+	public function injectParameterService(ParameterService $parameterService)
+	{
+		$this->parameterService = $parameterService;
+	}
 
 	/**
 	 * {@inheritDoc}

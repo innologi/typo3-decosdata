@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2017 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2017-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -26,6 +26,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\TagBuilder\TagInterface;
 use TYPO3\CMS\Core\Resource\AbstractFile;
+use TYPO3\CMS\Extbase\Service\ImageService;
 /**
  * Image File option
  *
@@ -40,10 +41,19 @@ class ImageFile implements OptionInterface {
 	// @TODO ___Absolute URIs for other contexts than normal HTML?
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Service\ImageService
-	 * @inject
+	 * @var ImageService
 	 */
 	protected $imageService;
+
+	/**
+	 *
+	 * @param ImageService $imageService
+	 * @return void
+	 */
+	public function injectImageService(ImageService $imageService)
+	{
+		$this->imageService = $imageService;
+	}
 
 	/**
 	 * {@inheritDoc}

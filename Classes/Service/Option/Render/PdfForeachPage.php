@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2018 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2018-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -28,6 +28,7 @@ use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\TagBuilder\TagInterface;
 use Innologi\TagBuilder\TagContent;
 use TYPO3\CMS\Core\Resource\AbstractFile;
+use Innologi\Decosdata\Service\CommandRunService;
 /**
  * PDF Foreach Page option
  *
@@ -47,10 +48,19 @@ class PdfForeachPage implements OptionInterface {
 	use Traits\ExtensionConfiguration;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\CommandRunService
-	 * @inject
+	 * @var CommandRunService
 	 */
 	protected $commandRunService;
+
+	/**
+	 *
+	 * @param CommandRunService $commandRunService
+	 * @return void
+	 */
+	public function injectCommandRunService(CommandRunService $commandRunService)
+	{
+		$this->commandRunService = $commandRunService;
+	}
 
 	/**
 	 * {@inheritDoc}

@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Importer\StorageHandler;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -25,8 +25,18 @@ namespace Innologi\Decosdata\Service\Importer\StorageHandler;
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
+use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
+use TYPO3\CMS\Extbase\Persistence\Generic\QuerySettingsInterface;
+use Innologi\Decosdata\Domain\Factory\FieldFactory;
+use Innologi\Decosdata\Domain\Factory\ItemTypeFactory;
+use Innologi\Decosdata\Domain\Factory\ItemBlobFactory;
+use Innologi\Decosdata\Domain\Factory\ItemFieldFactory;
+use Innologi\Decosdata\Domain\Factory\ItemFactory;
+use Innologi\Decosdata\Domain\Repository\ItemBlobRepository;
+use Innologi\Decosdata\Domain\Repository\ItemFieldRepository;
+use Innologi\Decosdata\Domain\Repository\ItemRepository;
 use Innologi\Decosdata\Exception\MissingObjectProperty;
+use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
 use Innologi\TYPO3FalApi\Exception\FileException;
 /**
@@ -47,70 +57,169 @@ use Innologi\TYPO3FalApi\Exception\FileException;
 class ExtbaseStorageHandler implements StorageHandlerInterface,SingletonInterface {
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface
-	 * @inject
+	 * @var ConfigurationManagerInterface
 	 */
 	protected $configurationManager;
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager
-	 * @inject
+	 * @var PersistenceManager
 	 */
 	protected $persistenceManager;
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Repository\ItemRepository
-	 * @inject
+	 * @var ItemRepository
 	 */
 	protected $itemRepository;
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Repository\ItemFieldRepository
-	 * @inject
+	 * @var ItemFieldRepository
 	 */
 	protected $itemFieldRepository;
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Repository\ItemBlobRepository
-	 * @inject
+	 * @var ItemBlobRepository
 	 */
 	protected $itemBlobRepository;
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Factory\ItemFactory
-	 * @inject
+	 * @var ItemFactory
 	 */
 	protected $itemFactory;
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Factory\ItemFieldFactory
-	 * @inject
+	 * @var ItemFieldFactory
 	 */
 	protected $itemFieldFactory;
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Factory\ItemBlobFactory
-	 * @inject
+	 * @var ItemBlobFactory
 	 */
 	protected $itemBlobFactory;
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Factory\ItemTypeFactory
-	 * @inject
+	 * @var ItemTypeFactory
 	 */
 	protected $itemTypeFactory;
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Factory\FieldFactory
-	 * @inject
+	 * @var FieldFactory
 	 */
 	protected $fieldFactory;
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Persistence\Generic\QuerySettingsInterface
-	 * @inject
+	 * @var QuerySettingsInterface
 	 */
 	protected $defaultQuerySettings;
+
+	/**
+	 *
+	 * @param ConfigurationManagerInterface $configurationManager
+	 * @return void
+	 */
+	public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager)
+	{
+		$this->configurationManager = $configurationManager;
+	}
+
+	/**
+	 *
+	 * @param PersistenceManager $persistenceManager
+	 * @return void
+	 */
+	public function injectPersistenceManager(PersistenceManager $persistenceManager)
+	{
+		$this->persistenceManager = $persistenceManager;
+	}
+
+	/**
+	 *
+	 * @param ItemRepository $itemRepository
+	 * @return void
+	 */
+	public function injectItemRepository(ItemRepository $itemRepository)
+	{
+		$this->itemRepository = $itemRepository;
+	}
+
+	/**
+	 *
+	 * @param ItemFieldRepository $itemFieldRepository
+	 * @return void
+	 */
+	public function injectItemFieldRepository(ItemFieldRepository $itemFieldRepository)
+	{
+		$this->itemFieldRepository = $itemFieldRepository;
+	}
+
+	/**
+	 *
+	 * @param ItemBlobRepository $itemBlobRepository
+	 * @return void
+	 */
+	public function injectItemBlobRepository(ItemBlobRepository $itemBlobRepository)
+	{
+		$this->itemBlobRepository = $itemBlobRepository;
+	}
+
+	/**
+	 *
+	 * @param ItemFactory $itemFactory
+	 * @return void
+	 */
+	public function injectItemFactory(ItemFactory $itemFactory)
+	{
+		$this->itemFactory = $itemFactory;
+	}
+
+	/**
+	 *
+	 * @param ItemFieldFactory $itemFieldFactory
+	 * @return void
+	 */
+	public function injectItemFieldFactory(ItemFieldFactory $itemFieldFactory)
+	{
+		$this->itemFieldFactory = $itemFieldFactory;
+	}
+
+	/**
+	 *
+	 * @param ItemBlobFactory $itemBlobFactory
+	 * @return void
+	 */
+	public function injectItemBlobFactory(ItemBlobFactory $itemBlobFactory)
+	{
+		$this->itemBlobFactory = $itemBlobFactory;
+	}
+
+	/**
+	 *
+	 * @param ItemTypeFactory $itemTypeFactory
+	 * @return void
+	 */
+	public function injectItemTypeFactory(ItemTypeFactory $itemTypeFactory)
+	{
+		$this->itemTypeFactory = $itemTypeFactory;
+	}
+
+	/**
+	 *
+	 * @param FieldFactory $fieldFactory
+	 * @return void
+	 */
+	public function injectFieldFactory(FieldFactory $fieldFactory)
+	{
+		$this->fieldFactory = $fieldFactory;
+	}
+
+	/**
+	 *
+	 * @param QuerySettingsInterface $defaultQuerySettings
+	 * @return void
+	 */
+	public function injectDefaultQuerySettings(QuerySettingsInterface $defaultQuerySettings)
+	{
+		$this->defaultQuerySettings = $defaultQuerySettings;
+	}
 
 	/**
 	 * Initialize Storage Handler

@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\ViewHelpers;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2016-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -24,6 +24,8 @@ namespace Innologi\Decosdata\ViewHelpers;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
+use Innologi\Decosdata\Service\BreadcrumbService;
+use Innologi\Decosdata\Service\ParameterService;
 // @LOW ___use \TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface ?
 /**
  * Crumbpath ViewHelper
@@ -44,14 +46,12 @@ class CrumbPathViewHelper extends AbstractViewHelper {
 	protected $escapeOutput = FALSE;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\BreadcrumbService
-	 * @inject
+	 * @var BreadcrumbService
 	 */
 	protected $breadcrumbService;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\ParameterService
-	 * @inject
+	 * @var ParameterService
 	 */
 	protected $parameterService;
 
@@ -59,6 +59,26 @@ class CrumbPathViewHelper extends AbstractViewHelper {
 	 * @var integer
 	 */
 	protected $currentLevel;
+
+	/**
+	 *
+	 * @param BreadcrumbService $breadcrumbService
+	 * @return void
+	 */
+	public function injectBreadcrumbService(BreadcrumbService $breadcrumbService)
+	{
+		$this->breadcrumbService = $breadcrumbService;
+	}
+
+	/**
+	 *
+	 * @param ParameterService $parameterService
+	 * @return void
+	 */
+	public function injectParameterService(ParameterService $parameterService)
+	{
+		$this->parameterService = $parameterService;
+	}
 
 	/**
 	 * Initialize arguments

@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\QueryBuilder;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -25,6 +25,11 @@ namespace Innologi\Decosdata\Service\QueryBuilder;
  ***************************************************************/
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
+use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory;
+use Innologi\Decosdata\Service\Option\QueryOptionService;
+use Innologi\Decosdata\Service\PaginateService;
+use Innologi\Decosdata\Service\SearchService;
 /**
  * Query Builder
  *
@@ -42,32 +47,27 @@ class QueryBuilder {
 	// @LOW ___is there any upside to making this a singleton? Consider that many views probably use it twice (to produce a header part)
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface
-	 * @inject
+	 * @var ObjectManagerInterface
 	 */
 	protected $objectManager;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
-	 * @inject
+	 * @var ConstraintFactory
 	 */
 	protected $constraintFactory;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\Option\QueryOptionService
-	 * @inject
+	 * @var QueryOptionService
 	 */
 	protected $optionService;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\PaginateService
-	 * @inject
+	 * @var PaginateService
 	 */
 	protected $paginateService;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\SearchService
-	 * @inject
+	 * @var SearchService
 	 */
 	protected $searchService;
 
@@ -75,6 +75,56 @@ class QueryBuilder {
 	 * @var integer
 	 */
 	protected $groupByContentPriority;
+
+	/**
+	 *
+	 * @param ObjectManagerInterface $objectManager
+	 * @return void
+	 */
+	public function injectObjectManager(ObjectManagerInterface $objectManager)
+	{
+		$this->objectManager = $objectManager;
+	}
+
+	/**
+	 *
+	 * @param ConstraintFactory $constraintFactory
+	 * @return void
+	 */
+	public function injectConstraintFactory(ConstraintFactory $constraintFactory)
+	{
+		$this->constraintFactory = $constraintFactory;
+	}
+
+	/**
+	 *
+	 * @param QueryOptionService $optionService
+	 * @return void
+	 */
+	public function injectOptionService(QueryOptionService $optionService)
+	{
+		$this->optionService = $optionService;
+	}
+
+	/**
+	 *
+	 * @param PaginateService $paginateService
+	 * @return void
+	 */
+	public function injectPaginateService(PaginateService $paginateService)
+	{
+		$this->paginateService = $paginateService;
+	}
+
+	/**
+	 *
+	 * @param SearchService $searchService
+	 * @return void
+	 */
+	public function injectSearchService(SearchService $searchService)
+	{
+		$this->searchService = $searchService;
+	}
 
 	// @TODO ___doc?
 	// @TODO ___refactor such huge methods

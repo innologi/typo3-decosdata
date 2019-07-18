@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Option;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -23,7 +23,7 @@ namespace Innologi\Decosdata\Service\Option;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 /**
  * Option Service Abstract
  *
@@ -38,8 +38,7 @@ namespace Innologi\Decosdata\Service\Option;
 abstract class OptionServiceAbstract {
 	// @LOW ___singleton?
 	/**
-	 * @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface
-	 * @inject
+	 * @var ObjectManagerInterface
 	 */
 	protected $objectManager;
 
@@ -62,6 +61,16 @@ abstract class OptionServiceAbstract {
 	 * @var array
 	 */
 	protected $optionVariables = [];
+
+	/**
+	 *
+	 * @param ObjectManagerInterface $objectManager
+	 * @return void
+	 */
+	public function injectObjectManager(ObjectManagerInterface $objectManager)
+	{
+		$this->objectManager = $objectManager;
+	}
 
 	/**
 	 * Class constructor

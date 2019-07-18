@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Paginate;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2018 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2018-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\Service\Paginate;
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use Innologi\Decosdata\Exception\NotInitialized;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 /**
  * Pagination Service Factory
  *
@@ -38,8 +39,7 @@ use Innologi\Decosdata\Exception\NotInitialized;
 class PaginateServiceFactory implements SingletonInterface {
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Object\ObjectManager
-	 * @inject
+	 * @var ObjectManager
 	 */
 	protected $objectManager;
 
@@ -47,6 +47,16 @@ class PaginateServiceFactory implements SingletonInterface {
 	 * @var array
 	 */
 	protected $instances = [];
+
+	/**
+	 *
+	 * @param ObjectManager $objectManager
+	 * @return void
+	 */
+	public function injectObjectManager(ObjectManager $objectManager)
+	{
+		$this->objectManager = $objectManager;
+	}
 
 	/**
 	 * Create / retrieve the PaginateService instance that is identified by its parameters

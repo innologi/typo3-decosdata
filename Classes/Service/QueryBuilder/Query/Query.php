@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -26,6 +26,7 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Innologi\Decosdata\Service\Database\StatementFactory;
 use Innologi\Decosdata\Service\QueryBuilder\QueryConfigurator;
+use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 /**
  * Query object
  *
@@ -38,8 +39,7 @@ use Innologi\Decosdata\Service\QueryBuilder\QueryConfigurator;
 class Query extends QueryIterator implements QueryInterface {
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface
-	 * @inject
+	 * @var ObjectManagerInterface
 	 */
 	protected $objectManager;
 
@@ -47,6 +47,16 @@ class Query extends QueryIterator implements QueryInterface {
 	 * @var array
 	 */
 	protected $parameters = [];
+
+	/**
+	 *
+	 * @param ObjectManagerInterface $objectManager
+	 * @return void
+	 */
+	public function injectObjectManager(ObjectManagerInterface $objectManager)
+	{
+		$this->objectManager = $objectManager;
+	}
 
 	/**
 	 * {@inheritDoc}

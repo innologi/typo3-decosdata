@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service\Importer\StorageHandler;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -25,10 +25,12 @@ namespace Innologi\Decosdata\Service\Importer\StorageHandler;
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use Innologi\Decosdata\Exception\SqlError;
+use Innologi\Decosdata\Service\Database\DatabaseHelper;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
 use Innologi\TraceLogger\TraceLoggerAwareInterface;
 use Innologi\TYPO3FalApi\Exception\FileException;
+use Innologi\TYPO3FalApi\FileReferenceRepository;
 /**
  * Importer Storage Handler: Classic Edition
  *
@@ -50,14 +52,12 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	protected $databaseConnection;
 
 	/**
-	 * @var \Innologi\Decosdata\Service\Database\DatabaseHelper
-	 * @inject
+	 * @var DatabaseHelper
 	 */
 	protected $databaseHelper;
 
 	/**
-	 * @var \Innologi\TYPO3FalApi\FileReferenceRepository
-	 * @inject
+	 * @var FileReferenceRepository
 	 */
 	protected $fileReferenceRepository;
 
@@ -80,6 +80,26 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 	 * @var array
 	 */
 	protected $fieldCache = [];
+
+	/**
+	 *
+	 * @param DatabaseHelper $databaseHelper
+	 * @return void
+	 */
+	public function injectDatabaseHelper(DatabaseHelper $databaseHelper)
+	{
+		$this->databaseHelper = $databaseHelper;
+	}
+
+	/**
+	 *
+	 * @param FileReferenceRepository $fileReferenceRepository
+	 * @return void
+	 */
+	public function injectFileReferenceRepository(FileReferenceRepository $fileReferenceRepository)
+	{
+		$this->fileReferenceRepository = $fileReferenceRepository;
+	}
 
 	/**
 	 * Class constructor

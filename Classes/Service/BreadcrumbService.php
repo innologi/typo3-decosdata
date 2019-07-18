@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Service;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2016 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2016-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -25,6 +25,8 @@ namespace Innologi\Decosdata\Service;
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use Innologi\Decosdata\Exception\BreadcrumbError;
+use Innologi\Decosdata\Domain\Repository\ItemRepository;
+use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
 /**
  * Breadcrumb Service
  *
@@ -39,22 +41,20 @@ use Innologi\Decosdata\Exception\BreadcrumbError;
  */
 class BreadcrumbService implements SingletonInterface {
 	// @LOW _should we validate the crumb levels with those from the actual configuration?
-	// @LOW consider that the @injects aren't always necessary, so you might want to work with getMethods instead
+	// @LOW consider that the injects aren't always necessary, so you might want to work with getMethods instead
 
 	/**
-	 * @var \Innologi\Decosdata\Service\ParameterService
-	 * @inject
+	 * @var ParameterService
 	 */
 	protected $parameterService;
 
 	/**
-	 * @var \Innologi\Decosdata\Domain\Repository\ItemRepository
-	 * @inject
+	 * @var ItemRepository
 	 */
 	protected $itemRepository;
+
 	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\QueryBuilder
-	 * @inject
+	 * @var QueryBuilder
 	 */
 	protected $queryBuilder;
 
@@ -72,6 +72,36 @@ class BreadcrumbService implements SingletonInterface {
 	 * @var boolean
 	 */
 	protected $active = FALSE;
+
+	/**
+	 *
+	 * @param ParameterService $parameterService
+	 * @return void
+	 */
+	public function injectParameterService(ParameterService $parameterService)
+	{
+		$this->parameterService = $parameterService;
+	}
+
+	/**
+	 *
+	 * @param ItemRepository $itemRepository
+	 * @return void
+	 */
+	public function injectItemRepository(ItemRepository $itemRepository)
+	{
+		$this->itemRepository = $itemRepository;
+	}
+
+	/**
+	 *
+	 * @param QueryBuilder $queryBuilder
+	 * @return void
+	 */
+	public function injectQueryBuilder(QueryBuilder $queryBuilder)
+	{
+		$this->queryBuilder = $queryBuilder;
+	}
 
 	/**
 	 * Returns current level
