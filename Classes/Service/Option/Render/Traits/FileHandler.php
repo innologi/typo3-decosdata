@@ -118,15 +118,6 @@ trait FileHandler {
 		if (is_dir($dirPath)) {
 			return;
 		}
-
-		$matches = [];
-		// windows-paths are assumed to have been corrected!
-		$pattern = '=^(' . PATH_site . ')(.*)$=i';
-		// split the dirpath for use by mkdir_deep
-		preg_match($pattern, $dirPath, $matches);
-		if (GeneralUtility::mkdir_deep($matches[1], $matches[2]) !== NULL) {
-			// mkdir_deep only returns something on errors
-			// @TODO throw exception
-		}
+		GeneralUtility::mkdir_deep($dirPath);
 	}
 }

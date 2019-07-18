@@ -80,6 +80,12 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 
 	/**
 	 *
+	 * @var string
+	 */
+	protected $sitePath;
+
+	/**
+	 *
 	 * @param ConfigurationManagerInterface $configurationManager
 	 * @return void
 	 */
@@ -107,7 +113,7 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 	public function processImport(\Innologi\Decosdata\Domain\Model\Import $import) {
 		if($this->logger) $this->logger->logTrace();
 
-		$importFilePath = PATH_site . $import->getFile()->getOriginalResource()->getPublicUrl();
+		$importFilePath = $this->getSitePath() . $import->getFile()->getOriginalResource()->getPublicUrl();
 		$this->baseFilePath = dirname($importFilePath);
 		$this->importObject = $import;
 
@@ -120,6 +126,19 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 		$this->storageHandler->initialize($import->getPid());
 		$this->startParser($importFilePath);
 		$this->storageHandler->commit();
+	}
+
+	/**
+	 *
+	 * @return string
+	 */
+	protected function getSitePath()
+	{
+		if ($this->sitePath === null) {
+			// @extensionScannerIgnoreLine
+			$this->sitePath = \version_compare(TYPO3_version, '9.4', '<') ? PATH_site : \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/';
+		}
+		return $this->sitePath;
 	}
 
 	/**

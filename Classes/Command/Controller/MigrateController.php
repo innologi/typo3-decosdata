@@ -235,6 +235,8 @@ class MigrateController extends ExtUpdateAbstract {
 		$this->io->text('Migrate XML filedirpaths.');
 		$this->io->progressStart($max);
 
+		// @extensionScannerIgnoreLine
+		$sitePath = \version_compare(TYPO3_version, '9.4', '<') ? PATH_site : \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/';
 		$count = 0;
 		$errorCount = 0;
 		while ($count+$errorCount < $max) {
@@ -245,7 +247,7 @@ class MigrateController extends ExtUpdateAbstract {
 				// get all the necessary paths
 				$file = $this->fileService->getFileObjectByUid($xml['migrated_file']);
 				$xmlPath = pathinfo($file->getPublicUrl());
-				$xmlDirPath = PATH_site . $xmlPath['dirname'] . '/';
+				$xmlDirPath = $sitePath . $xmlPath['dirname'] . '/';
 				$fileDirPath = rtrim($xml['filedirpath'], '/') . '/';
 
 				if ($xmlDirPath === $fileDirPath) {

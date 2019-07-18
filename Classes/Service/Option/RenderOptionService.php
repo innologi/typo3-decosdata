@@ -82,23 +82,18 @@ class RenderOptionService extends OptionServiceAbstract {
 
 	/**
 	 *
+	 * @var string
+	 */
+	protected $sitePath;
+
+	/**
+	 *
 	 * @param TagFactory $tagFactory
 	 * @return void
 	 */
 	public function injectTagFactory(TagFactory $tagFactory)
 	{
 		$this->tagFactory = $tagFactory;
-	}
-
-	/**
-	 * Public class constructor
-	 *
-	 * @return void
-	 */
-	public function __construct() {
-		parent::__construct();
-		// PHP < 5.6 does not support concatenation in above variable declarations, hence:
-		$this->patternInline = sprintf($this->patternInline, $this->patternArgumentInline);
 	}
 
 	/**
@@ -110,6 +105,17 @@ class RenderOptionService extends OptionServiceAbstract {
 	public function injectConditionService(\Innologi\Decosdata\Service\ConditionService $conditionService) {
 		$conditionService->setRenderOptionService($this);
 		$this->conditionService = $conditionService;
+	}
+
+	/**
+	 * Public class constructor
+	 *
+	 * @return void
+	 */
+	public function __construct() {
+		parent::__construct();
+		// PHP < 5.6 does not support concatenation in above variable declarations, hence:
+		$this->patternInline = sprintf($this->patternInline, $this->patternArgumentInline);
 	}
 
 	/**
@@ -166,6 +172,19 @@ class RenderOptionService extends OptionServiceAbstract {
 	 */
 	public function getItem() {
 		return $this->item;
+	}
+
+	/**
+	 *
+	 * @return string
+	 */
+	public function getSitePath()
+	{
+		if ($this->sitePath === null) {
+			// @extensionScannerIgnoreLine
+			$this->sitePath = \version_compare(TYPO3_version, '9.4', '<') ? PATH_site : \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/';
+		}
+		return $this->sitePath;
 	}
 
 	/**

@@ -61,7 +61,7 @@ class CustomImage implements OptionInterface {
 			return $tag;
 		}
 
-		if (!is_file(PATH_site . $args['path'])) {
+		if (!is_file($service->getSitePath() . $args['path'])) {
 			// @TODO ___throw exception instead?
 			// if image does not exist, stop
 			return $tag;

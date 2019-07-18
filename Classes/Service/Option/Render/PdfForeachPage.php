@@ -77,7 +77,7 @@ class PdfForeachPage implements OptionInterface {
 
 		$separator = $args['separator'] ?? '';
 		$content = [];
-		$pdfPageCount = $this->getPdfPageCount($file);
+		$pdfPageCount = $this->getPdfPageCount($file, $service->getSitePath());
 		$paginator = $service->getPaginator();
 		if ($paginator !== NULL) {
 			// returns a complete and paginated result
@@ -123,9 +123,10 @@ class PdfForeachPage implements OptionInterface {
 	 * - INPUTFILE
 	 *
 	 * @param AbstractFile $inputFile
+	 * @param string $sitePath
 	 * @return integer
 	 */
-	protected function getPdfPageCount(AbstractFile $inputFile) {
+	protected function getPdfPageCount(AbstractFile $inputFile, $sitePath) {
 		$cmdOutput = $this->commandRunService
 			->reset()
 			->setCommandLimit(3)
@@ -139,7 +140,7 @@ class PdfForeachPage implements OptionInterface {
 			])->runCommand(
 				$this->getExtensionConfiguration('pdf_info_cmd'),
 				[
-					'INPUTFILE' => PATH_site . $inputFile->getPublicUrl()
+					'INPUTFILE' => $sitePath . $inputFile->getPublicUrl()
 				]
 			);
 

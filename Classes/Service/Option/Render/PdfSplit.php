@@ -75,14 +75,15 @@ class PdfSplit implements OptionInterface {
 			throw new MissingArgument(1524141816, [self::class, 'renderOptions']);
 		}
 
-		$outputPath = PATH_site . rtrim($this->getExtensionConfiguration('pdf_split_out'), '/') . '/' . $file->getSha1() . '/';
+		$sitePath = $service->getSitePath();
+		$outputPath = $sitePath . rtrim($this->getExtensionConfiguration('pdf_split_out'), '/') . '/' . $file->getSha1() . '/';
 		$this->createDirectoryIfNotExists($outputPath);
 
 		// first check if there are already splitted files at the original file's would-be output path
 		$files = new \GlobIterator($outputPath . '*.pdf');
 		if (!$files->valid()) {
 			// if files do not exist, create them
-			$files = $this->splitPdfFile($file, $outputPath);
+			$files = $this->splitPdfFile($file, $sitePath, $outputPath);
 		}
 		$pdfPageCount = $files->count();
 
@@ -145,11 +146,12 @@ class PdfSplit implements OptionInterface {
 	 * - INPUTFILE
 	 *
 	 * @param AbstractFile $inputFile
+	 * @param string $sitePath
 	 * @param string $outputPath
 	 * @throws OptionException
 	 * @return \GlobIterator
 	 */
-	protected function splitPdfFile(AbstractFile $inputFile, $outputPath) {
+	protected function splitPdfFile(AbstractFile $inputFile, $sitePath, $outputPath) {
 		$cmdOutput = $this->commandRunService
 			->reset()
 			->setAllowBinaries([
@@ -159,7 +161,7 @@ class PdfSplit implements OptionInterface {
 				$this->getExtensionConfiguration('pdf_split_cmd'),
 				[
 					'OUTPUTDIR' => $outputPath,
-					'INPUTFILE' => PATH_site . $inputFile->getPublicUrl()
+					'INPUTFILE' => $sitePath . $inputFile->getPublicUrl()
 				]
 			);
 

@@ -58,6 +58,12 @@ class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
 
 	/**
 	 *
+	 * @var string
+	 */
+	protected $sitePath;
+
+	/**
+	 *
 	 * @param ImportRepository $importRepository
 	 * @return void
 	 */
@@ -127,7 +133,7 @@ class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
 	 */
 	public function importSingle(\Innologi\Decosdata\Domain\Model\Import $import, $force = FALSE) {
 		if ($this->logger) $this->logger->logTrace();
-		$filePath = PATH_site . $import->getFile()->getOriginalResource()->getPublicUrl();
+		$filePath = $this->getSitePath() . $import->getFile()->getOriginalResource()->getPublicUrl();
 		if ( !file_exists($filePath) || (($newHash = $this->getHashIfReadyForProcessing($filePath, $import->getHash())) === FALSE && !$force) ) {
 			// @LOW consider throwing an exception, which when caught will register the import as notUpdated?
 			// either no file present, or the file has seen no change: no sense in continuing
@@ -149,6 +155,19 @@ class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
 				1448551145, NULL, DebugUtility::formatArrayValues($errors)
 			);
 		}
+	}
+
+	/**
+	 *
+	 * @return string
+	 */
+	protected function getSitePath()
+	{
+		if ($this->sitePath === null) {
+			// @extensionScannerIgnoreLine
+			$this->sitePath = \version_compare(TYPO3_version, '9.4', '<') ? PATH_site : \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/';
+		}
+		return $this->sitePath;
 	}
 
 	/**

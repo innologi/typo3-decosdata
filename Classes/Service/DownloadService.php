@@ -193,7 +193,7 @@ class DownloadService implements SingletonInterface {
 		}
 
 		$file = $this->getResourceFactory()->getFileObject($this->fileUid);
-		$filepath = PATH_site . $file->getPublicUrl();
+		$filepath = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $file->getPublicUrl();
 		$filesize = filesize($filepath);
 
 		// file transfer headers
