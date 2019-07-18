@@ -3,7 +3,7 @@ namespace Innologi\Decosdata\Task;
 /***************************************************************
  *  Copyright notice
  *
- *  (c) 2015-2019 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
+ *  (c) 2015 Frenck Lutke <typo3@innologi.nl>, www.innologi.nl
  *
  *  All rights reserved
  *
@@ -23,12 +23,8 @@ namespace Innologi\Decosdata\Task;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Scheduler\AbstractAdditionalFieldProvider;
-use TYPO3\CMS\Scheduler\Task\Enumeration\Action;
+use TYPO3\CMS\Scheduler\AdditionalFieldProviderInterface;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
-use Innologi\Decosdata\Domain\Repository\ImportRepository;
 /**
  * Importer Additional Field Provider
  *
@@ -37,8 +33,9 @@ use Innologi\Decosdata\Domain\Repository\ImportRepository;
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
+ * @extensionScannerIgnoreFile
  */
-class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider {
+class CompatImporterAdditionalFieldProvider implements AdditionalFieldProviderInterface {
 
 	/**
 	 * @var string
@@ -56,11 +53,13 @@ class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider {
 	public function getAdditionalFields(array &$taskInfo, $task, \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $schedulerModule) {
 		// set field value
 		if (empty($taskInfo['selectedImports'])) {
-			if ($schedulerModule->getCurrentAction()->equals(Action::EDIT)) {
-				// existing task, meaning there is a value
-				$taskInfo['selectedImports'] = $task->selectedImports;
-			} else {
-				$taskInfo['selectedImports'] = [];
+			switch ($schedulerModule->CMD) {
+				case 'edit':
+					// existing task, meaning there is a value
+					$taskInfo['selectedImports'] = $task->selectedImports;
+					break;
+				default:
+					$taskInfo['selectedImports'] = [];
 			}
 		}
 
@@ -91,16 +90,14 @@ class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider {
 		$valid = FALSE;
 		$availableImports = $this->findAllImports();
 		if (!is_array($submittedData['selectedImports'])) {
-			// @extensionScannerIgnoreLine false positive
-			$this->addMessage(
+			$schedulerModule->addMessage(
 				$GLOBALS['LANG']->sL($this->ll . 'task_importer.msg.noImportSelected'),
 				FlashMessage::ERROR
 			);
 		} else {
 			$invalidImports = array_diff($submittedData['selectedImports'], array_keys($availableImports));
 			if (!empty($invalidImports)) {
-				// @extensionScannerIgnoreLine false positive
-				$this->addMessage(
+				$schedulerModule->addMessage(
 					$GLOBALS['LANG']->sL($this->ll . 'task_importer.msg.invalidImportSelected'),
 					FlashMessage::ERROR
 				);
@@ -123,6 +120,29 @@ class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider {
 	}
 
 	/**
+	 * Finds all Imports regardless of pid, returns as an array
+	 * with values uid, pid, title, and uid as key.
+	 *
+	 * This method does not use the repository, because the task is TYPO3-specific
+	 * anyway and this way it is way faster.
+	 *
+	 * @return array|NULL
+	 */
+	protected function findAllImports() {
+		/* @var $databaseConnection \TYPO3\CMS\Core\Database\DatabaseConnection */
+		$databaseConnection = $GLOBALS['TYPO3_DB'];
+		return $databaseConnection->exec_SELECTgetRows(
+			'uid,pid,title',
+			'tx_decosdata_domain_model_import',
+			'deleted=0',
+			'',
+			'title ASC',
+			'',
+			'uid'
+		);
+	}
+
+	/**
 	 * Build select options of available imports and set currently selected imports,
 	 * for an HTML select element.
 	 *
@@ -131,11 +151,10 @@ class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider {
 	 */
 	protected function getImportOptions(array $selectedImports = []) {
 		$options = [];
-		$imports = GeneralUtility::makeInstance(ObjectManagerInterface::class)->get(ImportRepository::class)->findAllEverywhere();
-		/** @var \Innologi\Decosdata\Domain\Model\Import $import */
-		foreach ($imports as $import) {
-			$selected = in_array($import->getUid(), $selectedImports) ? ' selected="selected"' : '';
-			$options[] = '<option value="' . $import->getUid() . '"' . $selected . '>' . $import->getTitle() . ' [pid:' . $import->getPid() . ']</option>';
+		$imports = $this->findAllImports();
+		foreach ($imports as $uid => $import) {
+			$selected = in_array($uid, $selectedImports) ? ' selected="selected"' : '';
+			$options[] = '<option value="' . $uid . '"' . $selected . '>' . $import['title'] . ' [pid:' . $import['pid'] . ']</option>';
 		}
 		return join('', $options);
 	}

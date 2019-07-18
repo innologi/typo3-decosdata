@@ -38,7 +38,6 @@ use Innologi\Decosdata\Utility\DebugUtility;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class ImporterTask extends AbstractTask {
-	# @TODO make the task configurable in which XML's to update, removing the auto_update check in the import table
 
 	/**
 	 * @var string

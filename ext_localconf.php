@@ -21,10 +21,10 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][\Innologi\Decosd
 	'extension'        => $_EXTKEY,
 	'title'            => $ll . 'task_importer.title',
 	'description'      => $ll . 'task_importer.description',
-	'additionalFields' => \Innologi\Decosdata\Task\ImporterAdditionalFieldProvider::class
+	'additionalFields' => version_compare(TYPO3_version, '9.4', '<')
+		? \Innologi\Decosdata\Task\CompatImporterAdditionalFieldProvider::class
+		: \Innologi\Decosdata\Task\ImporterAdditionalFieldProvider::class
 ];
 
 // add eid scripts
-if (TYPO3_MODE === 'FE') {
-	$GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['tx_decosdata_download'] = 'EXT:decosdata/Classes/Eid/Download.php';
-}
+$GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['tx_decosdata_download'] = 'EXT:decosdata/Classes/Eid/Download.php';
