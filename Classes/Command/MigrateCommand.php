@@ -66,7 +66,12 @@ class MigrateCommand extends Command {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		// Make sure the _cli_ user is loaded
-		Bootstrap::getInstance()->initializeBackendAuthentication();
+		if (\version_compare(TYPO3_version, '9.4', '<')) {
+			// @extensionScannerIgnoreLine
+			Bootstrap::getInstance()->initializeBackendAuthentication();
+		} else {
+			Bootstrap::initializeBackendAuthentication();
+		}
 
 		$output->setDecorated(TRUE);
 		$io = new SymfonyStyle($input, $output);
@@ -79,8 +84,10 @@ class MigrateCommand extends Command {
 			$controller = GeneralUtility::makeInstance(
 				Controller\MigrateController::class, $io, $arguments
 			);
+			// @extensionScannerIgnoreLine false positive
 			$controller->main();
 		} catch (\Exception $e) {
+			// @extensionScannerIgnoreLine false positive
 			$io->error('[' . $e->getCode() . '] ' . $e->getMessage());
 		}
 	}

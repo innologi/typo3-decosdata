@@ -216,6 +216,7 @@ class TypeProcessorService implements SingletonInterface {
 				'partial' => $configuration['partial'] ?? 'ContentObject',
 				'type' => strtolower($type),
 				'configuration' => $configuration,
+				// @extensionScannerIgnoreLine false positive
 				'data' => $this->getConfigurationManager()->getContentObject()->cObjGetSingle(
 					$type, $this->getTypoScriptService()->convertPlainArrayToTypoScriptArray($configuration)
 				)

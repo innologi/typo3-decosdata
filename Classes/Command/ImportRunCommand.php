@@ -22,6 +22,7 @@ namespace Innologi\Decosdata\Command;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use Innologi\Decosdata\Utility\DebugUtility;
@@ -83,7 +84,12 @@ class ImportRunCommand extends Command {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		// Make sure the _cli_ user is loaded
-		\TYPO3\CMS\Core\Core\Bootstrap::getInstance()->initializeBackendAuthentication();
+		if (\version_compare(TYPO3_version, '9.4', '<')) {
+			// @extensionScannerIgnoreLine
+			Bootstrap::getInstance()->initializeBackendAuthentication();
+		} else {
+			Bootstrap::initializeBackendAuthentication();
+		}
 
 		$output->setDecorated(TRUE);
 		$io = new SymfonyStyle($input, $output);
@@ -127,6 +133,7 @@ class ImportRunCommand extends Command {
 			if ($e->getCode()) {
 				$message .= '[' . $e->getCode() . '] ';
 			}
+			// @extensionScannerIgnoreLine false positive
 			$io->error($message . $e->getMessage());
 		}
 	}

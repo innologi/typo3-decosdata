@@ -152,6 +152,7 @@ class ImageFeatures implements OptionInterface {
 			// casting index to int removes any index-modification by recursive options
 			$id = $service->getItem()['id'] . '_' . (int) $service->getIndex();
 			if ($id !== $this->lastContentId) {
+				// @extensionScannerIgnoreLine VERY false positive
 				$this->number += ($this->forcedTotal - $this->contentIncrements);
 				$this->lastContentId = $id;
 				$this->contentIncrements = 0;
@@ -160,10 +161,13 @@ class ImageFeatures implements OptionInterface {
 			$this->contentIncrements++;
 		}
 
+		// @extensionScannerIgnoreLine VERY false positive
 		$this->number++;
 		$numberTag = $service->getTagFactory()->createTag(
 			'span',
+			// @extensionScannerIgnoreLine VERY false positive
 			['class' => 'image-number', 'data-number' => $this->number],
+			// @extensionScannerIgnoreLine VERY false positive
 			$service->getTagFactory()->createTagContent((string) $this->number)
 		);
 		$mark = '###IMAGE-FEATURE-NUMBER###';

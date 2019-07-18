@@ -182,6 +182,8 @@ class ItemController extends ActionController {
 			// @TODO search action is already USER_INT. Why am I converting the follow-up GET requests to USER_INT again?
 			// @TODO also, can't we get rid of POST here? I remember how we got to using it, but let's face it: a search
 			// request should be GET, or even a POST-redirect-GET, so we should find a way to do so consistently.
+
+			// @extensionScannerIgnoreLine false positive
 			$contentObject = $this->configurationManager->getContentObject();
 			if ($contentObject->getUserObjectType() === \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::OBJECTTYPE_USER) {
 				$contentObject->convertToUserIntObject();
