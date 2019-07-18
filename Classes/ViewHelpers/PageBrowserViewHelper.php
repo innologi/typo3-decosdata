@@ -23,7 +23,7 @@ namespace Innologi\Decosdata\ViewHelpers;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 use Innologi\Decosdata\Exception\PaginationError;
 use Innologi\Decosdata\Service\PaginateService;
 // @LOW ___use \TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface ?
