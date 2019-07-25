@@ -25,11 +25,12 @@ $EM_CONF[$_EXTKEY] = [
 	'constraints' => [
 		'depends' => [
 			'php' => '7.1',
-			'typo3' => '8.7.0-8.7.99',
+			'typo3' => '8.7.0-9.5.99',
 		],
 		'conflicts' => [
 		],
 		'suggests' => [
+			'scheduler' => '8.7.0',
 			'typo3db_legacy' => '1.1.1'
 		],
 	],
