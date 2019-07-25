@@ -27,7 +27,7 @@ use TYPO3\CMS\Scheduler\AbstractAdditionalFieldProvider;
 use TYPO3\CMS\Scheduler\Task\Enumeration\Action;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use Innologi\Decosdata\Domain\Repository\ImportRepository;
 /**
  * Importer Additional Field Provider
@@ -89,7 +89,6 @@ class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider {
 	*/
 	public function validateAdditionalFields(array &$submittedData, \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $schedulerModule) {
 		$valid = FALSE;
-		$availableImports = $this->findAllImports();
 		if (!is_array($submittedData['selectedImports'])) {
 			// @extensionScannerIgnoreLine false positive
 			$this->addMessage(
@@ -97,7 +96,12 @@ class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider {
 				FlashMessage::ERROR
 			);
 		} else {
-			$invalidImports = array_diff($submittedData['selectedImports'], array_keys($availableImports));
+			$availableImports = GeneralUtility::makeInstance(ObjectManager::class)->get(ImportRepository::class)->findAllEverywhere();
+			$validKeys = [];
+			foreach ($availableImports as $import) {
+				$validKeys[] = $import->getUid();
+			}
+			$invalidImports = array_diff($submittedData['selectedImports'], $validKeys);
 			if (!empty($invalidImports)) {
 				// @extensionScannerIgnoreLine false positive
 				$this->addMessage(
@@ -131,7 +135,7 @@ class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider {
 	 */
 	protected function getImportOptions(array $selectedImports = []) {
 		$options = [];
-		$imports = GeneralUtility::makeInstance(ObjectManagerInterface::class)->get(ImportRepository::class)->findAllEverywhere();
+		$imports = GeneralUtility::makeInstance(ObjectManager::class)->get(ImportRepository::class)->findAllEverywhere();
 		/** @var \Innologi\Decosdata\Domain\Model\Import $import */
 		foreach ($imports as $import) {
 			$selected = in_array($import->getUid(), $selectedImports) ? ' selected="selected"' : '';
