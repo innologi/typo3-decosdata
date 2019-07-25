@@ -210,4 +210,16 @@ class Statement extends PreparedStatement {
 		}
 	}
 
+	/**
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		// TYPO3v9 Extbase Query considers this Statement an actual query, because it's not an instance of:
+		// - TYPO3 QueryBuilder
+		// - Doctrine DBAL Statement
+		// @TODO although this method provides a working fallback, we should consider replacing our Statement with either of the above
+		return $this->getProcessedQuery();
+	}
 }
