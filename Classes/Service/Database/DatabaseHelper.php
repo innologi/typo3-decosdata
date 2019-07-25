@@ -74,6 +74,7 @@ class DatabaseHelper implements SingletonInterface {
 	 * @return void
 	 */
 	public function __construct() {
+		// @extensionScannerIgnoreLine TYPO3_DB-usage needs a rewrite anyway once this ext goes standalone
 		$this->databaseConnection = $GLOBALS['TYPO3_DB'];
 		$this->databaseConnection->store_lastBuiltQuery = TRUE;
 		// @TODO ___utilize $this->databaseConnection->sql_error() ?

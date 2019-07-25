@@ -638,6 +638,7 @@ class MigrateController extends ExtUpdateAbstract {
 				);
 				// not nice, but it's a very specific part of an update script, I really don't care
 				// get first insert ID
+				// @extensionScannerIgnoreLine TYPO3_DB-usage needs a rewrite anyway once this ext goes standalone
 				$i = $GLOBALS['TYPO3_DB']->sql_insert_id();
 				foreach ($toInsert as $uid => $row) {
 					// update migrated_uid for inserted records

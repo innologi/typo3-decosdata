@@ -63,6 +63,7 @@ class CompatibleQueryProvider implements QueryProviderInterface,SingletonInterfa
 	 * @return void
 	 */
 	public function __construct() {
+		// @extensionScannerIgnoreLine TYPO3_DB-usage needs a rewrite anyway once this ext goes standalone
 		$this->databaseConnection = $GLOBALS['TYPO3_DB'];
 		// @TODO ___utilize $this->databaseConnection->sql_error() ?
 	}

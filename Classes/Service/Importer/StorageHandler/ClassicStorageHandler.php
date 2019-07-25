@@ -114,6 +114,7 @@ class ClassicStorageHandler implements StorageHandlerInterface,SingletonInterfac
 			'deleted' => 0
 			// leave enableFields alone, so that an import/update won't affect them
 		];
+		// @extensionScannerIgnoreLine TYPO3_DB-usage needs a rewrite anyway once this ext goes standalone
 		$this->databaseConnection = $GLOBALS['TYPO3_DB'];
 		$this->databaseConnection->store_lastBuiltQuery = TRUE;
 		// @TODO ___utilize $this->databaseConnection->sql_error() ?

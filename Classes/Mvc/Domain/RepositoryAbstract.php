@@ -51,6 +51,7 @@ abstract class RepositoryAbstract extends Repository {
 	 * @return \TYPO3\CMS\Core\Database\DatabaseConnection
 	 */
 	protected function getDatabaseConnection() {
+		// @extensionScannerIgnoreLine TYPO3_DB-usage needs a rewrite anyway once this ext goes standalone
 		return $GLOBALS['TYPO3_DB'];
 	}
 

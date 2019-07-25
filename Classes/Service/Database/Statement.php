@@ -41,6 +41,7 @@ use TYPO3\CMS\Core\Database\PreparedStatement;
  * @package decosdata
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
+ * @extensionScannerIgnoreLine TYPO3_DB-usage needs a rewrite anyway once this ext goes standalone
  */
 class Statement extends PreparedStatement {
 

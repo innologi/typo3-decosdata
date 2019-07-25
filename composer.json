@@ -20,6 +20,9 @@
 		"innologi/typo3-ext-update": "~0.5.0 || dev-develop",
 		"innologi/typo3-asset-provider": "~0.3.0 || dev-develop"
 	},
+	"suggest": {
+		"friendsoftypo3/typo3db-legacy": "Required for TYPO3 >=9 support"
+	},
 	"autoload": {
 		"psr-4": {
 			"Innologi\\Decosdata\\": "Classes/"

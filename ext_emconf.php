@@ -30,6 +30,7 @@ $EM_CONF[$_EXTKEY] = [
 		'conflicts' => [
 		],
 		'suggests' => [
+			'typo3db_legacy' => '1.1.1'
 		],
 	],
 	'autoload' => [
