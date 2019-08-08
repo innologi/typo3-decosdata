@@ -83,7 +83,7 @@ class SearchService implements SingletonInterface {
 		$matchAll = isset($configuration['matchAllSearchTerms']) && (bool)$configuration['matchAllSearchTerms'];
 		$orFilters = [];
 
-		foreach ($this->searchTerms as $i => $searchTerm) {
+		foreach ($this->searchTerms as $searchTerm) {
 			$filters = [];
 			// multiple sources: OR
 			foreach ($configuration['sources'] as $source) {
@@ -101,13 +101,15 @@ class SearchService implements SingletonInterface {
 			if (!empty($filters)) {
 				if ($matchAll) {
 					// every search term will be enclosed in his own FilterItems call: AND
+					// note that due to multiple source fields (which is always OR), we don't do
+					// all searchTerms in a single FilterItems with matchAll arg
 					$queryOptions[] = [
 						'option' => 'FilterItems',
 						'args' => ['filters' => $filters]
 					];
 				} else {
 					// every search term will be enclosed in a single FilterItems call: OR
-					$orFilters = array_merge($filterCollection, $filters);
+					$orFilters = array_merge($orFilters, $filters);
 				}
 			}
 		}
