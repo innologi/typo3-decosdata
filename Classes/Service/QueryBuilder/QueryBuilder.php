@@ -371,7 +371,7 @@ class QueryBuilder {
 
 			// add content itemfield id's
 			if (!empty($idAliases)) {
-				$idContent = $queryContent->getParent()->getContent('id' . $index)->setFieldSeparator('|');
+				$idContent = $queryContent->getParent()->getContent('id' . $index)->setFieldSeparator('-');
 				foreach ($idAliases as $i => $idAlias) {
 					$idContent->getField($i)->getSelect()->setField('uid')->setTableAlias($idAlias);
 				}

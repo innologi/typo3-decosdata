@@ -184,7 +184,7 @@ class ParameterService implements SingletonInterface {
 				throw new MissingParameter(1510679677, [$nParts[0]]);
 			}
 			// does part 1 (if requested) exist?
-			$paramParts = explode('|', $this->getParameterRaw($nParts[0]));
+			$paramParts = explode('-', $this->getParameterRaw($nParts[0]));
 			if (isset($nParts[1]) && !isset($paramParts[(int)$nParts[1]])) {
 				throw new MissingParameter(1510679678, [$name]);
 			}
@@ -193,7 +193,7 @@ class ParameterService implements SingletonInterface {
 				foreach ($paramParts as $index => &$paramPart) {
 					$this->parameterCache[$nParts[0] . '.' . $index] = $paramPart = (int)$paramPart;
 				}
-				$this->parameterCache[$nParts[0]] = join('|', $paramParts);
+				$this->parameterCache[$nParts[0]] = join('-', $paramParts);
 			} else {
 				$this->parameterCache[$name] = (int)$paramParts[0];
 			}
