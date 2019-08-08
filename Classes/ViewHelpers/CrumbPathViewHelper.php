@@ -156,7 +156,11 @@ class CrumbPathViewHelper extends AbstractViewHelper {
 		for ($i=$this->currentLevel; $i>$level; $i--) {
 			$exclude[] = $this->parameterService->wrapInPluginNamespace('_' . $i);
 		}
-		return [
+		// the first level is the default, we should be able to use the clean (original) page link for that
+		return $level === 1 ? [
+			'label' => $label,
+			'cleanLink' => true
+		] : [
 			'label' => $label,
 			'exclude' => $exclude,
 			'arguments' => ['level' => $level]

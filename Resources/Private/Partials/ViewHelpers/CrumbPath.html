@@ -20,7 +20,14 @@
 <ul class="crumbpath-navigation">
 	<f:for each="{configuration.crumbs}" as="item">
 		<li>
+			<f:if condition="{item.cleanLink}">
+			<f:then>
+			<f:link.page>{item.label}</f:link.page>
+			</f:then>
+			<f:else>
 			<f:link.action addQueryString="TRUE" argumentsToBeExcludedFromQueryString="{item.exclude}" arguments="{item.arguments}">{item.label}</f:link.action>
+			</f:else>
+			</f:if>
 		</li>
 	</f:for>
 	<li class="current">{configuration.current.label}</li>
