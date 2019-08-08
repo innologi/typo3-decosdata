@@ -218,7 +218,10 @@ class ParameterService implements SingletonInterface {
 	 * @return string
 	 */
 	public function encodeParameter($value) {
-		return rawurlencode($value);
+		// @LOW remove when dropping 8.7 support?
+		// it seems this has an adverse effect on 9.5 routing when used
+		// looks like there's some double encoding going on which messes with the chash gen / comparison
+		return \version_compare(TYPO3_version, '9.5', '<') ? rawurlencode($value) : $value;
 	}
 
 	/**
