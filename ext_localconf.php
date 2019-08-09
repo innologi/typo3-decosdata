@@ -28,3 +28,8 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][\Innologi\Decosd
 
 // add eid scripts
 $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['tx_decosdata_download'] = 'EXT:decosdata/Classes/Eid/Download.php';
+
+if (\version_compare(TYPO3_version, '9.5', '>=')) {
+	$GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['enhancers']['decosdata_EnhancedExtbase'] = \Innologi\Decosdata\Routing\Enhancer\EnhancedExtbasePluginEnhancer::class;
+	$GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['decosdata_FlexiblePersistedAliasMapper'] = \Innologi\Decosdata\Routing\Aspect\FlexiblePersistedAliasMapper::class;
+}

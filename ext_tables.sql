@@ -205,3 +205,17 @@ CREATE TABLE tx_decosdata_item_item_mm (
 	KEY uid_foreign (uid_foreign)
 );
 
+#
+# Table structure for table 'tx_decosdata_routing_slug'
+#
+CREATE TABLE tx_decosdata_routing_slug (
+	hash varchar(64) DEFAULT '' NOT NULL,
+	slug varchar(255) DEFAULT '' NOT NULL,
+	routevar int(11) unsigned DEFAULT '0' NOT NULL,
+	pid int(11) unsigned DEFAULT '0' NOT NULL,
+	tstamp int(11) unsigned DEFAULT '0' NOT NULL,
+
+	PRIMARY KEY (hash,slug),
+	KEY routevar (routevar),
+	KEY parent (pid)
+);
