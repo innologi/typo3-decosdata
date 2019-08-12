@@ -14,11 +14,11 @@
 		"php": ">=7.1 <7.4",
 		"typo3/cms-core": "~8.7.0 || ~9.5.0",
 		"typo3/cms-scheduler": "~8.7.0 || ~9.5.0",
-		"innologi/tag-builder": "~0.1.0 || dev-develop",
-		"innologi/trace-logger": "~0.1.0 || dev-develop",
-		"innologi/typo3-fal-api": "~0.1.0 || dev-develop",
-		"innologi/typo3-ext-update": "~0.5.0 || dev-develop",
-		"innologi/typo3-asset-provider": "~0.3.0 || dev-develop"
+		"innologi/tag-builder": "~0.1.1 || dev-develop",
+		"innologi/trace-logger": "~0.1.1 || dev-develop",
+		"innologi/typo3-fal-api": "~0.1.1 || dev-develop",
+		"innologi/typo3-ext-update": "~0.5.1 || dev-develop",
+		"innologi/typo3-asset-provider": "~0.3.1 || dev-develop"
 	},
 	"suggest": {
 		"friendsoftypo3/typo3db-legacy": "Required for TYPO3 >=9 support"
