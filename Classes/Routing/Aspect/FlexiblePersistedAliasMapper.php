@@ -192,7 +192,7 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
 			$this->purgeRouteValuePrefix($result[$this->routeFieldName])
 		);
 		if ($this->cacheResult) {
-			$this->storeCacheResult($value, $routeValue);
+			$this->storeCacheResult($value, $this->ensureUniqueValue($routeValue));
 		}
 		return $routeValue;
 	}
@@ -322,6 +322,24 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
 				$value = \substr($value, 0, $maxLength);
 			}
 		}
+		return $value;
+	}
+
+	/**
+	 *
+	 * @param string $value
+	 * @return string
+	 */
+	protected function ensureUniqueValue(string &$value): string
+	{
+		$tempValue = $value;
+		$counter = 0;
+		do {
+			$cache = $this->getCachedResult([
+				'slug' => $tempValue
+			]);
+		} while (isset($cache['routevar']) && ($tempValue = $value . '-' . ++$counter));
+		$value = $tempValue;
 		return $value;
 	}
 
