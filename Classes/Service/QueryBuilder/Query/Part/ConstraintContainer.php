@@ -39,6 +39,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 abstract class ConstraintContainer {
 
 	/**
+	 *
+	 * @var string
+	 */
+	protected $constraintKey;
+
+	/**
 	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintInterface
 	 */
 	protected $constraint;
@@ -87,13 +93,16 @@ abstract class ConstraintContainer {
 				$this->constraint->addConstraint($key, $constraint);
 				return $this;
 			} else {
-				// @LOW _note that if $key === 'original', it would overwrite $this->constraint..
+				// @LOW test if $this->constraintKey === $key, then $constraint takes precedence
 				$constraint = $this->getConstraintFactory()->createConstraintAnd([
-					'original' => $this->constraint,
+					$this->constraintKey ?? 'original' => $this->constraint,
 					$key => $constraint
 				]);
+				$key = null;
 			}
 		}
+
+		$this->constraintKey = $key;
 		return $this->setConstraint($constraint);
 	}
 
