@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -34,14 +36,22 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
 class From extends ConstraintContainer {
 
 	/**
+	 *
 	 * @var array
 	 */
 	protected $tables;
 
 	/**
+	 *
 	 * @var string
 	 */
 	protected $joinType;
+
+	/**
+	 *
+	 * @var boolean
+	 */
+	protected $defaultRestrictions = true;
 
 	/**
 	 * Class constructor
@@ -116,4 +126,23 @@ class From extends ConstraintContainer {
 		return $this;
 	}
 
+	/**
+	 *
+	 * @return boolean
+	 */
+	public function getDefaultRestrictions(): bool
+	{
+		return $this->defaultRestrictions;
+	}
+
+	/**
+	 *
+	 * @param boolean $defaultRestrictions
+	 * @return $this
+	 */
+	public function setDefaultRestrictions(bool $defaultRestrictions)
+	{
+		$this->defaultRestrictions = $defaultRestrictions;
+		return $this;
+	}
 }

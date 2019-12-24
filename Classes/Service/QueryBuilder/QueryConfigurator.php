@@ -24,14 +24,17 @@ namespace Innologi\Decosdata\Service\QueryBuilder;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Part\Select;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Part\From;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintInterface;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintCollection;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintByValue;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintByField;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Part\Where;
 /**
  * Query Configurator
  *
@@ -68,6 +71,22 @@ class QueryConfigurator implements SingletonInterface {
 	 */
 	protected $supportedOperators = ['=', '<', '>', '<=', '>=', '<>', '!=', '<=>', 'IS', 'NOT', 'REGEXP', 'RLIKE', 'LIKE', 'IN'];
 
+	// This class becomes more and more dirty, but at least it works nicely until we're in need of a cleanup and can revise our query building mechanism to more modern standards
+	/**
+	 * @var array
+	 */
+	protected $defaultConstraints = [
+		'tx_decosdata_domain_model_field' => [ 'deleted' ],
+		'tx_decosdata_domain_model_itemtype' => [ 'deleted' ],
+		// @TODO note that not all queries are joining this table, but only use the relation table.. might want to fix that
+		'tx_decosdata_domain_model_import' => [ 'deleted', 'hidden' ],
+		'tx_decosdata_domain_model_item' => [ 'deleted', 'hidden' ],
+		'tx_decosdata_domain_model_itemblob' => [ 'deleted', 'hidden' ],
+		'tx_decosdata_domain_model_itemfield' => [ 'deleted', 'hidden' ],
+		'tx_decosdata_domain_model_profile' => [ 'deleted', 'hidden' ],
+		'tx_decosdata_domain_model_profilefield' => [ 'deleted', 'hidden' ]
+	];
+
 	/**
 	 * @var array
 	 */
@@ -77,6 +96,23 @@ class QueryConfigurator implements SingletonInterface {
 	 * @var integer
 	 */
 	protected $parameterCount = 0;
+
+	/**
+	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
+	 */
+	protected $constraintFactory;
+
+	/**
+	 * Returns ConstraintFactory.
+	 *
+	 * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
+	 */
+	protected function getConstraintFactory() {
+		if ($this->constraintFactory === NULL) {
+			$this->constraintFactory = GeneralUtility::makeInstance(ConstraintFactory::class);
+		}
+		return $this->constraintFactory;
+	}
 
 	/**
 	 * Transforms a Query object to actual SQL Query Parts.
@@ -111,10 +147,10 @@ class QueryConfigurator implements SingletonInterface {
 					$concatSelect[] = $this->transformSelect($select);
 				}
 				$fromArray = $queryField->getFromAll();
-				foreach ($fromArray as $from) {
-					$queryParts['FROM'][] = $this->transformFrom($from);
-				}
 				$where = $queryField->getWhere();
+				foreach ($fromArray as $from) {
+					$queryParts['FROM'][] = $this->transformFrom($from, $where);
+				}
 				if ($where->getConstraint() !== NULL) {
 					$queryParts['WHERE'][] = $this->transformConstraint($where->getConstraint(), 'WHERE');
 				}
@@ -227,11 +263,12 @@ class QueryConfigurator implements SingletonInterface {
 	 * - Supports a 'constraint'
 	 *
 	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Part\From $from
+	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Part\Where $where
 	 * @return string
 	 * @throws Exception\MissingConfigurationProperty
 	 * @throws Exception\UnsupportedFeatureType
 	 */
-	protected function transformFrom(From $from) {
+	protected function transformFrom(From $from, Where $where) {
 		$tables = $from->getTables();
 		if (!isset($tables) || empty($tables)) {
 			throw new Exception\MissingConfigurationProperty(1448552598, [
@@ -240,12 +277,30 @@ class QueryConfigurator implements SingletonInterface {
 		}
 
 		$formatTables = [];
+		$joinType = $from->getJoinType();
 		foreach ($tables as $alias => $table) {
 			$formatTables[] = $table . ' ' . $alias;
+
+			// if the table has known default constraints, add them here unless this was disabled
+			if ($from->getDefaultRestrictions() && isset($this->defaultConstraints[$table])) {
+				$defaultConstraints = $this->defaultConstraints[$table];
+				// if there is no join type, it will not have any constraints, so we'll put them in WHERE instead
+				$constraintContainer = $joinType !== NULL ? $from : $where;
+				foreach ($defaultConstraints as $defaultConstraint) {
+					$constraintContainer->addConstraint(
+						'__default__' . $alias . '__' . $defaultConstraint,
+						$this->getConstraintFactory()->createConstraintByValue($defaultConstraint, $alias, '=', 0)
+					);
+				}
+				// @LOW yet another hack.. this class should not be adding constraints
+					// imagine what happens if a query object is amended and passed through it again
+					// hence we disable it here once it has been added once
+				$from->setDefaultRestrictions(false);
+			}
 		}
 		$string = '(' . join(',', $formatTables) . ')';
 
-		$joinType = $from->getJoinType();
+
 		// @LOW _if joinType is NULL, transformConfiguration will still join the table with "\n" and not with a comma..
 		if ($joinType !== NULL) {
 			if (!in_array($joinType, $this->supportedJoins, TRUE)) {
