@@ -308,7 +308,7 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
 
 		// @TODO add error handling
 		if ((bool) $this->transformRoute['lowerCase']) {
-			$value = \strtolower($value);
+			$value = \mb_strtolower($value, \mb_detect_encoding($value));
 		}
 		if (\is_string($this->transformRoute['replacementChar']) && \is_string($this->transformRoute['replacementMatch'])) {
 			$value = \preg_replace($this->transformRoute['replacementMatch'], $this->transformRoute['replacementChar'], $value);
