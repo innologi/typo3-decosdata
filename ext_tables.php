@@ -51,3 +51,13 @@ $cshPathPrefix = 'EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_csh_
 	'tx_' . $_EXTKEY . '_task_importer',
 	$cshPathPrefix . 'task_importer.xlf'
 );
+
+if (\version_compare(TYPO3_version, '9.5', '>=')) {
+	// Add module
+	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::insertModuleFunction(
+		'web_info',
+		\Innologi\Decosdata\Modfunc\Module::class,
+		null,
+		'Decosdata'
+	);
+}

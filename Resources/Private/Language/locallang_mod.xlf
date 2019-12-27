@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+  <file source-language="en" datatype="plaintext"
+    original="messages" date="2019-12-23T08:36:01Z"
+    product-name="decosdata">
+    <header />
+    <body>
+      <trans-unit id="tab.routing">
+        <source>Routing</source>
+      </trans-unit>
+      
+      <trans-unit id="no_access">
+        <source>You do not have access to this functionality</source>
+      </trans-unit>
+      <trans-unit id="no_access.title">
+        <source>No access</source>
+      </trans-unit>
+      
+      <trans-unit id="routing.title">
+        <source>Routing slugs</source>
+      </trans-unit>
+      <trans-unit id="routing.details">
+        <source>Decosdata can generate persistent(!) routing slugs per decos item field based on the publish plugin configuration and a routing config using its RoutingEnhancers. These generate once and never change, unless edited in this module. Note that this will potentially change your speaking paths for decosdata-generated views, if the data was changed!</source>
+      </trans-unit>
+      <trans-unit id="routing.missing_buttons">
+        <source>For now, this module only offers the ability to flush ALL decosdata routing slugs accross the entire TYPO3 instance. Do not use this unless you know why you would be doing that!</source>
+      </trans-unit>
+      <trans-unit id="routing.flush_label">
+        <source>Flush %d routing slugs</source>
+      </trans-unit>
+      <trans-unit id="routing.flush_notification">
+        <source>Flushing all routing slugs</source>
+      </trans-unit>
+      <trans-unit id="routing.flush_warning">
+        <source>Are you absolutely sure? Any existing decosdata routing slug will potentially be rebuilt differently!</source>
+      </trans-unit>
+      <trans-unit id="routing.flush_success">
+        <source>Flushed %d routing slugs</source>
+      </trans-unit>
+      <trans-unit id="routing.flush_success.title">
+        <source>Success</source>
+      </trans-unit>
+      
+    </body>
+  </file>
+</xliff>
