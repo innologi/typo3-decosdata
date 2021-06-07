@@ -23,13 +23,17 @@
 	"suggest": {
 		"friendsoftypo3/typo3db-legacy": "Required for TYPO3 >=9 support"
 	},
+	"extra": {
+		"typo3/cms": {
+			"extension-key": "decosdata"
+		}
+	},
 	"autoload": {
 		"psr-4": {
 			"Innologi\\Decosdata\\": "Classes/"
 		}
 	},
 	"replace": {
-		"decosdata": "self.version",
 		"typo3-ter/decosdata": "self.version"
 	}
 }
