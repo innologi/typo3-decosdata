@@ -59,6 +59,12 @@ decosdata_api {
 		debug = 0
 		# to imply that we want caching wherever possible
 		no_cache = 0
+		# cached content is unable to set response headers, so gets text/html content-type! forcing content type here
+		# @todo: overrule in cases of custom format value?
+		additionalHeaders.10 {
+			header = Content-Type: application/json
+			replace = 1
+		}
 	}
 	10 < tt_content.list.20.decosdata_publish
 }
