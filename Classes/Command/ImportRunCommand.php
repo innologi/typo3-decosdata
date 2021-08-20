@@ -84,12 +84,7 @@ class ImportRunCommand extends Command {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		// Make sure the _cli_ user is loaded
-		if (\version_compare(TYPO3_version, '9.4', '<')) {
-			// @extensionScannerIgnoreLine
-			Bootstrap::getInstance()->initializeBackendAuthentication();
-		} else {
-			Bootstrap::initializeBackendAuthentication();
-		}
+		Bootstrap::initializeBackendAuthentication();
 
 		$output->setDecorated(TRUE);
 		$io = new SymfonyStyle($input, $output);
@@ -98,7 +93,7 @@ class ImportRunCommand extends Command {
 		$traceLogEnabled = (bool) $input->getOption('trace-log');
 
 		try {
-			$bootstrap = new \TYPO3\CMS\Extbase\Core\Bootstrap();
+			$bootstrap = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Core\Bootstrap::class);
 			$bootstrap->initialize([
 				'pluginName' => 'Importer',
 				'extensionName' => $this->extensionName,

@@ -37,8 +37,6 @@ class Field extends AbstractValueObject {
 	 * Field Name
 	 *
 	 * @var string
-	 * @extensionScannerIgnoreLine
-	 * @validate NotEmpty
 	 * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
 	 */
 	protected $fieldName;

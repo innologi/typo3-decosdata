@@ -45,8 +45,6 @@ class Item extends AbstractEntity {
 	 * Item Type
 	 *
 	 * @var \Innologi\Decosdata\Domain\Model\ItemType
-	 * @extensionScannerIgnoreLine
-	 * @lazy
 	 * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
 	 */
 	protected $itemType;
@@ -55,8 +53,6 @@ class Item extends AbstractEntity {
 	 * Item Field
 	 *
 	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\ItemField>
-	 * @extensionScannerIgnoreLine
-	 * @lazy
 	 * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
 	 */
 	protected $itemField;
@@ -65,8 +61,6 @@ class Item extends AbstractEntity {
 	 * Item Blob
 	 *
 	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\ItemBlob>
-	 * @extensionScannerIgnoreLine
-	 * @lazy
 	 * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
 	 */
 	protected $itemBlob;
@@ -75,8 +69,6 @@ class Item extends AbstractEntity {
 	 * Import
 	 *
 	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Import>
-	 * @extensionScannerIgnoreLine
-	 * @lazy
 	 * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
 	 */
 	protected $import;
@@ -85,8 +77,6 @@ class Item extends AbstractEntity {
 	 * Parent Item
 	 *
 	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Item>
-	 * @extensionScannerIgnoreLine
-	 * @lazy
 	 * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
 	 */
 	protected $parentItem;
@@ -95,8 +85,6 @@ class Item extends AbstractEntity {
 	 * Child Item
 	 *
 	 * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Item>
-	 * @extensionScannerIgnoreLine
-	 * @lazy
 	 * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
 	 */
 	protected $childItem;

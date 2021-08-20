@@ -118,7 +118,7 @@ class DownloadService implements SingletonInterface {
 	 */
 	protected function getResourceFactory() {
 		if ($this->resourceFactory === NULL) {
-			$this->resourceFactory = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance();
+			$this->resourceFactory = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Resource\ResourceFactory::class);
 		}
 		return $this->resourceFactory;
 	}
@@ -145,7 +145,6 @@ class DownloadService implements SingletonInterface {
 	public function getDownloadUrl($fileUid, $blobUid, $itemUid) {
 		return $this->getUriBuilder()
 			->reset()
-			->setUseCacheHash(FALSE)
 			->setArguments([
 				'eID' => $this->eID,
 				'f' => $fileUid,

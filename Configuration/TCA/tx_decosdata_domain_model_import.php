@@ -23,9 +23,6 @@ return [
 		// @TODO __replace icon
 		'iconfile' => 'EXT:' . $extKey . '/Resources/Public/Icons/' . $table . '.gif'
 	],
-	'interface' => [
-		'showRecordFieldList' => 'hidden, title, file, hash, forget_on_update',
-	],
 	'types' => [
 		'0' => [
 			'showitem' => 'hidden, title, file, hash, forget_on_update,

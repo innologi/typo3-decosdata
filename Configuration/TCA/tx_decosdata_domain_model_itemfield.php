@@ -26,9 +26,6 @@ return [
 		'searchFields' => 'field_value',
 		'iconfile' => 'EXT:' . $extKey . '/Resources/Public/Icons/' . $table . '.gif'
 	],
-	'interface' => [
-		'showRecordFieldList' => 'hidden, field_value, field, item',
-	],
 	'types' => [
 		'0' => [
 			'showitem' => 'hidden, field_value, field, item'

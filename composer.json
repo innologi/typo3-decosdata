@@ -12,8 +12,8 @@
 	],
 	"require": {
 		"php": ">=7.2 <8",
-		"typo3/cms-core": "~8.7.0 || ~9.5.0",
-		"typo3/cms-scheduler": "~8.7.0 || ~9.5.0",
+		"typo3/cms-core": "^10.4",
+		"typo3/cms-scheduler": "^10.4",
 		"innologi/tag-builder": "~0.1.1 || dev-develop",
 		"innologi/trace-logger": "~0.1.1 || dev-develop",
 		"innologi/typo3-fal-api": "~0.1.1 || dev-develop",

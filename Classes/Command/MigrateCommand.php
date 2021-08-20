@@ -66,12 +66,7 @@ class MigrateCommand extends Command {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		// Make sure the _cli_ user is loaded
-		if (\version_compare(TYPO3_version, '9.4', '<')) {
-			// @extensionScannerIgnoreLine
-			Bootstrap::getInstance()->initializeBackendAuthentication();
-		} else {
-			Bootstrap::initializeBackendAuthentication();
-		}
+		Bootstrap::initializeBackendAuthentication();
 
 		$output->setDecorated(TRUE);
 		$io = new SymfonyStyle($input, $output);

@@ -56,7 +56,7 @@ class ImporterTask extends AbstractTask {
 	 * @throws \Exception
 	 */
 	public function execute() {
-		$bootstrap = new Bootstrap();
+		$bootstrap = GeneralUtility::makeInstance(Bootstrap::class);
 		$bootstrap->initialize([
 			'pluginName' => 'Importer',
 			'extensionName' => $this->extensionName,

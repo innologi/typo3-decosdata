@@ -37,8 +37,6 @@ class ItemType extends AbstractValueObject {
 	 * Type
 	 *
 	 * @var string
-	 * @extensionScannerIgnoreLine
-	 * @validate NotEmpty
 	 * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
 	 */
 	protected $itemType;

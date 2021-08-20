@@ -19,9 +19,6 @@ return [
 		// @TODO __replace icon
 		'iconfile' => 'EXT:' . $extKey . '/Resources/Public/Icons/' . $table . '.gif',
 	],
-	'interface' => [
-		'showRecordFieldList' => 'field_name',
-	],
 	'types' => [
 		'0' => ['showitem' => 'field_name'],
 	],

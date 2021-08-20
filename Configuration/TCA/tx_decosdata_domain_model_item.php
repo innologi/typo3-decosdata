@@ -27,9 +27,6 @@ return [
 		'iconfile' => 'EXT:' . $extKey . '/Resources/Public/Icons/' . $table . '.gif'
 	],
 
-	'interface' => [
-		'showRecordFieldList' => 'hidden, item_key, item_type, import, parent_item, child_item, item_field, item_blob',
-	],
 	'types' => [
 		'0' => [
 			'showitem' => 'hidden, item_key, item_type, import, parent_item, child_item,
@@ -146,7 +143,6 @@ return [
 				'autoSizeMax' => 30,
 				'maxitems' => 9999,
 				'multiple' => 0,
-				'enableMultiSelectFilterTextfield' => TRUE,
 				'fieldControl' => [
 					'editPopup' => [
 						'disabled' => FALSE,
@@ -174,7 +170,6 @@ return [
 				'autoSizeMax' => 30,
 				'maxitems' => 9999,
 				'multiple' => 0,
-				'enableMultiSelectFilterTextfield' => TRUE,
 				'fieldControl' => [
 					'editPopup' => [
 						'disabled' => FALSE,

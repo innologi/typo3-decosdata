@@ -30,9 +30,6 @@ return [
 		'iconfile' => 'EXT:' . $extKey . '/Resources/Public/Icons/' . $table . '.gif'
 	],
 
-	'interface' => [
-		'showRecordFieldList' => 'hidden, item_key, sequence, file, item',
-	],
 	'types' => [
 		'0' => [
 			'showitem' => 'hidden, item_key, sequence, file,

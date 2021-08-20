@@ -1,11 +1,11 @@
 <?php
 defined('TYPO3_MODE') or die();
 
-$ll = 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_be.xlf:';
+$ll = 'LLL:EXT:decosdata/Resources/Private/Language/locallang_be.xlf:';
 
 // plugin configuration
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-	'Innologi.' . $_EXTKEY,
+	'Innologi.Decosdata',
 	'Publish',
 	[
 		'Item' => 'multi,single,search'
@@ -18,18 +18,40 @@ $ll = 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_be.xlf:';
 
 // add scheduler tasks
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][\Innologi\Decosdata\Task\ImporterTask::class] = [
-	'extension'        => $_EXTKEY,
+	'extension'        => 'decosdata',
 	'title'            => $ll . 'task_importer.title',
 	'description'      => $ll . 'task_importer.description',
-	'additionalFields' => version_compare(TYPO3_version, '9.4', '<')
-		? \Innologi\Decosdata\Task\CompatImporterAdditionalFieldProvider::class
-		: \Innologi\Decosdata\Task\ImporterAdditionalFieldProvider::class
+	'additionalFields' => \Innologi\Decosdata\Task\ImporterAdditionalFieldProvider::class
 ];
 
 // add eid scripts
-$GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['tx_decosdata_download'] = 'EXT:decosdata/Classes/Eid/Download.php';
+$GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include']['tx_decosdata_download'] = \Innologi\Decosdata\Eid\Download::class;
 
-if (\version_compare(TYPO3_version, '9.5', '>=')) {
-	$GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['enhancers']['decosdata_EnhancedExtbase'] = \Innologi\Decosdata\Routing\Enhancer\EnhancedExtbasePluginEnhancer::class;
-	$GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['decosdata_FlexiblePersistedAliasMapper'] = \Innologi\Decosdata\Routing\Aspect\FlexiblePersistedAliasMapper::class;
-}
+// routing
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['enhancers']['decosdata_EnhancedExtbase'] = \Innologi\Decosdata\Routing\Enhancer\EnhancedExtbasePluginEnhancer::class;
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['decosdata_FlexiblePersistedAliasMapper'] = \Innologi\Decosdata\Routing\Aspect\FlexiblePersistedAliasMapper::class;
+
+// register implementation classes for DI
+/** @var \TYPO3\CMS\Extbase\Object\Container\Container $container */
+$container = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\Container\Container::class);
+$container->registerImplementation(
+    \Innologi\Decosdata\Service\Importer\Parser\ParserInterface::class,
+    \Innologi\Decosdata\Service\Importer\Parser\OneFileStreamingParser::class
+);
+$container->registerImplementation(
+    \Innologi\Decosdata\Service\Importer\StorageHandler\StorageHandlerInterface::class,
+    \Innologi\Decosdata\Service\Importer\StorageHandler\ClassicStorageHandler::class
+);
+$container->registerImplementation(
+    \Innologi\Decosdata\Service\Database\QueryProviderInterface::class,
+    \Innologi\Decosdata\Service\Database\MysqlQueryProvider::class
+);
+
+// @TODO replace all TEMPLATE cases with FLUIDTEMPLATE so this becomes unnecessary
+// Add FILE alternative
+$GLOBALS['TYPO3_CONF_VARS']['FE']['ContentObjects'] = array_merge(
+    $GLOBALS['TYPO3_CONF_VARS']['FE']['ContentObjects'],
+    [
+        'DECOSDATA_FILE' => \Innologi\Decosdata\Mvc\ContentObject\FileContentObject::class
+    ]
+);

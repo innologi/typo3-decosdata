@@ -30,7 +30,7 @@ plugin.tx_decosdata {
 		controller.Item.action.xhr {
 			javascript {
 				inline.tx_decosdata_xhr {
-					1 = FILE
+					1 = DECOSDATA_FILE
 					1.file = {$plugin.tx_decosdata.javascript.decosdataXhr}
 					placeInFooter = 1
 				}

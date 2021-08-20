@@ -73,12 +73,7 @@ class ImportStatusCommand extends Command {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		// Make sure the _cli_ user is loaded
-		if (\version_compare(TYPO3_version, '9.4', '<')) {
-			// @extensionScannerIgnoreLine
-			Bootstrap::getInstance()->initializeBackendAuthentication();
-		} else {
-			Bootstrap::initializeBackendAuthentication();
-		}
+		Bootstrap::initializeBackendAuthentication();
 
 		$output->setDecorated(TRUE);
 		$io = new SymfonyStyle($input, $output);
@@ -92,8 +87,7 @@ class ImportStatusCommand extends Command {
 			$importRepository = $objectManager->get(\Innologi\Decosdata\Domain\Repository\ImportRepository::class);
 			$imports = empty($uidArray) ? $importRepository->findAllEverywhere() : $importRepository->findInUidEverywhere($uidArray);
 
-			// @extensionScannerIgnoreLine
-			$sitePath = \version_compare(TYPO3_version, '9.4', '<') ? PATH_site : \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/';
+			$sitePath = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/';
 			/** @var $import \Innologi\Decosdata\Domain\Model\Import */
 			foreach ($imports as $import) {
 				$prefix = '[' . $import->getUid() . ':' . $import->getTitle() . '] - ';

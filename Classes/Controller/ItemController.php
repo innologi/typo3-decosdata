@@ -30,6 +30,8 @@ use Innologi\Decosdata\Service\TypeProcessorService;
 use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
 use Innologi\Decosdata\Service\BreadcrumbService;
 use Innologi\Decosdata\Service\ParameterService;
+use Innologi\Decosdata\View\Item\MultiJson;
+use Innologi\Decosdata\View\Item\SingleJson;
 /**
  * Item controller
  *
@@ -202,6 +204,30 @@ class ItemController extends ActionController {
 	}
 
 	/**
+	 * Set View for multiAction()
+	 * @return void
+	 */
+	protected function initializeMultiAction()
+	{
+	    if ($this->request->getFormat() === 'json') {
+	        // in TYPO3 v10, ViewResolver will only resolve whatever is the default view
+	        $this->defaultViewObjectName = MultiJson::class;
+	    }
+	}
+
+	/**
+	 * Set View for singleAction()
+	 * @return void
+	 */
+	protected function initializeSingleAction()
+	{
+	    if ($this->request->getFormat() === 'json') {
+	        // in TYPO3 v10, ViewResolver will only resolve whatever is the default view
+	        $this->defaultViewObjectName = SingleJson::class;
+	    }
+	}
+
+	/**
 	 * Run multiple publish-configurations and/or custom TS elements as a single cohesive content element + overarching template.
 	 *
 	 * @return void
@@ -257,7 +283,7 @@ class ItemController extends ActionController {
 				)
 			);
 			// we only really need the content fields, other query-added fields will only pad the JSON size
-			if ($this->view instanceof \Innologi\Decosdata\View\Item\SingleJson) {
+			if ($this->view instanceof SingleJson) {
 				$this->view->addContentFieldsToConfiguration(\count($this->activeConfiguration['contentField']));
 			}
 		}

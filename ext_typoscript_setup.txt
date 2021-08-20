@@ -1,15 +1,3 @@
-config.tx_extbase.objects {
-	Innologi\Decosdata\Service\Importer\Parser\ParserInterface {
-		className = Innologi\Decosdata\Service\Importer\Parser\OneFileStreamingParser
-	}
-	Innologi\Decosdata\Service\Importer\StorageHandler\StorageHandlerInterface {
-		className = Innologi\Decosdata\Service\Importer\StorageHandler\ClassicStorageHandler
-	}
-	Innologi\Decosdata\Service\Database\QueryProviderInterface {
-		className = Innologi\Decosdata\Service\Database\MysqlQueryProvider
-	}
-}
-
 module.tx_decosdata.importer.validation {
 	import = EXT:decosdata/Resources/Private/Importer/Validation/import.rng
 }

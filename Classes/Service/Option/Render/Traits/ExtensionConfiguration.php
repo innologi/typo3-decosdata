@@ -53,14 +53,9 @@ trait ExtensionConfiguration {
 	 */
 	protected function getExtensionConfiguration($key) {
 		if ($this->extensionConfiguration === NULL) {
-			if (\version_compare(TYPO3_version, '9.0', '<')) {
-				// @extensionScannerIgnoreLine
-				$this->extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extensionKey]);
-			} else {
-				$this->extensionConfiguration = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-					\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
-				)->get($this->extensionKey);
-			}
+			$this->extensionConfiguration = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+				\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
+			)->get($this->extensionKey);
 		}
 		if (!isset($this->extensionConfiguration[$key])) {
 			throw new OptionException(1525269917, ['Extension Configuration key \'' . $key . '\' missing.']);

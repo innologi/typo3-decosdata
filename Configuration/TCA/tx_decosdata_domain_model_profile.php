@@ -20,9 +20,6 @@ return [
 		'default_sortby' => 'ORDER BY title ASC',
 		'iconfile' => 'EXT:' . $extKey . '/Resources/Public/Icons/' . $table . '.gif'
 	],
-	'interface' => [
-		'showRecordFieldList' => 'hidden, title, file, profile_key, profile_field',
-	],
 	'types' => [
 		'0' => [
 			'showitem' => 'hidden, title, file, profile_key,

@@ -230,7 +230,7 @@ class Module
      */
     protected function render()
     {
-    	$languageService = $this->getLanguageService();
+        $languageService = $this->getLanguageService();
         if ($this->isAccessibleForCurrentUser) {
             $this->buttons = '<p>' . $languageService->getLL('routing.missing_buttons') . '</p>'
                 . '<input type="submit" class="btn btn-default t3js-update-button" name="flushRoutingSlugs" id="flushRoutingSlugs" value="'
@@ -398,16 +398,6 @@ class Module
             'BUTTONS' => $this->buttons,
             'CONTENT' => $this->content,
         ];
-    }
-
-    /**
-     * Called from InfoModuleController until deprecation removal in TYPO3 v10.0
-     *
-     * @return void
-     */
-    public function checkExtObj()
-    {
-        // do nothing
     }
 
     /**

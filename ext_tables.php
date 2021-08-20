@@ -1,8 +1,8 @@
 <?php
 defined('TYPO3_MODE') or die();
 
-$tablePrefix = 'tx_' . $_EXTKEY . '_domain_model_';
-$cshPathPrefix = 'EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_csh_';
+$tablePrefix = 'tx_decosdata_domain_model_';
+$cshPathPrefix = 'EXT:decosdata/Resources/Private/Language/locallang_csh_';
 
 // allow records of these tables to be stored on standard page types
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages($tablePrefix . 'profile');
@@ -48,16 +48,14 @@ $cshPathPrefix = 'EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_csh_
 	$cshPathPrefix . 'tca_itemtype.xlf'
 );
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
-	'tx_' . $_EXTKEY . '_task_importer',
+	'tx_decosdata_task_importer',
 	$cshPathPrefix . 'task_importer.xlf'
 );
 
-if (\version_compare(TYPO3_version, '9.5', '>=')) {
-	// Add module
-	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::insertModuleFunction(
-		'web_info',
-		\Innologi\Decosdata\Modfunc\Module::class,
-		null,
-		'Decosdata'
-	);
-}
+// Add module
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::insertModuleFunction(
+	'web_info',
+	\Innologi\Decosdata\Modfunc\Module::class,
+	null,
+	'Decosdata'
+);

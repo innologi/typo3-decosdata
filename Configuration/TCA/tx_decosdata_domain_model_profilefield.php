@@ -24,9 +24,6 @@ return [
 		'hideTable' => TRUE,
 		'iconfile' => 'EXT:' . $extKey . '/Resources/Public/Icons/' . $table . '.gif'
 	],
-	'interface' => [
-		'showRecordFieldList' => 'hidden, description, field, profile',
-	],
 	'types' => [
 		'0' => [
 			'showitem' => 'hidden, description, field, profile',
