@@ -96,7 +96,7 @@
 
 <f:section name="xhrpager">
 <div class="xhr-paging loader inactive" data-xhr="{xhrUri}" data-target="{xhrTarget}" data-autoload="{xhrAutoload}">
-	<a class="more" title="{f:translate(key:'xhrpaging.more')}" href="{f:uri.action(arguments:nextPageArgs, addQueryString:1)}">
+	<a class="more" title="{f:translate(key:'xhrpaging.more')}" href="{f:uri.action(arguments:nextPageArgs, addQueryString:1)}" rel="nofollow">
 		<f:translate key="xhrpaging.more"/>
 	</a>
 	<f:if condition="{includeXhrPagingResultCount}">
