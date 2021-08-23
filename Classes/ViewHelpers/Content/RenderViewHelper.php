@@ -72,7 +72,7 @@ class RenderViewHelper extends AbstractViewHelper {
 
 	/**
 	 * {@inheritDoc}
-	 * @see \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper::initialize()
+	 * @see \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper::initialize()
 	 */
 	public function initialize() {
 		if ($this->controllerContext !== NULL) {
