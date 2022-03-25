@@ -3,7 +3,7 @@ defined('TYPO3_MODE') or die();
 
 // add plugins
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-	'Innologi.Decosdata',
+	'Decosdata',
 	'Publish',
 	'Decos Data: Publish'
 );

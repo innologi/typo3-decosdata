@@ -5,14 +5,14 @@ $ll = 'LLL:EXT:decosdata/Resources/Private/Language/locallang_be.xlf:';
 
 // plugin configuration
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-	'Innologi.Decosdata',
+	'Decosdata',
 	'Publish',
 	[
-		'Item' => 'multi,single,search'
+		\Innologi\Decosdata\Controller\ItemController::class => 'multi,single,search'
 	],
 	// non-cacheable actions
 	[
-		'Item' => 'search'
+	    \Innologi\Decosdata\Controller\ItemController::class => 'search'
 	]
 );
 
