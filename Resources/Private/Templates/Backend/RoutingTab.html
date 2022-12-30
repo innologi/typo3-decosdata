@@ -1,0 +1,20 @@
+<div class="decosdata-routingTab">
+  <h4><f:translate key="LLL:EXT:decosdata/Resources/Private/Language/locallang_mod.xlf:routing.title"/></h4>
+  <p><f:translate key="LLL:EXT:decosdata/Resources/Private/Language/locallang_mod.xlf:routing.details"/></p>
+  <div class="decosdata-button">
+    <p><f:translate key="LLL:EXT:decosdata/Resources/Private/Language/locallang_mod.xlf:routing.missing_buttons"/></p>
+    <f:if condition="{count} === 0">
+      <f:then>
+        <input type="submit" class="btn btn-default" name="disabledButton" id="disabledButton"
+          value="{f:translate(key: 'LLL:EXT:decosdata/Resources/Private/Language/locallang_mod.xlf:routing.flush_label', arguments: {0: '{count}'})}"
+          disabled="disabled" />
+      </f:then>
+      <f:else>
+        <input type="submit" class="btn btn-default t3js-update-button" name="flushRoutingSlugs" id="flushRoutingSlugs"
+          value="{f:translate(key: 'LLL:EXT:decosdata/Resources/Private/Language/locallang_mod.xlf:routing.flush_label', arguments: {0: '{count}'})}"
+          data-notification-message="{f:translate(key: 'LLL:EXT:decosdata/Resources/Private/Language/locallang_mod.xlf:routing.flush_notification')}"
+          data-warning-message="{f:translate(key: 'LLL:EXT:decosdata/Resources/Private/Language/locallang_mod.xlf:routing.flush_warning')}" />
+      </f:else>
+    </f:if>
+  </div>
+</div>
