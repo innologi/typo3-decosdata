@@ -5,7 +5,7 @@
 	<buildpathentry combineaccessrules="false" kind="prj" path="/PHP-typo3-asset-provider"/>
 	<buildpathentry kind="con" path="org.eclipse.php.core.LANGUAGE"/>
 	<buildpathentry combineaccessrules="false" kind="prj" path="/PHP-trace-logger"/>
-	<buildpathentry combineaccessrules="false" kind="prj" path="/TYPO3-extdev8"/>
+	<buildpathentry combineaccessrules="false" kind="prj" path="/TYPO3-extdev11"/>
 	<buildpathentry combineaccessrules="false" kind="prj" path="/PHP-typo3-ext-update"/>
 	<buildpathentry kind="src" path=""/>
 </buildpath>

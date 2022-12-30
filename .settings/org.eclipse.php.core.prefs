@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
-include_path=0;/TYPO3_ext-decosdata\u00052;/TYPO3-extdev8\u00052;/PHP-tag-builder\u00052;/PHP-trace-logger\u00052;/PHP-typo3-asset-provider\u00052;/PHP-typo3-ext-update\u00052;/PHP-typo3-fal-api
-phpVersion=php7.1
+include_path=0;/TYPO3_ext-decosdata\u00052;/PHP-tag-builder\u00052;/PHP-trace-logger\u00052;/PHP-typo3-asset-provider\u00052;/PHP-typo3-ext-update\u00052;/PHP-typo3-fal-api\u00052;/TYPO3-extdev11
+phpVersion=php7.4
 useShortTags=false
+use_asp_tags_as_php=false
