@@ -67,10 +67,10 @@ class ParameterService implements SingletonInterface {
 	/**
 	 * Initializes through a request object
 	 *
-	 * @param \TYPO3\CMS\Extbase\Mvc\Web\Request $request
+	 * @param \TYPO3\CMS\Extbase\Mvc\Request $request
 	 * @return $this
 	 */
-	public function initializeByRequest(\TYPO3\CMS\Extbase\Mvc\Web\Request $request) {
+	public function initializeByRequest(\TYPO3\CMS\Extbase\Mvc\Request $request) {
 		if ($this->__initialized !== TRUE) {
 			/** @var \TYPO3\CMS\Extbase\Service\ExtensionService $extensionService */
 			$extensionService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
