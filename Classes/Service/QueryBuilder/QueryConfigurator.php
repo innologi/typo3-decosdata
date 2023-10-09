@@ -443,7 +443,7 @@ class QueryConfigurator implements SingletonInterface {
 	protected function transformWrap($string, array $wrapArray, $divider = '|') {
 		foreach ($wrapArray as $wrap) {
 			// @LOW _doesn't look like a wrap to me, does it? should we rename the feature?
-			$string = str_replace($divider, $string, $wrap);
+			$string = str_replace($divider, $string, (string) $wrap);
 		}
 		return $string;
 	}

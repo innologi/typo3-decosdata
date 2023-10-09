@@ -59,7 +59,7 @@ class EnhancedExtbasePluginEnhancer extends ExtbasePluginEnhancer
 					$_GET[$var] = isset($_GET[$var]) ? \array_merge($_GET[$var], $val) : $val;
 					if (isset($_SERVER['QUERY_STRING'][0])) {
 						$currentQueryArray = [];
-						parse_str($_SERVER['QUERY_STRING'], $currentQueryArray);
+						parse_str((string) $_SERVER['QUERY_STRING'], $currentQueryArray);
 						ArrayUtility::mergeRecursiveWithOverrule($currentQueryArray, [$var => $val], true);
 					} else {
 						$currentQueryArray = [$var => $val];

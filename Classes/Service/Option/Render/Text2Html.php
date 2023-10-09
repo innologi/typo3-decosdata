@@ -74,14 +74,14 @@ class Text2Html implements OptionInterface {
 						)
 					]);
 				},
-				$tag->getContent()
+				(string) $tag->getContent()
 			);
 		}
 
 		// if nl2br is not explicitly disabled..
 		if (! (isset($args['nl2br']['disable']) && ((bool) $args['nl2br']['disable']) !== FALSE) ) {
 			$tag->setContent(
-				\nl2br($tag->getContent())
+				\nl2br((string) $tag->getContent())
 			);
 		}
 

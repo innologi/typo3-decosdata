@@ -108,7 +108,7 @@ class ConditionService implements SingletonInterface {
 				// @TODO throw exception
 			} else {
 				// note that the typecasts will have the effect of NULL === ''
-				$source = (string) ($this->renderOptionService->getOptionVariable(...explode(':', $constraint['source'], 2)));
+				$source = (string) ($this->renderOptionService->getOptionVariable(...explode(':', (string) $constraint['source'], 2)));
 				$value = (string) ($constraint['value'] === 'NULL' ? NULL : $constraint['value']);
 				switch ($constraint['operator']) {
 					case '=':

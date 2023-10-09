@@ -127,7 +127,7 @@ class ParameterService implements SingletonInterface {
 	 * @return string
 	 */
 	public function getParameterRaw($name) {
-		return rawurldecode($this->arguments[$name]);
+		return rawurldecode((string) $this->arguments[$name]);
 	}
 
 	/**

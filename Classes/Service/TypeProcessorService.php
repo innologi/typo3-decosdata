@@ -194,7 +194,7 @@ class TypeProcessorService implements SingletonInterface {
 					}
 					break;
 				default:
-					$lType = strtolower(substr($type, 1));
+					$lType = strtolower(substr((string) $type, 1));
 					$formattedType = ucfirst($lType);
 					$method = 'process' . $formattedType;
 					if (!method_exists($this, $method)) {
@@ -214,7 +214,7 @@ class TypeProcessorService implements SingletonInterface {
 			// consider this a normal TYPO3 ContentObject
 			$content[$index] = [
 				'partial' => $configuration['partial'] ?? 'ContentObject',
-				'type' => strtolower($type),
+				'type' => strtolower((string) $type),
 				'configuration' => $configuration,
 				// @extensionScannerIgnoreLine false positive
 				'data' => $this->getConfigurationManager()->getContentObject()->cObjGetSingle(

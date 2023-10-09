@@ -271,7 +271,7 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 
 		// for each child-node of ITEM
 		while (($reader->nodeType === \XMLReader::ELEMENT || $reader->read()) && $fieldDepth === $reader->depth) {
-			$fieldName = strtoupper($reader->name);
+			$fieldName = strtoupper((string) $reader->name);
 			switch ($fieldName) {
 				case 'ITEM_KEY':
 					$itemKey = $this->readNodeValue($reader);
@@ -325,7 +325,7 @@ class OneFileStreamingParser implements ParserInterface,SingletonInterface,Trace
 
 		// for each child-node of ITEM
 		while (($reader->nodeType === \XMLReader::ELEMENT || $reader->read()) && $fieldDepth === $reader->depth) {
-			$fieldName = strtoupper($reader->name);
+			$fieldName = strtoupper((string) $reader->name);
 			switch ($fieldName) {
 				case 'ITEM_KEY':
 					$data['item_key'] = $this->readNodeValue($reader);

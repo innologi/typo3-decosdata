@@ -88,7 +88,7 @@ class RenderViewHelper extends AbstractViewHelper {
 	 */
 	public function render($content = NULL) {
 		if ($content === NULL) {
-			$content = trim($this->renderChildren());
+			$content = trim((string) $this->renderChildren());
 		}
 
 		// if configured, add an outer tag

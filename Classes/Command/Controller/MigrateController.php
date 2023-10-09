@@ -247,7 +247,7 @@ class MigrateController extends ExtUpdateAbstract {
 				$file = $this->fileService->getFileObjectByUid($xml['migrated_file']);
 				$xmlPath = pathinfo($file->getPublicUrl());
 				$xmlDirPath = $sitePath . $xmlPath['dirname'] . '/';
-				$fileDirPath = rtrim($xml['filedirpath'], '/') . '/';
+				$fileDirPath = rtrim((string) $xml['filedirpath'], '/') . '/';
 
 				if ($xmlDirPath === $fileDirPath) {
 					$okUidArray[] = $uid;
@@ -901,9 +901,9 @@ class MigrateController extends ExtUpdateAbstract {
 			foreach ($existingPlugins as $plugin) {
 				// ugly hack which gives us easy insight in the flexform values per plugin
 				$plugins[] = '<a href="#" onclick="(function() {jQuery(\'.hidden-info-plugin-text-' . (int) $plugin['uid'] . '\').slideToggle();})();" >' .
-					'page:' . (int) $plugin['pid'] . '|content:' . (int) $plugin['uid'] . '|' . htmlspecialchars($plugin['header']) . '</a>' .
+					'page:' . (int) $plugin['pid'] . '|content:' . (int) $plugin['uid'] . '|' . htmlspecialchars((string) $plugin['header']) . '</a>' .
 					'<pre class="hidden-info-plugin-text-' . (int) $plugin['uid'] . '" style="display:none;background-color:white;border:1px solid #aaa;">' .
-					htmlspecialchars($plugin['pi_flexform']) . '</pre>';
+					htmlspecialchars((string) $plugin['pi_flexform']) . '</pre>';
 			}
 			$this->addMessage(
 				sprintf(

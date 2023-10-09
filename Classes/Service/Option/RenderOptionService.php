@@ -219,7 +219,7 @@ class RenderOptionService extends OptionServiceAbstract {
 			// @LOW ___is there really no way? something I can change in the pattern used by preg_match_all?
 			if (isset($matches[3][$index][0])) {
 				$argMatch = [];
-				preg_match_all('/' . $this->patternArgumentInline . '/', $matches[3][$index], $argMatch);
+				preg_match_all('/' . $this->patternArgumentInline . '/', (string) $matches[3][$index], $argMatch);
 				if (isset($argMatch[1]) && isset($argMatch[2])) {
 					foreach ($argMatch[1] as $argIndex => $arg) {
 						$option['args'][$arg] = $argMatch[2][$argIndex];

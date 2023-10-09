@@ -62,14 +62,15 @@ class Statement extends PreparedStatement {
 	 *
 	 * @return string
 	 */
-	public function getProcessedQuery() {
+	public function getProcessedQuery(): string
+	{
 		// the isset statement part is to ensure we can only do this
 		if ($this->processedQuery === NULL) {
 			$parameters = !empty($this->parameters) ? $this->parameters : $this->usedParameters;
 			$precompiledQueryParts = $this->precompiledQueryParts;
 			$tempQuery = $this->query;
 			$this->convertNamedPlaceholdersToQuestionMarks($tempQuery, $parameters, $precompiledQueryParts);
-			$queryArray = explode('?', $tempQuery);
+			$queryArray = explode('?', (string) $tempQuery);
 			foreach ($parameters as $index => $parameter) {
 				$queryArray[$index] .= '\'' . $parameter['value'] . '\'';
 			}
@@ -167,10 +168,10 @@ class Statement extends PreparedStatement {
 		if ($hasNamedPlaceholders) {
 			if ($queryPartsCount === 0) {
 				// Convert named placeholders to standard question mark placeholders
-				$quotedParamWrapToken = preg_quote($this->parameterWrapToken, '/');
+				$quotedParamWrapToken = preg_quote((string) $this->parameterWrapToken, '/');
 				while (preg_match(
 					'/' . $quotedParamWrapToken . '(.*?)' . $quotedParamWrapToken . '/',
-					$query,
+					(string) $query,
 					$matches
 				)) {
 					$key = $matches[1];
@@ -200,7 +201,7 @@ class Statement extends PreparedStatement {
 						// <-- BEGIN ALTERATION
 						$replacement,
 						// END ALTERATION -->
-						$query,
+						(string) $query,
 						1
 					);
 				}
@@ -214,7 +215,7 @@ class Statement extends PreparedStatement {
 	 *
 	 * @return string
 	 */
-	public function __toString()
+	public function __toString(): string
 	{
 		// TYPO3v9 Extbase Query considers this Statement an actual query, because it's not an instance of:
 		// - TYPO3 QueryBuilder

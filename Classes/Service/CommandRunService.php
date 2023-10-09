@@ -147,7 +147,7 @@ class CommandRunService implements SingletonInterface {
 		if (!empty($variables)) {
 			foreach ($variables as $var => $value) {
 				// note that after evaluation, $-signs will have been escaped
-				$cmd = \str_replace('\\$' . $var, \escapeshellarg($value), $cmd);
+				$cmd = \str_replace('\\$' . $var, \escapeshellarg((string) $value), $cmd);
 			}
 		}
 		$this->lastRunCommand = $cmd;
@@ -216,9 +216,9 @@ class CommandRunService implements SingletonInterface {
 		}
 		// check if any allowed binary has a wildcard, and if yes, if the binary matches then
 		foreach ($this->allowBinaries as $allowedBinary) {
-			if (($pos = \strpos($allowedBinary, '*')) !== FALSE && (
-				($pos > 0 && \strpos($binary, \substr($allowedBinary, 0, $pos - 1)) === 0) ||
-				($pos === 0 && \strpos($binary, \substr($allowedBinary, 1)) > 0)
+			if (($pos = \strpos((string) $allowedBinary, '*')) !== FALSE && (
+				($pos > 0 && \strpos($binary, \substr((string) $allowedBinary, 0, $pos - 1)) === 0) ||
+				($pos === 0 && \strpos($binary, \substr((string) $allowedBinary, 1)) > 0)
 			)) {
 				return TRUE;
 			}
@@ -244,7 +244,7 @@ class CommandRunService implements SingletonInterface {
 				return \str_replace(
 					$searchArg,
 					isset($evalFunc) ? \call_user_func($evalFunc, $replaceArg) : $replaceArg,
-					$substitute
+					(string) $substitute
 				);
 			}
 		}

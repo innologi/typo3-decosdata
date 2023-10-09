@@ -63,7 +63,7 @@ class Wrapper implements OptionInterface {
 
 		// note that by choosing to first process inline options, they can never return
 		// pipe characters without consequence to the following preg match
-		if (!preg_match('/' . $this->patternWrap . '/', $args['wrap'], $wrap)) {
+		if (!preg_match('/' . $this->patternWrap . '/', (string) $args['wrap'], $wrap)) {
 			// @TODO ___throw exception ..unless we do away with the preg_match?
 		}
 
