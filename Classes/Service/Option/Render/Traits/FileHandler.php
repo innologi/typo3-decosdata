@@ -82,7 +82,7 @@ trait FileHandler {
 	 * @return boolean
 	 */
 	protected function isFileHandle($fileHandle) {
-		if (strpos($fileHandle, 'file:') === 0) {
+		if (str_starts_with($fileHandle, 'file:')) {
 			$parts = explode(':', $fileHandle, 2);
 			if (is_numeric($parts[1])) {
 				$this->fileUid = (int) $parts[1];
@@ -101,7 +101,7 @@ trait FileHandler {
 	protected function getFileObjectByUid($fileUid) {
 		try {
 			return $this->resourceFactory->getFileObject($fileUid);
-		} catch (FileDoesNotExistException $e) {
+		} catch (FileDoesNotExistException) {
 			// @TODO log this? or does it get logged internally already?
 		}
 		return NULL;

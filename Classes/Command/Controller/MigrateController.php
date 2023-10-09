@@ -375,7 +375,7 @@ class MigrateController extends ExtUpdateAbstract {
 				'',
 				FlashMessage::OK
 			);
-		} catch (NoData $e) {
+		} catch (NoData) {
 			// do nothing
 		}
 
@@ -519,7 +519,7 @@ class MigrateController extends ExtUpdateAbstract {
 				'',
 				FlashMessage::OK
 			);
-		} catch (NoData $e) {
+		} catch (NoData) {
 			// do nothing
 		}
 
@@ -741,7 +741,7 @@ class MigrateController extends ExtUpdateAbstract {
 				'',
 				FlashMessage::OK
 			);
-		} catch (NoData $e) {
+		} catch (NoData) {
 			// do nothing
 		}
 
@@ -781,7 +781,7 @@ class MigrateController extends ExtUpdateAbstract {
 				'',
 				FlashMessage::OK
 			);
-		} catch (NoData $e) {
+		} catch (NoData) {
 			// do nothing
 		}
 
@@ -823,7 +823,7 @@ class MigrateController extends ExtUpdateAbstract {
 				'',
 				FlashMessage::OK
 			);
-		} catch (NoData $e) {
+		} catch (NoData) {
 			// do nothing
 		}
 

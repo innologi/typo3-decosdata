@@ -199,7 +199,7 @@ class RenderOptionService extends OptionServiceAbstract {
 	 */
 	public function processInlineOptions($string) {
 		// quick check to prevent an unnecessary performance impact by RegExp
-		if (strpos($string, '{render:') === FALSE) {
+		if (!str_contains($string, '{render:')) {
 			return [];
 		}
 

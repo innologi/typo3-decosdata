@@ -183,7 +183,7 @@ class CommandRunService implements SingletonInterface {
 			$pipedCommands = \explode(' | ', $cmd, $this->commandLimit);
 			foreach ($pipedCommands as &$command) {
 				$command = \trim($command);
-				if (isset($this->commandSubstitutes) && \strpos($command, '$') === 0) {
+				if (isset($this->commandSubstitutes) && str_starts_with($command, '$')) {
 					// the command is a substitute
 					$command = $this->substituteCommand($command);
 					continue;
@@ -217,7 +217,7 @@ class CommandRunService implements SingletonInterface {
 		// check if any allowed binary has a wildcard, and if yes, if the binary matches then
 		foreach ($this->allowBinaries as $allowedBinary) {
 			if (($pos = \strpos((string) $allowedBinary, '*')) !== FALSE && (
-				($pos > 0 && \strpos($binary, \substr((string) $allowedBinary, 0, $pos - 1)) === 0) ||
+				($pos > 0 && str_starts_with($binary, \substr((string) $allowedBinary, 0, $pos - 1))) ||
 				($pos === 0 && \strpos($binary, \substr((string) $allowedBinary, 1)) > 0)
 			)) {
 				return TRUE;
@@ -238,7 +238,7 @@ class CommandRunService implements SingletonInterface {
 		// run through every available sub until we have a match
 		foreach ($this->commandSubstitutes as $var => $substitute) {
 			list($searchVar, $searchArg, $evalFunc) = \explode(':', $var, 3);
-			if (\strpos($cmd, '$' . $searchVar) === 0) {
+			if (str_starts_with($cmd, '$' . $searchVar)) {
 				// return the substitute
 				$replaceArg = \substr($cmd, \strlen($searchVar) + 2);
 				return \str_replace(

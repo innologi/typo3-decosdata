@@ -197,7 +197,7 @@ abstract class OptionServiceAbstract {
 	 * @throws Exception\InvalidOptionClass
 	 */
 	protected function resolveOptionClass($className) {
-		if (strpos($className, '\\') === FALSE) {
+		if (!str_contains($className, '\\')) {
 			$className = $this->optionNamespace . '\\' . $className;
 		}
 		if (!class_exists($className)) {
@@ -208,7 +208,7 @@ abstract class OptionServiceAbstract {
 		if ( !is_subclass_of($object, $interfaceClassName) ) {
 			throw new Exception\InvalidOptionClass(1449155186, [
 				// since $object was retrieved via objectManager, we're not sure if $object Class === $className
-				get_class($object), $interfaceClassName
+				$object::class, $interfaceClassName
 			]);
 		}
 		return $object;

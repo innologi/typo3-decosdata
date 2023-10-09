@@ -163,13 +163,10 @@ class PaginateService implements SingletonInterface {
 	public function configurePagination(array &$configuration, Query $query) {
 		$this->initializeConfiguration($configuration);
 
-		switch ($configuration['type']) {
-			case 'yearly':
-				$this->configureYearly($configuration, $query);
-				break;
-			default:
-				$this->configureDefault($configuration, $query);
-		}
+		match ($configuration['type']) {
+			'yearly' => $this->configureYearly($configuration, $query),
+			default => $this->configureDefault($configuration, $query),
+		};
 
 		$configuration['resultCount'] = $this->resultCount;
 		$configuration['more'] = $this->active && $this->currentPage < $this->pageCount ? ($this->currentPage+1) : FALSE;

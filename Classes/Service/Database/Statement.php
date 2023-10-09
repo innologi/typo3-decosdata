@@ -43,7 +43,7 @@ use TYPO3\CMS\Core\Database\PreparedStatement;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  * @extensionScannerIgnoreLine TYPO3_DB-usage needs a rewrite anyway once this ext goes standalone
  */
-class Statement extends PreparedStatement {
+class Statement extends PreparedStatement implements \Stringable {
 
 	/**
 	 * @var string
@@ -114,7 +114,7 @@ class Statement extends PreparedStatement {
 	/**
 	 * @var integer
 	 */
-	const PARAM_ARRAY = 201511181983;
+	public const PARAM_ARRAY = 201511181983;
 
 	/**
 	 * Guesses the type of a given value.

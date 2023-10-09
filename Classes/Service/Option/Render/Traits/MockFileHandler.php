@@ -64,7 +64,7 @@ trait MockFileHandler {
 	 * @return boolean
 	 */
 	protected function isMockFileHandle($mockFileHandle) {
-		if (strpos($mockFileHandle, 'mockfile:') === 0) {
+		if (str_starts_with($mockFileHandle, 'mockfile:')) {
 			$parts = explode(':', $mockFileHandle, 2);
 			if (is_file($parts[1])) {
 				$this->mockPath = $parts[1];

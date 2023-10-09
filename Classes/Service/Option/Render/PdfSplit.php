@@ -135,7 +135,7 @@ class PdfSplit implements OptionInterface {
 	 * @return boolean
 	 */
 	protected function isSupportedFile(AbstractFile $file) {
-		return $file->exists() && (strpos($file->getMimeType(), '/pdf') !== FALSE);
+		return $file->exists() && (str_contains($file->getMimeType(), '/pdf'));
 	}
 
 	/**

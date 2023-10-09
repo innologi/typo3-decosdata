@@ -98,7 +98,7 @@ class ImageFile implements OptionInterface {
 	 */
 	protected function isSupportedFile(AbstractFile $file) {
 		return $file->exists() && (
-			$file->getType() === AbstractFile::FILETYPE_IMAGE || strpos($file->getMimeType(), '/pdf') !== FALSE
+			$file->getType() === AbstractFile::FILETYPE_IMAGE || str_contains($file->getMimeType(), '/pdf')
 		);
 	}
 

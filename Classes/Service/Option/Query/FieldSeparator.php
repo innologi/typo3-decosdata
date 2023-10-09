@@ -45,7 +45,7 @@ class FieldSeparator extends OptionAbstract {
 			// @TODO ___throw exception
 		}
 		// @TODO use a regular expression to match whitespace PLEASE
-		if (isset($args['separator'][4]) && $args['separator'][0] === '|' && substr((string) $args['separator'], -1) === '|') {
+		if (isset($args['separator'][4]) && $args['separator'][0] === '|' && str_ends_with((string) $args['separator'], '|')) {
 			$args['separator'] = substr((string) $args['separator'], 1, strlen((string) $args['separator'])-2);
 		}
 		$queryContent->setFieldSeparator($args['separator']);

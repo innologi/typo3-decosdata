@@ -66,7 +66,7 @@ class FilterItems extends OptionAbstract {
 						$filter['operator'],
 						$filter['parameter']
 					);
-			} catch (MissingParameter $e) {
+			} catch (MissingParameter) {
 				// do nothing
 			}
 		}
@@ -100,7 +100,7 @@ class FilterItems extends OptionAbstract {
 				// identify by the field, so we don't create redundant joins
 				$alias = $id . $filter['field'];
 				$conditions[] = $this->filterBy($queryField, $filter, $alias, $filter['field']);
-			} catch (MissingParameter $e) {
+			} catch (MissingParameter) {
 				// do nothing
 			}
 		}

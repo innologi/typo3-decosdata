@@ -42,18 +42,15 @@ class ConstraintFactory implements SingletonInterface {
 	 * @return ConstraintCollection
 	 */
 	public function createConstraintCollection($logic, array $constraints = []) {
-		switch ($logic) {
-			case 'AND':
-				return $this->createConstraintAnd($constraints);
-			case 'OR':
-				return $this->createConstraintOr($constraints);
-			default:
-				return GeneralUtility::makeInstance(
-					ConstraintCollection::class,
-					$logic,
-					$constraints
-				);
-		}
+		return match ($logic) {
+			'AND' => $this->createConstraintAnd($constraints),
+			'OR' => $this->createConstraintOr($constraints),
+			default => GeneralUtility::makeInstance(
+				ConstraintCollection::class,
+				$logic,
+				$constraints
+			),
+		};
 	}
 
 	/**
