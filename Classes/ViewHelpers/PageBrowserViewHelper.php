@@ -247,9 +247,7 @@ class PageBrowserViewHelper extends AbstractViewHelper {
 	protected function createPageElement($pageNumber) {
 		return [
 			'number' => $pageNumber,
-			'label' => isset($this->pageLabelMap[$pageNumber])
-				? $this->pageLabelMap[$pageNumber]
-				: $pageNumber
+			'label' => $this->pageLabelMap[$pageNumber] ?? $pageNumber
 		];
 	}
 

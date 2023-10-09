@@ -189,7 +189,7 @@ class CommandRunService implements SingletonInterface {
 					continue;
 				} elseif (isset($this->allowBinaries)) {
 					// the command is NOT a subtitute
-					list($baseBinary, $args) = \explode(' ', $command, 2);
+					[$baseBinary, $args] = \explode(' ', $command, 2);
 					if ($this->isBinaryAllowed(\basename($baseBinary))) {
 						$command = \escapeshellcmd($command);
 						continue;
@@ -237,7 +237,7 @@ class CommandRunService implements SingletonInterface {
 	protected function substituteCommand($cmd) {
 		// run through every available sub until we have a match
 		foreach ($this->commandSubstitutes as $var => $substitute) {
-			list($searchVar, $searchArg, $evalFunc) = \explode(':', $var, 3);
+			[$searchVar, $searchArg, $evalFunc] = \explode(':', $var, 3);
 			if (str_starts_with($cmd, '$' . $searchVar)) {
 				// return the substitute
 				$replaceArg = \substr($cmd, \strlen($searchVar) + 2);

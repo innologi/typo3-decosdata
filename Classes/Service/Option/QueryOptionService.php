@@ -67,7 +67,7 @@ class QueryOptionService extends OptionServiceAbstract {
 			$this->executeOption('alterQueryField', $option, $configuration);
 		}
 
-		list($this->index, $this->optionIndex) = $previously;
+		[$this->index, $this->optionIndex] = $previously;
 	}
 
 	/**
@@ -88,7 +88,7 @@ class QueryOptionService extends OptionServiceAbstract {
 			$this->executeOption('alterQueryColumn', $option, $configuration);
 		}
 
-		list($this->index, $this->optionIndex) = $previously;
+		[$this->index, $this->optionIndex] = $previously;
 	}
 
 	/**
@@ -108,7 +108,7 @@ class QueryOptionService extends OptionServiceAbstract {
 			$this->executeOption('alterQueryRow', $option, $configuration);
 		}
 
-		list($this->index, $this->optionIndex) = $previously;
+		[$this->index, $this->optionIndex] = $previously;
 	}
 
 }

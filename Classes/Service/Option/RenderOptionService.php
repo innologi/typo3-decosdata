@@ -288,7 +288,7 @@ class RenderOptionService extends OptionServiceAbstract {
 		}
 
 		// restore safeguarded original values
-		list($this->item, $this->index, $this->originalContent, $this->paginator) = $previously;
+		[$this->item, $this->index, $this->originalContent, $this->paginator] = $previously;
 		$this->optionVariables['item'] = $this->item;
 		return $tag;
 	}

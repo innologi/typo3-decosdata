@@ -71,7 +71,7 @@ class From extends ConstraintContainer {
 	 * @return string
 	 */
 	public function getTableNameByAlias($alias) {
-		return isset($this->tables[$alias]) ? $this->tables[$alias] : NULL;
+		return $this->tables[$alias] ?? NULL;
 	}
 
 	/**
