@@ -210,7 +210,9 @@ class DownloadService implements SingletonInterface {
 			// allows progress indication
 			'Content-Length' => $filesize,
 			// cookies provide unnecessary overhead at downloads
-			'Set-Cookie' => NULL
+			'Set-Cookie' => NULL,
+			// noindex
+			'X-Robots-Tag' => 'noindex, nofollow',
 		];
 
 		if ($noCache) {
