@@ -485,9 +485,10 @@ class QueryConfigurator implements SingletonInterface {
 		if ($value === NULL) {
 			throw new Exception\CannotResolveConstraintValue(1448552781);
 		}
+		$value = (string) $value;
 
 		// if not already a parameter
-		if ($value[0] !== ':') {
+		if (!\str_starts_with($value, ':')) {
 			$specialValue = strtoupper($value);
 			if (in_array($specialValue, $this->specialValues, TRUE)) {
 				// special values can be function-names or e.g. NULL

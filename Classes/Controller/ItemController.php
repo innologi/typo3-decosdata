@@ -143,7 +143,7 @@ class ItemController extends ActionController {
 
 		// @LOW cache?
 		// check override TS
-		if (isset(trim((string) $this->settings['override']['publish'])[0])) {
+		if (isset($this->settings['override']['publish'][0])) {
 			/** @var \TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser $tsParser */
 			$tsParser = GeneralUtility::makeInstance(\TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser::class);
 			$tsParser->parse($this->settings['override']['publish']);

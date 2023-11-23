@@ -66,6 +66,8 @@ class Wrapper implements OptionInterface {
 		if (!preg_match('/' . $this->patternWrap . '/', (string) $args['wrap'], $wrap)) {
 			// @TODO ___throw exception ..unless we do away with the preg_match?
 		}
+		$wrap[1] = $wrap[1] ?? '';
+		$wrap[2] = $wrap[2] ?? '';
 
 		if ($tag instanceof TagContent) {
 			$tag->setContent($wrap[1] . $tag->getContent() . $wrap[2]);

@@ -54,7 +54,7 @@ class FilterValueOnSelect extends OptionAbstract {
 		$conditions = [];
 		foreach ($args['filters'] as $filter) {
 			$this->initializeFilter($filter);
-			if ($filter['parameter']) {
+			if (isset($filter['parameter'])) {
 				// @TODO throw exception or add support
 			}
 			$conditions[] = $property . ' ' . $filter['operator'] . ' \'' . $filter['value'] . '\'';

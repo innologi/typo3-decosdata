@@ -209,25 +209,27 @@ class RenderOptionService extends OptionServiceAbstract {
 			// @TODO ____throw exception?
 		}
 
-		foreach ($matches[0] as $index => $match) {
-			$option = [
-				'option' => $matches[1][$index],
-				'args' => []
-			];
-			// if arguments were found, they need to be indentified by another regular expression,
-			// as preg_match_all can't set multiple arguments in $matches[5] and $matches[6]
-			// @LOW ___is there really no way? something I can change in the pattern used by preg_match_all?
-			if (isset($matches[3][$index][0])) {
-				$argMatch = [];
-				preg_match_all('/' . $this->patternArgumentInline . '/', (string) $matches[3][$index], $argMatch);
-				if (isset($argMatch[1]) && isset($argMatch[2])) {
-					foreach ($argMatch[1] as $argIndex => $arg) {
-						$option['args'][$arg] = $argMatch[2][$argIndex];
+		if (isset($matches[0])) {
+			foreach ($matches[0] as $index => $match) {
+				$option = [
+					'option' => $matches[1][$index] ?? null,
+					'args' => []
+				];
+				// if arguments were found, they need to be indentified by another regular expression,
+				// as preg_match_all can't set multiple arguments in $matches[5] and $matches[6]
+				// @LOW ___is there really no way? something I can change in the pattern used by preg_match_all?
+				if (isset($matches[3][$index][0])) {
+					$argMatch = [];
+					preg_match_all('/' . $this->patternArgumentInline . '/', (string) $matches[3][$index], $argMatch);
+					if (isset($argMatch[1]) && isset($argMatch[2])) {
+						foreach ($argMatch[1] as $argIndex => $arg) {
+							$option['args'][$arg] = $argMatch[2][$argIndex];
+						}
 					}
 				}
+				// @LOW __note that this does not yet cache entries that are set multiple times
+				$replacements[$match] = $this->processOptions([ $option ], $this->originalContent, $this->index . 'in', $this->item);
 			}
-			// @LOW __note that this does not yet cache entries that are set multiple times
-			$replacements[$match] = $this->processOptions([ $option ], $this->originalContent, $this->index . 'in', $this->item);
 		}
 
 		return $replacements;

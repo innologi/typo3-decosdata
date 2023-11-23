@@ -163,7 +163,7 @@ class PaginateService implements SingletonInterface {
 	public function configurePagination(array &$configuration, Query $query) {
 		$this->initializeConfiguration($configuration);
 
-		match ($configuration['type']) {
+		match ($configuration['type'] ?? 'default') {
 			'yearly' => $this->configureYearly($configuration, $query),
 			default => $this->configureDefault($configuration, $query),
 		};
@@ -180,7 +180,6 @@ class PaginateService implements SingletonInterface {
 	 * @throws \Innologi\Decosdata\Exception\PaginationError
 	 */
 	protected function initializeConfiguration(array $configuration) {
-		// @LOW this can be more effective from within the switch
 		if ( isset($configuration['type']) && !in_array($configuration['type'], $this->supportedTypes, TRUE) ) {
 			throw new PaginationError(1449154955, [
 				'type', $configuration['type'], join('/', $this->supportedTypes)
@@ -233,13 +232,13 @@ class PaginateService implements SingletonInterface {
 		$queryField = $queryContent->getField('');
 
 		// if an offset year was configured, apply it
-		if ($configuration['offsetYear'] > 0) {
+		if (isset($configuration['offsetYear']) && $configuration['offsetYear'] > 0) {
 			$queryField->getWhere()->setConstraint(
 				$this->constraintFactory->createConstraintByValue($field, $tableAlias1, '>=', $configuration['offsetYear'])->addWrapLocal('year', 'YEAR(|)')
 			);
 		}
 		// if a maximum year was configured, apply it
-		if ($configuration['maxYear'] > 0) {
+		if (isset($configuration['maxYear']) && $configuration['maxYear'] > 0) {
 			$queryField->getWhere()->addConstraint('pagebrowser-max',
 				$this->constraintFactory->createConstraintByValue($field, $tableAlias1, '<=', $configuration['maxYear'])->addWrapLocal('year', 'YEAR(|)')
 			);

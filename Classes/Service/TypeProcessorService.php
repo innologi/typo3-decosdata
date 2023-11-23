@@ -183,7 +183,7 @@ class TypeProcessorService implements SingletonInterface {
 			throw new ConfigurationError(1509719824, ['Missing TYPE definition for level configuration']);
 		}
 		$type = $configuration['_typoScriptNodeValue'];
-		if ($type[0] === '_') {
+		if (isset($type[0]) && $type[0] === '_') {
 			// one of our plugin types
 			unset($configuration['_typoScriptNodeValue']);
 			switch ($type) {

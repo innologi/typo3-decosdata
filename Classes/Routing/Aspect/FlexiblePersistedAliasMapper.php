@@ -849,9 +849,9 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
         // @TODO error handling
         $constraints = [];
         foreach ($constraintList as $constraint) {
-            $operator = \is_string($constraint['operator']) && \method_exists($queryBuilder->expr(), $constraint['operator']) ? $constraint['operator'] : 'eq';
+            $operator = \is_string($constraint['operator'] ?? null) && \method_exists($queryBuilder->expr(), $constraint['operator']) ? $constraint['operator'] : 'eq';
             $valueType = null;
-            if (\is_string($constraint['valueType'])) {
+            if (\is_string($constraint['valueType'] ?? null)) {
                 $valueType = \constant(\TYPO3\CMS\Core\Database\Connection::class . '::PARAM_' . \strtoupper($constraint['valueType']));
             }
             $constraints[] = $queryBuilder->expr()->{$operator}($constraint['field'], isset($constraint['fieldForeign']) && \is_string($constraint['fieldForeign']) ? $queryBuilder->getConnection()

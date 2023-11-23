@@ -180,7 +180,7 @@ class ParameterService implements SingletonInterface {
 		if (!isset($this->parameterCache[$name])) {
 			// does part 0 exist?
 			$nParts = explode('.', $name);
-			if (!$this->hasParameter($nParts[0])) {
+			if (!isset($nParts[0]) || !$this->hasParameter($nParts[0])) {
 				throw new MissingParameter(1510679677, [$nParts[0]]);
 			}
 			// does part 1 (if requested) exist?
@@ -195,7 +195,7 @@ class ParameterService implements SingletonInterface {
 				}
 				$this->parameterCache[$nParts[0]] = join('-', $paramParts);
 			} else {
-				$this->parameterCache[$name] = (int)$paramParts[0];
+				$this->parameterCache[$name] = (int)$paramParts[0] ?? null;
 			}
 		}
 		return $this->parameterCache[$name];

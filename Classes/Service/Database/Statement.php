@@ -72,7 +72,7 @@ class Statement extends PreparedStatement implements \Stringable {
 			$this->convertNamedPlaceholdersToQuestionMarks($tempQuery, $parameters, $precompiledQueryParts);
 			$queryArray = explode('?', (string) $tempQuery);
 			foreach ($parameters as $index => $parameter) {
-				$queryArray[$index] .= '\'' . $parameter['value'] . '\'';
+				$queryArray[$index] .= '\'' . ($parameter['value'] ?? '') . '\'';
 			}
 			$this->processedQuery = join('', $queryArray);
 		}
@@ -142,7 +142,7 @@ class Statement extends PreparedStatement implements \Stringable {
 	 * @return void
 	 */
 	protected function convertNamedPlaceholdersToQuestionMarks(&$query, array &$parameterValues, array &$precompiledQueryParts) {
-		$queryPartsCount = is_array($precompiledQueryParts['queryParts']) ? count($precompiledQueryParts['queryParts']) : 0;
+		$queryPartsCount = isset($precompiledQueryParts['queryParts']) && is_array($precompiledQueryParts['queryParts']) ? count($precompiledQueryParts['queryParts']) : 0;
 		$newParameterValues = [];
 		$hasNamedPlaceholders = false;
 
