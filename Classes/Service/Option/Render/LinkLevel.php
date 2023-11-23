@@ -28,6 +28,7 @@ use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\TagBuilder\TagInterface;
 use Innologi\TagBuilder\TagContent;
 use Innologi\Decosdata\Service\ParameterService;
+use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 
 /**
  * Link Level option
@@ -40,6 +41,11 @@ use Innologi\Decosdata\Service\ParameterService;
  */
 class LinkLevel implements OptionInterface {
 
+    /**
+     * @var UriBuilder
+     */
+    protected UriBuilder $uriBuilder;
+
 	/**
 	 * @var ParameterService
 	 */
@@ -50,6 +56,11 @@ class LinkLevel implements OptionInterface {
 	 * @var string
 	 */
 	protected $defaultContent = 'link';
+
+	public function injectUriBuilder(UriBuilder $uriBuilder)
+	{
+	    $this->uriBuilder = $uriBuilder;
+	}
 
 	/**
 	 *
@@ -91,7 +102,7 @@ class LinkLevel implements OptionInterface {
 		}
 
 		// @LOW _if we just read the latest _ argument, can't we derive level from there, so we can get rid of the level arg? we have to be sure that it's not read anywhere else
-		$uri = $service->getControllerContext()->getUriBuilder()
+		$uri = $this->getUriBuilder($service)
 			->reset()
 			->uriFor(NULL, array_merge(
 				$this->parameterService->getLevelParameters(),
@@ -105,4 +116,8 @@ class LinkLevel implements OptionInterface {
 		return $service->getTagFactory()->createTag('a', ['href' => $uri], $tag);
 	}
 
+	protected function getUriBuilder(RenderOptionService $service): UriBuilder
+	{
+	    return $this->uriBuilder->setRequest($service->getRequest());
+	}
 }

@@ -171,7 +171,7 @@ class TypeProcessorService implements SingletonInterface {
 	 */
 	public function setControllerContext(ControllerContext $controllerContext) {
 		$this->controllerContext = $controllerContext;
-		$this->optionService->setControllerContext($controllerContext);
+		$this->optionService->setRequest($controllerContext->getRequest());
 	}
 
 

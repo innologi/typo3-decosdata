@@ -25,6 +25,7 @@ namespace Innologi\Decosdata\ViewHelpers\Content;
  ***************************************************************/
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 use Innologi\Decosdata\Service\Option\RenderOptionService;
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 // @TODO ___use \TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface ?
 /**
  * Content.Render ViewHelper
@@ -75,8 +76,10 @@ class RenderViewHelper extends AbstractViewHelper {
 	 * @see \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper::initialize()
 	 */
 	public function initialize() {
-		if ($this->controllerContext !== NULL) {
-			$this->optionService->setControllerContext($this->controllerContext);
+	    if ($this->renderingContext instanceof RenderingContextInterface) {
+			$this->optionService->setRequest(
+			    $this->renderingContext->getRequest()
+			);
 		}
 	}
 

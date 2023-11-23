@@ -23,9 +23,9 @@ namespace Innologi\Decosdata\Service\Option;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 use Innologi\Decosdata\Service\Paginate\PaginateService;
 use Innologi\TagBuilder\TagFactory;
+use TYPO3\CMS\Extbase\Mvc\Request;
 /**
  * Render Option Service
  *
@@ -48,9 +48,9 @@ class RenderOptionService extends OptionServiceAbstract {
 	protected $conditionService;
 
 	/**
-	 * @var \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext
+	 * @var Request
 	 */
-	protected $controllerContext;
+	protected Request $request;
 
 	/**
 	 * @var string
@@ -119,23 +119,23 @@ class RenderOptionService extends OptionServiceAbstract {
 	}
 
 	/**
-	 * Sets controller context
+	 * Sets request
 	 *
-	 * @param \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext $controllerContext
+	 * @param Request $request
 	 * @return $this
 	 */
-	public function setControllerContext(ControllerContext $controllerContext) {
-		$this->controllerContext = $controllerContext;
+	public function setRequest(Request $request) {
+		$this->request = $request;
 		return $this;
 	}
 
 	/**
-	 * Returns controller context
+	 * Returns request
 	 *
-	 * @return \TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext
+	 * @return Request
 	 */
-	public function getControllerContext() {
-		return $this->controllerContext;
+	public function getRequest() {
+		return $this->request;
 	}
 
 	/**
