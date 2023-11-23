@@ -14,6 +14,7 @@
 		"php": ">=7.2",
 		"typo3/cms-core": "^10.4 || ^11.0",
 		"typo3/cms-scheduler": "^10.4 || ^11.0",
+		"bmack/modern-template-building": "^1.0",
 		"innologi/tag-builder": "~0.1.1 || dev-develop",
 		"innologi/trace-logger": "~0.1.1 || dev-develop",
 		"innologi/typo3-fal-api": "~0.2.0 || dev-develop",

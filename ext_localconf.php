@@ -46,12 +46,3 @@ $container->registerImplementation(
     \Innologi\Decosdata\Service\Database\QueryProviderInterface::class,
     \Innologi\Decosdata\Service\Database\MysqlQueryProvider::class
 );
-
-// @TODO replace all TEMPLATE cases with FLUIDTEMPLATE so this becomes unnecessary
-// Add FILE alternative
-$GLOBALS['TYPO3_CONF_VARS']['FE']['ContentObjects'] = array_merge(
-    $GLOBALS['TYPO3_CONF_VARS']['FE']['ContentObjects'],
-    [
-        'DECOSDATA_FILE' => \Innologi\Decosdata\Mvc\ContentObject\FileContentObject::class
-    ]
-);
