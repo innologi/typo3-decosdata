@@ -56,23 +56,23 @@ abstract class QueryIterator implements \Iterator {
 	 * Iterator implementation
 	 **************************/
 
-	public function current () {
+	public function current (): mixed {
 		return current($this->children);
 	}
 
-	public function next () {
-		return next($this->children);
+	public function next(): void {
+		next($this->children);
 	}
 
-	public function key () {
+	public function key(): mixed {
 		return key($this->children);
 	}
 
-	public function valid () {
+	public function valid(): bool {
 		return current($this->children) !== FALSE;
 	}
 
-	public function rewind () {
+	public function rewind(): void {
 		reset($this->children);
 	}
 

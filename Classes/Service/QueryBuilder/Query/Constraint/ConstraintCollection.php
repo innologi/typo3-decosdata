@@ -129,23 +129,23 @@ class ConstraintCollection implements ConstraintInterface, \Iterator {
 	 * Iterator implementation
 	 **************************/
 
-	public function current () {
+	public function current(): mixed {
 		return current($this->constraints);
 	}
 
-	public function next () {
-		return next($this->constraints);
+	public function next(): void {
+		next($this->constraints);
 	}
 
-	public function key () {
+	public function key(): mixed {
 		return key($this->constraints);
 	}
 
-	public function valid () {
+	public function valid(): bool {
 		return current($this->constraints) !== FALSE;
 	}
 
-	public function rewind () {
+	public function rewind(): void {
 		reset($this->constraints);
 	}
 
