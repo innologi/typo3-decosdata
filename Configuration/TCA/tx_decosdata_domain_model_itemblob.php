@@ -41,7 +41,7 @@ return [
 
 		'hidden' => [
 			'exclude' => TRUE,
-			'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
+			'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
 			'config' => [
 				'type' => 'check',
 				'default' => 1
@@ -49,7 +49,7 @@ return [
 		],
 		'starttime' => [
 			'exclude' => TRUE,
-			'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.starttime',
+			'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.starttime',
 			'config' => [
 				'type' => 'input',
 				'renderType' => 'inputDateTime',
@@ -62,7 +62,7 @@ return [
 		],
 		'endtime' => [
 			'exclude' => TRUE,
-			'label' => 'LLL:EXT:lang/Resources/Private/Language/locallang_general.xlf:LGL.endtime',
+			'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.endtime',
 			'config' => [
 				'type' => 'input',
 				'renderType' => 'inputDateTime',
