@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,56 +33,59 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class Select extends WrapContainer {
+class Select extends WrapContainer
+{
+    /**
+     * @var string
+     */
+    protected $tableAlias;
 
-	/**
-	 * @var string
-	 */
-	protected $tableAlias;
+    /**
+     * @var string
+     */
+    protected $field;
 
-	/**
-	 * @var string
-	 */
-	protected $field;
+    /**
+     * Returns Table Alias
+     *
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return $this->tableAlias;
+    }
 
-	/**
-	 * Returns Table Alias
-	 *
-	 * @return string
-	 */
-	public function getTableAlias() {
-		return $this->tableAlias;
-	}
+    /**
+     * Sets Table Alias
+     *
+     * @param string $tableAlias
+     * @return $this
+     */
+    public function setTableAlias($tableAlias)
+    {
+        $this->tableAlias = $tableAlias;
+        return $this;
+    }
 
-	/**
-	 * Sets Table Alias
-	 *
-	 * @param string $tableAlias
-	 * @return $this
-	 */
-	public function setTableAlias($tableAlias) {
-		$this->tableAlias = $tableAlias;
-		return $this;
-	}
+    /**
+     * Returns field
+     *
+     * @return string
+     */
+    public function getField()
+    {
+        return $this->field;
+    }
 
-	/**
-	 * Returns field
-	 *
-	 * @return string
-	 */
-	public function getField() {
-		return $this->field;
-	}
-
-	/**
-	 * Sets field
-	 *
-	 * @param string $field
-	 * @return $this
-	 */
-	public function setField($field) {
-		$this->field = $field;
-		return $this;
-	}
-
+    /**
+     * Sets field
+     *
+     * @param string $field
+     * @return $this
+     */
+    public function setField($field)
+    {
+        $this->field = $field;
+        return $this;
+    }
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Domain\Repository;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -25,6 +27,7 @@ namespace Innologi\Decosdata\Domain\Repository;
  ***************************************************************/
 use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
 use Innologi\Decosdata\Service\Database\Statement;
+
 /**
  * Item domain repository
  *
@@ -32,33 +35,33 @@ use Innologi\Decosdata\Service\Database\Statement;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemRepository extends RepositoryAbstract {
+class ItemRepository extends RepositoryAbstract
+{
+    /**
+     * Finds items with query object and returns the result as a raw array
+     *
+     * @return array
+     */
+    public function findWithStatement(Statement $statement)
+    {
+        $query = $this->createQuery();
+        /** @var \TYPO3\CMS\Extbase\Persistence\Generic\Query $query */
+        return $query->statement(
+            $statement,
+        )->execute(true);
+    }
 
-	/**
-	 * Finds items with query object and returns the result as a raw array
-	 *
-	 * @param \Innologi\Decosdata\Service\Database\Statement $statement
-	 * @return array
-	 */
-	public function findWithStatement(Statement $statement) {
-		$query = $this->createQuery();
-		/* @var $query \TYPO3\CMS\Extbase\Persistence\Generic\Query */
-		return $query->statement(
-			$statement
-		)->execute(TRUE);
-	}
-
-	/**
-	 * Finds one item by its unique (per pid) itemkey.
-	 *
-	 * @param string $itemKey
-	 * @return \Innologi\Decosdata\Domain\Model\Item|NULL
-	 */
-	public function findOneByItemKey($itemKey) {
-		$query = $this->createQuery();
-		return $query->matching(
-			$query->equals('itemKey', $itemKey)
-		)->execute()->getFirst();
-	}
-
+    /**
+     * Finds one item by its unique (per pid) itemkey.
+     *
+     * @param string $itemKey
+     * @return \Innologi\Decosdata\Domain\Model\Item|null
+     */
+    public function findOneByItemKey($itemKey)
+    {
+        $query = $this->createQuery();
+        return $query->matching(
+            $query->equals('itemKey', $itemKey),
+        )->execute()->getFirst();
+    }
 }

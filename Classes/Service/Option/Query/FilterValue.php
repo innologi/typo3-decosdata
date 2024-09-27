@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,8 +25,9 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
+
 /**
  * FilterValue option
  *
@@ -34,41 +37,42 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FilterValue extends OptionAbstract {
-	use Traits\Filters;
+class FilterValue extends OptionAbstract
+{
+    use Traits\Filters;
 
-	/**
-	 * Filter is applied on current field configuration.
-	 *
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
-	 */
-	public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service) {
-		$this->doFiltersExist($args);
-		$id = $queryField->getId() . 'filteritems' . $service->getOptionIndex();
+    /**
+     * Filter is applied on current field configuration.
+     *
+     * {@inheritDoc}
+     * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
+     */
+    public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service)
+    {
+        $this->doFiltersExist($args);
+        $id = $queryField->getId() . 'filteritems' . $service->getOptionIndex();
 
-		$select = $queryField->getSelect();
-		$conditions = [];
-		foreach ($args['filters'] as $filter) {
-			$this->initializeFilter($filter);
-			$conditions[] = isset($filter['value']) ?
-				$this->constraintFactory->createConstraintByValue(
-					$select->getField(),
-					$select->getTableAlias(),
-					$filter['operator'],
-					$filter['value']
-				) : $this->constraintFactory->createConstraintByValue(
-					'uid',
-					$select->getTableAlias(),
-					$filter['operator'],
-					$filter['parameter']
-				);
-		}
+        $select = $queryField->getSelect();
+        $conditions = [];
+        foreach ($args['filters'] as $filter) {
+            $this->initializeFilter($filter);
+            $conditions[] = isset($filter['value']) ?
+                $this->constraintFactory->createConstraintByValue(
+                    $select->getField(),
+                    $select->getTableAlias(),
+                    $filter['operator'],
+                    $filter['value'],
+                ) : $this->constraintFactory->createConstraintByValue(
+                    'uid',
+                    $select->getTableAlias(),
+                    $filter['operator'],
+                    $filter['parameter'],
+                );
+        }
 
-		$queryField->getFrom(0)->addConstraint(
-			$id,
-			$this->processConditions($args, $conditions)
-		);
-	}
-
+        $queryField->getFrom(0)->addConstraint(
+            $id,
+            $this->processConditions($args, $conditions),
+        );
+    }
 }

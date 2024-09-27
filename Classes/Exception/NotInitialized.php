@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -30,11 +32,10 @@ namespace Innologi\Decosdata\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class NotInitialized extends Exception {
-
-	/**
-	 * @var string
-	 */
-	protected $message = '%1$s was not properly initialized before usage.';
-
+class NotInitialized extends Exception
+{
+    /**
+     * @var string
+     */
+    protected $message = '%1$s was not properly initialized before usage.';
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,38 +33,36 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-interface QueryInterface {
+interface QueryInterface
+{
+    /**
+     * Gets parameters
+     *
+     * @return array
+     */
+    public function getParameters();
 
-	/**
-	 * Gets parameters
-	 *
-	 * @return array
-	 */
-	public function getParameters();
+    /**
+     * Sets parameters
+     *
+     * @return $this
+     */
+    public function setParameters(array $parameters);
 
-	/**
-	 * Sets parameters
-	 *
-	 * @param array $parameters
-	 * @return $this
-	 */
-	public function setParameters(array $parameters);
+    /**
+     * Adds a parameter
+     *
+     * @param string $key
+     * @param string $value
+     * @return $this
+     */
+    public function addParameter($key, $value);
 
-	/**
-	 * Adds a parameter
-	 *
-	 * @param string $key
-	 * @param string $value
-	 * @return $this
-	 */
-	public function addParameter($key, $value);
-
-	/**
-	 * Removes a parameter
-	 *
-	 * @param string $key
-	 * @return $this
-	 */
-	public function removeParameter($key);
-
+    /**
+     * Removes a parameter
+     *
+     * @param string $key
+     * @return $this
+     */
+    public function removeParameter($key);
 }

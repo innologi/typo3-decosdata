@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Domain\Repository;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Domain\Repository;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
+
 /**
  * Import domain repository
  *
@@ -31,32 +34,32 @@ use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ImportRepository extends RepositoryAbstract {
+class ImportRepository extends RepositoryAbstract
+{
+    /**
+     * Returns all objects of this repository regardless of pid.
+     *
+     * @return \TYPO3\CMS\Extbase\Persistence\QueryResultInterface|array
+     */
+    public function findAllEverywhere()
+    {
+        $query = $this->createQuery();
+        $query->getQuerySettings()->setRespectStoragePage(false);
+        return $query->execute();
+    }
 
-	/**
-	 * Returns all objects of this repository regardless of pid.
-	 *
-	 * @return \TYPO3\CMS\Extbase\Persistence\QueryResultInterface|array
-	 */
-	public function findAllEverywhere() {
-		$query = $this->createQuery();
-		$query->getQuerySettings()->setRespectStoragePage(FALSE);
-		return $query->execute();
-	}
-
-	/**
-	 * Returns all objects of this repository with the given UIDs,
-	 * regardless of pid.
-	 *
-	 * @param array $uidArray
-	 * @return \TYPO3\CMS\Extbase\Persistence\QueryResultInterface|array
-	 */
-	public function findInUidEverywhere(array $uidArray) {
-		$query = $this->createQuery();
-		$query->getQuerySettings()->setRespectStoragePage(FALSE);
-		return $query->matching(
-			$query->in('uid', $uidArray)
-		)->execute();
-	}
-
+    /**
+     * Returns all objects of this repository with the given UIDs,
+     * regardless of pid.
+     *
+     * @return \TYPO3\CMS\Extbase\Persistence\QueryResultInterface|array
+     */
+    public function findInUidEverywhere(array $uidArray)
+    {
+        $query = $this->createQuery();
+        $query->getQuerySettings()->setRespectStoragePage(false);
+        return $query->matching(
+            $query->in('uid', $uidArray),
+        )->execute();
+    }
 }

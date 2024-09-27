@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Render;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,9 +26,10 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Innologi\TagBuilder\TagInterface;
 use Innologi\TagBuilder\TagContent;
+use Innologi\TagBuilder\TagInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * File Size option
  *
@@ -36,30 +39,30 @@ use Innologi\TagBuilder\TagContent;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileSize implements OptionInterface {
-	use Traits\FileHandler;
+class FileSize implements OptionInterface
+{
+    use Traits\FileHandler;
 
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
-	 */
-	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL ) {
-			return $tag;
-		}
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
+     */
+    public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service)
+    {
+        if (($file = $this->getFileObject($service->getOriginalContent())) === null) {
+            return $tag;
+        }
 
-		$content = GeneralUtility::formatSize(
-			$file->getSize(),
-			// @TODO ___get default format from typoscript?
-			// @LOW ___support formatting argument?
-			'b|kb|MB|GB|TB'
-		);
+        $content = GeneralUtility::formatSize(
+            $file->getSize(),
+            // @TODO ___get default format from typoscript?
+            // @LOW ___support formatting argument?
+            'b|kb|MB|GB|TB',
+        );
 
-		if ($tag instanceof TagContent) {
-			return $tag->reset()->setContent($content);
-		}
+        if ($tag instanceof TagContent) {
+            return $tag->reset()->setContent($content);
+        }
 
-		return $service->getTagFactory()->createTagContent($content);
-	}
-
+        return $service->getTagFactory()->createTagContent($content);
+    }
 }

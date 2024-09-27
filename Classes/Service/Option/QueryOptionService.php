@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Service\Option;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface;
+
 /**
  * Query Option Service
  *
@@ -33,82 +36,75 @@ use Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class QueryOptionService extends OptionServiceAbstract {
+class QueryOptionService extends OptionServiceAbstract
+{
+    /**
+     * @var integer
+     */
+    protected $optionIndex;
 
-	/**
-	 * @var integer
-	 */
-	protected $optionIndex;
+    /**
+     * Returns Option index
+     *
+     * @return integer
+     */
+    public function getOptionIndex()
+    {
+        return $this->optionIndex;
+    }
 
-	/**
-	 * Returns Option index
-	 *
-	 * @return integer
-	 */
-	public function getOptionIndex() {
-		return $this->optionIndex;
-	}
+    /**
+     * Processes an array of field-options by calling the contained alterQueryField()
+     * methods and passing the necessary arguments to it.
+     *
+     * @param integer $fieldIndex
+     */
+    public function processFieldOptions(array $options, QueryInterface $configuration, $fieldIndex)
+    {
+        $previously = [$this->index, $this->optionIndex];
 
-	/**
-	 * Processes an array of field-options by calling the contained alterQueryField()
-	 * methods and passing the necessary arguments to it.
-	 *
-	 * @param array $options
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface $configuration
-	 * @param integer $fieldIndex
-	 * @return void
-	 */
-	public function processFieldOptions(array $options, QueryInterface $configuration, $fieldIndex) {
-		$previously = [$this->index, $this->optionIndex];
+        $this->index = $fieldIndex;
+        foreach ($options as $index => $option) {
+            $this->optionIndex = $index;
+            $this->executeOption('alterQueryField', $option, $configuration);
+        }
 
-		$this->index = $fieldIndex;
-		foreach ($options as $index => $option) {
-			$this->optionIndex = $index;
-			$this->executeOption('alterQueryField', $option, $configuration);
-		}
+        [$this->index, $this->optionIndex] = $previously;
+    }
 
-		[$this->index, $this->optionIndex] = $previously;
-	}
+    /**
+     * Processes an array of column-options by calling the contained alterQueryColumn()
+     * methods and passing the necessary arguments to it.
+     *
+     * @param integer $columnIndex
+     */
+    public function processColumnOptions(array $options, QueryInterface $configuration, $columnIndex)
+    {
+        $previously = [$this->index, $this->optionIndex];
 
-	/**
-	 * Processes an array of column-options by calling the contained alterQueryColumn()
-	 * methods and passing the necessary arguments to it.
-	 *
-	 * @param array $options
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface $configuration
-	 * @param integer $columnIndex
-	 * @return void
-	 */
-	public function processColumnOptions(array $options, QueryInterface $configuration, $columnIndex) {
-		$previously = [$this->index, $this->optionIndex];
+        $this->index = $columnIndex;
+        foreach ($options as $index => $option) {
+            $this->optionIndex = $index;
+            $this->executeOption('alterQueryColumn', $option, $configuration);
+        }
 
-		$this->index = $columnIndex;
-		foreach ($options as $index => $option) {
-			$this->optionIndex = $index;
-			$this->executeOption('alterQueryColumn', $option, $configuration);
-		}
+        [$this->index, $this->optionIndex] = $previously;
+    }
 
-		[$this->index, $this->optionIndex] = $previously;
-	}
+    /**
+     * Processes an array of row-options by calling the contained alterQueryRow()
+     * methods and passing the necessary arguments to it.
+     */
+    public function processRowOptions(array $options, QueryInterface $configuration)
+    {
+        $previously = [$this->index, $this->optionIndex];
 
-	/**
-	 * Processes an array of row-options by calling the contained alterQueryRow()
-	 * methods and passing the necessary arguments to it.
-	 *
-	 * @param array $options
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface $configuration
-	 * @return void
-	 */
-	public function processRowOptions(array $options, QueryInterface $configuration) {
-		$previously = [$this->index, $this->optionIndex];
+        $this->index = 0;
+        foreach ($options as $index => $option) {
+            $this->optionIndex = $index;
+            $this->executeOption('alterQueryRow', $option, $configuration);
+        }
 
-		$this->index = 0;
-		foreach ($options as $index => $option) {
-			$this->optionIndex = $index;
-			$this->executeOption('alterQueryRow', $option, $configuration);
-		}
-
-		[$this->index, $this->optionIndex] = $previously;
-	}
-
+        [$this->index, $this->optionIndex] = $previously;
+    }
 }

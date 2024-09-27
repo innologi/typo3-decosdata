@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Domain\Repository;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Domain\Repository;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
+
 /**
  * Field domain repository
  *
@@ -31,18 +34,19 @@ use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FieldRepository extends RepositoryAbstract {
-
-	/**
-	 * Find by field_name value
-	 *
-	 * @param string $fieldName
-	 * @return \Innologi\Decosdata\Domain\Model\Field|NULL
-	 */
-	public function findOneByFieldName($fieldName) {
-		$query = $this->createQuery();
-		return $query->matching(
-			$query->equals('field_name', $fieldName)
-		)->execute()->getFirst();
-	}
+class FieldRepository extends RepositoryAbstract
+{
+    /**
+     * Find by field_name value
+     *
+     * @param string $fieldName
+     * @return \Innologi\Decosdata\Domain\Model\Field|null
+     */
+    public function findOneByFieldName($fieldName)
+    {
+        $query = $this->createQuery();
+        return $query->matching(
+            $query->equals('field_name', $fieldName),
+        )->execute()->getFirst();
+    }
 }

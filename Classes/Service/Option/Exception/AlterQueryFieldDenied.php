@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Service\Option\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class AlterQueryFieldDenied extends OptionException {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Query Option Configuration Error: Applying %1$s on the field-level is not supported.';
-
+class AlterQueryFieldDenied extends OptionException
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Query Option Configuration Error: Applying %1$s on the field-level is not supported.';
 }

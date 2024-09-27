@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Importer\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Service\Importer\Exception;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Exception\Exception;
+
 /**
  * General Importer Exception
  *
@@ -31,11 +34,10 @@ use Innologi\Decosdata\Exception\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ImporterError extends Exception {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'The importer encountered the following problem: %1$s';
-
+class ImporterError extends Exception
+{
+    /**
+     * @var string
+     */
+    protected $message = 'The importer encountered the following problem: %1$s';
 }

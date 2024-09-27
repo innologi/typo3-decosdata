@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class PaginationError extends Exception {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Pagination Error: \'%1$s\' contains unsupported value \'%2$s\'. Example values: \'%3$s\'';
-
+class PaginationError extends Exception
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Pagination Error: \'%1$s\' contains unsupported value \'%2$s\'. Example values: \'%3$s\'';
 }

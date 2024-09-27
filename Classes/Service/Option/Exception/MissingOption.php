@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Service\Option\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MissingOption extends OptionException {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Query Option Configuration Error: An option was configured without its defining \'option\' property.';
-
+class MissingOption extends OptionException
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Query Option Configuration Error: An option was configured without its defining \'option\' property.';
 }

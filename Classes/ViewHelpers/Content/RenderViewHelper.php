@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\ViewHelpers\Content;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,9 +25,10 @@ namespace Innologi\Decosdata\ViewHelpers\Content;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+
 // @TODO ___use \TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface ?
 /**
  * Content.Render ViewHelper
@@ -36,90 +39,84 @@ use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class RenderViewHelper extends AbstractViewHelper {
+class RenderViewHelper extends AbstractViewHelper
+{
+    /**
+     * @var boolean
+     */
+    protected $escapeOutput = false;
 
-	/**
-	 * @var boolean
-	 */
-	protected $escapeOutput = FALSE;
+    /**
+     * @var RenderOptionService
+     */
+    protected $optionService;
 
-	/**
-	 * @var RenderOptionService
-	 */
-	protected $optionService;
+    public function injectOptionService(RenderOptionService $optionService)
+    {
+        $this->optionService = $optionService;
+    }
 
-	/**
-	 *
-	 * @param RenderOptionService $optionService
-	 * @return void
-	 */
-	public function injectOptionService(RenderOptionService $optionService)
-	{
-		$this->optionService = $optionService;
-	}
+    /**
+     * Initialize arguments
+     */
+    public function initializeArguments()
+    {
+        $this->registerArgument('tag', 'string', 'Wraps content with optional tag.', false);
+        $this->registerArgument('tagAttributes', 'array', 'Sets attributes to optional tag.', false, []);
+        $this->registerArgument('options', 'array', 'Configuration directives for rendering content.', false, []);
+        $this->registerArgument('item', 'array', 'Complete item.', false, []);
+        $this->registerArgument('index', 'integer', 'Current content index.', true);
+    }
 
-	/**
-	 * Initialize arguments
-	 *
-	 * @return void
-	 */
-	public function initializeArguments() {
-		$this->registerArgument('tag', 'string', 'Wraps content with optional tag.', FALSE);
-		$this->registerArgument('tagAttributes', 'array', 'Sets attributes to optional tag.', FALSE, []);
-		$this->registerArgument('options', 'array', 'Configuration directives for rendering content.', FALSE, []);
-		$this->registerArgument('item', 'array', 'Complete item.', FALSE, []);
-		$this->registerArgument('index', 'integer', 'Current content index.', TRUE);
-	}
+    /**
+     * @see \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper::initialize()
+     */
+    public function initialize()
+    {
+        if ($this->renderingContext instanceof RenderingContextInterface) {
+            $this->optionService->setRequest(
+                $this->renderingContext->getRequest(),
+            );
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 * @see \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper::initialize()
-	 */
-	public function initialize() {
-	    if ($this->renderingContext instanceof RenderingContextInterface) {
-			$this->optionService->setRequest(
-			    $this->renderingContext->getRequest()
-			);
-		}
-	}
+    /**
+     * Renders content
+     *
+     * @param string $content
+     * @return string
+     */
+    public function render($content = null)
+    {
+        if ($content === null) {
+            $content = trim((string) $this->renderChildren());
+        }
 
-	/**
-	 * Renders content
-	 *
-	 * @param string $content
-	 * @return string
-	 */
-	public function render($content = NULL) {
-		if ($content === NULL) {
-			$content = trim((string) $this->renderChildren());
-		}
+        // if configured, add an outer tag
+        if ($this->hasArgument('tag')) {
+            // we use the AddTag RenderOption instead of directly using the tagFactory,
+            // so that other options can be used to influence said tag, like adding
+            // a class or title or data-attribute, or whatever
+            $this->arguments['options'][] = [
+                'option' => 'AddTag',
+                'args' => [
+                    'name' => $this->arguments['tag'],
+                    'attributes' => $this->arguments['tagAttributes'],
+                ],
+            ];
+        }
 
-		// if configured, add an outer tag
-		if ($this->hasArgument('tag')) {
-			// we use the AddTag RenderOption instead of directly using the tagFactory,
-				// so that other options can be used to influence said tag, like adding
-				// a class or title or data-attribute, or whatever
-			$this->arguments['options'][] = [
-				'option' => 'AddTag',
-				'args' => [
-					'name' => $this->arguments['tag'],
-					'attributes' => $this->arguments['tagAttributes']
-				]
-			];
-		}
+        if (!empty($this->arguments['options'])) {
+            // @TODO ___if we want to support field- en blob-less content, consider a render->content element referring to a content-# or a default 'current'. We would also have to have access to other content fields.
+            $tag = $this->optionService->processOptions(
+                $this->arguments['options'],
+                $content,
+                $this->arguments['index'],
+                $this->arguments['item'],
+            );
+            return $tag->render();
+        }
 
-		if (!empty($this->arguments['options'])) {
-			// @TODO ___if we want to support field- en blob-less content, consider a render->content element referring to a content-# or a default 'current'. We would also have to have access to other content fields.
-			$tag = $this->optionService->processOptions(
-				$this->arguments['options'],
-				$content,
-				$this->arguments['index'],
-				$this->arguments['item']
-			);
-			return $tag->render();
-		}
-
-		return $content;
-	}
-
+        return $content;
+    }
 }

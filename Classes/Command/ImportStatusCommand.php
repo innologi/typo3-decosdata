@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Command;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -22,13 +24,14 @@ namespace Innologi\Decosdata\Command;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Core\Bootstrap;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Input\InputArgument;
+use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Import Status Command
  *
@@ -36,79 +39,74 @@ use Symfony\Component\Console\Input\InputArgument;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ImportStatusCommand extends Command {
+class ImportStatusCommand extends Command
+{
+    /**
+     * @var array
+     */
+    protected $answers = [
+        0 => 'no',
+        1 => 'yes',
+    ];
 
-	/**
-	 * @var array
-	 */
-	protected $answers = [
-		0 => 'no',
-		1 => 'yes'
-	];
+    /**
+     * Configure the command by defining the name, options and arguments
+     */
+    protected function configure()
+    {
+        $this->setDescription(
+            'Show status of imports by uid',
+        )->addArgument(
+            'uid-list',
+            InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
+            'Optional space-separated list of import UIDs to check.',
+        );
+        // @LOW setHelp()
+        // @LOW addUsage()
+        // @LOW disableSimulateArg?
+    }
 
-	/**
-	 * Configure the command by defining the name, options and arguments
-	 *
-	 * @return void
-	 */
-	protected function configure() {
-		$this->setDescription(
-			'Show status of imports by uid'
-		)->addArgument(
-			'uid-list',
-			InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
-			'Optional space-separated list of import UIDs to check.'
-		);
-		// @LOW setHelp()
-		// @LOW addUsage()
-		// @LOW disableSimulateArg?
-	}
+    /**
+     * Executes the command
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        // Make sure the _cli_ user is loaded
+        Bootstrap::initializeBackendAuthentication();
 
-	/**
-	 * Executes the command
-	 *
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 * @return void
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		// Make sure the _cli_ user is loaded
-		Bootstrap::initializeBackendAuthentication();
+        $output->setDecorated(true);
+        $io = new SymfonyStyle($input, $output);
+        $io->title($this->getDescription());
+        $uidArray = $input->getArgument('uid-list');
 
-		$output->setDecorated(TRUE);
-		$io = new SymfonyStyle($input, $output);
-		$io->title($this->getDescription());
-		$uidArray = $input->getArgument('uid-list');
+        try {
+            /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
+            $objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
+            /** @var \Innologi\Decosdata\Domain\Repository\ImportRepository $importRepository */
+            $importRepository = $objectManager->get(\Innologi\Decosdata\Domain\Repository\ImportRepository::class);
+            $imports = empty($uidArray) ? $importRepository->findAllEverywhere() : $importRepository->findInUidEverywhere($uidArray);
 
-		try {
-			/** @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
-			$objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
-			/** @var $importRepository \Innologi\Decosdata\Domain\Repository\ImportRepository */
-			$importRepository = $objectManager->get(\Innologi\Decosdata\Domain\Repository\ImportRepository::class);
-			$imports = empty($uidArray) ? $importRepository->findAllEverywhere() : $importRepository->findInUidEverywhere($uidArray);
+            $sitePath = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/';
+            /** @var \Innologi\Decosdata\Domain\Model\Import $import */
+            foreach ($imports as $import) {
+                $prefix = '[' . $import->getUid() . ':' . $import->getTitle() . '] - ';
+                $filePath = $sitePath . $import->getFile()->getOriginalResource()->getPublicUrl();
 
-			$sitePath = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/';
-			/** @var $import \Innologi\Decosdata\Domain\Model\Import */
-			foreach ($imports as $import) {
-				$prefix = '[' . $import->getUid() . ':' . $import->getTitle() . '] - ';
-				$filePath = $sitePath . $import->getFile()->getOriginalResource()->getPublicUrl();
+                $fileExists = file_exists($filePath);
+                $knownHash = $import->getHash();
+                $newHash = md5_file($filePath);
+                $canBeUpdated = $fileExists && $knownHash !== $newHash;
 
-				$fileExists = file_exists($filePath);
-				$knownHash = $import->getHash();
-				$newHash = md5_file($filePath);
-				$canBeUpdated = $fileExists && $knownHash !== $newHash;
-
-				$io->writeln($prefix . 'file-path: ' . $filePath);
-				$io->writeln($prefix . 'file-exists: ' . $this->answers[(int)$fileExists]);
-				$io->writeln($prefix . 'known-hash: ' . $knownHash);
-				$io->writeln($prefix . 'current-hash: ' . $newHash);
-				$io->writeln($prefix . 'updatable: ' . $this->answers[(int)$canBeUpdated]);
-				$io->newLine();
-			}
-		} catch (\Exception $e) {
-			// @extensionScannerIgnoreLine false positive
-			$io->error('[' . $e->getCode() . '] ' . $e->getMessage());
-		}
-	}
-
+                $io->writeln($prefix . 'file-path: ' . $filePath);
+                $io->writeln($prefix . 'file-exists: ' . $this->answers[(int) $fileExists]);
+                $io->writeln($prefix . 'known-hash: ' . $knownHash);
+                $io->writeln($prefix . 'current-hash: ' . $newHash);
+                $io->writeln($prefix . 'updatable: ' . $this->answers[(int) $canBeUpdated]);
+                $io->newLine();
+            }
+        } catch (\Exception $e) {
+            // @extensionScannerIgnoreLine false positive
+            $io->error('[' . $e->getCode() . '] ' . $e->getMessage());
+        }
+    }
 }

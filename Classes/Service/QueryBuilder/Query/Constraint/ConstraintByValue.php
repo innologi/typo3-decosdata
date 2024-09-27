@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Query\Constraint;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,48 +33,48 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Constraint;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ConstraintByValue extends ConstraintAbstract {
+class ConstraintByValue extends ConstraintAbstract
+{
+    /**
+     * @var mixed
+     */
+    protected $value;
 
-	/**
-	 * @var mixed
-	 */
-	protected $value;
+    /**
+     * @param string $localField
+     * @param string $localAlias
+     * @param string $operator
+     * @param mixed $value
+     * @return $this
+     */
+    public function __construct($localField, $localAlias, $operator, $value)
+    {
+        $this->localField = $localField;
+        $this->localAlias = $localAlias;
+        $this->operator = $operator;
+        $this->value = $value;
+        return $this;
+    }
 
-	/**
-	 * Class constructor
-	 *
-	 * @param string $localField
-	 * @param string $localAlias
-	 * @param string $operator
-	 * @param mixed $value
-	 * @return $this
-	 */
-	public function __construct($localField, $localAlias, $operator, $value) {
-		$this->localField = $localField;
-		$this->localAlias = $localAlias;
-		$this->operator = $operator;
-		$this->value = $value;
-		return $this;
-	}
+    /**
+     * Returns value
+     *
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
 
-	/**
-	 * Returns value
-	 *
-	 * @return mixed
-	 */
-	public function getValue() {
-		return $this->value;
-	}
-
-	/**
-	 * Sets value
-	 *
-	 * @param mixed $value
-	 * @return $this
-	 */
-	public function setValue($value) {
-		$this->value = $value;
-		return $this;
-	}
-
+    /**
+     * Sets value
+     *
+     * @param mixed $value
+     * @return $this
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+        return $this;
+    }
 }

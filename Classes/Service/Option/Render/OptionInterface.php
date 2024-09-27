@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Render;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -25,6 +27,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\TagBuilder\TagInterface;
+
 /**
  * Render Option Interface
  *
@@ -32,16 +35,13 @@ use Innologi\TagBuilder\TagInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-interface OptionInterface {
-	// @TODO _______better doc
-	/**
-	 * Alters content.
-	 *
-	 * @param array $args
-	 * @param \Innologi\TagBuilder\TagInterface $tag
-	 * @param \Innologi\Decosdata\Service\Option\RenderOptionService $service
-	 * @return \Innologi\TagBuilder\TagInterface
-	 */
-	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service);
-
+interface OptionInterface
+{
+    // @TODO _______better doc
+    /**
+     * Alters content.
+     *
+     * @return \Innologi\TagBuilder\TagInterface
+     */
+    public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service);
 }

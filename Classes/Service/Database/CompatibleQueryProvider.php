@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Database;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Service\Database;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
+
 /**
  * Query Provider: Compatible edition
  *
@@ -35,74 +38,65 @@ use TYPO3\CMS\Core\SingletonInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class CompatibleQueryProvider implements QueryProviderInterface,SingletonInterface {
+class CompatibleQueryProvider implements QueryProviderInterface, SingletonInterface
+{
+    /**
+     * @var \TYPO3\CMS\Core\Database\DatabaseConnection
+     */
+    protected $databaseConnection;
 
-	/**
-	 * @var \TYPO3\CMS\Core\Database\DatabaseConnection
-	 */
-	protected $databaseConnection;
+    /**
+     * @var DatabaseHelper
+     */
+    protected $databaseHelper;
 
-	/**
-	 * @var DatabaseHelper
-	 */
-	protected $databaseHelper;
+    public function injectDatabaseHelper(DatabaseHelper $databaseHelper)
+    {
+        $this->databaseHelper = $databaseHelper;
+    }
 
-	/**
-	 *
-	 * @param DatabaseHelper $databaseHelper
-	 * @return void
-	 */
-	public function injectDatabaseHelper(DatabaseHelper $databaseHelper)
-	{
-		$this->databaseHelper = $databaseHelper;
-	}
+    public function __construct()
+    {
+        // @extensionScannerIgnoreLine TYPO3_DB-usage needs a rewrite anyway once this ext goes standalone
+        $this->databaseConnection = $GLOBALS['TYPO3_DB'];
+        // @TODO ___utilize $this->databaseConnection->sql_error() ?
+    }
 
-	/**
-	 * Class constructor
-	 *
-	 * @return void
-	 */
-	public function __construct() {
-		// @extensionScannerIgnoreLine TYPO3_DB-usage needs a rewrite anyway once this ext goes standalone
-		$this->databaseConnection = $GLOBALS['TYPO3_DB'];
-		// @TODO ___utilize $this->databaseConnection->sql_error() ?
-	}
+    /**
+     * An upsert, or InsertOrUpdateOnDuplicate: will attempt to insert a record,
+     * or update en existing one if its data matches an existing record.
+     *
+     * @param string $table
+     * @param array $data Contains property => value elements
+     * @param array $uniqueProperties (optional)
+     * @return string The upsert query
+     */
+    public function upsertQuery($table, array $data, array $uniqueProperties = [])
+    {
+        $query = null;
 
-	/**
-	 * An upsert, or InsertOrUpdateOnDuplicate: will attempt to insert a record,
-	 * or update en existing one if its data matches an existing record.
-	 *
-	 * @param string $table
-	 * @param array $data Contains property => value elements
-	 * @param array $uniqueProperties (optional)
-	 * @return string The upsert query
-	 */
-	public function upsertQuery($table, array $data, array $uniqueProperties = []) {
-		$query = NULL;
+        $matchProperties = empty($uniqueProperties)
+            ? $data
+            : array_intersect_key(
+                $data,
+                array_flip($uniqueProperties),
+            );
 
-		$matchProperties = empty($uniqueProperties)
-			? $data
-			: array_intersect_key(
-				$data,
-				array_flip($uniqueProperties)
-			);
+        $uid = $this->databaseHelper->getLastUidOfMatch($table, $matchProperties);
+        if ($uid === null) {
+            $query = $this->databaseConnection->INSERTquery($table, $data);
+        } else {
+            if ($data['crdate']) {
+                // we never want to update the crdate property value
+                unset($data['crdate']);
+            }
+            $query = $this->databaseConnection->UPDATEquery(
+                $table,
+                'uid = ' . $this->databaseConnection->fullQuoteStr($uid, $table),
+                $data,
+            );
+        }
 
-		$uid = $this->databaseHelper->getLastUidOfMatch($table, $matchProperties);
-		if ($uid === NULL) {
-			$query = $this->databaseConnection->INSERTquery($table, $data);
-		} else {
-			if ($data['crdate']) {
-				// we never want to update the crdate property value
-				unset($data['crdate']);
-			}
-			$query = $this->databaseConnection->UPDATEquery(
-				$table,
-				'uid = ' . $this->databaseConnection->fullQuoteStr($uid, $table),
-				$data
-			);
-		}
-
-		return $query;
-	}
-
+        return $query;
+    }
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Importer\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Service\Importer\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ValidationFailed extends ImporterError {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'The file \'%1$s\' does not validate as an import-file.';
-
+class ValidationFailed extends ImporterError
+{
+    /**
+     * @var string
+     */
+    protected $message = 'The file \'%1$s\' does not validate as an import-file.';
 }

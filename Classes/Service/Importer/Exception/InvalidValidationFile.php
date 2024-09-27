@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Importer\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Service\Importer\Exception;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Exception\Exception;
+
 /**
  * Invalid Validation File Exception
  *
@@ -31,11 +34,10 @@ use Innologi\Decosdata\Exception\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class InvalidValidationFile extends Exception {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Invalid Validation File: the path \'%1$s\' is either not a file, unreadable, or of an unexpected format.';
-
+class InvalidValidationFile extends Exception
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Invalid Validation File: the path \'%1$s\' is either not a file, unreadable, or of an unexpected format.';
 }

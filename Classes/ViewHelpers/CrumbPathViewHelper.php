@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\ViewHelpers;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,9 +25,10 @@ namespace Innologi\Decosdata\ViewHelpers;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 use Innologi\Decosdata\Service\BreadcrumbService;
 use Innologi\Decosdata\Service\ParameterService;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+
 // @LOW ___use \TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface ?
 /**
  * Crumbpath ViewHelper
@@ -36,135 +39,129 @@ use Innologi\Decosdata\Service\ParameterService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class CrumbPathViewHelper extends AbstractViewHelper {
-	// @LOW _can we bring the user back in a breadcrumb-location to the exact URL that he originated from?
-	// @TODO ___what about link titles?
+class CrumbPathViewHelper extends AbstractViewHelper
+{
+    // @LOW _can we bring the user back in a breadcrumb-location to the exact URL that he originated from?
+    // @TODO ___what about link titles?
 
-	/**
-	 * @var boolean
-	 */
-	protected $escapeOutput = FALSE;
+    /**
+     * @var boolean
+     */
+    protected $escapeOutput = false;
 
-	/**
-	 * @var BreadcrumbService
-	 */
-	protected $breadcrumbService;
+    /**
+     * @var BreadcrumbService
+     */
+    protected $breadcrumbService;
 
-	/**
-	 * @var ParameterService
-	 */
-	protected $parameterService;
+    /**
+     * @var ParameterService
+     */
+    protected $parameterService;
 
-	/**
-	 * @var integer
-	 */
-	protected $currentLevel;
+    /**
+     * @var integer
+     */
+    protected $currentLevel;
 
-	/**
-	 *
-	 * @param BreadcrumbService $breadcrumbService
-	 * @return void
-	 */
-	public function injectBreadcrumbService(BreadcrumbService $breadcrumbService)
-	{
-		$this->breadcrumbService = $breadcrumbService;
-	}
+    public function injectBreadcrumbService(BreadcrumbService $breadcrumbService)
+    {
+        $this->breadcrumbService = $breadcrumbService;
+    }
 
-	/**
-	 *
-	 * @param ParameterService $parameterService
-	 * @return void
-	 */
-	public function injectParameterService(ParameterService $parameterService)
-	{
-		$this->parameterService = $parameterService;
-	}
+    public function injectParameterService(ParameterService $parameterService)
+    {
+        $this->parameterService = $parameterService;
+    }
 
-	/**
-	 * Initialize arguments
-	 *
-	 * @return void
-	 */
-	public function initializeArguments() {
-		$this->registerArgument('partial', 'string', 'Dedicated partial template override.', FALSE, 'ViewHelpers/CrumbPath');
-		$this->registerArgument('renderAbove', 'boolean', 'Renders crumbpath above content.', FALSE, TRUE);
-		$this->registerArgument('renderBelow', 'boolean', 'Renders crumbpath below content.', FALSE, TRUE);
-	}
+    /**
+     * Initialize arguments
+     */
+    public function initializeArguments()
+    {
+        $this->registerArgument('partial', 'string', 'Dedicated partial template override.', false, 'ViewHelpers/CrumbPath');
+        $this->registerArgument('renderAbove', 'boolean', 'Renders crumbpath above content.', false, true);
+        $this->registerArgument('renderBelow', 'boolean', 'Renders crumbpath below content.', false, true);
+    }
 
-	/**
-	 * Render Crumbpath
-	 *
-	 * @return string
-	 */
-	public function render() {
-		// render crumbpath only if active
-		if ( !$this->breadcrumbService->isActive() ) {
-			return $this->renderChildren();
-		}
+    /**
+     * Render Crumbpath
+     *
+     * @return string
+     */
+    public function render()
+    {
+        // render crumbpath only if active
+        if (!$this->breadcrumbService->isActive()) {
+            return $this->renderChildren();
+        }
 
-		// render a specific partial that exists for this sole purpose
-		return $this->viewHelperVariableContainer->getView()->renderPartial(
-			$this->arguments['partial'],
-			NULL,
-			[
-				'renderAbove' => $this->arguments['renderAbove'],
-				'renderBelow' => $this->arguments['renderBelow'],
-				'crumbPath' => $this->buildCrumbPathConfiguration(),
-				// requires the use of format.raw VH, which costs us ~1.6 ms on average, but keeps us
-				// from using a marker like ###CONTENT### with str_replace, which can easily be fooled
-				'content' => $this->renderChildren()
-			]
-		);
-	}
+        // render a specific partial that exists for this sole purpose
+        return $this->viewHelperVariableContainer->getView()->renderPartial(
+            $this->arguments['partial'],
+            null,
+            [
+                'renderAbove' => $this->arguments['renderAbove'],
+                'renderBelow' => $this->arguments['renderBelow'],
+                'crumbPath' => $this->buildCrumbPathConfiguration(),
+                // requires the use of format.raw VH, which costs us ~1.6 ms on average, but keeps us
+                // from using a marker like ###CONTENT### with str_replace, which can easily be fooled
+                'content' => $this->renderChildren(),
+            ],
+        );
+    }
 
-	/**
-	 * Build crumbpath template configuration arguments
-	 *
-	 * @return array
-	 * @throws \Innologi\Decosdata\Exception\PaginationError
-	 */
-	protected function buildCrumbPathConfiguration() {
-		$this->currentLevel = $this->breadcrumbService->getCurrentLevel();
-		$labelMap = $this->breadcrumbService->getCrumbLabelMap();
-		$configuration = [
-			'current' => [
-				'label' => $labelMap[$this->currentLevel]
-			],
-			'crumbs' => []
-		];
-		unset($labelMap[$this->currentLevel]);
+    /**
+     * Build crumbpath template configuration arguments
+     *
+     * @return array
+     * @throws \Innologi\Decosdata\Exception\PaginationError
+     */
+    protected function buildCrumbPathConfiguration()
+    {
+        $this->currentLevel = $this->breadcrumbService->getCurrentLevel();
+        $labelMap = $this->breadcrumbService->getCrumbLabelMap();
+        $configuration = [
+            'current' => [
+                'label' => $labelMap[$this->currentLevel],
+            ],
+            'crumbs' => [],
+        ];
+        unset($labelMap[$this->currentLevel]);
 
-		foreach ($labelMap as $level => $label) {
-			$configuration['crumbs'][] = $this->createCrumbElement($level, $label);
-		}
-		return $configuration;
-	}
+        foreach ($labelMap as $level => $label) {
+            $configuration['crumbs'][] = $this->createCrumbElement($level, $label);
+        }
+        return $configuration;
+    }
 
-	/**
-	 * Creates a crumb element
-	 *
-	 * @param integer $level
-	 * @param string $label
-	 * @return array
-	 */
-	protected function createCrumbElement($level, $label) {
-		$exclude = [
-			// @TODO I'm doing this on multiple locations, so I should just put it in configuration somewhere and let parameterService do the rest
-			$this->parameterService->wrapInPluginNamespace('page'),
-			$this->parameterService->wrapInPluginNamespace('search')
-		];
-		for ($i=$this->currentLevel; $i>$level; $i--) {
-			$exclude[] = $this->parameterService->wrapInPluginNamespace('_' . $i);
-		}
-		// the first level is the default, we should be able to use the clean (original) page link for that
-		return $level === 1 ? [
-			'label' => $label,
-			'cleanLink' => true
-		] : [
-			'label' => $label,
-			'exclude' => $exclude,
-			'arguments' => ['level' => $level]
-		];
-	}
-
+    /**
+     * Creates a crumb element
+     *
+     * @param integer $level
+     * @param string $label
+     * @return array
+     */
+    protected function createCrumbElement($level, $label)
+    {
+        $exclude = [
+            // @TODO I'm doing this on multiple locations, so I should just put it in configuration somewhere and let parameterService do the rest
+            $this->parameterService->wrapInPluginNamespace('page'),
+            $this->parameterService->wrapInPluginNamespace('search'),
+        ];
+        for ($i = $this->currentLevel; $i > $level; $i--) {
+            $exclude[] = $this->parameterService->wrapInPluginNamespace('_' . $i);
+        }
+        // the first level is the default, we should be able to use the clean (original) page link for that
+        return $level === 1 ? [
+            'label' => $label,
+            'cleanLink' => true,
+        ] : [
+            'label' => $label,
+            'exclude' => $exclude,
+            'arguments' => [
+                'level' => $level,
+            ],
+        ];
+    }
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,8 +25,9 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
+
 /**
  * FilterValueOnSelect option
  *
@@ -36,34 +39,35 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FilterValueOnSelect extends OptionAbstract {
-	use Traits\Filters;
-	// @TODO add proper IF support at some point, because this is a bit of an unsecure mess
-	/**
-	 * Filter is applied on current field configuration.
-	 *
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
-	 */
-	public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service) {
-		$this->doFiltersExist($args);
-		$id = $queryField->getId() . 'filteritems' . $service->getOptionIndex();
+class FilterValueOnSelect extends OptionAbstract
+{
+    use Traits\Filters;
+    // @TODO add proper IF support at some point, because this is a bit of an unsecure mess
+    /**
+     * Filter is applied on current field configuration.
+     *
+     * {@inheritDoc}
+     * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
+     */
+    public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service)
+    {
+        $this->doFiltersExist($args);
+        $id = $queryField->getId() . 'filteritems' . $service->getOptionIndex();
 
-		$select = $queryField->getSelect();
-		$property = $select->getTableAlias() . '.' . $select->getField();
-		$conditions = [];
-		foreach ($args['filters'] as $filter) {
-			$this->initializeFilter($filter);
-			if (isset($filter['parameter'])) {
-				// @TODO throw exception or add support
-			}
-			$conditions[] = $property . ' ' . $filter['operator'] . ' \'' . $filter['value'] . '\'';
-		}
+        $select = $queryField->getSelect();
+        $property = $select->getTableAlias() . '.' . $select->getField();
+        $conditions = [];
+        foreach ($args['filters'] as $filter) {
+            $this->initializeFilter($filter);
+            if (isset($filter['parameter'])) {
+                // @TODO throw exception or add support
+            }
+            $conditions[] = $property . ' ' . $filter['operator'] . ' \'' . $filter['value'] . '\'';
+        }
 
-		if (!empty($conditions)) {
-			$glue = isset($args['matchAll']) && (bool) $args['matchAll'] ? ' AND ' : ' OR ';
-			$select->addWrap('filter', 'IF(' . join($glue, $conditions) . ', |, NULL)');
-		}
-	}
-
+        if (!empty($conditions)) {
+            $glue = isset($args['matchAll']) && (bool) $args['matchAll'] ? ' AND ' : ' OR ';
+            $select->addWrap('filter', 'IF(' . join($glue, $conditions) . ', |, NULL)');
+        }
+    }
 }

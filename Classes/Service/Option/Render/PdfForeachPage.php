@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Render;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,12 +25,13 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\Option\RenderOptionService;
-use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
-use Innologi\TagBuilder\TagInterface;
-use Innologi\TagBuilder\TagContent;
-use TYPO3\CMS\Core\Resource\AbstractFile;
 use Innologi\Decosdata\Service\CommandRunService;
+use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
+use Innologi\Decosdata\Service\Option\RenderOptionService;
+use Innologi\TagBuilder\TagContent;
+use Innologi\TagBuilder\TagInterface;
+use TYPO3\CMS\Core\Resource\AbstractFile;
+
 /**
  * PDF Foreach Page option
  *
@@ -43,135 +46,131 @@ use Innologi\Decosdata\Service\CommandRunService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class PdfForeachPage implements OptionInterface {
-	use Traits\FileHandler;
-	use Traits\ExtensionConfiguration;
+class PdfForeachPage implements OptionInterface
+{
+    use Traits\FileHandler;
+    use Traits\ExtensionConfiguration;
 
-	/**
-	 * @var CommandRunService
-	 */
-	protected $commandRunService;
+    /**
+     * @var CommandRunService
+     */
+    protected $commandRunService;
 
-	/**
-	 *
-	 * @param CommandRunService $commandRunService
-	 * @return void
-	 */
-	public function injectCommandRunService(CommandRunService $commandRunService)
-	{
-		$this->commandRunService = $commandRunService;
-	}
+    public function injectCommandRunService(CommandRunService $commandRunService)
+    {
+        $this->commandRunService = $commandRunService;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
-	 */
-	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL || !$this->isSupportedFile($file) ) {
-			return $tag;
-		}
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
+     */
+    public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service)
+    {
+        if (($file = $this->getFileObject($service->getOriginalContent())) === null || !$this->isSupportedFile($file)) {
+            return $tag;
+        }
 
-		if (! (isset($args['renderOptions']) && is_array($args['renderOptions'])) ) {
-			throw new MissingArgument(1524141815, [self::class, 'renderOptions']);
-		}
+        if (!(isset($args['renderOptions']) && is_array($args['renderOptions']))) {
+            throw new MissingArgument(1524141815, [self::class, 'renderOptions']);
+        }
 
-		$separator = $args['separator'] ?? '';
-		$content = [];
-		$pdfPageCount = $this->getPdfPageCount($file, $service->getSitePath());
-		$paginator = $service->getPaginator();
-		if ($paginator !== NULL) {
-			// returns a complete and paginated result
-			$content = $paginator->setTotal($pdfPageCount)->execute($separator);
-		} else {
-			// unpaginated result
-			for ($i = 0; $i < $pdfPageCount; $i++) {
-				$content[] = $this->createContent($i, $pdfPageCount, $args['renderOptions'], $service);
-			}
-			$content = join($separator, $content);
-		}
+        $separator = $args['separator'] ?? '';
+        $content = [];
+        $pdfPageCount = $this->getPdfPageCount($file, $service->getSitePath());
+        $paginator = $service->getPaginator();
+        if ($paginator !== null) {
+            // returns a complete and paginated result
+            $content = $paginator->setTotal($pdfPageCount)->execute($separator);
+        } else {
+            // unpaginated result
+            for ($i = 0; $i < $pdfPageCount; $i++) {
+                $content[] = $this->createContent($i, $pdfPageCount, $args['renderOptions'], $service);
+            }
+            $content = join($separator, $content);
+        }
 
-		if ($tag instanceof TagContent) {
-			return $tag->reset()->setContent($content);
-		}
+        if ($tag instanceof TagContent) {
+            return $tag->reset()->setContent($content);
+        }
 
-		return $service->getTagFactory()->createTagContent($content);
-	}
+        return $service->getTagFactory()->createTagContent($content);
+    }
 
-	public function paginateIterate(array $args, RenderOptionService $service) {
-		return $this->createContent(
-			$service->getPaginator()->getIterationIndex(),
-			$service->getPaginator()->getTotal(),
-			$args['renderOptions'],
-			$service
-		);
-	}
+    public function paginateIterate(array $args, RenderOptionService $service)
+    {
+        return $this->createContent(
+            $service->getPaginator()->getIterationIndex(),
+            $service->getPaginator()->getTotal(),
+            $args['renderOptions'],
+            $service,
+        );
+    }
 
-	/**
-	 * Return whether we support this file, i.e. an existing PDF
-	 *
-	 * @param AbstractFile $file
-	 * @return boolean
-	 */
-	protected function isSupportedFile(AbstractFile $file) {
-		return $file->exists() && (str_contains($file->getMimeType(), '/pdf'));
-	}
+    /**
+     * Return whether we support this file, i.e. an existing PDF
+     *
+     * @return boolean
+     */
+    protected function isSupportedFile(AbstractFile $file)
+    {
+        return $file->exists() && (str_contains($file->getMimeType(), '/pdf'));
+    }
 
-	/**
-	 * Returns the PDF page count
-	 *
-	 * Supports the following variables in the command:
-	 * - INPUTFILE
-	 *
-	 * @param AbstractFile $inputFile
-	 * @param string $sitePath
-	 * @return integer
-	 */
-	protected function getPdfPageCount(AbstractFile $inputFile, $sitePath) {
-		$cmdOutput = $this->commandRunService
-			->reset()
-			->setCommandLimit(3)
-			->setCommandSubstitutes([
-				'GREP:$1:escapeshellarg' => 'grep $1',
-				'AWKPRINT:$1:intval' => 'awk \'{print $$1}\''
-			])->setAllowBinaries([
-				'pdftk',
-				'pdfinfo',
-				'pdf*'
-			])->runCommand(
-				$this->getExtensionConfiguration('pdf_info_cmd'),
-				[
-					'INPUTFILE' => $sitePath . $inputFile->getPublicUrl()
-				]
-			);
+    /**
+     * Returns the PDF page count
+     *
+     * Supports the following variables in the command:
+     * - INPUTFILE
+     *
+     * @param string $sitePath
+     * @return integer
+     */
+    protected function getPdfPageCount(AbstractFile $inputFile, $sitePath)
+    {
+        $cmdOutput = $this->commandRunService
+            ->reset()
+            ->setCommandLimit(3)
+            ->setCommandSubstitutes([
+                'GREP:$1:escapeshellarg' => 'grep $1',
+                'AWKPRINT:$1:intval' => 'awk \'{print $$1}\'',
+            ])->setAllowBinaries([
+                'pdftk',
+                'pdfinfo',
+                'pdf*',
+            ])->runCommand(
+                $this->getExtensionConfiguration('pdf_info_cmd'),
+                [
+                    'INPUTFILE' => $sitePath . $inputFile->getPublicUrl(),
+                ],
+            );
 
-		if (! (isset($cmdOutput[0]) && \is_numeric($cmdOutput[0])) ) {
-			// @TODO throw exception
-		}
+        if (!(isset($cmdOutput[0]) && \is_numeric($cmdOutput[0]))) {
+            // @TODO throw exception
+        }
 
-		return (int) $cmdOutput[0];
-	}
+        return (int) $cmdOutput[0];
+    }
 
-	/**
-	 * Create content through sub-renderOptions
-	 *
-	 * @param integer $pageIndex
-	 * @param integer $total
-	 * @param array $renderOptions
-	 * @param RenderOptionService $service
-	 * @return \Innologi\TagBuilder\TagInterface
-	 */
-	protected function createContent($pageIndex, $total, array $renderOptions, RenderOptionService $service) {
-		$service->setOptionVariables('PdfForeachPage', [
-			'index' => $pageIndex,
-			'total' => $total
-		]);
-		$content = $service->processOptions(
-			$renderOptions,
-			$service->getOriginalContent(),
-			$service->getIndex() . 'p' . $pageIndex,
-			$service->getItem()
-		);
-		$service->unsetOptionVariables('PdfForeachPage');
-		return $content;
-	}
+    /**
+     * Create content through sub-renderOptions
+     *
+     * @param integer $pageIndex
+     * @param integer $total
+     * @return \Innologi\TagBuilder\TagInterface
+     */
+    protected function createContent($pageIndex, $total, array $renderOptions, RenderOptionService $service)
+    {
+        $service->setOptionVariables('PdfForeachPage', [
+            'index' => $pageIndex,
+            'total' => $total,
+        ]);
+        $content = $service->processOptions(
+            $renderOptions,
+            $service->getOriginalContent(),
+            $service->getIndex() . 'p' . $pageIndex,
+            $service->getItem(),
+        );
+        $service->unsetOptionVariables('PdfForeachPage');
+        return $content;
+    }
 }

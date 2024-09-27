@@ -33,116 +33,114 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class From extends ConstraintContainer {
+class From extends ConstraintContainer
+{
+    /**
+     * @var array
+     */
+    protected $tables;
 
-	/**
-	 *
-	 * @var array
-	 */
-	protected $tables;
+    /**
+     * @var string
+     */
+    protected $joinType;
 
-	/**
-	 *
-	 * @var string
-	 */
-	protected $joinType;
+    /**
+     * @var boolean
+     */
+    protected $defaultRestrictions = true;
 
-	/**
-	 *
-	 * @var boolean
-	 */
-	protected $defaultRestrictions = true;
+    /**
+     * Optional parameter needs to consist of $alias => $table pairs.
+     *
+     * @return $this
+     */
+    public function __construct(array $tables = [])
+    {
+        return $this->setTables($tables);
+    }
 
-	/**
-	 * Class constructor
-	 *
-	 * Optional parameter needs to consist of $alias => $table pairs.
-	 *
-	 * @param array $tables
-	 * @return $this
-	 */
-	public function __construct(array $tables = []) {
-		return $this->setTables($tables);
-	}
+    /**
+     * Returns Table by alias
+     *
+     * @return string
+     */
+    public function getTableNameByAlias($alias)
+    {
+        return $this->tables[$alias] ?? null;
+    }
 
-	/**
-	 * Returns Table by alias
-	 *
-	 * @return string
-	 */
-	public function getTableNameByAlias($alias) {
-		return $this->tables[$alias] ?? NULL;
-	}
+    /**
+     * Sets table
+     *
+     * @param string $table
+     * @param string $alias
+     * @return $this
+     */
+    public function addTable($table, $alias)
+    {
+        $this->tables[$alias] = $table;
+        return $this;
+    }
 
-	/**
-	 * Sets table
-	 *
-	 * @param string $table
-	 * @param string $alias
-	 * @return $this
-	 */
-	public function addTable($table, $alias) {
-		$this->tables[$alias] = $table;
-		return $this;
-	}
+    /**
+     * Returns all $alias => $table pairs
+     *
+     * @return array
+     */
+    public function getTables()
+    {
+        return $this->tables;
+    }
 
-	/**
-	 * Returns all $alias => $table pairs
-	 *
-	 * @return array
-	 */
-	public function getTables() {
-		return $this->tables;
-	}
+    /**
+     * Sets or replaces entire table collection
+     *
+     * @return $this
+     */
+    public function setTables(array $tables)
+    {
+        $this->tables = $tables;
+        return $this;
+    }
 
-	/**
-	 * Sets or replaces entire table collection
-	 *
-	 * @param array $tables
-	 * @return $this
-	 */
-	public function setTables(array $tables) {
-		$this->tables = $tables;
-		return $this;
-	}
+    /**
+     * Returns join type
+     *
+     * @return string
+     */
+    public function getJoinType()
+    {
+        return $this->joinType;
+    }
 
-	/**
-	 * Returns join type
-	 *
-	 * @return string
-	 */
-	public function getJoinType() {
-		return $this->joinType;
-	}
+    /**
+     * Sets join type
+     *
+     * @param string $joinType
+     * @return $this
+     */
+    public function setJoinType($joinType)
+    {
+        $this->joinType = $joinType;
+        return $this;
+    }
 
-	/**
-	 * Sets join type
-	 *
-	 * @param string $joinType
-	 * @return $this
-	 */
-	public function setJoinType($joinType) {
-		$this->joinType = $joinType;
-		return $this;
-	}
+    /**
+     * @return boolean
+     */
+    public function getDefaultRestrictions(): bool
+    {
+        return $this->defaultRestrictions;
+    }
 
-	/**
-	 *
-	 * @return boolean
-	 */
-	public function getDefaultRestrictions(): bool
-	{
-		return $this->defaultRestrictions;
-	}
-
-	/**
-	 *
-	 * @param boolean $defaultRestrictions
-	 * @return $this
-	 */
-	public function setDefaultRestrictions(bool $defaultRestrictions)
-	{
-		$this->defaultRestrictions = $defaultRestrictions;
-		return $this;
-	}
+    /**
+     * @param boolean $defaultRestrictions
+     * @return $this
+     */
+    public function setDefaultRestrictions(bool $defaultRestrictions)
+    {
+        $this->defaultRestrictions = $defaultRestrictions;
+        return $this;
+    }
 }

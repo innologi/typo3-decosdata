@@ -11,32 +11,32 @@
  ***************************************************************/
 
 $EM_CONF[$_EXTKEY] = [
-	'title' => 'Decos Data',
-	'description' => 'Import Decos XML exports locally and flexibly publish their contents. Successor to the \'decospublisher\' extension.',
-	'category' => 'plugin',
-	'author' => 'Frenck Lutke',
-	'author_email' => 'typo3@innologi.nl',
-	'author_company' => 'www.innologi.nl',
-	'state' => 'beta',
-	'uploadfolder' => 0,
-	'createDirs' => '',
-	'clearCacheOnLoad' => 1,
-	'version' => '1.2.0',
-	'constraints' => [
-		'depends' => [
-			'php' => '8.0',
-			'typo3' => '10.4.0-11.99.99',
-		],
-		'conflicts' => [
-		],
-		'suggests' => [
-			'scheduler' => '10.4.0',
-			'typo3db_legacy' => '1.1.4'
-		],
-	],
-	'autoload' => [
-		'psr-4' => [
-			'Innologi\\Decosdata\\' => 'Classes'
-		]
-	]
+    'title' => 'Decos Data',
+    'description' => 'Import Decos XML exports locally and flexibly publish their contents. Successor to the \'decospublisher\' extension.',
+    'category' => 'plugin',
+    'author' => 'Frenck Lutke',
+    'author_email' => 'typo3@innologi.nl',
+    'author_company' => 'www.innologi.nl',
+    'state' => 'beta',
+    'uploadfolder' => 0,
+    'createDirs' => '',
+    'clearCacheOnLoad' => 1,
+    'version' => '1.2.0',
+    'constraints' => [
+        'depends' => [
+            'php' => '8.0',
+            'typo3' => '10.4.0-11.99.99',
+        ],
+        'conflicts' => [
+        ],
+        'suggests' => [
+            'scheduler' => '10.4.0',
+            'typo3db_legacy' => '1.1.4',
+        ],
+    ],
+    'autoload' => [
+        'psr-4' => [
+            'Innologi\\Decosdata\\' => 'Classes',
+        ],
+    ],
 ];

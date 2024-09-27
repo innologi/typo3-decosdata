@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Database;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -35,55 +37,55 @@ namespace Innologi\Decosdata\Service\Database;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MysqlQueryProvider extends CompatibleQueryProvider {
+class MysqlQueryProvider extends CompatibleQueryProvider
+{
+    /**
+     * An upsert, or InsertOrUpdateOnDuplicate: will attempt to insert a record,
+     * or update an existing one if its data matches an existing record.
+     *
+     * Optionally, you can provide uniqueProperties which will contain the property
+     * keynames from $data which define an existing record. This is useful when you
+     * cannot rely on unique key being set on properties other than uid. In TYPO3,
+     * this is almost always the case when you don't know the uid, where the table
+     * has valid TCA and also supports the `deleted` flag, because it would provide
+     * serious duplicate key issues. Only provide the argument in those cases, because
+     * it will force the method to fallback to the CompatibleQueryProvider implementation.
+     *
+     * @param string $table
+     * @param array $data Contains property => value elements
+     * @param array $uniqueProperties (optional)
+     * @return string The upsert query
+     */
+    public function upsertQuery($table, array $data, array $uniqueProperties = [])
+    {
+        if (!empty($uniqueProperties)) {
+            // fallback to compatibleQueryProvider
+            return parent::upsertQuery($table, $data, $uniqueProperties);
+        }
 
-	/**
-	 * An upsert, or InsertOrUpdateOnDuplicate: will attempt to insert a record,
-	 * or update an existing one if its data matches an existing record.
-	 *
-	 * Optionally, you can provide uniqueProperties which will contain the property
-	 * keynames from $data which define an existing record. This is useful when you
-	 * cannot rely on unique key being set on properties other than uid. In TYPO3,
-	 * this is almost always the case when you don't know the uid, where the table
-	 * has valid TCA and also supports the `deleted` flag, because it would provide
-	 * serious duplicate key issues. Only provide the argument in those cases, because
-	 * it will force the method to fallback to the CompatibleQueryProvider implementation.
-	 *
-	 * @param string $table
-	 * @param array $data Contains property => value elements
-	 * @param array $uniqueProperties (optional)
-	 * @return string The upsert query
-	 */
-	public function upsertQuery($table, array $data, array $uniqueProperties = []) {
-		if (!empty($uniqueProperties)) {
-			// fallback to compatibleQueryProvider
-			return parent::upsertQuery($table, $data, $uniqueProperties);
-		}
+        // escape values
+        $data = $this->databaseConnection->fullQuoteArray($data, $table);
 
-		// escape values
-		$data = $this->databaseConnection->fullQuoteArray($data, $table);
+        // provide the UPDATE parameters in another format
+        $updateParameters = [];
+        foreach ($data as $property => $value) {
+            $updateParameters[$property] = $property . '=' . $value;
+        }
+        if ($updateParameters['crdate']) {
+            // we never want to update the crdate property value
+            unset($updateParameters['crdate']);
+        }
 
-		// provide the UPDATE parameters in another format
-		$updateParameters = [];
-		foreach ($data as $property => $value) {
-			$updateParameters[$property] = $property . '=' . $value;
-		}
-		if ($updateParameters['crdate']) {
-			// we never want to update the crdate property value
-			unset($updateParameters['crdate']);
-		}
+        $query = sprintf(
+            'INSERT INTO %1$s (%2$s) VALUES (%3$s) ON DUPLICATE KEY UPDATE %4$s',
+            $table,
+            // fields
+            implode(',', array_keys($data)),
+            // values
+            implode(',', $data),
+            implode(',', $updateParameters),
+        );
 
-		$query = sprintf(
-			'INSERT INTO %1$s (%2$s) VALUES (%3$s) ON DUPLICATE KEY UPDATE %4$s',
-			$table,
-			// fields
-			implode(',', array_keys($data)),
-			// values
-			implode(',', $data),
-			implode(',', $updateParameters)
-		);
-
-		return $query;
-	}
-
+        return $query;
+    }
 }

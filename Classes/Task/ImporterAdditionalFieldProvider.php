@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Task;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,12 +25,13 @@ namespace Innologi\Decosdata\Task;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Scheduler\AbstractAdditionalFieldProvider;
-use TYPO3\CMS\Scheduler\Task\Enumeration\Action;
+use Innologi\Decosdata\Domain\Repository\ImportRepository;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
-use Innologi\Decosdata\Domain\Repository\ImportRepository;
+use TYPO3\CMS\Scheduler\AbstractAdditionalFieldProvider;
+use TYPO3\CMS\Scheduler\Task\Enumeration\Action;
+
 /**
  * Importer Additional Field Provider
  *
@@ -38,110 +41,112 @@ use Innologi\Decosdata\Domain\Repository\ImportRepository;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider {
+class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider
+{
+    /**
+     * @var string
+     */
+    protected $ll = 'LLL:EXT:decosdata/Resources/Private/Language/locallang_be.xlf:';
 
-	/**
-	 * @var string
-	 */
-	protected $ll = 'LLL:EXT:decosdata/Resources/Private/Language/locallang_be.xlf:';
+    /**
+     * Gets additional fields to render in the form to add/edit a task
+     *
+     * @param array $taskInfo Values of the fields from the add/edit task form
+     * @param \TYPO3\CMS\Scheduler\Task\AbstractTask $task The task object being edited. Null when adding a task!
+     * @param \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $schedulerModule Reference to the scheduler backend module
+     * @return array A two dimensional array, array('Identifier' => array('fieldId' => array('code' => '', 'label' => '', 'cshKey' => '', 'cshLabel' => ''))
+     */
+    public function getAdditionalFields(array &$taskInfo, $task, \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $schedulerModule)
+    {
+        // set field value
+        if (empty($taskInfo['selectedImports'])) {
+            if ($schedulerModule->getCurrentAction()->equals(Action::EDIT)) {
+                // existing task, meaning there is a value
+                $taskInfo['selectedImports'] = $task->selectedImports;
+            } else {
+                $taskInfo['selectedImports'] = [];
+            }
+        }
 
-	/**
-	 * Gets additional fields to render in the form to add/edit a task
-	 *
-	 * @param array $taskInfo Values of the fields from the add/edit task form
-	 * @param \TYPO3\CMS\Scheduler\Task\AbstractTask $task The task object being edited. Null when adding a task!
-	 * @param \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $schedulerModule Reference to the scheduler backend module
-	 * @return array A two dimensional array, array('Identifier' => array('fieldId' => array('code' => '', 'label' => '', 'cshKey' => '', 'cshLabel' => ''))
-	 */
-	public function getAdditionalFields(array &$taskInfo, $task, \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $schedulerModule) {
-		// set field value
-		if (empty($taskInfo['selectedImports'])) {
-			if ($schedulerModule->getCurrentAction()->equals(Action::EDIT)) {
-				// existing task, meaning there is a value
-				$taskInfo['selectedImports'] = $task->selectedImports;
-			} else {
-				$taskInfo['selectedImports'] = [];
-			}
-		}
+        // provide HTML parameters
+        $fieldName = 'tx_scheduler[selectedImports][]';
+        $fieldId = 'task_selectedImports';
+        $fieldOptions = $this->getImportOptions($taskInfo['selectedImports']);
+        $fieldHtml = '<select name="' . $fieldName . '" id="' . $fieldId . '" class="wide" size="10" multiple="multiple">' . $fieldOptions . '</select>';
+        $additionalFields = [
+            $fieldId => [
+                'code' => $fieldHtml,
+                'label' => $this->ll . 'task_importer.field.selectImports',
+                'cshKey' => 'tx_decosdata_task_importer',
+                'cshLabel' => $fieldId,
+            ],
+        ];
+        return $additionalFields;
+    }
 
-		// provide HTML parameters
-		$fieldName = 'tx_scheduler[selectedImports][]';
-		$fieldId = 'task_selectedImports';
-		$fieldOptions = $this->getImportOptions($taskInfo['selectedImports']);
-		$fieldHtml = '<select name="' . $fieldName . '" id="' . $fieldId . '" class="wide" size="10" multiple="multiple">' . $fieldOptions . '</select>';
-		$additionalFields = [
-			$fieldId => [
-				'code' => $fieldHtml,
-				'label' => $this->ll . 'task_importer.field.selectImports',
-				'cshKey' => 'tx_decosdata_task_importer',
-				'cshLabel' => $fieldId
-			]
-		];
-		return $additionalFields;
-	}
+    /**
+     * Validates the additional fields' values
+     *
+     * @param array $submittedData An array containing the data submitted by the add/edit task form
+     * @param \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $schedulerModule Reference to the scheduler backend module
+     * @return boolean TRUE if validation was ok (or selected class is not relevant), FALSE otherwise
+     */
+    public function validateAdditionalFields(array &$submittedData, \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $schedulerModule)
+    {
+        $valid = false;
+        if (!is_array($submittedData['selectedImports'])) {
+            // @extensionScannerIgnoreLine false positive
+            $this->addMessage(
+                $GLOBALS['LANG']->sL($this->ll . 'task_importer.msg.noImportSelected'),
+                FlashMessage::ERROR,
+            );
+        } else {
+            $availableImports = GeneralUtility::makeInstance(ObjectManager::class)->get(ImportRepository::class)->findAllEverywhere();
+            $validKeys = [];
+            foreach ($availableImports as $import) {
+                $validKeys[] = $import->getUid();
+            }
+            $invalidImports = array_diff($submittedData['selectedImports'], $validKeys);
+            if (!empty($invalidImports)) {
+                // @extensionScannerIgnoreLine false positive
+                $this->addMessage(
+                    $GLOBALS['LANG']->sL($this->ll . 'task_importer.msg.invalidImportSelected'),
+                    FlashMessage::ERROR,
+                );
+            } else {
+                $valid = true;
+            }
+        }
+        return $valid;
+    }
 
-	/**
-	 * Validates the additional fields' values
-	 *
-	 * @param array &$submittedData An array containing the data submitted by the add/edit task form
-	 * @param \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $schedulerModule Reference to the scheduler backend module
-	 * @return boolean TRUE if validation was ok (or selected class is not relevant), FALSE otherwise
-	*/
-	public function validateAdditionalFields(array &$submittedData, \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $schedulerModule) {
-		$valid = FALSE;
-		if (!is_array($submittedData['selectedImports'])) {
-			// @extensionScannerIgnoreLine false positive
-			$this->addMessage(
-				$GLOBALS['LANG']->sL($this->ll . 'task_importer.msg.noImportSelected'),
-				FlashMessage::ERROR
-			);
-		} else {
-			$availableImports = GeneralUtility::makeInstance(ObjectManager::class)->get(ImportRepository::class)->findAllEverywhere();
-			$validKeys = [];
-			foreach ($availableImports as $import) {
-				$validKeys[] = $import->getUid();
-			}
-			$invalidImports = array_diff($submittedData['selectedImports'], $validKeys);
-			if (!empty($invalidImports)) {
-				// @extensionScannerIgnoreLine false positive
-				$this->addMessage(
-					$GLOBALS['LANG']->sL($this->ll . 'task_importer.msg.invalidImportSelected'),
-					FlashMessage::ERROR
-				);
-			} else {
-				$valid = TRUE;
-			}
-		}
-		return $valid;
-	}
+    /**
+     * Takes care of saving the additional fields' values in the task's object
+     *
+     * @param array $submittedData An array containing the data submitted by the add/edit task form
+     * @param \TYPO3\CMS\Scheduler\Task\AbstractTask $task Reference to the scheduler backend module
+     */
+    public function saveAdditionalFields(array $submittedData, \TYPO3\CMS\Scheduler\Task\AbstractTask $task)
+    {
+        $task->selectedImports = $submittedData['selectedImports'];
+    }
 
-	/**
-	 * Takes care of saving the additional fields' values in the task's object
-	 *
-	 * @param array $submittedData An array containing the data submitted by the add/edit task form
-	 * @param \TYPO3\CMS\Scheduler\Task\AbstractTask $task Reference to the scheduler backend module
-	 * @return void
-	*/
-	public function saveAdditionalFields(array $submittedData, \TYPO3\CMS\Scheduler\Task\AbstractTask $task) {
-		$task->selectedImports = $submittedData['selectedImports'];
-	}
-
-	/**
-	 * Build select options of available imports and set currently selected imports,
-	 * for an HTML select element.
-	 *
-	 * @param array $selectedImports Selected imports
-	 * @return string HTML of selectbox options
-	 */
-	protected function getImportOptions(array $selectedImports = []) {
-		$options = [];
-		$imports = GeneralUtility::makeInstance(ObjectManager::class)->get(ImportRepository::class)->findAllEverywhere();
-		/** @var \Innologi\Decosdata\Domain\Model\Import $import */
-		foreach ($imports as $import) {
-			$selected = in_array($import->getUid(), $selectedImports) ? ' selected="selected"' : '';
-			$options[] = '<option value="' . $import->getUid() . '"' . $selected . '>' . $import->getTitle() . ' [pid:' . $import->getPid() . ']</option>';
-		}
-		return join('', $options);
-	}
-
+    /**
+     * Build select options of available imports and set currently selected imports,
+     * for an HTML select element.
+     *
+     * @param array $selectedImports Selected imports
+     * @return string HTML of selectbox options
+     */
+    protected function getImportOptions(array $selectedImports = [])
+    {
+        $options = [];
+        $imports = GeneralUtility::makeInstance(ObjectManager::class)->get(ImportRepository::class)->findAllEverywhere();
+        /** @var \Innologi\Decosdata\Domain\Model\Import $import */
+        foreach ($imports as $import) {
+            $selected = in_array($import->getUid(), $selectedImports) ? ' selected="selected"' : '';
+            $options[] = '<option value="' . $import->getUid() . '"' . $selected . '>' . $import->getTitle() . ' [pid:' . $import->getPid() . ']</option>';
+        }
+        return join('', $options);
+    }
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Domain\Factory;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Domain\Factory;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
+
 /**
  * ItemField factory
  *
@@ -31,25 +34,21 @@ use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemFieldFactory extends FactoryAbstract {
-
-	/**
-	 * Sets properties of domain object
-	 *
-	 * @param \Innologi\Decosdata\Domain\Model\ItemField $object
-	 * @param array $data
-	 * @return void
-	 */
-	protected function setProperties(\Innologi\Decosdata\Domain\Model\ItemField $object, array $data) {
-		if (isset($data['item'])) {
-			$object->setItem($data['item']);
-		}
-		if (isset($data['field'])) {
-			$object->setField($data['field']);
-		}
-		if (isset($data['field_value'])) {
-			$object->setFieldValue($data['field_value']);
-		}
-	}
-
+class ItemFieldFactory extends FactoryAbstract
+{
+    /**
+     * Sets properties of domain object
+     */
+    protected function setProperties(\Innologi\Decosdata\Domain\Model\ItemField $object, array $data)
+    {
+        if (isset($data['item'])) {
+            $object->setItem($data['item']);
+        }
+        if (isset($data['field'])) {
+            $object->setField($data['field']);
+        }
+        if (isset($data['field_value'])) {
+            $object->setFieldValue($data['field_value']);
+        }
+    }
 }

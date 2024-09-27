@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,13 +25,14 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\Option\Exception\AlterQueryFieldDenied;
 use Innologi\Decosdata\Service\Option\Exception\AlterQueryColumnDenied;
+use Innologi\Decosdata\Service\Option\Exception\AlterQueryFieldDenied;
 use Innologi\Decosdata\Service\Option\Exception\AlterQueryRowDenied;
-use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
-use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
-use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
+
 /**
  * Query Option Abstract
  *
@@ -37,33 +40,32 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-abstract class OptionAbstract implements OptionInterface {
+abstract class OptionAbstract implements OptionInterface
+{
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
+     * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryFieldDenied
+     */
+    public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service)
+    {
+        throw new AlterQueryFieldDenied(1448551244, [static::class]);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
-	 * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryFieldDenied
-	 */
-	public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service) {
-		throw new AlterQueryFieldDenied(1448551244, [get_class($this)]);
-	}
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
+     * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryColumnDenied
+     */
+    public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service)
+    {
+        throw new AlterQueryColumnDenied(1448551259, [static::class]);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
-	 * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryColumnDenied
-	 */
-	public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service) {
-		throw new AlterQueryColumnDenied(1448551259, [get_class($this)]);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
-	 * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryRowDenied
-	 */
-	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
-		throw new AlterQueryRowDenied(1448551286, [get_class($this)]);
-	}
-
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
+     * @throws \Innologi\Decosdata\Service\Option\Exception\AlterQueryRowDenied
+     */
+    public function alterQueryRow(array $args, Query $query, QueryOptionService $service)
+    {
+        throw new AlterQueryRowDenied(1448551286, [static::class]);
+    }
 }

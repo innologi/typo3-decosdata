@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Render;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,11 +25,11 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
-use Innologi\TagBuilder\TagInterface;
-use Innologi\TagBuilder\TagContent;
+use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\Decosdata\Service\ParameterService;
+use Innologi\TagBuilder\TagContent;
+use Innologi\TagBuilder\TagInterface;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 
 /**
@@ -39,85 +41,79 @@ use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class LinkLevel implements OptionInterface {
-
-    /**
-     * @var UriBuilder
-     */
+class LinkLevel implements OptionInterface
+{
     protected UriBuilder $uriBuilder;
 
-	/**
-	 * @var ParameterService
-	 */
-	protected $parameterService;
+    /**
+     * @var ParameterService
+     */
+    protected $parameterService;
 
-	// @LOW ___allow this to be set via configuration? TS? or maybe even args?
-	/**
-	 * @var string
-	 */
-	protected $defaultContent = 'link';
+    // @LOW ___allow this to be set via configuration? TS? or maybe even args?
+    /**
+     * @var string
+     */
+    protected $defaultContent = 'link';
 
-	public function injectUriBuilder(UriBuilder $uriBuilder)
-	{
-	    $this->uriBuilder = $uriBuilder;
-	}
+    public function injectUriBuilder(UriBuilder $uriBuilder)
+    {
+        $this->uriBuilder = $uriBuilder;
+    }
 
-	/**
-	 *
-	 * @param ParameterService $parameterService
-	 * @return void
-	 */
-	public function injectParameterService(ParameterService $parameterService)
-	{
-		$this->parameterService = $parameterService;
-	}
+    public function injectParameterService(ParameterService $parameterService)
+    {
+        $this->parameterService = $parameterService;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
-	 */
-	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( !(isset($args['level']) && is_numeric($args['level'])) ) {
-			throw new MissingArgument(1449048090, [self::class, 'level']);
-		}
-		$linkValue = NULL;
-		$item = $service->getItem();
-		if (isset($args['linkItem']) && $args['linkItem']) {
-			$linkValue = (string) $item['id'] ?? '';
-		} elseif (isset($args['linkRelation']) && $args['linkRelation']) {
-			$linkValue = (string) $item['relation' . $service->getIndex()] ?? '';
-		} else {
-			$linkValue = (string) $item['id' . $service->getIndex()] ?? '';
-			//$linkValue = $service->getOriginalContent();
-		}
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
+     */
+    public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service)
+    {
+        if (!(isset($args['level']) && is_numeric($args['level']))) {
+            throw new MissingArgument(1449048090, [self::class, 'level']);
+        }
+        $linkValue = null;
+        $item = $service->getItem();
+        if (isset($args['linkItem']) && $args['linkItem']) {
+            $linkValue = (string) $item['id'] ?? '';
+        } elseif (isset($args['linkRelation']) && $args['linkRelation']) {
+            $linkValue = (string) $item['relation' . $service->getIndex()] ?? '';
+        } else {
+            $linkValue = (string) $item['id' . $service->getIndex()] ?? '';
+            //$linkValue = $service->getOriginalContent();
+        }
 
-		// no linkValue means no uri building, this is not an error
-		if (!isset($linkValue[0])) {
-			return $tag;
-		}
+        // no linkValue means no uri building, this is not an error
+        if (!isset($linkValue[0])) {
+            return $tag;
+        }
 
-		// no content in a TagContent means we need a default substitute
-		if ($tag instanceof TagContent && !$tag->hasContent()) {
-			$tag->setContent($this->defaultContent);
-		}
+        // no content in a TagContent means we need a default substitute
+        if ($tag instanceof TagContent && !$tag->hasContent()) {
+            $tag->setContent($this->defaultContent);
+        }
 
-		// @LOW _if we just read the latest _ argument, can't we derive level from there, so we can get rid of the level arg? we have to be sure that it's not read anywhere else
-		$uri = $this->getUriBuilder($service)
-			->reset()
-			->uriFor(NULL, array_merge(
-				$this->parameterService->getLevelParameters(),
-				[
-					'level' => $args['level'],
-					'_' . $args['level'] => $this->parameterService->encodeParameter($linkValue)
-				]
-			));
+        // @LOW _if we just read the latest _ argument, can't we derive level from there, so we can get rid of the level arg? we have to be sure that it's not read anywhere else
+        $uri = $this->getUriBuilder($service)
+            ->reset()
+            ->uriFor(null, array_merge(
+                $this->parameterService->getLevelParameters(),
+                [
+                    'level' => $args['level'],
+                    '_' . $args['level'] => $this->parameterService->encodeParameter($linkValue),
+                ],
+            ));
 
-		// @TODO ___title and or other attributes? in tx_decospublisher, a title could be set through an argument, which would expand the query to include the field containing the title
-		return $service->getTagFactory()->createTag('a', ['href' => $uri], $tag);
-	}
+        // @TODO ___title and or other attributes? in tx_decospublisher, a title could be set through an argument, which would expand the query to include the field containing the title
+        return $service->getTagFactory()->createTag('a', [
+            'href' => $uri,
+        ], $tag);
+    }
 
-	protected function getUriBuilder(RenderOptionService $service): UriBuilder
-	{
-	    return $this->uriBuilder->setRequest($service->getRequest());
-	}
+    protected function getUriBuilder(RenderOptionService $service): UriBuilder
+    {
+        return $this->uriBuilder->setRequest($service->getRequest());
+    }
 }

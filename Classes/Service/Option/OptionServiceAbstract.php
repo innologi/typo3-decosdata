@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Service\Option;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
+
 /**
  * Option Service Abstract
  *
@@ -35,182 +38,176 @@ use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-abstract class OptionServiceAbstract {
-	// @LOW ___singleton?
-	/**
-	 * @var ObjectManagerInterface
-	 */
-	protected $objectManager;
+abstract class OptionServiceAbstract
+{
+    // @LOW ___singleton?
+    /**
+     * @var ObjectManagerInterface
+     */
+    protected $objectManager;
 
-	/**
-	 * @var array
-	 */
-	protected $objectCache = [];
+    /**
+     * @var array
+     */
+    protected $objectCache = [];
 
-	/**
-	 * @var string
-	 */
-	protected $optionNamespace;
+    /**
+     * @var string
+     */
+    protected $optionNamespace;
 
-	/**
-	 * @var integer
-	 */
-	protected $index;
+    /**
+     * @var integer
+     */
+    protected $index;
 
-	/**
-	 * @var array
-	 */
-	protected $optionVariables = [];
+    /**
+     * @var array
+     */
+    protected $optionVariables = [];
 
-	/**
-	 *
-	 * @param ObjectManagerInterface $objectManager
-	 * @return void
-	 */
-	public function injectObjectManager(ObjectManagerInterface $objectManager)
-	{
-		$this->objectManager = $objectManager;
-	}
+    public function injectObjectManager(ObjectManagerInterface $objectManager)
+    {
+        $this->objectManager = $objectManager;
+    }
 
-	/**
-	 * Class constructor
-	 *
-	 * @return void
-	 */
-	public function __construct() {
-		$this->optionNamespace = str_replace('OptionService', '', get_class($this));
-	}
+    public function __construct()
+    {
+        $this->optionNamespace = str_replace('OptionService', '', static::class);
+    }
 
-	/**
-	 * Returns current index
-	 *
-	 * @return integer
-	 */
-	public function getIndex() {
-		return $this->index;
-	}
+    /**
+     * Returns current index
+     *
+     * @return integer
+     */
+    public function getIndex()
+    {
+        return $this->index;
+    }
 
-	/**
-	 * Sets option variables
-	 *
-	 * @param string $option
-	 * @param array $vars
-	 * @return void
-	 */
-	public function setOptionVariables($option, array $vars = []) {
-		$this->optionVariables[$option] = $vars;
-	}
+    /**
+     * Sets option variables
+     *
+     * @param string $option
+     */
+    public function setOptionVariables($option, array $vars = [])
+    {
+        $this->optionVariables[$option] = $vars;
+    }
 
-	/**
-	 * Unsets option variables
-	 *
-	 * @param string $option
-	 * @return void
-	 */
-	public function unsetOptionVariables($option) {
-		unset($this->optionVariables[$option]);
-	}
+    /**
+     * Unsets option variables
+     *
+     * @param string $option
+     */
+    public function unsetOptionVariables($option)
+    {
+        unset($this->optionVariables[$option]);
+    }
 
-	/**
-	 * Returns option variable
-	 *
-	 * @param string $option
-	 * @param string $var
-	 * @return mixed
-	 */
-	public function getOptionVariable($option, $var) {
-		// array_key_exists makes sure we support returning NULL values for existing $var s
-		if (! (isset($this->optionVariables[$option]) && \array_key_exists($var, $this->optionVariables[$option])) ) {
-			throw new Exception\OptionException(1528817379, ['Option variable {' . $option . ':' . $var . '} does not exist.']);
-		}
-		return $this->optionVariables[$option][$var];
-	}
+    /**
+     * Returns option variable
+     *
+     * @param string $option
+     * @param string $var
+     * @return mixed
+     */
+    public function getOptionVariable($option, $var)
+    {
+        // array_key_exists makes sure we support returning NULL values for existing $var s
+        if (!(isset($this->optionVariables[$option]) && \array_key_exists($var, $this->optionVariables[$option]))) {
+            throw new Exception\OptionException(1528817379, ['Option variable {' . $option . ':' . $var . '} does not exist.']);
+        }
+        return $this->optionVariables[$option][$var];
+    }
 
-	// @TODO ___debug to see if this is still a valid construction now that Query uses objects as $value
-	/**
-	 * Executes the given optionMethod on the requested option.
-	 *
-	 * $option is passed as reference since args may contain .var elements that
-	 * are resolved when executed.
-	 *
-	 * @param string $optionMethod
-	 * @param array $option
-	 * @param mixed $subject
-	 * @return mixed
-	 */
-	protected function executeOption($optionMethod, array &$option, $subject) {
-		// validate args, detect and replace references to previously set option vars
-		$option['args'] = isset($option['args']) && \is_array($option['args']) ? $this->detectAndReplaceArgumentVariables($option['args']) : [];
+    // @TODO ___debug to see if this is still a valid construction now that Query uses objects as $value
+    /**
+     * Executes the given optionMethod on the requested option.
+     *
+     * $option is passed as reference since args may contain .var elements that
+     * are resolved when executed.
+     *
+     * @param string $optionMethod
+     * @param mixed $subject
+     * @return mixed
+     */
+    protected function executeOption($optionMethod, array &$option, $subject)
+    {
+        // validate args, detect and replace references to previously set option vars
+        $option['args'] = isset($option['args']) && \is_array($option['args']) ? $this->detectAndReplaceArgumentVariables($option['args']) : [];
 
-		return call_user_func_array(
-			[$this->getOptionObject($option), $optionMethod],
-			// @LOW ___if the service becomes a singleton, we could do away with the need to pass $this
-			[$option['args'], $subject, $this]
-		);
-	}
+        return call_user_func_array(
+            [$this->getOptionObject($option), $optionMethod],
+            // @LOW ___if the service becomes a singleton, we could do away with the need to pass $this
+            [$option['args'], $subject, $this],
+        );
+    }
 
-	/**
-	 * Recursively detects .var elements in option arguments, and replaces it with requested var value
-	 *
-	 * @param array $args
-	 * @return array
-	 */
-	protected function detectAndReplaceArgumentVariables(array $args) {
-		foreach ($args as $name => &$arg) {
-			// go through arrays but only if the arg isn't a renderOptions recursion
-			if (is_array($arg) && $name !== 'renderOptions') {
-				// replace if there is only a .var string element, or recursively continue detection
-				$arg = isset($arg['var'][0]) && is_string($arg['var']) && \count($arg) === 1
-					? $this->getOptionVariable(...explode(':', $arg['var'], 2))
-					: $this->detectAndReplaceArgumentVariables($arg);
-			}
-		}
-		return $args;
-	}
+    /**
+     * Recursively detects .var elements in option arguments, and replaces it with requested var value
+     *
+     * @return array
+     */
+    protected function detectAndReplaceArgumentVariables(array $args)
+    {
+        foreach ($args as $name => &$arg) {
+            // go through arrays but only if the arg isn't a renderOptions recursion
+            if (is_array($arg) && $name !== 'renderOptions') {
+                // replace if there is only a .var string element, or recursively continue detection
+                $arg = isset($arg['var'][0]) && is_string($arg['var']) && \count($arg) === 1
+                    ? $this->getOptionVariable(...explode(':', $arg['var'], 2))
+                    : $this->detectAndReplaceArgumentVariables($arg);
+            }
+        }
+        return $args;
+    }
 
-	/**
-	 * Get Option Object
-	 *
-	 * @param array $option
-	 * @throws Exception\MissingOption
-	 * @return object
-	 */
-	protected function getOptionObject(array $option) {
-		if ( !isset($option['option']) ) {
-			throw new Exception\MissingOption(1448552481);
-		}
-		$className = $option['option'];
-		if (!isset($this->objectCache[$className])) {
-			$this->objectCache[$className] = $this->resolveOptionClass($className);
-		}
-		return $this->objectCache[$className];
-	}
+    /**
+     * Get Option Object
+     *
+     * @throws Exception\MissingOption
+     * @return object
+     */
+    protected function getOptionObject(array $option)
+    {
+        if (!isset($option['option'])) {
+            throw new Exception\MissingOption(1448552481);
+        }
+        $className = $option['option'];
+        if (!isset($this->objectCache[$className])) {
+            $this->objectCache[$className] = $this->resolveOptionClass($className);
+        }
+        return $this->objectCache[$className];
+    }
 
-	/**
-	 * Resolves an option class by its class name
-	 *
-	 * If classname is given without namespace, the default option namespace is assumed.
-	 *
-	 * @param string $className
-	 * @return object
-	 * @throws Exception\MissingOptionClass
-	 * @throws Exception\InvalidOptionClass
-	 */
-	protected function resolveOptionClass($className) {
-		if (!str_contains($className, '\\')) {
-			$className = $this->optionNamespace . '\\' . $className;
-		}
-		if (!class_exists($className)) {
-			throw new Exception\MissingOptionClass(1448552497, [$className]);
-		}
-		$object = $this->objectManager->get($className);
-		$interfaceClassName = $this->optionNamespace . '\\OptionInterface';
-		if ( !is_subclass_of($object, $interfaceClassName) ) {
-			throw new Exception\InvalidOptionClass(1449155186, [
-				// since $object was retrieved via objectManager, we're not sure if $object Class === $className
-				$object::class, $interfaceClassName
-			]);
-		}
-		return $object;
-	}
+    /**
+     * Resolves an option class by its class name
+     *
+     * If classname is given without namespace, the default option namespace is assumed.
+     *
+     * @param string $className
+     * @return object
+     * @throws Exception\MissingOptionClass
+     * @throws Exception\InvalidOptionClass
+     */
+    protected function resolveOptionClass($className)
+    {
+        if (!str_contains($className, '\\')) {
+            $className = $this->optionNamespace . '\\' . $className;
+        }
+        if (!class_exists($className)) {
+            throw new Exception\MissingOptionClass(1448552497, [$className]);
+        }
+        $object = $this->objectManager->get($className);
+        $interfaceClassName = $this->optionNamespace . '\\OptionInterface';
+        if (!is_subclass_of($object, $interfaceClassName)) {
+            throw new Exception\InvalidOptionClass(1449155186, [
+                // since $object was retrieved via objectManager, we're not sure if $object Class === $className
+                $object::class, $interfaceClassName,
+            ]);
+        }
+        return $object;
+    }
 }

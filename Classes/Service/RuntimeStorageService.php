@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Service;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
+
 /**
  * Runtime Storage Service
  *
@@ -36,65 +39,69 @@ use TYPO3\CMS\Core\SingletonInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class RuntimeStorageService implements SingletonInterface {
+class RuntimeStorageService implements SingletonInterface
+{
+    /**
+     * @var array
+     */
+    protected $storage = [];
 
-	/**
-	 * @var array
-	 */
-	protected $storage = [];
 
+    /**
+     * Generates and returns hash for $input
+     *
+     * @param mixed $input
+     * @return string
+     */
+    public function generateHash($input)
+    {
+        return md5(json_encode($input));
+    }
 
-	/**
-	 * Generates and returns hash for $input
-	 *
-	 * @param mixed $input
-	 * @return string
-	 */
-	public function generateHash($input) {
-		return md5(json_encode($input));
-	}
+    /**
+     * Checks if the $identifier is known
+     *
+     * @param string $identifier
+     * @return boolean
+     */
+    public function has($identifier)
+    {
+        return isset($this->storage[$identifier]);
+    }
 
-	/**
-	 * Checks if the $identifier is known
-	 *
-	 * @param string $identifier
-	 * @return boolean
-	 */
-	public function has($identifier) {
-		return isset($this->storage[$identifier]);
-	}
+    /**
+     * Retrieves variable by $identifier
+     *
+     * @param string $identifier
+     * @return mixed
+     */
+    public function get($identifier)
+    {
+        return $this->storage[$identifier];
+    }
 
-	/**
-	 * Retrieves variable by $identifier
-	 *
-	 * @param string $identifier
-	 * @return mixed
-	 */
-	public function get($identifier) {
-		return $this->storage[$identifier];
-	}
+    /**
+     * Sets variable by $identifier
+     *
+     * @param string $identifier
+     * @param mixed $variable
+     * @return $this
+     */
+    public function set($identifier, $variable)
+    {
+        $this->storage[$identifier] = $variable;
+        return $this;
+    }
 
-	/**
-	 * Sets variable by $identifier
-	 *
-	 * @param string $identifier
-	 * @param mixed $variable
-	 * @return $this
-	 */
-	public function set($identifier, $variable) {
-		$this->storage[$identifier] = $variable;
-		return $this;
-	}
-
-	/**
-	 * Removes variable by $identifier
-	 *
-	 * @param string $identifier
-	 * @return $this
-	 */
-	public function remove($identifier) {
-		unset($this->storage[$identifier]);
-		return $this;
-	}
-
+    /**
+     * Removes variable by $identifier
+     *
+     * @param string $identifier
+     * @return $this
+     */
+    public function remove($identifier)
+    {
+        unset($this->storage[$identifier]);
+        return $this;
+    }
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Service\Option\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class InvalidOptionClass extends OptionException {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Query Option Configuration Error: Option class %1$s needs to implement interface %2$s';
-
+class InvalidOptionClass extends OptionException
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Query Option Configuration Error: Option class %1$s needs to implement interface %2$s';
 }

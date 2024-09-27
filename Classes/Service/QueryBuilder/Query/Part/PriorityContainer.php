@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -33,31 +35,32 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-abstract class PriorityContainer {
+abstract class PriorityContainer
+{
+    /**
+     * @var integer
+     */
+    protected $priority;
 
-	/**
-	 * @var integer
-	 */
-	protected $priority;
+    /**
+     * Returns Priority
+     *
+     * @return integer
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
 
-	/**
-	 * Returns Priority
-	 *
-	 * @return integer
-	 */
-	public function getPriority() {
-		return $this->priority;
-	}
-
-	/**
-	 * Sets priority
-	 *
-	 * @param integer $priority
-	 * @return $this
-	 */
-	public function setPriority($priority) {
-		$this->priority = $priority;
-		return $this;
-	}
-
+    /**
+     * Sets priority
+     *
+     * @param integer $priority
+     * @return $this
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
+        return $this;
+    }
 }

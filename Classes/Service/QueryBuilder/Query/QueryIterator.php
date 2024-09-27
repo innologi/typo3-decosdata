@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,49 +33,52 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-abstract class QueryIterator implements \Iterator {
+abstract class QueryIterator implements \Iterator
+{
+    /**
+     * @var array
+     */
+    protected $children = [];
 
-	/**
-	 * @var array
-	 */
-	protected $children = [];
 
 
+    /**
+     * Ensures proper cloning of object properties
+     */
+    public function __clone()
+    {
+        foreach ($this->children as &$child) {
+            $child = clone $child;
+            $child->setParent($this);
+        }
+    }
 
-	/**
-	 * Ensures proper cloning of object properties
-	 *
-	 * @return void
-	 */
-	public function __clone() {
-		foreach ($this->children as &$child) {
-			$child = clone $child;
-			$child->setParent($this);
-		}
-	}
+    /**************************
+     * Iterator implementation
+     **************************/
 
-	/**************************
-	 * Iterator implementation
-	 **************************/
+    public function current(): mixed
+    {
+        return current($this->children);
+    }
 
-	public function current (): mixed {
-		return current($this->children);
-	}
+    public function next(): void
+    {
+        next($this->children);
+    }
 
-	public function next(): void {
-		next($this->children);
-	}
+    public function key(): mixed
+    {
+        return key($this->children);
+    }
 
-	public function key(): mixed {
-		return key($this->children);
-	}
+    public function valid(): bool
+    {
+        return current($this->children) !== false;
+    }
 
-	public function valid(): bool {
-		return current($this->children) !== FALSE;
-	}
-
-	public function rewind(): void {
-		reset($this->children);
-	}
-
+    public function rewind(): void
+    {
+        reset($this->children);
+    }
 }

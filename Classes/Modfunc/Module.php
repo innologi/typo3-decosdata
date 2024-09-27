@@ -36,13 +36,11 @@ use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Info\Controller\InfoModuleController;
 use TYPO3\CMS\Fluid\View\StandaloneView;
-
+use TYPO3\CMS\Info\Controller\InfoModuleController;
 
 class Module
 {
-
     /**
      * @var ModuleTemplate
      */
@@ -70,7 +68,6 @@ class Module
     protected $modTS = [];
 
     /**
-     *
      * @var integer
      */
     protected $searchLevel = 0;
@@ -86,7 +83,6 @@ class Module
     protected $pObj;
 
     /**
-     *
      * @var integer
      */
     protected $count = 0;
@@ -139,7 +135,7 @@ class Module
             $this->moduleTemplate->addFlashMessage(
                 sprintf($this->getLanguageService()->getLL('routing.flush_success'), $this->count),
                 $this->getLanguageService()->getLL('routing.flush_success.title'),
-                FlashMessage::OK
+                FlashMessage::OK,
             );
             $this->count = 0;
         }
@@ -169,7 +165,7 @@ class Module
             $this->moduleTemplate->addFlashMessage(
                 $this->getLanguageService()->getLL('no.access'),
                 $this->getLanguageService()->getLL('no.access.title'),
-                FlashMessage::ERROR
+                FlashMessage::ERROR,
             );
             return '';
         }
@@ -184,7 +180,7 @@ class Module
         $menuItems = [
             0 => [
                 'label' => $this->getLanguageService()->getLL('tab.routing'),
-                'content' => $routingTabView->render()
+                'content' => $routingTabView->render(),
             ],
         ];
 
@@ -192,9 +188,7 @@ class Module
     }
 
     /**
-     *
      * @param array $pageList Pages to check for routing slugs
-     * @return Statement
      */
     protected function getRoutingSlugs(array $pageList): Statement
     {
@@ -206,17 +200,13 @@ class Module
             ->where(
                 $queryBuilder->expr()->in(
                     'pid',
-                    $queryBuilder->createNamedParameter($pageList, Connection::PARAM_INT_ARRAY)
-                )
+                    $queryBuilder->createNamedParameter($pageList, Connection::PARAM_INT_ARRAY),
+                ),
             )
             ->orderBy('uid')
             ->execute();
     }
 
-    /**
-     *
-     * @return int
-     */
     protected function countRoutingSlugs(): int
     {
         return GeneralUtility::makeInstance(ConnectionPool::class)
@@ -224,10 +214,6 @@ class Module
             ->count('*', 'tx_decosdata_routing_slug', []);
     }
 
-    /**
-     *
-     * @return int
-     */
     protected function flushRoutingSlugs(): int
     {
         return GeneralUtility::makeInstance(ConnectionPool::class)
@@ -235,25 +221,16 @@ class Module
             ->truncate('tx_decosdata_routing_slug');
     }
 
-    /**
-     * @return LanguageService
-     */
     protected function getLanguageService(): LanguageService
     {
         return $GLOBALS['LANG'];
     }
 
-    /**
-     * @return BackendUserAuthentication
-     */
     protected function getBackendUser(): BackendUserAuthentication
     {
         return $GLOBALS['BE_USER'];
     }
 
-    /**
-     * @return PageRenderer
-     */
     protected function getPageRenderer(): PageRenderer
     {
         return GeneralUtility::makeInstance(PageRenderer::class);

@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,9 +25,10 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Part\GroupBy;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Query Content object
  *
@@ -35,175 +38,179 @@ use Innologi\Decosdata\Service\QueryBuilder\Query\Part\GroupBy;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class QueryContent extends QueryIterator implements QueryInterface {
+class QueryContent extends QueryIterator implements QueryInterface
+{
+    /**
+     * @var Query
+     */
+    protected $parent;
 
-	/**
-	 * @var Query
-	 */
-	protected $parent;
+    /**
+     * @var string
+     */
+    protected $id;
 
-	/**
-	 * @var string
-	 */
-	protected $id;
+    /**
+     * @var string
+     */
+    protected $fieldSeparator = ' ';
 
-	/**
-	 * @var string
-	 */
-	protected $fieldSeparator = ' ';
+    /**
+     * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy
+     */
+    protected $orderBy;
 
-	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy
-	 */
-	protected $orderBy;
+    /**
+     * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Part\GroupBy
+     */
+    protected $groupBy;
 
-	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Part\GroupBy
-	 */
-	protected $groupBy;
+    /**
+     * @param string $id
+     * @return $this
+     */
+    public function __construct($id, QueryInterface $parent)
+    {
+        $this->id = $id;
+        $this->parent = $parent;
+        $this->orderBy = GeneralUtility::makeInstance(OrderBy::class);
+        $this->groupBy = GeneralUtility::makeInstance(GroupBy::class);
+        return $this;
+    }
 
-	/**
-	 * Class constructor
-	 *
-	 * @param string $id
-	 * @param QueryInterface $parent
-	 * @return $this
-	 */
-	public function __construct($id, QueryInterface $parent) {
-		$this->id = $id;
-		$this->parent = $parent;
-		$this->orderBy = GeneralUtility::makeInstance(OrderBy::class);
-		$this->groupBy = GeneralUtility::makeInstance(GroupBy::class);
-		return $this;
-	}
+    /**
+     * Returns OrderBy object
+     *
+     * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy
+     */
+    public function getOrderBy()
+    {
+        return $this->orderBy;
+    }
 
-	/**
-	 * Returns OrderBy object
-	 *
-	 * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Part\OrderBy
-	 */
-	public function getOrderBy() {
-		return $this->orderBy;
-	}
+    /**
+     * Returns GroupBy object
+     *
+     * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Part\GroupBy
+     */
+    public function getGroupBy()
+    {
+        return $this->groupBy;
+    }
 
-	/**
-	 * Returns GroupBy object
-	 *
-	 * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Part\GroupBy
-	 */
-	public function getGroupBy() {
-		return $this->groupBy;
-	}
+    /**
+     * Returns Query Field object. If it does not exist yet, it is created.
+     *
+     * @param string $subId
+     * @return QueryField
+     */
+    public function getField($subId)
+    {
+        $id = $this->id . $subId;
+        if (!isset($this->children[$id])) {
+            $this->children[$id] = GeneralUtility::makeInstance(QueryField::class, $id, $this);
+        }
+        return $this->children[$id];
+    }
 
-	/**
-	 * Returns Query Field object. If it does not exist yet, it is created.
-	 *
-	 * @param string $subId
-	 * @return QueryField
-	 */
-	public function getField($subId) {
-		$id = $this->id . $subId;
-		if (!isset($this->children[$id])) {
-			$this->children[$id] = GeneralUtility::makeInstance(QueryField::class, $id, $this);
-		}
-		return $this->children[$id];
-	}
+    /**
+     * Returns id
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * Returns id
-	 *
-	 * @return string
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * Returns field separator
+     *
+     * @return string
+     */
+    public function getFieldSeparator()
+    {
+        return $this->fieldSeparator;
+    }
 
-	/**
-	 * Returns field separator
-	 *
-	 * @return string
-	 */
-	public function getFieldSeparator() {
-		return $this->fieldSeparator;
-	}
+    /**
+     * Set field separator
+     *
+     * @param string $fieldSeparator
+     * @return $this
+     */
+    public function setFieldSeparator($fieldSeparator)
+    {
+        $this->fieldSeparator = $fieldSeparator;
+        return $this;
+    }
 
-	/**
-	 * Set field separator
-	 *
-	 * @param string $fieldSeparator
-	 * @return $this
-	 */
-	public function setFieldSeparator($fieldSeparator) {
-		$this->fieldSeparator = $fieldSeparator;
-		return $this;
-	}
+    /**
+     * Returns parent
+     *
+     * @return Query
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
 
-	/**
-	 * Returns parent
-	 *
-	 * @return Query
-	 */
-	public function getParent() {
-		return $this->parent;
-	}
-
-	/**
-	 * Overrides parent
-	 *
-	 * @param Query $parent
-	 * @return $this
-	 */
-	public function setParent(Query $parent) {
-		$this->parent = $parent;
-		return $this;
-	}
-
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface::getParameters()
-	 */
-	public function getParameters() {
-		return $this->parent->getParameters();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface::setParameters()
-	 */
-	public function setParameters(array $parameters) {
-		$this->parent->setParameters($parameters);
-		return $this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface::addParameter()
-	 */
-	public function addParameter($key, $value) {
-		$this->parent->addParameter($key, $value);
-		return $this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface::removeParameter()
-	 */
-	public function removeParameter($key) {
-		$this->parent->removeParameter($key);
-		return $this;
-	}
+    /**
+     * Overrides parent
+     *
+     * @return $this
+     */
+    public function setParent(Query $parent)
+    {
+        $this->parent = $parent;
+        return $this;
+    }
 
 
+    /**
+     * @see \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface::getParameters()
+     */
+    public function getParameters()
+    {
+        return $this->parent->getParameters();
+    }
 
-	/**
-	 * Ensures proper cloning of object properties
-	 *
-	 * @return void
-	 */
-	public function __clone() {
-		parent::__clone();
-		$this->orderBy = clone $this->orderBy;
-		$this->groupBy = clone $this->groupBy;
-	}
+    /**
+     * @see \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface::setParameters()
+     */
+    public function setParameters(array $parameters)
+    {
+        $this->parent->setParameters($parameters);
+        return $this;
+    }
+
+    /**
+     * @see \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface::addParameter()
+     */
+    public function addParameter($key, $value)
+    {
+        $this->parent->addParameter($key, $value);
+        return $this;
+    }
+
+    /**
+     * @see \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface::removeParameter()
+     */
+    public function removeParameter($key)
+    {
+        $this->parent->removeParameter($key);
+        return $this;
+    }
+
+
+
+    /**
+     * Ensures proper cloning of object properties
+     */
+    public function __clone()
+    {
+        parent::__clone();
+        $this->orderBy = clone $this->orderBy;
+        $this->groupBy = clone $this->groupBy;
+    }
 }

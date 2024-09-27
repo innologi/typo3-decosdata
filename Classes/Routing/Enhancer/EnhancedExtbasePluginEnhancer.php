@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Routing\Enhancer;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -29,6 +31,7 @@ use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\HttpUtility;
 use TYPO3\CMS\Extbase\Routing\ExtbasePluginEnhancer;
+
 /**
  * Enhanced Extbase Plugin Enhancer
  *
@@ -40,39 +43,38 @@ use TYPO3\CMS\Extbase\Routing\ExtbasePluginEnhancer;
  */
 class EnhancedExtbasePluginEnhancer extends ExtbasePluginEnhancer
 {
+    public function buildResult(Route $route, array $results, array $remainingQueryParameters = []): PageArguments
+    {
+        $pageArguments = parent::buildResult($route, $results, $remainingQueryParameters);
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function buildResult(Route $route, array $results, array $remainingQueryParameters = []): PageArguments
-	{
-		$pageArguments = parent::buildResult($route, $results, $remainingQueryParameters);
+        // detect match/resolve context, as opposed to generate
+        if (isset($results['_route'])) {
+            foreach ($pageArguments->getRouteArguments() as $var => $val) {
+                if ($var === $this->namespace && \is_array($val)) {
+                    // fallback to support dependencies to uriBuilder's / typolink's addQueryString
+                    // although I can hardly contain my vomit for doing this, it at least gives me something to work with until TYPO3 routing matures.
+                    // note that this is dangerous as any other (custom) script may not behave well to our alterations.
+                    // So far, no adverse side-affects in vanilla TYPO3 in my use-cases. Even when cHash is involved, it works.
+                    $_GET[$var] = isset($_GET[$var]) ? \array_merge($_GET[$var], $val) : $val;
+                    if (isset($_SERVER['QUERY_STRING'][0])) {
+                        $currentQueryArray = [];
+                        parse_str((string) $_SERVER['QUERY_STRING'], $currentQueryArray);
+                        ArrayUtility::mergeRecursiveWithOverrule($currentQueryArray, [
+                            $var => $val,
+                        ], true);
+                    } else {
+                        $currentQueryArray = [
+                            $var => $val,
+                        ];
+                    }
+                    $_SERVER['QUERY_STRING'] = HttpUtility::buildQueryString($currentQueryArray, '&');
+                    // set Utility's internal cache in case it was read before
+                    GeneralUtility::setIndpEnv('QUERY_STRING', $_SERVER['QUERY_STRING']);
+                    break;
+                }
+            }
+        }
 
-		// detect match/resolve context, as opposed to generate
-		if (isset($results['_route'])) {
-			foreach ( $pageArguments->getRouteArguments() as $var => $val ) {
-				if ($var === $this->namespace && \is_array($val)) {
-					// fallback to support dependencies to uriBuilder's / typolink's addQueryString
-						// although I can hardly contain my vomit for doing this, it at least gives me something to work with until TYPO3 routing matures.
-						// note that this is dangerous as any other (custom) script may not behave well to our alterations.
-						// So far, no adverse side-affects in vanilla TYPO3 in my use-cases. Even when cHash is involved, it works.
-					$_GET[$var] = isset($_GET[$var]) ? \array_merge($_GET[$var], $val) : $val;
-					if (isset($_SERVER['QUERY_STRING'][0])) {
-						$currentQueryArray = [];
-						parse_str((string) $_SERVER['QUERY_STRING'], $currentQueryArray);
-						ArrayUtility::mergeRecursiveWithOverrule($currentQueryArray, [$var => $val], true);
-					} else {
-						$currentQueryArray = [$var => $val];
-					}
-					$_SERVER['QUERY_STRING'] = HttpUtility::buildQueryString($currentQueryArray, '&');
-					// set Utility's internal cache in case it was read before
-					GeneralUtility::setIndpEnv('QUERY_STRING', $_SERVER['QUERY_STRING']);
-					break;
-				}
-			}
-		}
-
-		return $pageArguments;
-	}
-
+        return $pageArguments;
+    }
 }

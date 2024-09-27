@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MissingObjectProperty extends Exception {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Missing required property \'%1$s\' for \'%2$s\' object.';
-
+class MissingObjectProperty extends Exception
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Missing required property \'%1$s\' for \'%2$s\' object.';
 }

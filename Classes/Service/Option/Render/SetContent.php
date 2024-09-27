@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Render;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,10 +25,11 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
-use Innologi\TagBuilder\TagInterface;
+use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\TagBuilder\TagContent;
+use Innologi\TagBuilder\TagInterface;
+
 /**
  * Set Content
  *
@@ -36,29 +39,28 @@ use Innologi\TagBuilder\TagContent;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class SetContent implements OptionInterface {
+class SetContent implements OptionInterface
+{
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
+     * @throws \Innologi\Decosdata\Service\Option\Exception\MissingArgument
+     */
+    public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service)
+    {
+        $wrap = [];
+        if (!isset($args['content'][0])) {
+            throw new MissingArgument(1515607288, [self::class, 'content']);
+        }
 
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
-	 * @throws \Innologi\Decosdata\Service\Option\Exception\MissingArgument
-	 */
-	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		$wrap = [];
-		if (!isset($args['content'][0])) {
-			throw new MissingArgument(1515607288, [self::class, 'content']);
-		}
+        if ($tag instanceof TagContent) {
+            $tag->reset();
+            $tag->setContent($args['content']);
+            return $tag;
+        }
 
-		if ($tag instanceof TagContent) {
-			$tag->reset();
-			$tag->setContent($args['content']);
-			return $tag;
-		}
-
-		// if $tag is an actual Tag instance, replace its content object (if any)
-		return $tag->setContent(
-			$service->getTagFactory()->createTagContent($args['content'])
-		);
-	}
-
+        // if $tag is an actual Tag instance, replace its content object (if any)
+        return $tag->setContent(
+            $service->getTagFactory()->createTagContent($args['content']),
+        );
+    }
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Render;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -27,6 +29,7 @@ use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\TagBuilder\TagInterface;
 use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * File Download option
  *
@@ -36,31 +39,31 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileDownload implements OptionInterface {
-	use Traits\FileHandler;
-	// @TODO ___Absolute URIs for other contexts than normal HTML?
-	// @TODO ___add class?
+class FileDownload implements OptionInterface
+{
+    use Traits\FileHandler;
+    // @TODO ___Absolute URIs for other contexts than normal HTML?
+    // @TODO ___add class?
 
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
-	 */
-	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		// @TODO ___what if the content is empty? Can (and should) we differentiate between originalContent and content? I mean it's clear we shouldn't generate a downloadlink if no file was found
-		// $fileRelativeUrl = $renderer->getFileRelativeUrl();?
-		//if ($fileRelativeUrl === NULL) {
-		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL ) {
-			return $tag;
-		}
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
+     */
+    public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service)
+    {
+        // @TODO ___what if the content is empty? Can (and should) we differentiate between originalContent and content? I mean it's clear we shouldn't generate a downloadlink if no file was found
+        // $fileRelativeUrl = $renderer->getFileRelativeUrl();?
+        //if ($fileRelativeUrl === NULL) {
+        if (($file = $this->getFileObject($service->getOriginalContent())) === null) {
+            return $tag;
+        }
 
-		/** @var Typo3Version $typo3Version */
-		$typo3Version = GeneralUtility::makeInstance(Typo3Version::class);
-		$prefix = $typo3Version->getMajorVersion() > 10 ? '' : $GLOBALS['TSFE']->absRefPrefix;
+        /** @var Typo3Version $typo3Version */
+        $typo3Version = GeneralUtility::makeInstance(Typo3Version::class);
+        $prefix = $typo3Version->getMajorVersion() > 10 ? '' : $GLOBALS['TSFE']->absRefPrefix;
 
-		return $service->getTagFactory()->createTag('a', [
-			'href' => $prefix . $file->getPublicUrl(),
-			'title' => $file->getName()
-		], $tag);
-	}
-
+        return $service->getTagFactory()->createTag('a', [
+            'href' => $prefix . $file->getPublicUrl(),
+            'title' => $file->getName(),
+        ], $tag);
+    }
 }

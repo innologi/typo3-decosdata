@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\View\Item;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,38 +33,38 @@ namespace Innologi\Decosdata\View\Item;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class SingleJson extends \TYPO3\CMS\Extbase\Mvc\View\JsonView {
+class SingleJson extends \TYPO3\CMS\Extbase\Mvc\View\JsonView
+{
+    /**
+     * @var array
+     */
+    protected $variablesToRender = ['section'];
 
-	/**
-	 * @var array
-	 */
-	protected $variablesToRender = ['section'];
+    /**
+     * @var array
+     */
+    protected $configuration = [
+        'section' => [
+            '_only' => ['type', 'data', 'paging'],
+        ],
+    ];
 
-	/**
-	 * @var array
-	 */
-	protected $configuration = [
-		'section' => [
-			'_only' => ['type', 'data', 'paging']
-		]
-	];
+    /**
+     * Limits section.data to contentfields
+     *
+     * @param integer $contentFieldCount
+     */
+    public function addContentFieldsToConfiguration($contentFieldCount)
+    {
+        $this->configuration['section']['data'] = [
+            '_descendAll' => [
+                '_only' => ['id'],
+            ],
+        ];
 
-	/**
-	 * Limits section.data to contentfields
-	 *
-	 * @param integer $contentFieldCount
-	 * @return void
-	 */
-	public function addContentFieldsToConfiguration($contentFieldCount) {
-		$this->configuration['section']['data'] = [
-			'_descendAll' => [
-				'_only' => ['id']
-			]
-		];
-
-		// we only really need the content fields, not other query-added fields that really pad the JSON size
-		for ($i=1; $i<=$contentFieldCount; $i++) {
-			$this->configuration['section']['data']['_descendAll']['_only'][] = 'content' . $i;
-		}
-	}
+        // we only really need the content fields, not other query-added fields that really pad the JSON size
+        for ($i = 1; $i <= $contentFieldCount; $i++) {
+            $this->configuration['section']['data']['_descendAll']['_only'][] = 'content' . $i;
+        }
+    }
 }

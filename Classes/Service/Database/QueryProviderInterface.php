@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Database;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,17 +33,16 @@ namespace Innologi\Decosdata\Service\Database;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-interface QueryProviderInterface {
-
-	/**
-	 * An upsert, or InsertOrUpdateOnDuplicate: will attempt to insert a record,
-	 * or update en existing one if its data matches an existing record.
-	 *
-	 * @param string $table
-	 * @param array $data Contains property => value elements
-	 * @param array $uniqueProperties (optional)
-	 * @return string The upsert query
-	 */
-	public function upsertQuery($table, array $data, array $uniqueProperties = []);
-
+interface QueryProviderInterface
+{
+    /**
+     * An upsert, or InsertOrUpdateOnDuplicate: will attempt to insert a record,
+     * or update en existing one if its data matches an existing record.
+     *
+     * @param string $table
+     * @param array $data Contains property => value elements
+     * @param array $uniqueProperties (optional)
+     * @return string The upsert query
+     */
+    public function upsertQuery($table, array $data, array $uniqueProperties = []);
 }

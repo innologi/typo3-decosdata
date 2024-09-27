@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Domain\Repository;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Domain\Repository;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
+
 /**
  * ItemType domain repository
  *
@@ -31,18 +34,19 @@ use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemTypeRepository extends RepositoryAbstract {
-
-	/**
-	 * Find by item_type value
-	 *
-	 * @param string $type
-	 * @return \Innologi\Decosdata\Domain\Model\ItemType|NULL
-	 */
-	public function findOneByItemType($type) {
-		$query = $this->createQuery();
-		return $query->matching(
-			$query->equals('item_type', $type)
-		)->execute()->getFirst();
-	}
+class ItemTypeRepository extends RepositoryAbstract
+{
+    /**
+     * Find by item_type value
+     *
+     * @param string $type
+     * @return \Innologi\Decosdata\Domain\Model\ItemType|null
+     */
+    public function findOneByItemType($type)
+    {
+        $query = $this->createQuery();
+        return $query->matching(
+            $query->equals('item_type', $type),
+        )->execute()->getFirst();
+    }
 }

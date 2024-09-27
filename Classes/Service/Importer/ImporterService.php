@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Importer;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,12 +25,13 @@ namespace Innologi\Decosdata\Service\Importer;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Core\SingletonInterface;
-use Innologi\Decosdata\Utility\DebugUtility;
 use Innologi\Decosdata\Domain\Repository\ImportRepository;
 use Innologi\Decosdata\Service\Importer\Parser\ParserInterface;
+use Innologi\Decosdata\Utility\DebugUtility;
 use Innologi\TraceLogger\TraceLoggerAwareInterface;
 use Innologi\TraceLogger\TraceLoggerInterface;
+use TYPO3\CMS\Core\SingletonInterface;
+
 /**
  * Importer Service
  *
@@ -38,168 +41,164 @@ use Innologi\TraceLogger\TraceLoggerInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ImporterService implements SingletonInterface,TraceLoggerAwareInterface {
-	use \Innologi\TraceLogger\TraceLoggerAware;
+class ImporterService implements SingletonInterface, TraceLoggerAwareInterface
+{
+    use \Innologi\TraceLogger\TraceLoggerAware;
 
-	/**
-	 * @var ImportRepository
-	 */
-	protected $importRepository;
+    /**
+     * @var ImportRepository
+     */
+    protected $importRepository;
 
-	/**
-	 * @var ParserInterface
-	 */
-	protected $parser;
+    /**
+     * @var ParserInterface
+     */
+    protected $parser;
 
-	/**
-	 * @var array
-	 */
-	protected $errors = [];
+    /**
+     * @var array
+     */
+    protected $errors = [];
 
-	/**
-	 *
-	 * @var string
-	 */
-	protected $sitePath;
+    /**
+     * @var string
+     */
+    protected $sitePath;
 
-	/**
-	 *
-	 * @param ImportRepository $importRepository
-	 * @return void
-	 */
-	public function injectImportRepository(ImportRepository $importRepository)
-	{
-		$this->importRepository = $importRepository;
-	}
+    public function injectImportRepository(ImportRepository $importRepository)
+    {
+        $this->importRepository = $importRepository;
+    }
 
-	/**
-	 *
-	 * @param ParserInterface $parser
-	 * @return void
-	 */
-	public function injectParser(ParserInterface $parser)
-	{
-		$this->parser = $parser;
-	}
+    public function injectParser(ParserInterface $parser)
+    {
+        $this->parser = $parser;
+    }
 
-	/**
-	 * Will process all available imports, regardless of page uid
-	 *
-	 * @return void
-	 */
-	public function importAll($force = FALSE) {
-		$importCollection = $this->importRepository->findAllEverywhere();
-		$this->importSelection($importCollection, $force);
-	}
+    /**
+     * Will process all available imports, regardless of page uid
+     */
+    public function importAll($force = false)
+    {
+        $importCollection = $this->importRepository->findAllEverywhere();
+        $this->importSelection($importCollection, $force);
+    }
 
-	/**
-	 * Will process a selection of imports given as parameter as uid
-	 *
-	 * @param array $uidArray
-	 * @return void
-	 */
-	public function importUidSelection(array $uidArray, $force = FALSE) {
-		if ($this->logger) $this->logger->logTrace();
-		$importCollection = $this->importRepository->findInUidEverywhere($uidArray);
-		$this->importSelection($importCollection, $force);
-	}
+    /**
+     * Will process a selection of imports given as parameter as uid
+     */
+    public function importUidSelection(array $uidArray, $force = false)
+    {
+        if ($this->logger) {
+            $this->logger->logTrace();
+        }
+        $importCollection = $this->importRepository->findInUidEverywhere($uidArray);
+        $this->importSelection($importCollection, $force);
+    }
 
-	/**
-	 * Will process a selection of imports given as parameter
-	 *
-	 * @param \TYPO3\CMS\Extbase\Persistence\QueryResultInterface|array $importCollection
-	 * @return void
-	 */
-	public function importSelection($importCollection, $force = FALSE) {
-		if ($this->logger) $this->logger->logTrace();
-		/* @var $import \Innologi\Decosdata\Domain\Model\Import */
-		foreach ($importCollection as $import) {
-			try {
-				$this->importSingle($import, $force);
-			} catch (Exception\ImporterError $e) {
-				// register the error and move on
-				$this->errors[$import->getUid() . ':' . $import->getTitle()] = $e->getFormattedErrorMessage();
-			}
-			// any other exception is so serious that we have to halt the entire process anyway
-		}
-	}
+    /**
+     * Will process a selection of imports given as parameter
+     *
+     * @param \TYPO3\CMS\Extbase\Persistence\QueryResultInterface|array $importCollection
+     */
+    public function importSelection($importCollection, $force = false)
+    {
+        if ($this->logger) {
+            $this->logger->logTrace();
+        }
+        /** @var \Innologi\Decosdata\Domain\Model\Import $import */
+        foreach ($importCollection as $import) {
+            try {
+                $this->importSingle($import, $force);
+            } catch (Exception\ImporterError $e) {
+                // register the error and move on
+                $this->errors[$import->getUid() . ':' . $import->getTitle()] = $e->getFormattedErrorMessage();
+            }
+            // any other exception is so serious that we have to halt the entire process anyway
+        }
+    }
 
-	/**
-	 * Will process a single import
-	 *
-	 * @param \Innologi\Decosdata\Domain\Model\Import $import
-	 * @return void
-	 * @throws
-	 */
-	public function importSingle(\Innologi\Decosdata\Domain\Model\Import $import, $force = FALSE) {
-		if ($this->logger) $this->logger->logTrace();
-		$filePath = $this->getSitePath() . $import->getFile()->getOriginalResource()->getPublicUrl();
-		if ( !file_exists($filePath) || (($newHash = $this->getHashIfReadyForProcessing($filePath, $import->getHash())) === FALSE && !$force) ) {
-			// @LOW consider throwing an exception, which when caught will register the import as notUpdated?
-			// either no file present, or the file has seen no change: no sense in continuing
-			return;
-		}
+    /**
+     * Will process a single import
+     *
+     * @throws
+     */
+    public function importSingle(\Innologi\Decosdata\Domain\Model\Import $import, $force = false)
+    {
+        if ($this->logger) {
+            $this->logger->logTrace();
+        }
+        $filePath = $this->getSitePath() . $import->getFile()->getOriginalResource()->getPublicUrl();
+        if (!file_exists($filePath) || (($newHash = $this->getHashIfReadyForProcessing($filePath, $import->getHash())) === false && !$force)) {
+            // @LOW consider throwing an exception, which when caught will register the import as notUpdated?
+            // either no file present, or the file has seen no change: no sense in continuing
+            return;
+        }
 
-		$this->parser->processImport($import);
-		// not using the File record's hash, because that one is set initially and could be updated by outside sources
-		if ($newHash !== FALSE) {
-			$import->setHash($newHash);
-		}
-		// mark as processed
-		$this->importRepository->update($import);
+        $this->parser->processImport($import);
+        // not using the File record's hash, because that one is set initially and could be updated by outside sources
+        if ($newHash !== false) {
+            $import->setHash($newHash);
+        }
+        // mark as processed
+        $this->importRepository->update($import);
 
-		// parsing errors throw an exception afterwards
-		$errors = $this->parser->getErrors();
-		if (!empty($errors)) {
-			throw new Exception\ImporterError(
-				1448551145, NULL, DebugUtility::formatArrayValues($errors)
-			);
-		}
-	}
+        // parsing errors throw an exception afterwards
+        $errors = $this->parser->getErrors();
+        if (!empty($errors)) {
+            throw new Exception\ImporterError(
+                1448551145,
+                null,
+                DebugUtility::formatArrayValues($errors),
+            );
+        }
+    }
 
-	/**
-	 *
-	 * @return string
-	 */
-	protected function getSitePath()
-	{
-		if ($this->sitePath === null) {
-			$this->sitePath = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/';
-		}
-		return $this->sitePath;
-	}
+    /**
+     * @return string
+     */
+    protected function getSitePath()
+    {
+        if ($this->sitePath === null) {
+            $this->sitePath = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/';
+        }
+        return $this->sitePath;
+    }
 
-	/**
-	 * Returns hash of $filePath, only if it does not match $knownHash.
-	 * Returns boolean FALSE if file does not exist or hash matches $knownHash.
-	 *
-	 * @param string $filePath
-	 * @param string $knownHash
-	 * @return string|boolean
-	 */
-	protected function getHashIfReadyForProcessing($filePath, $knownHash) {
-		if ($this->logger) $this->logger->logTrace();
-		return ($newHash = md5_file($filePath)) !== $knownHash ? $newHash : FALSE;
-	}
+    /**
+     * Returns hash of $filePath, only if it does not match $knownHash.
+     * Returns boolean FALSE if file does not exist or hash matches $knownHash.
+     *
+     * @param string $filePath
+     * @param string $knownHash
+     * @return string|boolean
+     */
+    protected function getHashIfReadyForProcessing($filePath, $knownHash)
+    {
+        if ($this->logger) {
+            $this->logger->logTrace();
+        }
+        return ($newHash = md5_file($filePath)) !== $knownHash ? $newHash : false;
+    }
 
-	/**
-	 * Returns any errors registered by the service
-	 *
-	 * @return array
-	 */
-	public function getErrors() {
-		return $this->errors;
-	}
+    /**
+     * Returns any errors registered by the service
+     *
+     * @return array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 * @see TraceLoggerAwareInterface::setLogger()
-	 */
-	public function setLogger(TraceLoggerInterface $logger): void {
-		$this->logger = $logger;
-		if ($this->parser instanceof TraceLoggerAwareInterface) {
-			$this->parser->setLogger($logger);
-		}
-	}
-
+    /**
+     * @see TraceLoggerAwareInterface::setLogger()
+     */
+    public function setLogger(TraceLoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+        if ($this->parser instanceof TraceLoggerAwareInterface) {
+            $this->parser->setLogger($logger);
+        }
+    }
 }

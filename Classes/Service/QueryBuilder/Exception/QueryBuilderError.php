@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Exception;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Exception\Exception;
+
 /**
  * Configuration Error
  *
@@ -31,11 +34,10 @@ use Innologi\Decosdata\Exception\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class QueryBuilderError extends Exception {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Query Builder Error: %1$s';
-
+class QueryBuilderError extends Exception
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Query Builder Error: %1$s';
 }

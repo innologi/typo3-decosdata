@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Query\Constraint;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,122 +33,126 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Constraint;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ConstraintCollection implements ConstraintInterface, \Iterator {
+class ConstraintCollection implements ConstraintInterface, \Iterator
+{
+    /**
+     * @var string
+     */
+    protected $logic;
 
-	/**
-	 * @var string
-	 */
-	protected $logic;
+    /**
+     * @var array
+     */
+    protected $constraints;
 
-	/**
-	 * @var array
-	 */
-	protected $constraints;
+    /**
+     * @param string $logic
+     * @return $this
+     */
+    public function __construct($logic, array $constraints = [])
+    {
+        $this->logic = $logic;
+        $this->constraints = $constraints;
+        return $this;
+    }
 
-	/**
-	 * Class constructor
-	 *
-	 * @param string $logic
-	 * @param array $constraints
-	 * @return $this
-	 */
-	public function __construct($logic, array $constraints = []) {
-		$this->logic = $logic;
-		$this->constraints = $constraints;
-		return $this;
-	}
+    /**
+     * Returns logic
+     *
+     * @return string
+     */
+    public function getLogic()
+    {
+        return $this->logic;
+    }
 
-	/**
-	 * Returns logic
-	 *
-	 * @return string
-	 */
-	public function getLogic() {
-		return $this->logic;
-	}
+    /**
+     * Returns constraints
+     *
+     * @return array
+     */
+    public function getConstraints()
+    {
+        return $this->constraints;
+    }
 
-	/**
-	 * Returns constraints
-	 *
-	 * @return array
-	 */
-	public function getConstraints() {
-		return $this->constraints;
-	}
+    /**
+     * Sets constraints
+     *
+     * @return $this
+     */
+    public function setConstraints(array $constraints)
+    {
+        $this->constraints = $constraints;
+        return $this;
+    }
 
-	/**
-	 * Sets constraints
-	 *
-	 * @param array $constraints
-	 * @return $this
-	 */
-	public function setConstraints(array $constraints) {
-		$this->constraints = $constraints;
-		return $this;
-	}
+    /**
+     * Adds constraint
+     *
+     * @param string $key
+     * @return $this
+     */
+    public function addConstraint($key, ConstraintInterface $constraint)
+    {
+        $this->constraints[$key] = $constraint;
+        return $this;
+    }
 
-	/**
-	 * Adds constraint
-	 *
-	 * @param string $key
-	 * @param ConstraintInterface $constraint
-	 * @return $this
-	 */
-	public function addConstraint($key, ConstraintInterface $constraint) {
-		$this->constraints[$key] = $constraint;
-		return $this;
-	}
-
-	/**
-	 * Removes constraint
-	 *
-	 * @param string $key
-	 * @return $this
-	 */
-	public function removeConstraint($key) {
-		if (isset($this->constraints[$key])) {
-			unset($this->constraints[$key]);
-		}
-		return $this;
-	}
-
-
-
-	/**
-	 * Ensures proper cloning of object properties
-	 *
-	 * @return void
-	 */
-	public function __clone() {
-		foreach ($this->constraints as &$constraint) {
-			$constraint = clone $constraint;
-		}
-	}
+    /**
+     * Removes constraint
+     *
+     * @param string $key
+     * @return $this
+     */
+    public function removeConstraint($key)
+    {
+        if (isset($this->constraints[$key])) {
+            unset($this->constraints[$key]);
+        }
+        return $this;
+    }
 
 
 
-	/**************************
-	 * Iterator implementation
-	 **************************/
+    /**
+     * Ensures proper cloning of object properties
+     */
+    public function __clone()
+    {
+        foreach ($this->constraints as &$constraint) {
+            $constraint = clone $constraint;
+        }
+    }
 
-	public function current(): mixed {
-		return current($this->constraints);
-	}
 
-	public function next(): void {
-		next($this->constraints);
-	}
 
-	public function key(): mixed {
-		return key($this->constraints);
-	}
+    /**************************
+     * Iterator implementation
+     **************************/
 
-	public function valid(): bool {
-		return current($this->constraints) !== FALSE;
-	}
+    public function current(): mixed
+    {
+        return current($this->constraints);
+    }
 
-	public function rewind(): void {
-		reset($this->constraints);
-	}
+    public function next(): void
+    {
+        next($this->constraints);
+    }
 
+    public function key(): mixed
+    {
+        return key($this->constraints);
+    }
+
+    public function valid(): bool
+    {
+        return current($this->constraints) !== false;
+    }
+
+    public function rewind(): void
+    {
+        reset($this->constraints);
+    }
 }

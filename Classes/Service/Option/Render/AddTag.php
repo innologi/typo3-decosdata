@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Render;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,9 +25,10 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
+use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\TagBuilder\TagInterface;
+
 /**
  * Add Tag
  *
@@ -35,21 +38,20 @@ use Innologi\TagBuilder\TagInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class AddTag implements OptionInterface {
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
-	 */
-	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( !isset($args['name'][0]) ) {
-			throw new MissingArgument(1466007305, [self::class, 'name']);
-		}
-		return $service->getTagFactory()->createTag(
-			$args['name'],
-			(isset($args['attributes']) && is_array($args['attributes']) ? $args['attributes'] : []),
-			$tag
-		);
-	}
-
+class AddTag implements OptionInterface
+{
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
+     */
+    public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service)
+    {
+        if (!isset($args['name'][0])) {
+            throw new MissingArgument(1466007305, [self::class, 'name']);
+        }
+        return $service->getTagFactory()->createTag(
+            $args['name'],
+            (isset($args['attributes']) && is_array($args['attributes']) ? $args['attributes'] : []),
+            $tag,
+        );
+    }
 }

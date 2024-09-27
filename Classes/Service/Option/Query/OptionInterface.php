@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,10 +25,11 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
-use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
-use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
+
 /**
  * Query Option Interface
  *
@@ -34,39 +37,24 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-interface OptionInterface {
-	// @TODO __consider that for TCA to offer some kind of interface to apply queryOptions with, it could be helpful to NOT enforce these options, put a method_exists check in the optionService, and detect the available uses by which of these methods exist per option
-	/**
-	 * Alters query through $queryField on the field level.
-	 * Influences a specific column field.
-	 *
-	 * @param array $args
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\QueryField $queryField
-	 * @param \Innologi\Decosdata\Service\Option\QueryOptionService $service
-	 * @return void
-	 */
-	public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service);
+interface OptionInterface
+{
+    // @TODO __consider that for TCA to offer some kind of interface to apply queryOptions with, it could be helpful to NOT enforce these options, put a method_exists check in the optionService, and detect the available uses by which of these methods exist per option
+    /**
+     * Alters query through $queryField on the field level.
+     * Influences a specific column field.
+     */
+    public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service);
 
-	/**
-	 * Alters query through $queryContent on the column level.
-	 * Influences all fields of a column.
-	 *
-	 * @param array $args
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent $queryContent
-	 * @param \Innologi\Decosdata\Service\Option\QueryOptionService $service
-	 * @return void
-	 */
-	public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service);
+    /**
+     * Alters query through $queryContent on the column level.
+     * Influences all fields of a column.
+     */
+    public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service);
 
-	/**
-	 * Alters query through $query on the row level.
-	 * Influences the entire row of columns.
-	 *
-	 * @param array $args
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Query $query
-	 * @param \Innologi\Decosdata\Service\Option\QueryOptionService $service
-	 * @return void
-	 */
-	public function alterQueryRow(array $args, Query $query, QueryOptionService $service);
-
+    /**
+     * Alters query through $query on the row level.
+     * Influences the entire row of columns.
+     */
+    public function alterQueryRow(array $args, Query $query, QueryOptionService $service);
 }

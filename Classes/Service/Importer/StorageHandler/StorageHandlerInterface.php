@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Importer\StorageHandler;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,50 +33,40 @@ namespace Innologi\Decosdata\Service\Importer\StorageHandler;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-interface StorageHandlerInterface {
+interface StorageHandlerInterface
+{
+    /**
+     * Initialize Storage Handler
+     *
+     * This will allow the importer to set specific parameters
+     * that are of importance.
+     *
+     * @param integer $pid
+     */
+    public function initialize($pid);
 
-	/**
-	 * Initialize Storage Handler
-	 *
-	 * This will allow the importer to set specific parameters
-	 * that are of importance.
-	 *
-	 * @param integer $pid
-	 * @return void
-	 */
-	public function initialize($pid);
+    /**
+     * Push an item ready for commit.
+     *
+     * @return mixed
+     * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItem
+     */
+    public function pushItem(array $data);
 
-	/**
-	 * Push an item ready for commit.
-	 *
-	 * @param array $data
-	 * @return mixed
-	 * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItem
-	 */
-	public function pushItem(array $data);
+    /**
+     * Push an itemblob ready for commit.
+     *
+     * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob
+     */
+    public function pushItemBlob(array $data);
 
-	/**
-	 * Push an itemblob ready for commit.
-	 *
-	 * @param array $data
-	 * @return void
-	 * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob
-	 */
-	public function pushItemBlob(array $data);
+    /**
+     * Push an itemfield ready for commit.
+     */
+    public function pushItemField(array $data);
 
-	/**
-	 * Push an itemfield ready for commit.
-	 *
-	 * @param array $data
-	 * @return void
-	 */
-	public function pushItemField(array $data);
-
-	/**
-	 * Commits all pushed data.
-	 *
-	 * @return void
-	 */
-	public function commit();
-
+    /**
+     * Commits all pushed data.
+     */
+    public function commit();
 }

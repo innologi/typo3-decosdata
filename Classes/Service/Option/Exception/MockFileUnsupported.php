@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Service\Option\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MockFileUnsupported extends OptionException {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Render Option \'%1$s\' does not support MockFiles created by previous options, please adjust your configuration.';
-
+class MockFileUnsupported extends OptionException
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Render Option \'%1$s\' does not support MockFiles created by previous options, please adjust your configuration.';
 }

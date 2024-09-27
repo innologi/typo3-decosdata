@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,9 +25,10 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
-use Innologi\Decosdata\Service\Option\QueryOptionService;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
+use Innologi\Decosdata\Service\Option\QueryOptionService;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
+
 /**
  * AddFallback option
  *
@@ -35,22 +38,21 @@ use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class AddFallback extends OptionAbstract {
+class AddFallback extends OptionAbstract
+{
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
+     */
+    public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service)
+    {
+        if (!isset($args['value'])) {
+            throw new MissingArgument(1528453416, [self::class, 'value']);
+        }
 
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
-	 */
-	public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service) {
-		if (!isset($args['value'])) {
-			throw new MissingArgument(1528453416, [self::class, 'value']);
-		}
-
-		$id = $queryField->getId() . 'addfallback' . $service->getOptionIndex();
-		$parameterKey = ':' . $id;
-		$select = $queryField->getSelect();
-		$select->addWrap($id, 'COALESCE(' . $select->getWrapDivider() . ', ' . $parameterKey . ')');
-		$queryField->addParameter($parameterKey, $args['value']);
-	}
-
+        $id = $queryField->getId() . 'addfallback' . $service->getOptionIndex();
+        $parameterKey = ':' . $id;
+        $select = $queryField->getSelect();
+        $select->addWrap($id, 'COALESCE(' . $select->getWrapDivider() . ', ' . $parameterKey . ')');
+        $queryField->addParameter($parameterKey, $args['value']);
+    }
 }

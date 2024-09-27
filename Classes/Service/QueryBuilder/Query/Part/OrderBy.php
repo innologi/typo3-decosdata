@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,106 +33,113 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class OrderBy extends PriorityContainer {
+class OrderBy extends PriorityContainer
+{
+    /**
+     * @var string
+     */
+    protected $sortOrder;
 
-	/**
-	 * @var string
-	 */
-	protected $sortOrder;
+    /**
+     * @var string
+     */
+    protected $tableAlias;
 
-	/**
-	 * @var string
-	 */
-	protected $tableAlias;
+    /**
+     * @var string
+     */
+    protected $field;
 
-	/**
-	 * @var string
-	 */
-	protected $field;
+    /**
+     * @var boolean
+     */
+    protected $forceNumeric = false;
 
-	/**
-	 * @var boolean
-	 */
-	protected $forceNumeric = FALSE;
+    /**
+     * Returns Sort Order
+     *
+     * @return string
+     */
+    public function getSortOrder()
+    {
+        return $this->sortOrder;
+    }
 
-	/**
-	 * Returns Sort Order
-	 *
-	 * @return string
-	 */
-	public function getSortOrder() {
-		return $this->sortOrder;
-	}
+    /**
+     * Sets Sort Order
+     *
+     * @param string $sortOrder
+     * @return $this
+     */
+    public function setSortOrder($sortOrder)
+    {
+        $this->sortOrder = $sortOrder;
+        return $this;
+    }
 
-	/**
-	 * Sets Sort Order
-	 *
-	 * @param string $sortOrder
-	 * @return $this
-	 */
-	public function setSortOrder($sortOrder) {
-		$this->sortOrder = $sortOrder;
-		return $this;
-	}
+    /**
+     * Returns Table Alias
+     *
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return $this->tableAlias;
+    }
 
-	/**
-	 * Returns Table Alias
-	 *
-	 * @return string
-	 */
-	public function getTableAlias() {
-		return $this->tableAlias;
-	}
+    /**
+     * Sets Table Alias
+     *
+     * @param string $tableAlias
+     * @return $this
+     */
+    public function setTableAlias($tableAlias)
+    {
+        $this->tableAlias = $tableAlias;
+        return $this;
+    }
 
-	/**
-	 * Sets Table Alias
-	 *
-	 * @param string $tableAlias
-	 * @return $this
-	 */
-	public function setTableAlias($tableAlias) {
-		$this->tableAlias = $tableAlias;
-		return $this;
-	}
+    /**
+     * Returns field
+     *
+     * @return string
+     */
+    public function getField()
+    {
+        return $this->field;
+    }
 
-	/**
-	 * Returns field
-	 *
-	 * @return string
-	 */
-	public function getField() {
-		return $this->field;
-	}
+    /**
+     * Sets field
+     *
+     * @param string $field
+     * @return $this
+     */
+    public function setField($field)
+    {
+        $this->field = $field;
+        return $this;
+    }
 
-	/**
-	 * Sets field
-	 *
-	 * @param string $field
-	 * @return $this
-	 */
-	public function setField($field) {
-		$this->field = $field;
-		return $this;
-	}
+    /**
+     * Returns ForceNumeric
+     *
+     * @return boolean
+     */
+    public function getForceNumeric()
+    {
+        return $this->forceNumeric;
+    }
 
-	/**
-	 * Returns ForceNumeric
-	 *
-	 * @return boolean
-	 */
-	public function getForceNumeric() {
-		return $this->forceNumeric;
-	}
-
-	/**
-	 * Sets ForceNumeric
-	 *
-	 * @param boolean $forceNumeric
-	 * @return $this
-	 */
-	public function setForceNumeric($forceNumeric) {
-		$this->forceNumeric = $forceNumeric;
-		return $this;
-	}
-
+    /**
+     * Sets ForceNumeric
+     *
+     * @param boolean $forceNumeric
+     * @return $this
+     */
+    public function setForceNumeric($forceNumeric)
+    {
+        $this->forceNumeric = $forceNumeric;
+        return $this;
+    }
 }

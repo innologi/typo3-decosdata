@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Domain\Model;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Domain\Model;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+
 /**
  * Import domain model
  *
@@ -31,116 +34,122 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class Import extends AbstractEntity {
+class Import extends AbstractEntity
+{
+    /**
+     * Title
+     *
+     * @var string
+     * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
+     */
+    protected $title;
 
-	/**
-	 * Title
-	 *
-	 * @var string
-	 * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
-	 */
-	protected $title;
+    /**
+     * File reference
+     *
+     * @var \TYPO3\CMS\Extbase\Domain\Model\FileReference
+     * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
+     */
+    protected $file;
 
-	/**
-	 * File reference
-	 *
-	 * @var \TYPO3\CMS\Extbase\Domain\Model\FileReference
-	 * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
-	 */
-	protected $file;
+    /**
+     * File Hash
+     *
+     * @var string
+     */
+    protected $hash;
 
-	/**
-	 * File Hash
-	 *
-	 * @var string
-	 */
-	protected $hash;
+    /**
+     * Forget all previous content on new update
+     *
+     * @var boolean
+     */
+    protected $forgetOnUpdate;
 
-	/**
-	 * Forget all previous content on new update
-	 *
-	 * @var boolean
-	 */
-	protected $forgetOnUpdate;
+    /**
+     * Returns the title
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
 
-	/**
-	 * Returns the title
-	 *
-	 * @return string
-	 */
-	public function getTitle() {
-		return $this->title;
-	}
+    /**
+     * Sets the title
+     *
+     * @param string $title
+     * @return \Innologi\Decosdata\Domain\Model\Import
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+        return $this;
+    }
 
-	/**
-	 * Sets the title
-	 *
-	 * @param string $title
-	 * @return \Innologi\Decosdata\Domain\Model\Import
-	 */
-	public function setTitle($title) {
-		$this->title = $title;
-		return $this;
-	}
+    /**
+     * Returns the file
+     *
+     * @return \TYPO3\CMS\Extbase\Domain\Model\FileReference
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
 
-	/**
-	 * Returns the file
-	 *
-	 * @return \TYPO3\CMS\Extbase\Domain\Model\FileReference $file
-	 */
-	public function getFile() {
-		return $this->file;
-	}
+    /**
+     * Sets the file
+     *
+     * @return \Innologi\Decosdata\Domain\Model\Import
+     */
+    public function setFile(\TYPO3\CMS\Extbase\Domain\Model\FileReference $file)
+    {
+        $this->file = $file;
+        return $this;
+    }
 
-	/**
-	 * Sets the file
-	 *
-	 * @param \TYPO3\CMS\Extbase\Domain\Model\FileReference $file
-	 * @return \Innologi\Decosdata\Domain\Model\Import
-	 */
-	public function setFile(\TYPO3\CMS\Extbase\Domain\Model\FileReference $file) {
-		$this->file = $file;
-		return $this;
-	}
+    /**
+     * Returns the hash
+     *
+     * @return string
+     */
+    public function getHash()
+    {
+        return $this->hash;
+    }
 
-	/**
-	 * Returns the hash
-	 *
-	 * @return string
-	 */
-	public function getHash() {
-		return $this->hash;
-	}
+    /**
+     * Sets the hash
+     *
+     * @param string $hash
+     * @return \Innologi\Decosdata\Domain\Model\Import
+     */
+    public function setHash($hash)
+    {
+        $this->hash = $hash;
+        return $this;
+    }
 
-	/**
-	 * Sets the hash
-	 *
-	 * @param string $hash
-	 * @return \Innologi\Decosdata\Domain\Model\Import
-	 */
-	public function setHash($hash) {
-		$this->hash = $hash;
-		return $this;
-	}
+    /**
+     * Returns the forgetOnUpdate
+     *
+     * @return boolean
+     */
+    public function getForgetOnUpdate()
+    {
+        return $this->forgetOnUpdate;
+    }
 
-	/**
-	 * Returns the forgetOnUpdate
-	 *
-	 * @return boolean
-	 */
-	public function getForgetOnUpdate() {
-		return $this->forgetOnUpdate;
-	}
-
-	/**
-	 * Sets the forgetOnUpdate
-	 *
-	 * @param boolean $forgetOnUpdate
-	 * @return \Innologi\Decosdata\Domain\Model\Import
-	 */
-	public function setForgetOnUpdate($forgetOnUpdate) {
-		$this->forgetOnUpdate = $forgetOnUpdate;
-		return $this;
-	}
-
+    /**
+     * Sets the forgetOnUpdate
+     *
+     * @param boolean $forgetOnUpdate
+     * @return \Innologi\Decosdata\Domain\Model\Import
+     */
+    public function setForgetOnUpdate($forgetOnUpdate)
+    {
+        $this->forgetOnUpdate = $forgetOnUpdate;
+        return $this;
+    }
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Eid;
+
 /***************************************************************
  * Copyright notice
  *
@@ -23,8 +25,9 @@ namespace Innologi\Decosdata\Eid;
  *
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Innologi\Decosdata\Service\DownloadService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Download Eid script
  *
@@ -32,22 +35,23 @@ use Innologi\Decosdata\Service\DownloadService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class Download {
+class Download
+{
+    /**
+     * Run Eid script and return output
+     *
+     * @return string
+     */
+    public function run()
+    {
+        /** @var DownloadService $downloadService */
+        $downloadService = GeneralUtility::makeInstance(DownloadService::class);
 
-	/**
-	 * Run Eid script and return output
-	 *
-	 * @return string
-	 */
-	public function run() {
-		/** @var DownloadService $downloadService */
-		$downloadService = GeneralUtility::makeInstance(DownloadService::class);
-
-		// @TODO try/catch for better response?
-		$downloadService
-			->validateRequest()
-			->sendFile(TRUE);
-	}
+        // @TODO try/catch for better response?
+        $downloadService
+            ->validateRequest()
+            ->sendFile(true);
+    }
 }
 
 $eID = GeneralUtility::makeInstance(Download::class);

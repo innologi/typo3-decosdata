@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Render;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,10 +25,11 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+use Innologi\Decosdata\Service\DownloadService;
+use Innologi\Decosdata\Service\Option\Exception\MockFileUnsupported;
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\TagBuilder\TagInterface;
-use Innologi\Decosdata\Service\Option\Exception\MockFileUnsupported;
-use Innologi\Decosdata\Service\DownloadService;
+
 /**
  * File Download option
  *
@@ -36,48 +39,43 @@ use Innologi\Decosdata\Service\DownloadService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileDownloadObscured implements OptionInterface {
-	use Traits\FileHandler;
-	// @TODO ___add class?
-	/**
-	 * @var DownloadService
-	 */
-	protected $downloadService;
+class FileDownloadObscured implements OptionInterface
+{
+    use Traits\FileHandler;
+    // @TODO ___add class?
+    /**
+     * @var DownloadService
+     */
+    protected $downloadService;
 
-	/**
-	 *
-	 * @param DownloadService $downloadService
-	 * @return void
-	 */
-	public function injectDownloadService(DownloadService $downloadService)
-	{
-		$this->downloadService = $downloadService;
-	}
+    public function injectDownloadService(DownloadService $downloadService)
+    {
+        $this->downloadService = $downloadService;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
-	 */
-	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		// @TODO ___what if the content is empty? Can (and should) we differentiate between originalContent and content? I mean it's clear we shouldn't generate a downloadlink if no file was found
-		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL ) {
-			return $tag;
-		}
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
+     */
+    public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service)
+    {
+        // @TODO ___what if the content is empty? Can (and should) we differentiate between originalContent and content? I mean it's clear we shouldn't generate a downloadlink if no file was found
+        if (($file = $this->getFileObject($service->getOriginalContent())) === null) {
+            return $tag;
+        }
 
-		if ( !($this->fileUid > 0) ) {
-			throw new MockFileUnsupported(1537371733, ['FileDownloadObscured']);
-		}
+        if (!($this->fileUid > 0)) {
+            throw new MockFileUnsupported(1537371733, ['FileDownloadObscured']);
+        }
 
-		$item = $service->getItem();
-		$id = 'id' . $service->getIndex();
-		if (!isset($item['id'])) {
-			// @TODO throw exception
-		}
+        $item = $service->getItem();
+        $id = 'id' . $service->getIndex();
+        if (!isset($item['id'])) {
+            // @TODO throw exception
+        }
 
-		return $service->getTagFactory()->createTag('a', [
-			'href' => $this->downloadService->getDownloadUrl($this->fileUid, (int)$item[$id], $item['id']),
-			'title' => $file->getName()
-		], $tag);
-	}
-
+        return $service->getTagFactory()->createTag('a', [
+            'href' => $this->downloadService->getDownloadUrl($this->fileUid, (int) $item[$id], $item['id']),
+            'title' => $file->getName(),
+        ], $tag);
+    }
 }

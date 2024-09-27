@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Importer\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Service\Importer\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class UnreadableImportFile extends ValidationFailed {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Unreadable Import File: the path \'%1$s\' is either not a file, unreadable, or of an unexpected format.';
-
+class UnreadableImportFile extends ValidationFailed
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Unreadable Import File: the path \'%1$s\' is either not a file, unreadable, or of an unexpected format.';
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Domain\Factory;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,9 +25,10 @@ namespace Innologi\Decosdata\Domain\Factory;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
-use Innologi\Decosdata\Exception\MissingObjectProperty;
 use Innologi\Decosdata\Domain\Repository\ItemTypeRepository;
+use Innologi\Decosdata\Exception\MissingObjectProperty;
+use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
+
 /**
  * ItemType factory
  *
@@ -33,68 +36,63 @@ use Innologi\Decosdata\Domain\Repository\ItemTypeRepository;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemTypeFactory extends FactoryAbstract {
+class ItemTypeFactory extends FactoryAbstract
+{
+    /**
+     * @var ItemTypeRepository
+     */
+    protected $repository;
 
-	/**
-	 * @var ItemTypeRepository
-	 */
-	protected $repository;
+    public function injectRepository(ItemTypeRepository $repository)
+    {
+        $this->repository = $repository;
+    }
 
-	/**
-	 *
-	 * @param ItemTypeRepository $repository
-	 * @return void
-	 */
-	public function injectRepository(ItemTypeRepository $repository)
-	{
-		$this->repository = $repository;
-	}
+    /**
+     * Sets properties of domain object
+     *
+     * @throws \Innologi\Decosdata\Exception\MissingObjectProperty
+     */
+    protected function setProperties(\Innologi\Decosdata\Domain\Model\ItemType $object, array $data)
+    {
+        if (!isset($data['item_type'][0])) {
+            throw new MissingObjectProperty(1448549941, [
+                'item_type',
+                'ItemType',
+            ]);
+        }
+        $object->setItemType($data['item_type']);
+    }
 
-	/**
-	 * Sets properties of domain object
-	 *
-	 * @param \Innologi\Decosdata\Domain\Model\ItemType $object
-	 * @param array $data
-	 * @return void
-	 * @throws \Innologi\Decosdata\Exception\MissingObjectProperty
-	 */
-	protected function setProperties(\Innologi\Decosdata\Domain\Model\ItemType $object, array $data) {
-		if (!isset($data['item_type'][0])) {
-			throw new MissingObjectProperty(1448549941, [
-				'item_type',
-				'ItemType'
-			]);
-		}
-		$object->setItemType($data['item_type']);
-	}
-
-	/**
-	 * Retrieve ItemType Object from, in this order until successful:
-	 * - local object cache
-	 * - repository
-	 * - newly created by parameters
-	 *
-	 * Optionally inserts the (value)Object into the database
-	 * to relieve the much heavier persistence mechanisms.
-	 *
-	 * @param string $type
-	 * @param boolean $autoInsert
-	 * @return \Innologi\Decosdata\Domain\Model\ItemType
-	 */
-	public function getByItemType($type, $autoInsert = FALSE) {
-		$cacheKey = $type . ';;;' . $this->storagePid;
-		if (!isset($this->objectCache[$cacheKey])) {
-			/* @var $typeObject \Innologi\Decosdata\Domain\Model\ItemType */
-			$typeObject = $this->repository->findOneByItemType($type);
-			if ($typeObject === NULL) {
-				$data = ['item_type' => $type];
-				$typeObject = $autoInsert
-					? $this->createAndStoreObject($data)
-					: $this->create($data);
-			}
-			$this->objectCache[$cacheKey] = $typeObject;
-		}
-		return $this->objectCache[$cacheKey];
-	}
-
+    /**
+     * Retrieve ItemType Object from, in this order until successful:
+     * - local object cache
+     * - repository
+     * - newly created by parameters
+     *
+     * Optionally inserts the (value)Object into the database
+     * to relieve the much heavier persistence mechanisms.
+     *
+     * @param string $type
+     * @param boolean $autoInsert
+     * @return \Innologi\Decosdata\Domain\Model\ItemType
+     */
+    public function getByItemType($type, $autoInsert = false)
+    {
+        $cacheKey = $type . ';;;' . $this->storagePid;
+        if (!isset($this->objectCache[$cacheKey])) {
+            /** @var \Innologi\Decosdata\Domain\Model\ItemType $typeObject */
+            $typeObject = $this->repository->findOneByItemType($type);
+            if ($typeObject === null) {
+                $data = [
+                    'item_type' => $type,
+                ];
+                $typeObject = $autoInsert
+                    ? $this->createAndStoreObject($data)
+                    : $this->create($data);
+            }
+            $this->objectCache[$cacheKey] = $typeObject;
+        }
+        return $this->objectCache[$cacheKey];
+    }
 }

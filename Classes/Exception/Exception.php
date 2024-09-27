@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,33 +33,31 @@ namespace Innologi\Decosdata\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class Exception extends \Exception {
+class Exception extends \Exception
+{
+    /**
+     * @param integer $code (optional)
+     * @param array $messageArguments (optional)
+     * @param string $message (optional)
+     */
+    public function __construct($code = null, array $messageArguments = null, $message = null)
+    {
+        $this->code = $code;
+        if ($message !== null) {
+            $this->message = $message;
+        }
+        if ($messageArguments !== null) {
+            $this->message = vsprintf($this->message, $messageArguments);
+        }
+    }
 
-	/**
-	 * Class constructor
-	 *
-	 * @param integer $code (optional)
-	 * @param array $messageArguments (optional)
-	 * @param string $message (optional)
-	 * @return void
-	 */
-	public function __construct($code = NULL, array $messageArguments = NULL, $message = NULL) {
-		$this->code = $code;
-		if ($message !== NULL) {
-			$this->message = $message;
-		}
-		if ($messageArguments !== NULL) {
-			$this->message = vsprintf($this->message, $messageArguments);
-		}
-	}
-
-	/**
-	 * Return error message formatted, prepended with code
-	 *
-	 * @return string
-	 */
-	public function getFormattedErrorMessage() {
-		return '[' . $this->code . '] ' . $this->message;
-	}
-
+    /**
+     * Return error message formatted, prepended with code
+     *
+     * @return string
+     */
+    public function getFormattedErrorMessage()
+    {
+        return '[' . $this->code . '] ' . $this->message;
+    }
 }

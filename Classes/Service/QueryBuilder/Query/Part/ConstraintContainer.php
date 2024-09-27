@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,10 +25,11 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintAnd;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintInterface;
-use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintAnd;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Constraint Container abstract
  *
@@ -36,102 +39,101 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-abstract class ConstraintContainer {
+abstract class ConstraintContainer
+{
+    /**
+     * @var string
+     */
+    protected $constraintKey;
 
-	/**
-	 *
-	 * @var string
-	 */
-	protected $constraintKey;
+    /**
+     * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintInterface
+     */
+    protected $constraint;
 
-	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintInterface
-	 */
-	protected $constraint;
+    /**
+     * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
+     */
+    protected $constraintFactory;
 
-	/**
-	 * @var \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
-	 */
-	protected $constraintFactory;
+    /**
+     * Returns constraints
+     *
+     * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintInterface
+     */
+    public function getConstraint()
+    {
+        return $this->constraint;
+    }
 
-	/**
-	 * Returns constraints
-	 *
-	 * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintInterface
-	 */
-	public function getConstraint() {
-		return $this->constraint;
-	}
+    /**
+     * Sets constraint
+     *
+     * @return $this
+     */
+    public function setConstraint(ConstraintInterface $constraint)
+    {
+        $this->constraint = $constraint;
+        return $this;
+    }
 
-	/**
-	 * Sets constraint
-	 *
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintInterface $constraint
-	 * @return $this
-	 */
-	public function setConstraint(ConstraintInterface $constraint) {
-		$this->constraint = $constraint;
-		return $this;
-	}
+    /**
+     * Adds a constraint to already existing ones.
+     *
+     * Note that there is only one constraint. This method will check if there already
+     * is one, and if so, creates an ConstraintAnd to which both constraints can be added.
+     *
+     * @param string $key
+     * @return $this
+     */
+    public function addConstraint($key, ConstraintInterface $constraint)
+    {
+        if ($this->constraint !== null) {
+            // an existing constraint means we need to add both constraints to a collection
+            if ($this->constraint instanceof ConstraintAnd) {
+                // but if our existing constraint already is a usable collection, just add to
+                // it to save memory and performance
+                $this->constraint->addConstraint($key, $constraint);
+                return $this;
+            }
+            // @LOW test if $this->constraintKey === $key, then $constraint takes precedence
+            $constraint = $this->getConstraintFactory()->createConstraintAnd([
+                $this->constraintKey ?? 'original' => $this->constraint,
+                $key => $constraint,
+            ]);
+            $key = null;
+        }
 
-	/**
-	 * Adds a constraint to already existing ones.
-	 *
-	 * Note that there is only one constraint. This method will check if there already
-	 * is one, and if so, creates an ConstraintAnd to which both constraints can be added.
-	 *
-	 * @param string $key
-	 * @param ConstraintInterface $constraint
-	 * @return $this
-	 */
-	public function addConstraint($key, ConstraintInterface $constraint) {
-		if ($this->constraint !== NULL) {
-			// an existing constraint means we need to add both constraints to a collection
-			if ($this->constraint instanceof ConstraintAnd) {
-				// but if our existing constraint already is a usable collection, just add to
-				// it to save memory and performance
-				$this->constraint->addConstraint($key, $constraint);
-				return $this;
-			} else {
-				// @LOW test if $this->constraintKey === $key, then $constraint takes precedence
-				$constraint = $this->getConstraintFactory()->createConstraintAnd([
-					$this->constraintKey ?? 'original' => $this->constraint,
-					$key => $constraint
-				]);
-				$key = null;
-			}
-		}
+        $this->constraintKey = $key;
+        return $this->setConstraint($constraint);
+    }
 
-		$this->constraintKey = $key;
-		return $this->setConstraint($constraint);
-	}
-
-	/**
-	 * Returns ConstraintFactory.
-	 *
-	 * This construct is preferred over DI in this specific case, because we only ever need
-	 * the constraintFactory added to this class if it is used, which is ON FEW OCCASSIONS
-	 * only. So this saves us some memory and performance.
-	 *
-	 * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
-	 */
-	protected function getConstraintFactory() {
-		if ($this->constraintFactory === NULL) {
-			$this->constraintFactory = GeneralUtility::makeInstance(ConstraintFactory::class);
-		}
-		return $this->constraintFactory;
-	}
+    /**
+     * Returns ConstraintFactory.
+     *
+     * This construct is preferred over DI in this specific case, because we only ever need
+     * the constraintFactory added to this class if it is used, which is ON FEW OCCASSIONS
+     * only. So this saves us some memory and performance.
+     *
+     * @return \Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory
+     */
+    protected function getConstraintFactory()
+    {
+        if ($this->constraintFactory === null) {
+            $this->constraintFactory = GeneralUtility::makeInstance(ConstraintFactory::class);
+        }
+        return $this->constraintFactory;
+    }
 
 
 
-	/**
-	 * Ensures proper cloning of object properties
-	 *
-	 * @return void
-	 */
-	public function __clone() {
-		if ($this->constraint !== NULL) {
-			$this->constraint = clone $this->constraint;
-		}
-	}
+    /**
+     * Ensures proper cloning of object properties
+     */
+    public function __clone()
+    {
+        if ($this->constraint !== null) {
+            $this->constraint = clone $this->constraint;
+        }
+    }
 }

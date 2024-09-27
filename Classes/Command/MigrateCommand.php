@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Command;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -22,13 +24,14 @@ namespace Innologi\Decosdata\Command;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Core\Bootstrap;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Input\InputOption;
+use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Migrate Command
  *
@@ -36,55 +39,52 @@ use Symfony\Component\Console\Input\InputOption;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MigrateCommand extends Command {
+class MigrateCommand extends Command
+{
+    /**
+     * Configure the command by defining the name, options and arguments
+     */
+    protected function configure()
+    {
+        $this->setDescription(
+            'decospublisher => decosdata migration',
+        )->addOption(
+            'table-source',
+            't',
+            InputOption::VALUE_NONE,
+            'Override source-extension requirement if tables exist',
+        );
+        // @LOW setHelp()
+        // @LOW addUsage()
+        // @LOW disableSimulateArg?
+    }
 
-	/**
-	 * Configure the command by defining the name, options and arguments
-	 *
-	 * @return void
-	 */
-	protected function configure() {
-		$this->setDescription(
-			'decospublisher => decosdata migration'
-		)->addOption(
-			'table-source',
-			't',
-			InputOption::VALUE_NONE,
-			'Override source-extension requirement if tables exist'
-		);
-		// @LOW setHelp()
-		// @LOW addUsage()
-		// @LOW disableSimulateArg?
-	}
+    /**
+     * Executes the command for adding the lock file
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        // Make sure the _cli_ user is loaded
+        Bootstrap::initializeBackendAuthentication();
 
-	/**
-	 * Executes the command for adding the lock file
-	 *
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 * @return void
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		// Make sure the _cli_ user is loaded
-		Bootstrap::initializeBackendAuthentication();
+        $output->setDecorated(true);
+        $io = new SymfonyStyle($input, $output);
+        $io->title($this->getDescription());
+        $arguments = [
+            'overrideSourceRequirement' => (bool) $input->getOption('table-source'),
+        ];
 
-		$output->setDecorated(TRUE);
-		$io = new SymfonyStyle($input, $output);
-		$io->title($this->getDescription());
-		$arguments = [
-			'overrideSourceRequirement' => (bool) $input->getOption('table-source')
-		];
-
-		try {
-			$controller = GeneralUtility::makeInstance(
-				Controller\MigrateController::class, $io, $arguments
-			);
-			// @extensionScannerIgnoreLine false positive
-			$controller->main();
-		} catch (\Exception $e) {
-			// @extensionScannerIgnoreLine false positive
-			$io->error('[' . $e->getCode() . '] ' . $e->getMessage());
-		}
-	}
-
+        try {
+            $controller = GeneralUtility::makeInstance(
+                Controller\MigrateController::class,
+                $io,
+                $arguments,
+            );
+            // @extensionScannerIgnoreLine false positive
+            $controller->main();
+        } catch (\Exception $e) {
+            // @extensionScannerIgnoreLine false positive
+            $io->error('[' . $e->getCode() . '] ' . $e->getMessage());
+        }
+    }
 }

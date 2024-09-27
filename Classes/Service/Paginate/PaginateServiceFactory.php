@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Paginate;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,9 +25,10 @@ namespace Innologi\Decosdata\Service\Paginate;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Core\SingletonInterface;
 use Innologi\Decosdata\Exception\NotInitialized;
+use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
+
 /**
  * Pagination Service Factory
  *
@@ -36,54 +39,49 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class PaginateServiceFactory implements SingletonInterface {
+class PaginateServiceFactory implements SingletonInterface
+{
+    /**
+     * @var ObjectManager
+     */
+    protected $objectManager;
 
-	/**
-	 * @var ObjectManager
-	 */
-	protected $objectManager;
+    /**
+     * @var array
+     */
+    protected $instances = [];
 
-	/**
-	 * @var array
-	 */
-	protected $instances = [];
+    public function injectObjectManager(ObjectManager $objectManager)
+    {
+        $this->objectManager = $objectManager;
+    }
 
-	/**
-	 *
-	 * @param ObjectManager $objectManager
-	 * @return void
-	 */
-	public function injectObjectManager(ObjectManager $objectManager)
-	{
-		$this->objectManager = $objectManager;
-	}
+    /**
+     * Create / retrieve the PaginateService instance that is identified by its parameters
+     *
+     * @return PaginateService
+     */
+    public function get(array $parameters)
+    {
+        $id = \substr(\md5(\json_encode($parameters)), 0, 8);
+        if (!isset($this->instances[$id])) {
+            $this->instances[$id] = $this->objectManager->get(PaginateService::class, $id, $parameters);
+        }
+        return $this->instances[$id];
+    }
 
-	/**
-	 * Create / retrieve the PaginateService instance that is identified by its parameters
-	 *
-	 * @param array $parameters
-	 * @return PaginateService
-	 */
-	public function get(array $parameters) {
-		$id = \substr(\md5(\json_encode($parameters)), 0, 8);
-		if (!isset($this->instances[$id])) {
-			$this->instances[$id] = $this->objectManager->get(PaginateService::class, $id, $parameters);
-		}
-		return $this->instances[$id];
-	}
-
-	/**
-	 * Retrieve already existing instance
-	 *
-	 * @param string $id
-	 * @throws NotInitialized
-	 * @return PaginateService
-	 */
-	public function getById($id) {
-		if (!isset($this->instances[$id])) {
-			throw new NotInitialized(1530549752, ['PaginateService[' . $id . ']']);
-		}
-		return $this->instances[$id];
-	}
-
+    /**
+     * Retrieve already existing instance
+     *
+     * @param string $id
+     * @throws NotInitialized
+     * @return PaginateService
+     */
+    public function getById($id)
+    {
+        if (!isset($this->instances[$id])) {
+            throw new NotInitialized(1530549752, ['PaginateService[' . $id . ']']);
+        }
+        return $this->instances[$id];
+    }
 }

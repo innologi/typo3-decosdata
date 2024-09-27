@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class CmdError extends Exception {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Failed to run command, "%1$s": %2$s';
-
+class CmdError extends Exception
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Failed to run command, "%1$s": %2$s';
 }

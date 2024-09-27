@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Domain\Factory;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,9 +25,10 @@ namespace Innologi\Decosdata\Domain\Factory;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
-use Innologi\Decosdata\Exception\MissingObjectProperty;
 use Innologi\Decosdata\Domain\Repository\FieldRepository;
+use Innologi\Decosdata\Exception\MissingObjectProperty;
+use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
+
 /**
  * Field factory
  *
@@ -33,68 +36,63 @@ use Innologi\Decosdata\Domain\Repository\FieldRepository;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FieldFactory extends FactoryAbstract {
+class FieldFactory extends FactoryAbstract
+{
+    /**
+     * @var FieldRepository
+     */
+    protected $repository;
 
-	/**
-	 * @var FieldRepository
-	 */
-	protected $repository;
+    public function injectRepository(FieldRepository $repository)
+    {
+        $this->repository = $repository;
+    }
 
-	/**
-	 *
-	 * @param FieldRepository $repository
-	 * @return void
-	 */
-	public function injectRepository(FieldRepository $repository)
-	{
-		$this->repository = $repository;
-	}
+    /**
+     * Sets properties of domain object
+     *
+     * @throws \Innologi\Decosdata\Exception\MissingObjectProperty
+     */
+    protected function setProperties(\Innologi\Decosdata\Domain\Model\Field $object, array $data)
+    {
+        if (!isset($data['field_name'][0])) {
+            throw new MissingObjectProperty(1448549862, [
+                'field_name',
+                'Field',
+            ]);
+        }
+        $object->setFieldName($data['field_name']);
+    }
 
-	/**
-	 * Sets properties of domain object
-	 *
-	 * @param \Innologi\Decosdata\Domain\Model\Field $object
-	 * @param array $data
-	 * @return void
-	 * @throws \Innologi\Decosdata\Exception\MissingObjectProperty
-	 */
-	protected function setProperties(\Innologi\Decosdata\Domain\Model\Field $object, array $data) {
-		if (!isset($data['field_name'][0])) {
-			throw new MissingObjectProperty(1448549862, [
-				'field_name',
-				'Field'
-			]);
-		}
-		$object->setFieldName($data['field_name']);
-	}
-
-	/**
-	 * Retrieve Field Object from, in this order until successful:
-	 * - local object cache
-	 * - repository
-	 * - newly created by parameters
-	 *
-	 * Optionally inserts the (value)Object into the database
-	 * to relieve the much heavier persistence mechanisms.
-	 *
-	 * @param string $fieldName
-	 * @param boolean $autoInsert
-	 * @return \Innologi\Decosdata\Domain\Model\Field
-	 */
-	public function getByFieldName($fieldName, $autoInsert = FALSE) {
-		$cacheKey = $fieldName . ';;;' . $this->storagePid;
-		if (!isset($this->objectCache[$cacheKey])) {
-			/* @var $fieldObject \Innologi\Decosdata\Domain\Model\Field */
-			$fieldObject = $this->repository->findOneByFieldName($fieldName);
-			if ($fieldObject === NULL) {
-				$data = ['field_name' => $fieldName];
-				$fieldObject = $autoInsert
-					? $this->createAndStoreObject($data)
-					: $this->create($data);
-			}
-			$this->objectCache[$cacheKey] = $fieldObject;
-		}
-		return $this->objectCache[$cacheKey];
-	}
-
+    /**
+     * Retrieve Field Object from, in this order until successful:
+     * - local object cache
+     * - repository
+     * - newly created by parameters
+     *
+     * Optionally inserts the (value)Object into the database
+     * to relieve the much heavier persistence mechanisms.
+     *
+     * @param string $fieldName
+     * @param boolean $autoInsert
+     * @return \Innologi\Decosdata\Domain\Model\Field
+     */
+    public function getByFieldName($fieldName, $autoInsert = false)
+    {
+        $cacheKey = $fieldName . ';;;' . $this->storagePid;
+        if (!isset($this->objectCache[$cacheKey])) {
+            /** @var \Innologi\Decosdata\Domain\Model\Field $fieldObject */
+            $fieldObject = $this->repository->findOneByFieldName($fieldName);
+            if ($fieldObject === null) {
+                $data = [
+                    'field_name' => $fieldName,
+                ];
+                $fieldObject = $autoInsert
+                    ? $this->createAndStoreObject($data)
+                    : $this->create($data);
+            }
+            $this->objectCache[$cacheKey] = $fieldObject;
+        }
+        return $this->objectCache[$cacheKey];
+    }
 }

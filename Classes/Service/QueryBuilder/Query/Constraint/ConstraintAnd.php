@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Query\Constraint;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,22 +33,19 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Constraint;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ConstraintAnd extends ConstraintCollection {
+class ConstraintAnd extends ConstraintCollection
+{
+    /**
+     * @var string
+     */
+    protected $logic = 'AND';
 
-	/**
-	 * @var string
-	 */
-	protected $logic = 'AND';
-
-	/**
-	 * Class constructor
-	 *
-	 * @param array $constraints
-	 * @return $this
-	 */
-	public function __construct(array $constraints = []) {
-		$this->constraints = $constraints;
-		return $this;
-	}
-
+    /**
+     * @return $this
+     */
+    public function __construct(array $constraints = [])
+    {
+        $this->constraints = $constraints;
+        return $this;
+    }
 }

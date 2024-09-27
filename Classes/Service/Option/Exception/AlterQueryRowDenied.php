@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,12 +33,12 @@ namespace Innologi\Decosdata\Service\Option\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class AlterQueryRowDenied extends OptionException {
-	// @TODO ___once you've finalized configurations, you should check if "row-level" is still correctly named
-	// @TODO ___test errorhandling with these
-	/**
-	 * @var string
-	 */
-	protected $message = 'Query Option Configuration Error: Applying %1$s on the row-level is not supported.';
-
+class AlterQueryRowDenied extends OptionException
+{
+    // @TODO ___once you've finalized configurations, you should check if "row-level" is still correctly named
+    // @TODO ___test errorhandling with these
+    /**
+     * @var string
+     */
+    protected $message = 'Query Option Configuration Error: Applying %1$s on the row-level is not supported.';
 }

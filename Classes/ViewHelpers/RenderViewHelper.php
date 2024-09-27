@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\ViewHelpers;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,9 +26,10 @@ namespace Innologi\Decosdata\ViewHelpers;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\RuntimeStorageService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithRenderStatic;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Render ViewHelper
  *
@@ -40,43 +43,45 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class RenderViewHelper extends \TYPO3Fluid\Fluid\ViewHelpers\RenderViewHelper {
-	use CompileWithRenderStatic;
+class RenderViewHelper extends \TYPO3Fluid\Fluid\ViewHelpers\RenderViewHelper
+{
+    use CompileWithRenderStatic;
 
-	/**
-	 * @var boolean
-	 */
-	protected $escapeOutput = FALSE;
+    /**
+     * @var boolean
+     */
+    protected $escapeOutput = false;
 
-	/**
-	 * @var \Innologi\Decosdata\Service\RuntimeStorageService
-	 */
-	protected static $storageService;
+    /**
+     * @var \Innologi\Decosdata\Service\RuntimeStorageService
+     */
+    protected static $storageService;
 
-	/**
-	 * Get Storage Service
-	 *
-	 * @return \Innologi\Decosdata\Service\RuntimeStorageService
-	 */
-	protected static function getStorageService() {
-		if (self::$storageService === NULL) {
-			self::$storageService = GeneralUtility::makeInstance(RuntimeStorageService::class);
-		}
-		return self::$storageService;
-	}
+    /**
+     * Get Storage Service
+     *
+     * @return \Innologi\Decosdata\Service\RuntimeStorageService
+     */
+    protected static function getStorageService()
+    {
+        if (self::$storageService === null) {
+            self::$storageService = GeneralUtility::makeInstance(RuntimeStorageService::class);
+        }
+        return self::$storageService;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext) {
-		$id = 'RenderViewHelper-' . self::getStorageService()->generateHash($arguments);
-		if (self::getStorageService()->has($id)) {
-			$output = self::getStorageService()->get($id);
-		} else {
-			$output = parent::renderStatic($arguments, $renderChildrenClosure, $renderingContext);
-			self::getStorageService()->set($id, $output);
-		}
-		return $output;
-	}
-
+    /**
+     * @return mixed
+     */
+    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
+    {
+        $id = 'RenderViewHelper-' . self::getStorageService()->generateHash($arguments);
+        if (self::getStorageService()->has($id)) {
+            $output = self::getStorageService()->get($id);
+        } else {
+            $output = parent::renderStatic($arguments, $renderChildrenClosure, $renderingContext);
+            self::getStorageService()->set($id, $output);
+        }
+        return $output;
+    }
 }

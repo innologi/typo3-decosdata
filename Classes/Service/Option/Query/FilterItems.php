@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,9 +26,10 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Exception\MissingParameter;
-use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
-use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
+
 /**
  * FilterItems option
  *
@@ -36,81 +39,83 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FilterItems extends OptionAbstract {
-	use Traits\Filters;
+class FilterItems extends OptionAbstract
+{
+    use Traits\Filters;
 
-	/**
-	 * Filter is applied on current field configuration.
-	 *
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
-	 */
-	public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service) {
-		$this->doFiltersExist($args);
-		$id = $queryField->getId() . 'filteritems' . $service->getOptionIndex();
+    /**
+     * Filter is applied on current field configuration.
+     *
+     * {@inheritDoc}
+     * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
+     */
+    public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service)
+    {
+        $this->doFiltersExist($args);
+        $id = $queryField->getId() . 'filteritems' . $service->getOptionIndex();
 
-		$select = $queryField->getSelect();
-		$conditions = [];
-		foreach ($args['filters'] as $filter) {
-			try {
-				$this->initializeFilter($filter);
-				$conditions[] = isset($filter['value']) ?
-					$this->constraintFactory->createConstraintByValue(
-						$select->getField(),
-						$select->getTableAlias(),
-						$filter['operator'],
-						$filter['value']
-					) : $this->constraintFactory->createConstraintByValue(
-						'uid',
-						$select->getTableAlias(),
-						$filter['operator'],
-						$filter['parameter']
-					);
-			} catch (MissingParameter) {
-				// do nothing
-			}
-		}
+        $select = $queryField->getSelect();
+        $conditions = [];
+        foreach ($args['filters'] as $filter) {
+            try {
+                $this->initializeFilter($filter);
+                $conditions[] = isset($filter['value']) ?
+                    $this->constraintFactory->createConstraintByValue(
+                        $select->getField(),
+                        $select->getTableAlias(),
+                        $filter['operator'],
+                        $filter['value'],
+                    ) : $this->constraintFactory->createConstraintByValue(
+                        'uid',
+                        $select->getTableAlias(),
+                        $filter['operator'],
+                        $filter['parameter'],
+                    );
+            } catch (MissingParameter) {
+                // do nothing
+            }
+        }
 
-		if (!empty($conditions)) {
-			$queryField->getWhere()->addConstraint(
-				$id,
-				$this->processConditions($args, $conditions)
-			);
-		}
-	}
+        if (!empty($conditions)) {
+            $queryField->getWhere()->addConstraint(
+                $id,
+                $this->processConditions($args, $conditions),
+            );
+        }
+    }
 
-	/**
-	 * Filter can be applied on any field.
-	 *
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
-	 */
-	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
-		$this->doFiltersExist($args);
-		$id = 'filteritems';
+    /**
+     * Filter can be applied on any field.
+     *
+     * {@inheritDoc}
+     * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
+     */
+    public function alterQueryRow(array $args, Query $query, QueryOptionService $service)
+    {
+        $this->doFiltersExist($args);
+        $id = 'filteritems';
 
-		// note that by $id, we'll always use the same field, this way
-		// we can add multiple conditions on the same FROM join if a
-		// field is checked on multiple values
-		$queryField = $query->getContent($id)->getField('');
-		$conditions = [];
-		foreach ($args['filters'] as $filter) {
-			try {
-				$this->initializeFilter($filter, TRUE);
-				// identify by the field, so we don't create redundant joins
-				$alias = $id . $filter['field'];
-				$conditions[] = $this->filterBy($queryField, $filter, $alias, $filter['field']);
-			} catch (MissingParameter) {
-				// do nothing
-			}
-		}
+        // note that by $id, we'll always use the same field, this way
+        // we can add multiple conditions on the same FROM join if a
+        // field is checked on multiple values
+        $queryField = $query->getContent($id)->getField('');
+        $conditions = [];
+        foreach ($args['filters'] as $filter) {
+            try {
+                $this->initializeFilter($filter, true);
+                // identify by the field, so we don't create redundant joins
+                $alias = $id . $filter['field'];
+                $conditions[] = $this->filterBy($queryField, $filter, $alias, $filter['field']);
+            } catch (MissingParameter) {
+                // do nothing
+            }
+        }
 
-		if (!empty($conditions)) {
-			$queryField->getWhere()->addConstraint(
-				$service->getOptionIndex(),
-				$this->processConditions($args, $conditions)
-			);
-		}
-	}
-
+        if (!empty($conditions)) {
+            $queryField->getWhere()->addConstraint(
+                $service->getOptionIndex(),
+                $this->processConditions($args, $conditions),
+            );
+        }
+    }
 }

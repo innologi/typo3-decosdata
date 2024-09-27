@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Utility;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -33,32 +35,32 @@ namespace Innologi\Decosdata\Utility;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class DebugUtility {
-	// @TODO ___find any other use of the original DebugUtility, and replace it with this one
-	/**
-	 * Formats array values on new lines in a single string
-	 *
-	 * @param array $array
-	 * @return string
-	 */
-	public static function formatArrayValues(array $array) {
-		$output = PHP_EOL . '- ' . join(', ' . PHP_EOL . '- ', $array);
-		return $output;
-	}
+class DebugUtility
+{
+    // @TODO ___find any other use of the original DebugUtility, and replace it with this one
+    /**
+     * Formats array values on new lines in a single string
+     *
+     * @return string
+     */
+    public static function formatArrayValues(array $array)
+    {
+        $output = PHP_EOL . '- ' . join(', ' . PHP_EOL . '- ', $array);
+        return $output;
+    }
 
-	/**
-	 * Formats array key => value pairs on new lines in a single string
-	 *
-	 * @param array $array
-	 * @return string
-	 */
-	public static function formatArray(array $array) {
-		$temp = [];
-		foreach ($array as $key => $value) {
-			$temp[] = $key . ' ' . PHP_EOL . $value;
-		}
-		$output = PHP_EOL . join(' ' . PHP_EOL . PHP_EOL, $temp);
-		return $output;
-	}
-
+    /**
+     * Formats array key => value pairs on new lines in a single string
+     *
+     * @return string
+     */
+    public static function formatArray(array $array)
+    {
+        $temp = [];
+        foreach ($array as $key => $value) {
+            $temp[] = $key . ' ' . PHP_EOL . $value;
+        }
+        $output = PHP_EOL . join(' ' . PHP_EOL . PHP_EOL, $temp);
+        return $output;
+    }
 }

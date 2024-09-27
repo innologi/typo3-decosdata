@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,9 +25,10 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
-use Innologi\Decosdata\Service\Option\QueryOptionService;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
+use Innologi\Decosdata\Service\Option\QueryOptionService;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
+
 /**
  * RestrictByParentItem option
  *
@@ -35,32 +38,35 @@ use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class RestrictByParentItem extends OptionAbstract {
-	use Traits\Filters;
+class RestrictByParentItem extends OptionAbstract
+{
+    use Traits\Filters;
 
-	/**
-	 * Restricts items by parent item id
-	 *
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
-	 */
-	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
-		if (! (isset($args['id'][0]) || isset($args['parameter'][0])) ) {
-			throw new MissingArgument(1450794744, [self::class, 'id/parameter']);
-		}
-		$itemId = $args['id'] ?? $this->parameterService->getParameterValidated($args['parameter']);
+    /**
+     * Restricts items by parent item id
+     *
+     * {@inheritDoc}
+     * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
+     */
+    public function alterQueryRow(array $args, Query $query, QueryOptionService $service)
+    {
+        if (!(isset($args['id'][0]) || isset($args['parameter'][0]))) {
+            throw new MissingArgument(1450794744, [self::class, 'id/parameter']);
+        }
+        $itemId = $args['id'] ?? $this->parameterService->getParameterValidated($args['parameter']);
 
-		$alias = 'restrictByParent';
-		$parameterKey = ':' . $alias;
-		$query->getContent('id')->getField('')
-			->getFrom($alias, [$alias => 'tx_decosdata_item_item_mm'])
-			->setJoinType('INNER')->setConstraint(
-				$this->constraintFactory->createConstraintAnd([
-					'relation' => $this->constraintFactory->createConstraintByField('uid_local', $alias, '=', 'uid', 'it'),
-					'restriction' => $this->constraintFactory->createConstraintByValue('uid_foreign', $alias, '=', $parameterKey)
-				])
-			);
-		$query->addParameter($parameterKey, $itemId);
-	}
-
+        $alias = 'restrictByParent';
+        $parameterKey = ':' . $alias;
+        $query->getContent('id')->getField('')
+            ->getFrom($alias, [
+                $alias => 'tx_decosdata_item_item_mm',
+            ])
+            ->setJoinType('INNER')->setConstraint(
+                $this->constraintFactory->createConstraintAnd([
+                    'relation' => $this->constraintFactory->createConstraintByField('uid_local', $alias, '=', 'uid', 'it'),
+                    'restriction' => $this->constraintFactory->createConstraintByValue('uid_foreign', $alias, '=', $parameterKey),
+                ]),
+            );
+        $query->addParameter($parameterKey, $itemId);
+    }
 }

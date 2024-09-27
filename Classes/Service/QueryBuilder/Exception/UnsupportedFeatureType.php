@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class UnsupportedFeatureType extends QueryBuilderError {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Query Builder Error: Value \'%2$s\' of feature \'%1$s\' is not supported. Supported values are: %3$s';
-
+class UnsupportedFeatureType extends QueryBuilderError
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Query Builder Error: Value \'%2$s\' of feature \'%1$s\' is not supported. Supported values are: %3$s';
 }

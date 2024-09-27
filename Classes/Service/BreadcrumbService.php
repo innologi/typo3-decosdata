@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,10 +25,11 @@ namespace Innologi\Decosdata\Service;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Core\SingletonInterface;
-use Innologi\Decosdata\Exception\BreadcrumbError;
 use Innologi\Decosdata\Domain\Repository\ItemRepository;
+use Innologi\Decosdata\Exception\BreadcrumbError;
 use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
+use TYPO3\CMS\Core\SingletonInterface;
+
 /**
  * Breadcrumb Service
  *
@@ -39,171 +42,155 @@ use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class BreadcrumbService implements SingletonInterface {
-	// @LOW _should we validate the crumb levels with those from the actual configuration?
-	// @LOW consider that the injects aren't always necessary, so you might want to work with getMethods instead
+class BreadcrumbService implements SingletonInterface
+{
+    // @LOW _should we validate the crumb levels with those from the actual configuration?
+    // @LOW consider that the injects aren't always necessary, so you might want to work with getMethods instead
 
-	/**
-	 * @var ParameterService
-	 */
-	protected $parameterService;
+    /**
+     * @var ParameterService
+     */
+    protected $parameterService;
 
-	/**
-	 * @var ItemRepository
-	 */
-	protected $itemRepository;
+    /**
+     * @var ItemRepository
+     */
+    protected $itemRepository;
 
-	/**
-	 * @var QueryBuilder
-	 */
-	protected $queryBuilder;
+    /**
+     * @var QueryBuilder
+     */
+    protected $queryBuilder;
 
-	/**
-	 * @var integer
-	 */
-	protected $currentLevel = 1;
+    /**
+     * @var integer
+     */
+    protected $currentLevel = 1;
 
-	/**
-	 * @var array
-	 */
-	protected $crumbLabelMap = [];
+    /**
+     * @var array
+     */
+    protected $crumbLabelMap = [];
 
-	/**
-	 * @var boolean
-	 */
-	protected $active = FALSE;
+    /**
+     * @var boolean
+     */
+    protected $active = false;
 
-	/**
-	 *
-	 * @param ParameterService $parameterService
-	 * @return void
-	 */
-	public function injectParameterService(ParameterService $parameterService)
-	{
-		$this->parameterService = $parameterService;
-	}
+    public function injectParameterService(ParameterService $parameterService)
+    {
+        $this->parameterService = $parameterService;
+    }
 
-	/**
-	 *
-	 * @param ItemRepository $itemRepository
-	 * @return void
-	 */
-	public function injectItemRepository(ItemRepository $itemRepository)
-	{
-		$this->itemRepository = $itemRepository;
-	}
+    public function injectItemRepository(ItemRepository $itemRepository)
+    {
+        $this->itemRepository = $itemRepository;
+    }
 
-	/**
-	 *
-	 * @param QueryBuilder $queryBuilder
-	 * @return void
-	 */
-	public function injectQueryBuilder(QueryBuilder $queryBuilder)
-	{
-		$this->queryBuilder = $queryBuilder;
-	}
+    public function injectQueryBuilder(QueryBuilder $queryBuilder)
+    {
+        $this->queryBuilder = $queryBuilder;
+    }
 
-	/**
-	 * Returns current level
-	 *
-	 * @return integer
-	 */
-	public function getCurrentLevel() {
-		return $this->currentLevel;
-	}
+    /**
+     * Returns current level
+     *
+     * @return integer
+     */
+    public function getCurrentLevel()
+    {
+        return $this->currentLevel;
+    }
 
-	/**
-	 * Returns crumb mapping
-	 *
-	 * @return array
-	 */
-	public function getCrumbLabelMap() {
-		return $this->crumbLabelMap;
-	}
+    /**
+     * Returns crumb mapping
+     *
+     * @return array
+     */
+    public function getCrumbLabelMap()
+    {
+        return $this->crumbLabelMap;
+    }
 
-	/**
-	 * Confirms whether the service was successfully configured and active.
-	 *
-	 * Note that this also returns FALSE when misconfigured, so not ready !== error
-	 *
-	 * @return boolean
-	 */
-	public function isActive() {
-		return $this->active;
-	}
+    /**
+     * Confirms whether the service was successfully configured and active.
+     *
+     * Note that this also returns FALSE when misconfigured, so not ready !== error
+     *
+     * @return boolean
+     */
+    public function isActive()
+    {
+        return $this->active;
+    }
 
-	/**
-	 * Initialize Breadcrumbs (if not locked)
-	 *
-	 * @param array $configuration
-	 * @param array $import
-	 * @return boolean
-	 */
-	public function configureBreadcrumb(array $configuration, array $import) {
-		$this->initializeConfiguration();
-		$this->configureDefault($configuration, $import);
-		return TRUE;
-	}
+    /**
+     * Initialize Breadcrumbs (if not locked)
+     *
+     * @return boolean
+     */
+    public function configureBreadcrumb(array $configuration, array $import)
+    {
+        $this->initializeConfiguration();
+        $this->configureDefault($configuration, $import);
+        return true;
+    }
 
-	/**
-	 * Initialize configuration
-	 *
-	 * @return void
-	 */
-	protected function initializeConfiguration() {
-		$this->currentLevel = $this->parameterService->getParameterNormalized('level');
+    /**
+     * Initialize configuration
+     */
+    protected function initializeConfiguration()
+    {
+        $this->currentLevel = $this->parameterService->getParameterNormalized('level');
 
-		// invalidate any previous configuration, just in case
-		$this->active = FALSE;
-	}
+        // invalidate any previous configuration, just in case
+        $this->active = false;
+    }
 
-	/**
-	 * Configures default breadcrumb
-	 *
-	 * @param array $configuration
-	 * @param array $import
-	 * @return void
-	 * @throws \Innologi\Decosdata\Exception\BreadcrumbError
-	 */
-	protected function configureDefault(array $configuration, array $import) {
-		try {
-			foreach ($configuration as $level => $config) {
-				// don't process past current level
-				if ($level > $this->currentLevel) {
-					break;
-				}
-				$crumb = '';
+    /**
+     * Configures default breadcrumb
+     *
+     * @throws \Innologi\Decosdata\Exception\BreadcrumbError
+     */
+    protected function configureDefault(array $configuration, array $import)
+    {
+        try {
+            foreach ($configuration as $level => $config) {
+                // don't process past current level
+                if ($level > $this->currentLevel) {
+                    break;
+                }
+                $crumb = '';
 
-				// @TODO don't you want to offer this option to general content as well? if so, we need to move this into something else
-				if (isset($config['value'])) {
-					$crumb = $config['value'];
-				} elseif ($config['contentField']) {
-					// treat as normal content
-					$items = $this->itemRepository->findWithStatement(
-						$this->queryBuilder->buildListQuery($config, $import)->setLimit(1)->createStatement()
-					);
-					// 0 results
-					if (empty($items)) {
-						throw new BreadcrumbError(1509383208, [$level, 'no query-results']);
-					}
-					// somehow erroneous query or NULL value
-					if (!isset($items[0]['content1'])) {
-						throw new BreadcrumbError(1509383681, [$level, 'missing or empty content field 1']);
-					}
-					$crumb = $items[0]['content1'];
-				}
+                // @TODO don't you want to offer this option to general content as well? if so, we need to move this into something else
+                if (isset($config['value'])) {
+                    $crumb = $config['value'];
+                } elseif ($config['contentField']) {
+                    // treat as normal content
+                    $items = $this->itemRepository->findWithStatement(
+                        $this->queryBuilder->buildListQuery($config, $import)->setLimit(1)->createStatement(),
+                    );
+                    // 0 results
+                    if (empty($items)) {
+                        throw new BreadcrumbError(1509383208, [$level, 'no query-results']);
+                    }
+                    // somehow erroneous query or NULL value
+                    if (!isset($items[0]['content1'])) {
+                        throw new BreadcrumbError(1509383681, [$level, 'missing or empty content field 1']);
+                    }
+                    $crumb = $items[0]['content1'];
+                }
 
-				$this->crumbLabelMap[$level] = $crumb;
-			}
-		} catch (\Innologi\Decosdata\Exception\Exception $e) {
-			throw new BreadcrumbError($e->getCode(), NULL, $e->getMessage());
-		}
+                $this->crumbLabelMap[$level] = $crumb;
+            }
+        } catch (\Innologi\Decosdata\Exception\Exception $e) {
+            throw new BreadcrumbError($e->getCode(), null, $e->getMessage());
+        }
 
-		// if the current level isn't available
-		if (!isset($this->crumbLabelMap[$this->currentLevel])) {
-			throw new BreadcrumbError(1509382055, [$this->currentLevel, 'missing in configuration']);
-		}
-		$this->active = TRUE;
-	}
-
+        // if the current level isn't available
+        if (!isset($this->crumbLabelMap[$this->currentLevel])) {
+            throw new BreadcrumbError(1509382055, [$this->currentLevel, 'missing in configuration']);
+        }
+        $this->active = true;
+    }
 }

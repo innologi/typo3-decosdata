@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Render;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,11 +26,12 @@ namespace Innologi\Decosdata\Service\Option\Render;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
+use Innologi\TagBuilder\TagContent;
+use Innologi\TagBuilder\TagInterface;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Innologi\TagBuilder\TagInterface;
-use Innologi\TagBuilder\TagContent;
+
 /**
  * File Icon option
  *
@@ -39,45 +42,42 @@ use Innologi\TagBuilder\TagContent;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FileIcon implements OptionInterface {
-	use Traits\FileHandler;
-	// @TODO ___Absolute URIs for other contexts than normal HTML?
+class FileIcon implements OptionInterface
+{
+    use Traits\FileHandler;
+    // @TODO ___Absolute URIs for other contexts than normal HTML?
 
-	/**
-	 * @var IconFactory
-	 */
-	protected $iconFactory;
+    /**
+     * @var IconFactory
+     */
+    protected $iconFactory;
 
-	/**
-	 * Class constructor
-	 *
-	 * @return void
-	 */
-	public function __construct() {
-		$this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-	}
+    public function __construct()
+    {
+        $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
-	 */
-	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL ) {
-			return $tag;
-		}
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
+     */
+    public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service)
+    {
+        if (($file = $this->getFileObject($service->getOriginalContent())) === null) {
+            return $tag;
+        }
 
-		// @LOW support setting the size through config?
-		// will always return an icon, even if the extension is unknown
-		// while technically a tag, we have to make do with a string
-			// if we want to make use of the internal API
-		$content = $this->iconFactory->getIconForFileExtension(
-			$file->getExtension(), Icon::SIZE_SMALL
-		)->getMarkup();
-		if ($tag instanceof TagContent) {
-			return $tag->reset()->setContent($content);
-		}
+        // @LOW support setting the size through config?
+        // will always return an icon, even if the extension is unknown
+        // while technically a tag, we have to make do with a string
+        // if we want to make use of the internal API
+        $content = $this->iconFactory->getIconForFileExtension(
+            $file->getExtension(),
+            Icon::SIZE_SMALL,
+        )->getMarkup();
+        if ($tag instanceof TagContent) {
+            return $tag->reset()->setContent($content);
+        }
 
-		return $service->getTagFactory()->createTagContent($content);
-	}
-
+        return $service->getTagFactory()->createTagContent($content);
+    }
 }

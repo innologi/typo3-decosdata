@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Service\Option\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MissingArgument extends OptionException {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Query Option Configuration Error: %1$s was configured without required argument \'%2$s\'.';
-
+class MissingArgument extends OptionException
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Query Option Configuration Error: %1$s was configured without required argument \'%2$s\'.';
 }

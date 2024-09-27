@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Importer\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Service\Importer\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class UnexpectedItemStructure extends ValidationFailed {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'The import-file contains an item with a \'%1$s\' field prior to its identifying \'ITEM_KEY\' field.';
-
+class UnexpectedItemStructure extends ValidationFailed
+{
+    /**
+     * @var string
+     */
+    protected $message = 'The import-file contains an item with a \'%1$s\' field prior to its identifying \'ITEM_KEY\' field.';
 }

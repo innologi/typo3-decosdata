@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Render;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -27,6 +29,7 @@ use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\TagBuilder\TagInterface;
 use TYPO3\CMS\Core\Resource\AbstractFile;
 use TYPO3\CMS\Extbase\Service\ImageService;
+
 /**
  * Image File option
  *
@@ -36,70 +39,65 @@ use TYPO3\CMS\Extbase\Service\ImageService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ImageFile implements OptionInterface {
-	use Traits\FileHandler;
-	// @TODO ___Absolute URIs for other contexts than normal HTML?
+class ImageFile implements OptionInterface
+{
+    use Traits\FileHandler;
+    // @TODO ___Absolute URIs for other contexts than normal HTML?
 
-	/**
-	 * @var ImageService
-	 */
-	protected $imageService;
+    /**
+     * @var ImageService
+     */
+    protected $imageService;
 
-	/**
-	 *
-	 * @param ImageService $imageService
-	 * @return void
-	 */
-	public function injectImageService(ImageService $imageService)
-	{
-		$this->imageService = $imageService;
-	}
+    public function injectImageService(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
-	 * @see \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper
-	 */
-	public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service) {
-		if ( ($file = $this->getFileObject($service->getOriginalContent())) === NULL || !$this->isSupportedFile($file) ) {
-			// if file could not be retrieved or is not of type image, either fall back to a set defaultFile or just return the tag
-			if ( !isset($args['defaultFile']) || ($file = $this->getFileObject($args['defaultFile'])) === NULL || !$this->isSupportedFile($file) ) {
-				return $tag;
-			}
-		}
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
+     * @see \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper
+     */
+    public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service)
+    {
+        if (($file = $this->getFileObject($service->getOriginalContent())) === null || !$this->isSupportedFile($file)) {
+            // if file could not be retrieved or is not of type image, either fall back to a set defaultFile or just return the tag
+            if (!isset($args['defaultFile']) || ($file = $this->getFileObject($args['defaultFile'])) === null || !$this->isSupportedFile($file)) {
+                return $tag;
+            }
+        }
 
-		$processingInstructions = [
-			'width' => $args['width'] ?? NULL,
-			'height' => $args['height'] ?? NULL,
-			// frame is for multi-page images (e.g. pdf) to determine the index of the page
-			'frame' => $args['frame'] ?? 0,
-		];
-		$processedImage = $this->imageService->applyProcessingInstructions($file, $processingInstructions);
-		$imageUri = $this->imageService->getImageUri($processedImage);
+        $processingInstructions = [
+            'width' => $args['width'] ?? null,
+            'height' => $args['height'] ?? null,
+            // frame is for multi-page images (e.g. pdf) to determine the index of the page
+            'frame' => $args['frame'] ?? 0,
+        ];
+        $processedImage = $this->imageService->applyProcessingInstructions($file, $processingInstructions);
+        $imageUri = $this->imageService->getImageUri($processedImage);
 
-		$attributes = [
-			'src' => $imageUri,
-			'class' => 'file-' . $this->fileUid
-		];
-		if (isset($args['alt'][0]) && is_string($args['alt'])) {
-			$attributes['alt'] = $args['alt'];
-		}
-		$attributes['width'] = $processedImage->getProperty('width');
-		$attributes['height'] = $processedImage->getProperty('height');
+        $attributes = [
+            'src' => $imageUri,
+            'class' => 'file-' . $this->fileUid,
+        ];
+        if (isset($args['alt'][0]) && is_string($args['alt'])) {
+            $attributes['alt'] = $args['alt'];
+        }
+        $attributes['width'] = $processedImage->getProperty('width');
+        $attributes['height'] = $processedImage->getProperty('height');
 
-		return $service->getTagFactory()->createTag('img', $attributes);
-	}
+        return $service->getTagFactory()->createTag('img', $attributes);
+    }
 
-	/**
-	 * Return whether we support this file, i.e. an existing image or PDF
-	 *
-	 * @param AbstractFile $file
-	 * @return boolean
-	 */
-	protected function isSupportedFile(AbstractFile $file) {
-		return $file->exists() && (
-			$file->getType() === AbstractFile::FILETYPE_IMAGE || str_contains($file->getMimeType(), '/pdf')
-		);
-	}
-
+    /**
+     * Return whether we support this file, i.e. an existing image or PDF
+     *
+     * @return boolean
+     */
+    protected function isSupportedFile(AbstractFile $file)
+    {
+        return $file->exists() && (
+            $file->getType() === AbstractFile::FILETYPE_IMAGE || str_contains($file->getMimeType(), '/pdf')
+        );
+    }
 }

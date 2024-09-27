@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Render\Traits;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,7 +26,8 @@ namespace Innologi\Decosdata\Service\Option\Render\Traits;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\Exception\OptionException;
- /**
+
+/**
  * Extension Configuration Trait
  *
  * Offers basic functionality to retrieve extension configuration.
@@ -33,34 +36,34 @@ use Innologi\Decosdata\Service\Option\Exception\OptionException;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-trait ExtensionConfiguration {
+trait ExtensionConfiguration
+{
+    /**
+     * @var string
+     */
+    protected $extensionKey = 'decosdata';
 
-	/**
-	 * @var string
-	 */
-	protected $extensionKey = 'decosdata';
+    /**
+     * @var array
+     */
+    protected $extensionConfiguration;
 
-	/**
-	 * @var array
-	 */
-	protected $extensionConfiguration;
-
-	/**
-	 * Retrieve extension configuration by key
-	 *
-	 * @param string $key
-	 * @return array
-	 */
-	protected function getExtensionConfiguration($key) {
-		if ($this->extensionConfiguration === NULL) {
-			$this->extensionConfiguration = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-				\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
-			)->get($this->extensionKey);
-		}
-		if (!isset($this->extensionConfiguration[$key])) {
-			throw new OptionException(1525269917, ['Extension Configuration key \'' . $key . '\' missing.']);
-		}
-		return $this->extensionConfiguration[$key];
-	}
-
+    /**
+     * Retrieve extension configuration by key
+     *
+     * @param string $key
+     * @return array
+     */
+    protected function getExtensionConfiguration($key)
+    {
+        if ($this->extensionConfiguration === null) {
+            $this->extensionConfiguration = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+                \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class,
+            )->get($this->extensionKey);
+        }
+        if (!isset($this->extensionConfiguration[$key])) {
+            throw new OptionException(1525269917, ['Extension Configuration key \'' . $key . '\' missing.']);
+        }
+        return $this->extensionConfiguration[$key];
+    }
 }

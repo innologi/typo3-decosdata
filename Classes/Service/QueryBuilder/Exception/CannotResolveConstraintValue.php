@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class CannotResolveConstraintValue extends QueryBuilderError {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Query Builder Error: A constraint value is expected but was not given due to misconfiguration.';
-
+class CannotResolveConstraintValue extends QueryBuilderError
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Query Builder Error: A constraint value is expected but was not given due to misconfiguration.';
 }

@@ -8,13 +8,13 @@
  * example: bin/typo3 backend:lock
  */
 return [
-	'decosdata:migrate' => [
-		'class' => \Innologi\Decosdata\Command\MigrateCommand::class
-	],
-	'decosdata:import:status' => [
-		'class' => \Innologi\Decosdata\Command\ImportStatusCommand::class
-	],
-	'decosdata:import:run' => [
-		'class' => \Innologi\Decosdata\Command\ImportRunCommand::class
-	],
+    'decosdata:migrate' => [
+        'class' => \Innologi\Decosdata\Command\MigrateCommand::class,
+    ],
+    'decosdata:import:status' => [
+        'class' => \Innologi\Decosdata\Command\ImportStatusCommand::class,
+    ],
+    'decosdata:import:run' => [
+        'class' => \Innologi\Decosdata\Command\ImportRunCommand::class,
+    ],
 ];

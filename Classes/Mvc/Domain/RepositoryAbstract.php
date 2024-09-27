@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Mvc\Domain;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,9 +25,10 @@ namespace Innologi\Decosdata\Mvc\Domain;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Extbase\Persistence\Repository;
 use Innologi\Decosdata\Exception\StaticUidInsertion;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
+use TYPO3\CMS\Extbase\Persistence\Repository;
+
 /**
  * General RepositoryAbstract class
  *
@@ -36,93 +39,96 @@ use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-abstract class RepositoryAbstract extends Repository {
+abstract class RepositoryAbstract extends Repository
+{
+    /**
+     * @var string
+     */
+    protected $tableName;
 
-	/**
-	 * @var string
-	 */
-	protected $tableName;
+    /**
+     * Returns DatabaseConnection
+     *
+     * Using a method for this so we don't need to overrule the constructor.
+     *
+     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
+     */
+    protected function getDatabaseConnection()
+    {
+        // @extensionScannerIgnoreLine TYPO3_DB-usage needs a rewrite anyway once this ext goes standalone
+        return $GLOBALS['TYPO3_DB'];
+    }
 
-	/**
-	 * Returns DatabaseConnection
-	 *
-	 * Using a method for this so we don't need to overrule the constructor.
-	 *
-	 * @return \TYPO3\CMS\Core\Database\DatabaseConnection
-	 */
-	protected function getDatabaseConnection() {
-		// @extensionScannerIgnoreLine TYPO3_DB-usage needs a rewrite anyway once this ext goes standalone
-		return $GLOBALS['TYPO3_DB'];
-	}
+    /**
+     * Resolve the table name for the objectType
+     *
+     * @return string
+     */
+    protected function getTableName()
+    {
+        if ($this->tableName === null) {
+            $parts = explode(
+                '\\',
+                ltrim($this->objectType, '\\'),
+            );
+            $this->tableName = 'tx_' . strtolower(
+                implode(
+                    '_',
+                    // skip vendor
+                    array_slice($parts, 1),
+                ),
+            );
+        }
+        return $this->tableName;
+    }
 
-	/**
-	 * Resolve the table name for the objectType
-	 *
-	 * @return string
-	 */
-	protected function getTableName() {
-		if ($this->tableName === NULL) {
-			$parts = explode('\\',
-				ltrim($this->objectType, '\\')
-			);
-			$this->tableName = 'tx_' . strtolower(
-				implode('_',
-					// skip vendor
-					array_slice($parts, 1)
-				)
-			);
-		}
-		return $this->tableName;
-	}
+    /**
+     * Insert record data in repository table, and add the following fields to reference:
+     * - uid
+     * - pid (if not set)
+     * - crdate
+     * - tstamp
+     *
+     * Used to speed up persistence considerably of e.g. valueObjects.
+     *
+     * @throws \Innologi\Decosdata\Exception\StaticUidInsertion
+     */
+    public function insertRecord(array &$data)
+    {
+        if (isset($data['uid'])) {
+            throw new StaticUidInsertion(1448550380, [
+                $this->getTableName(),
+                $data['uid'],
+            ]);
+        }
+        if (!isset($data['pid'])) {
+            $data['pid'] = $this->getStoragePid();
+        }
+        // set initial time values
+        $data['crdate'] = $data['tstamp'] = $GLOBALS['EXEC_TIME'];
+        // insert
+        $this->getDatabaseConnection()->exec_INSERTquery($this->getTableName(), $data);
+        // @LOW ___what about SQL errors?
+        $data['uid'] = $this->getDatabaseConnection()->sql_insert_id();
+    }
 
-	/**
-	 * Insert record data in repository table, and add the following fields to reference:
-	 * - uid
-	 * - pid (if not set)
-	 * - crdate
-	 * - tstamp
-	 *
-	 * Used to speed up persistence considerably of e.g. valueObjects.
-	 *
-	 * @param array &$data
-	 * @return void
-	 * @throws \Innologi\Decosdata\Exception\StaticUidInsertion
-	 */
-	public function insertRecord(array &$data) {
-		if (isset($data['uid'])) {
-			throw new StaticUidInsertion(1448550380, [
-				$this->getTableName(),
-				$data['uid']
-			]);
-		}
-		if (!isset($data['pid'])) {
-			$data['pid'] = $this->getStoragePid();
-		}
-		// set initial time values
-		$data['crdate'] = $data['tstamp'] = $GLOBALS['EXEC_TIME'];
-		// insert
-		$this->getDatabaseConnection()->exec_INSERTquery($this->getTableName(), $data);
-		// @LOW ___what about SQL errors?
-		$data['uid'] = $this->getDatabaseConnection()->sql_insert_id();
-	}
-
-	/**
-	 * Gets Storage Pid from configuration
-	 *
-	 * Used by custom database methods as a fallback. Note that this
-	 * is a slower alternative to providing the pid with the database
-	 * method directly.
-	 *
-	 * @return integer
-	 */
-	protected function getStoragePid() {
-		$frameworkConfiguration = $this->objectManager->get(
-			ConfigurationManagerInterface::class
-		)->getConfiguration(
-			ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK
-		);
-		// @LOW ___this will fail completely if multiple are set
-		return (int) $frameworkConfiguration['persistence']['storagePid'];
-	}
-
+    /**
+     * Gets Storage Pid from configuration
+     *
+     * Used by custom database methods as a fallback. Note that this
+     * is a slower alternative to providing the pid with the database
+     * method directly.
+     *
+     * @return integer
+     */
+    protected function getStoragePid()
+    {
+        $frameworkConfiguration = $this->objectManager->get(
+            ConfigurationManagerInterface::class,
+        )->getConfiguration(
+            ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK,
+        );
+        // @LOW ___this will fail completely if multiple are set
+        return (int) $frameworkConfiguration['persistence']['storagePid'];
+    }
 }

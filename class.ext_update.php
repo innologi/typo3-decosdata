@@ -21,8 +21,9 @@
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Ext Update
  *
@@ -30,45 +31,46 @@ use TYPO3\CMS\Core\Messaging\FlashMessage;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ext_update {
+class ext_update
+{
+    /**
+     * This method is called by the extension manager to execute updates.
+     *
+     * Any exception thrown will be captured and converted to a flash message.
+     *
+     * @return string
+     */
+    public function main()
+    {
+        /** @var \TYPO3\CMS\Core\Messaging\FlashMessageQueue $flashMessageQueue */
+        $flashMessageQueue = GeneralUtility::makeInstance(
+            \TYPO3\CMS\Extbase\Object\ObjectManager::class,
+        )->get(
+            \TYPO3\CMS\Core\Messaging\FlashMessageQueue::class,
+            'extbase.flashmessages.tx_decosdata_extupdate',
+        );
+        $flashMessageQueue->enqueue(
+            GeneralUtility::makeInstance(
+                FlashMessage::class,
+                'Execute this command from TYPO3 root to find out more about migrating from decospublisher.',
+                './vendor/bin/typo3 help decosdata:migrate',
+                FlashMessage::INFO,
+            ),
+        );
+        return $flashMessageQueue->renderFlashMessages();
+    }
 
-	/**
-	 * This method is called by the extension manager to execute updates.
-	 *
-	 * Any exception thrown will be captured and converted to a flash message.
-	 *
-	 * @return string
-	 */
-	public function main() {
-		/** @var \TYPO3\CMS\Core\Messaging\FlashMessageQueue $flashMessageQueue */
-		$flashMessageQueue = GeneralUtility::makeInstance(
-			\TYPO3\CMS\Extbase\Object\ObjectManager::class
-		)->get(
-			\TYPO3\CMS\Core\Messaging\FlashMessageQueue::class,
-			'extbase.flashmessages.tx_decosdata_extupdate'
-		);
-		$flashMessageQueue->enqueue(
-			GeneralUtility::makeInstance(
-				FlashMessage::class,
-				'Execute this command from TYPO3 root to find out more about migrating from decospublisher.',
-				'./vendor/bin/typo3 help decosdata:migrate',
-				FlashMessage::INFO
-			)
-		);
-		return $flashMessageQueue->renderFlashMessages();
-	}
-
-	/**
-	 * This method is called by the extension manager to determine
-	 * whether it is allowed to execute the update scripts.
-	 *
-	 * You can overrule this method to provide any access-logic
-	 * you see fit.
-	 *
-	 * @return boolean
-	 */
-	public function access() {
-		return TRUE;
-	}
-
+    /**
+     * This method is called by the extension manager to determine
+     * whether it is allowed to execute the update scripts.
+     *
+     * You can overrule this method to provide any access-logic
+     * you see fit.
+     *
+     * @return boolean
+     */
+    public function access()
+    {
+        return true;
+    }
 }

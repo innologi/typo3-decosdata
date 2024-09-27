@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Query\Constraint;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,6 +33,4 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Constraint;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-interface ConstraintInterface {
-
-}
+interface ConstraintInterface {}

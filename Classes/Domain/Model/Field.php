@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Domain\Model;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Domain\Model;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Extbase\DomainObject\AbstractValueObject;
+
 /**
  * Field domain model
  *
@@ -31,34 +34,35 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractValueObject;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class Field extends AbstractValueObject {
+class Field extends AbstractValueObject
+{
+    /**
+     * Field Name
+     *
+     * @var string
+     * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
+     */
+    protected $fieldName;
 
-	/**
-	 * Field Name
-	 *
-	 * @var string
-	 * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
-	 */
-	protected $fieldName;
+    /**
+     * Returns the fieldName
+     *
+     * @return string
+     */
+    public function getFieldName()
+    {
+        return $this->fieldName;
+    }
 
-	/**
-	 * Returns the fieldName
-	 *
-	 * @return string $fieldName
-	 */
-	public function getFieldName() {
-		return $this->fieldName;
-	}
-
-	/**
-	 * Sets the fieldName
-	 *
-	 * @param string $fieldName
-	 * @return \Innologi\Decosdata\Domain\Model\Field
-	 */
-	public function setFieldName($fieldName) {
-		$this->fieldName = $fieldName;
-		return $this;
-	}
-
+    /**
+     * Sets the fieldName
+     *
+     * @param string $fieldName
+     * @return \Innologi\Decosdata\Domain\Model\Field
+     */
+    public function setFieldName($fieldName)
+    {
+        $this->fieldName = $fieldName;
+        return $this;
+    }
 }

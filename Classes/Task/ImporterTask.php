@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Task;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,11 +25,12 @@ namespace Innologi\Decosdata\Task;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Scheduler\Task\AbstractTask;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
-use TYPO3\CMS\Extbase\Core\Bootstrap;
 use Innologi\Decosdata\Utility\DebugUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Core\Bootstrap;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Scheduler\Task\AbstractTask;
+
 /**
  * Importer Task
  *
@@ -37,53 +40,53 @@ use Innologi\Decosdata\Utility\DebugUtility;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ImporterTask extends AbstractTask {
+class ImporterTask extends AbstractTask
+{
+    /**
+     * @var string
+     */
+    protected $extensionName = 'Decosdata';
 
-	/**
-	 * @var string
-	 */
-	protected $extensionName = 'Decosdata';
+    /**
+     * @var array
+     */
+    public $selectedImports = [];
 
-	/**
-	 * @var array
-	 */
-	public $selectedImports = [];
+    /**
+     * Execute task logic
+     *
+     * @return boolean
+     * @throws \Exception
+     */
+    public function execute()
+    {
+        $bootstrap = GeneralUtility::makeInstance(Bootstrap::class);
+        $bootstrap->initialize([
+            'pluginName' => 'Importer',
+            'extensionName' => $this->extensionName,
+            'vendorName' => 'Innologi',
+        ]);
 
-	/**
-	 * Execute task logic
-	 *
-	 * @return boolean
-	 * @throws \Exception
-	 */
-	public function execute() {
-		$bootstrap = GeneralUtility::makeInstance(Bootstrap::class);
-		$bootstrap->initialize([
-			'pluginName' => 'Importer',
-			'extensionName' => $this->extensionName,
-			'vendorName' => 'Innologi'
-		]);
+        /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
+        $objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
 
-		/* @var $objectManager \TYPO3\CMS\Extbase\Object\ObjectManager */
-		$objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
+        /** @var \Innologi\Decosdata\Service\Importer\ImporterService $importerService */
+        $importerService = $objectManager->get(\Innologi\Decosdata\Service\Importer\ImporterService::class);
+        $importerService->importUidSelection($this->selectedImports);
 
-		/* @var $importerService \Innologi\Decosdata\Service\Importer\ImporterService */
-		$importerService = $objectManager->get(\Innologi\Decosdata\Service\Importer\ImporterService::class);
-		$importerService->importUidSelection($this->selectedImports);
+        // persist any lingering data
+        /** @var \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager $persistenceManager */
+        $persistenceManager = $objectManager->get(\TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager::class);
+        $persistenceManager->persistAll();
 
-		// persist any lingering data
-		/* @var $persistenceManager \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager */
-		$persistenceManager = $objectManager->get(\TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager::class);
-		$persistenceManager->persistAll();
+        $errors = $importerService->getErrors();
+        if (!empty($errors)) {
+            throw new \Exception(
+                '<pre>' . LocalizationUtility::translate('importer.errors', $this->extensionName) .
+                DebugUtility::formatArray($errors) . '</pre>',
+            );
+        }
 
-		$errors = $importerService->getErrors();
-		if (!empty($errors)) {
-			throw new \Exception(
-				'<pre>' . LocalizationUtility::translate('importer.errors', $this->extensionName) .
-				DebugUtility::formatArray($errors) . '</pre>'
-			);
-		}
-
-		return TRUE;
-	}
-
+        return true;
+    }
 }

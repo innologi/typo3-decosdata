@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Domain\Model;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Domain\Model;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+
 /**
  * ItemField domain model
  *
@@ -31,87 +34,90 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemField extends AbstractEntity {
+class ItemField extends AbstractEntity
+{
+    /**
+     * Field Value
+     *
+     * @var string
+     */
+    protected $fieldValue = '';
 
-	/**
-	 * Field Value
-	 *
-	 * @var string
-	 */
-	protected $fieldValue = '';
+    /**
+     * Field
+     *
+     * @var \Innologi\Decosdata\Domain\Model\Field
+     */
+    protected $field;
 
-	/**
-	 * Field
-	 *
-	 * @var \Innologi\Decosdata\Domain\Model\Field
-	 */
-	protected $field;
+    /**
+     * Item
+     *
+     * @var \Innologi\Decosdata\Domain\Model\Item
+     */
+    protected $item;
 
-	/**
-	 * Item
-	 *
-	 * @var \Innologi\Decosdata\Domain\Model\Item
-	 */
-	protected $item;
+    /**
+     * Returns the value
+     *
+     * @return string
+     */
+    public function getFieldValue()
+    {
+        return $this->fieldValue;
+    }
 
-	/**
-	 * Returns the value
-	 *
-	 * @return string $fieldValue
-	 */
-	public function getFieldValue() {
-		return $this->fieldValue;
-	}
+    /**
+     * Sets the value
+     *
+     * @param string $fieldValue
+     * @return \Innologi\Decosdata\Domain\Model\ItemField
+     */
+    public function setFieldValue($fieldValue)
+    {
+        $this->fieldValue = $fieldValue;
+        return $this;
+    }
 
-	/**
-	 * Sets the value
-	 *
-	 * @param string $fieldValue
-	 * @return \Innologi\Decosdata\Domain\Model\ItemField
-	 */
-	public function setFieldValue($fieldValue) {
-		$this->fieldValue = $fieldValue;
-		return $this;
-	}
+    /**
+     * Returns the field
+     *
+     * @return \Innologi\Decosdata\Domain\Model\Field
+     */
+    public function getField()
+    {
+        return $this->field;
+    }
 
-	/**
-	 * Returns the field
-	 *
-	 * @return \Innologi\Decosdata\Domain\Model\Field $field
-	 */
-	public function getField() {
-		return $this->field;
-	}
+    /**
+     * Sets the field
+     *
+     * @return \Innologi\Decosdata\Domain\Model\ItemField
+     */
+    public function setField(\Innologi\Decosdata\Domain\Model\Field $field)
+    {
+        $this->field = $field;
+        return $this;
+    }
 
-	/**
-	 * Sets the field
-	 *
-	 * @param \Innologi\Decosdata\Domain\Model\Field $field
-	 * @return \Innologi\Decosdata\Domain\Model\ItemField
-	 */
-	public function setField(\Innologi\Decosdata\Domain\Model\Field $field) {
-		$this->field = $field;
-		return $this;
-	}
+    /**
+     * Returns the item
+     *
+     * @return \Innologi\Decosdata\Domain\Model\Item
+     */
+    public function getItem()
+    {
+        return $this->item;
+    }
 
-	/**
-	 * Returns the item
-	 *
-	 * @return \Innologi\Decosdata\Domain\Model\Item $item
-	 */
-	public function getItem() {
-		return $this->item;
-	}
-
-	/**
-	 * Sets the item
-	 *
-	 * @param \Innologi\Decosdata\Domain\Model\Item $item
-	 * @return \Innologi\Decosdata\Domain\Model\ItemField
-	 */
-	public function setItem(\Innologi\Decosdata\Domain\Model\Item $item) {
-		$this->item = $item;
-		return $this;
-	}
-
+    /**
+     * Sets the item
+     *
+     * @return \Innologi\Decosdata\Domain\Model\ItemField
+     */
+    public function setItem(\Innologi\Decosdata\Domain\Model\Item $item)
+    {
+        $this->item = $item;
+        return $this;
+    }
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -33,81 +35,85 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Part;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-abstract class WrapContainer {
+abstract class WrapContainer
+{
+    /**
+     * @var array
+     */
+    protected $wrap = [];
 
-	/**
-	 * @var array
-	 */
-	protected $wrap = [];
+    /**
+     * @var string
+     */
+    protected $wrapDivider = '|';
 
-	/**
-	 * @var string
-	 */
-	protected $wrapDivider = '|';
+    /**
+     * Returns wrap
+     *
+     * @return array
+     */
+    public function getWrap()
+    {
+        return $this->wrap;
+    }
 
-	/**
-	 * Returns wrap
-	 *
-	 * @return array
-	 */
-	public function getWrap() {
-		return $this->wrap;
-	}
+    /**
+     * Sets wrap
+     *
+     * @return $this
+     */
+    public function setWrap(array $wrap)
+    {
+        $this->wrap = $wrap;
+        return $this;
+    }
 
-	/**
-	 * Sets wrap
-	 *
-	 * @param array $wrap
-	 * @return $this
-	 */
-	public function setWrap(array $wrap) {
-		$this->wrap = $wrap;
-		return $this;
-	}
+    /**
+     * Add wrap by key
+     *
+     * @param string $key
+     * @param string $wrap
+     * @return $this
+     */
+    public function addWrap($key, $wrap)
+    {
+        $this->wrap[$key] = $wrap;
+        return $this;
+    }
 
-	/**
-	 * Add wrap by key
-	 *
-	 * @param string $key
-	 * @param string $wrap
-	 * @return $this
-	 */
-	public function addWrap($key, $wrap) {
-		$this->wrap[$key] = $wrap;
-		return $this;
-	}
+    /**
+     * Remove wrap by key
+     *
+     * @param string $key
+     * @return $this
+     */
+    public function removeWrap($key)
+    {
+        if (isset($this->wrap[$key])) {
+            unset($this->wrap[$key]);
+        }
+        return $this;
+    }
 
-	/**
-	 * Remove wrap by key
-	 *
-	 * @param string $key
-	 * @return $this
-	 */
-	public function removeWrap($key) {
-		if (isset($this->wrap[$key])) {
-			unset($this->wrap[$key]);
-		}
-		return $this;
-	}
+    /**
+     * Returns Wrap divider
+     *
+     * @return string
+     */
+    public function getWrapDivider()
+    {
+        return $this->wrapDivider;
+    }
 
-	/**
-	 * Returns Wrap divider
-	 *
-	 * @return string
-	 */
-	public function getWrapDivider() {
-		return $this->wrapDivider;
-	}
-
-	/**
-	 * Sets Wrap divider
-	 *
-	 * @param string $wrapDivider
-	 * @return $this
-	 */
-	public function setWrapDivider($wrapDivider) {
-		$this->wrapDivider = $wrapDivider;
-		return $this;
-	}
-
+    /**
+     * Sets Wrap divider
+     *
+     * @param string $wrapDivider
+     * @return $this
+     */
+    public function setWrapDivider($wrapDivider)
+    {
+        $this->wrapDivider = $wrapDivider;
+        return $this;
+    }
 }

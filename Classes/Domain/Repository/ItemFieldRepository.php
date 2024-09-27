@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Domain\Repository;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Domain\Repository;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
+
 /**
  * ItemField domain repository
  *
@@ -31,23 +34,21 @@ use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemFieldRepository extends RepositoryAbstract {
-
-	/**
-	 * Finds one itemfield by its Field and its parent, a unique combination per item.
-	 *
-	 * @param \Innologi\Decosdata\Domain\Model\Field $field
-	 * @param \Innologi\Decosdata\Domain\Model\Item $item
-	 * @return \Innologi\Decosdata\Domain\Model\ItemField|NULL
-	 */
-	public function findOneByFieldAndItem(\Innologi\Decosdata\Domain\Model\Field $field, \Innologi\Decosdata\Domain\Model\Item $item) {
-		$query = $this->createQuery();
-		return $query->matching(
-			$query->logicalAnd([
-				$query->equals('field', $field),
-				$query->equals('item', $item)
-			])
-		)->execute()->getFirst();
-	}
-
+class ItemFieldRepository extends RepositoryAbstract
+{
+    /**
+     * Finds one itemfield by its Field and its parent, a unique combination per item.
+     *
+     * @return \Innologi\Decosdata\Domain\Model\ItemField|null
+     */
+    public function findOneByFieldAndItem(\Innologi\Decosdata\Domain\Model\Field $field, \Innologi\Decosdata\Domain\Model\Item $item)
+    {
+        $query = $this->createQuery();
+        return $query->matching(
+            $query->logicalAnd([
+                $query->equals('field', $field),
+                $query->equals('item', $item),
+            ]),
+        )->execute()->getFirst();
+    }
 }

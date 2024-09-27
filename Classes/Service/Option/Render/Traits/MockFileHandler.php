@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Render\Traits;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,7 +26,8 @@ namespace Innologi\Decosdata\Service\Option\Render\Traits;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\TYPO3FalApi\MockFileFactory;
- /**
+
+/**
  * Mock File Handler Trait
  *
  * Offers some basic file-related methods for use by RenderOptions
@@ -34,54 +37,49 @@ use Innologi\TYPO3FalApi\MockFileFactory;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-trait MockFileHandler {
+trait MockFileHandler
+{
+    /**
+     * @var MockFileFactory
+     */
+    protected $mockFileFactory;
 
-	/**
-	 *
-	 * @var MockFileFactory
-	 */
-	protected $mockFileFactory;
+    /**
+     * @var string
+     */
+    protected $mockPath;
 
-	/**
-	 * @var string
-	 */
-	protected $mockPath;
+    public function injectMockFileFactory(MockFileFactory $mockFileFactory)
+    {
+        $this->mockFileFactory = $mockFileFactory;
+    }
 
-	/**
-	 *
-	 * @param MockFileFactory $mockFileFactory
-	 * @return void
-	 */
-	public function injectMockFileFactory(MockFileFactory $mockFileFactory)
-	{
-		$this->mockFileFactory = $mockFileFactory;
-	}
+    /**
+     * Returns whether the argument is a mockfile handle
+     *
+     * @param string $mockFileHandle
+     * @return boolean
+     */
+    protected function isMockFileHandle($mockFileHandle)
+    {
+        if (str_starts_with($mockFileHandle, 'mockfile:')) {
+            $parts = explode(':', $mockFileHandle, 2);
+            if (is_file($parts[1])) {
+                $this->mockPath = $parts[1];
+                return true;
+            }
+        }
+        return false;
+    }
 
-	/**
-	 * Returns whether the argument is a mockfile handle
-	 *
-	 * @param string $mockFileHandle
-	 * @return boolean
-	 */
-	protected function isMockFileHandle($mockFileHandle) {
-		if (str_starts_with($mockFileHandle, 'mockfile:')) {
-			$parts = explode(':', $mockFileHandle, 2);
-			if (is_file($parts[1])) {
-				$this->mockPath = $parts[1];
-				return TRUE;
-			}
-		}
-		return FALSE;
-	}
-
-	/**
-	 * Return MockFile object by filepath
-	 *
-	 * @param string $filePath
-	 * @return \Innologi\TYPO3FalApi\MockFile
-	 */
-	protected function getMockFileObjectByPath($filePath) {
-		return $this->mockFileFactory->getByFilePath($filePath);
-	}
-
+    /**
+     * Return MockFile object by filepath
+     *
+     * @param string $filePath
+     * @return \Innologi\TYPO3FalApi\MockFile
+     */
+    protected function getMockFileObjectByPath($filePath)
+    {
+        return $this->mockFileFactory->getByFilePath($filePath);
+    }
 }

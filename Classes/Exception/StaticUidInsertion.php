@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class StaticUidInsertion extends Exception {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'It is not allowed to insert a record into table \'%1$s\' with a static uid of \'%2$d\'. The uid is determined automatically after transaction.';
-
+class StaticUidInsertion extends Exception
+{
+    /**
+     * @var string
+     */
+    protected $message = 'It is not allowed to insert a record into table \'%1$s\' with a static uid of \'%2$d\'. The uid is determined automatically after transaction.';
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,8 +25,9 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
+
 /**
  * FieldSeparator option
  *
@@ -34,21 +37,20 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FieldSeparator extends OptionAbstract {
-
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
-	 */
-	public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service) {
-		if (!isset($args['separator'])) {
-			// @TODO ___throw exception
-		}
-		// @TODO use a regular expression to match whitespace PLEASE
-		if (isset($args['separator'][4]) && $args['separator'][0] === '|' && str_ends_with((string) $args['separator'], '|')) {
-			$args['separator'] = substr((string) $args['separator'], 1, strlen((string) $args['separator'])-2);
-		}
-		$queryContent->setFieldSeparator($args['separator']);
-	}
-
+class FieldSeparator extends OptionAbstract
+{
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
+     */
+    public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service)
+    {
+        if (!isset($args['separator'])) {
+            // @TODO ___throw exception
+        }
+        // @TODO use a regular expression to match whitespace PLEASE
+        if (isset($args['separator'][4]) && $args['separator'][0] === '|' && str_ends_with((string) $args['separator'], '|')) {
+            $args['separator'] = substr((string) $args['separator'], 1, strlen((string) $args['separator']) - 2);
+        }
+        $queryContent->setFieldSeparator($args['separator']);
+    }
 }

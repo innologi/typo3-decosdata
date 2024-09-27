@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Domain\Model;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,7 +25,8 @@ namespace Innologi\Decosdata\Domain\Model;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use \TYPO3\CMS\Extbase\DomainObject\AbstractValueObject;
+use TYPO3\CMS\Extbase\DomainObject\AbstractValueObject;
+
 /**
  * ItemType domain model
  *
@@ -31,34 +34,35 @@ use \TYPO3\CMS\Extbase\DomainObject\AbstractValueObject;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemType extends AbstractValueObject {
+class ItemType extends AbstractValueObject
+{
+    /**
+     * Type
+     *
+     * @var string
+     * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
+     */
+    protected $itemType;
 
-	/**
-	 * Type
-	 *
-	 * @var string
-	 * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
-	 */
-	protected $itemType;
+    /**
+     * Returns the type
+     *
+     * @return string
+     */
+    public function getItemType()
+    {
+        return $this->itemType;
+    }
 
-	/**
-	 * Returns the type
-	 *
-	 * @return string $itemType
-	 */
-	public function getItemType() {
-		return $this->itemType;
-	}
-
-	/**
-	 * Sets the type
-	 *
-	 * @param string $itemType
-	 * @return \Innologi\Decosdata\Domain\Model\ItemType
-	 */
-	public function setItemType($itemType) {
-		$this->itemType = $itemType;
-		return $this;
-	}
-
+    /**
+     * Sets the type
+     *
+     * @param string $itemType
+     * @return \Innologi\Decosdata\Domain\Model\ItemType
+     */
+    public function setItemType($itemType)
+    {
+        $this->itemType = $itemType;
+        return $this;
+    }
 }

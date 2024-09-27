@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Domain\Repository;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Domain\Repository;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
+
 /**
  * ItemBlob domain repository
  *
@@ -31,19 +34,19 @@ use Innologi\Decosdata\Mvc\Domain\RepositoryAbstract;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemBlobRepository extends RepositoryAbstract {
-
-	/**
-	 * Finds one itemblob by its unique (per pid) itemkey.
-	 *
-	 * @param string $itemKey
-	 * @return \Innologi\Decosdata\Domain\Model\ItemBlob|NULL
-	 */
-	public function findOneByItemKey($itemKey) {
-		$query = $this->createQuery();
-		return $query->matching(
-			$query->equals('itemKey', $itemKey)
-		)->execute()->getFirst();
-	}
-
+class ItemBlobRepository extends RepositoryAbstract
+{
+    /**
+     * Finds one itemblob by its unique (per pid) itemkey.
+     *
+     * @param string $itemKey
+     * @return \Innologi\Decosdata\Domain\Model\ItemBlob|null
+     */
+    public function findOneByItemKey($itemKey)
+    {
+        $query = $this->createQuery();
+        return $query->matching(
+            $query->equals('itemKey', $itemKey),
+        )->execute()->getFirst();
+    }
 }

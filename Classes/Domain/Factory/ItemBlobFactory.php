@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Domain\Factory;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,10 +25,11 @@ namespace Innologi\Decosdata\Domain\Factory;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
-use Innologi\Decosdata\Exception\MissingObjectProperty;
 use Innologi\Decosdata\Domain\Repository\ItemBlobRepository;
+use Innologi\Decosdata\Exception\MissingObjectProperty;
+use Innologi\Decosdata\Mvc\Domain\FactoryAbstract;
 use Innologi\TYPO3FalApi\FileReferenceFactory;
+
 /**
  * ItemBlob factory
  *
@@ -34,97 +37,84 @@ use Innologi\TYPO3FalApi\FileReferenceFactory;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ItemBlobFactory extends FactoryAbstract {
+class ItemBlobFactory extends FactoryAbstract
+{
+    /**
+     * @var ItemBlobRepository
+     */
+    protected $repository;
 
-	/**
-	 * @var ItemBlobRepository
-	 */
-	protected $repository;
+    /**
+     * @var FileReferenceFactory
+     */
+    protected $fileReferenceFactory;
 
-	/**
-	 * @var FileReferenceFactory
-	 */
-	protected $fileReferenceFactory;
+    public function injectRepository(ItemBlobRepository $repository)
+    {
+        $this->repository = $repository;
+    }
 
-	/**
-	 *
-	 * @param ItemBlobRepository $repository
-	 * @return void
-	 */
-	public function injectRepository(ItemBlobRepository $repository)
-	{
-		$this->repository = $repository;
-	}
+    public function injectFileReferenceFactory(FileReferenceFactory $fileReferenceFactory)
+    {
+        $this->fileReferenceFactory = $fileReferenceFactory;
+    }
 
-	/**
-	 *
-	 * @param FileReferenceFactory $repository
-	 * @return void
-	 */
-	public function injectFileReferenceFactory(FileReferenceFactory $fileReferenceFactory)
-	{
-	    $this->fileReferenceFactory = $fileReferenceFactory;
-	}
+    /**
+     * Sets properties of domain object
+     *
+     * @throws \Innologi\Decosdata\Exception\MissingObjectProperty
+     */
+    protected function setProperties(\Innologi\Decosdata\Domain\Model\ItemBlob $object, array $data)
+    {
+        if (!isset($data['item_key'][0])) {
+            throw new MissingObjectProperty(1448549890, [
+                'item_key',
+                'ItemBlob',
+            ]);
+        }
+        $object->setItemKey($data['item_key']);
 
-	/**
-	 * Sets properties of domain object
-	 *
-	 * @param \Innologi\Decosdata\Domain\Model\ItemBlob $object
-	 * @param array $data
-	 * @return void
-	 * @throws \Innologi\Decosdata\Exception\MissingObjectProperty
-	 */
-	protected function setProperties(\Innologi\Decosdata\Domain\Model\ItemBlob $object, array $data) {
-		if (!isset($data['item_key'][0])) {
-			throw new MissingObjectProperty(1448549890, [
-				'item_key',
-				'ItemBlob'
-			]);
-		}
-		$object->setItemKey($data['item_key']);
+        // data-to-be-converted
+        if (isset($data['filepath'])) {
+            $data['file'] = $this->fileReferenceFactory->createByFilePath($data['filepath']);
+        }
 
-		// data-to-be-converted
-		if (isset($data['filepath'])) {
-			$data['file'] =	$this->fileReferenceFactory->createByFilePath($data['filepath']);
-		}
+        // regular data
+        if (isset($data['sequence'])) {
+            // LOW _____don't we rely on sequence?
+            $object->setSequence($data['sequence']);
+        }
+        if (isset($data['file'])) {
+            // @LOW _____if itemBlob already exists, it will have a file reference. If the filepath differs from the new one, should we remove the old file if it doesn't have any other file references?
+            $object->setFile($data['file']);
+        }
+        if (isset($data['item'])) {
+            $object->setItem($data['item']);
+        }
+    }
 
-		// regular data
-		if (isset($data['sequence'])) {
-			// LOW _____don't we rely on sequence?
-			$object->setSequence($data['sequence']);
-		}
-		if (isset($data['file'])) {
-			// @LOW _____if itemBlob already exists, it will have a file reference. If the filepath differs from the new one, should we remove the old file if it doesn't have any other file references?
-			$object->setFile($data['file']);
-		}
-		if (isset($data['item'])) {
-			$object->setItem($data['item']);
-		}
-	}
-
-	/**
-	 * Retrieve ItemBlob Object from, in this order until successful:
-	 * - repository, values replaced by optional data parameters
-	 * - newly created by optional data parameters
-	 *
-	 * @param string $itemKey
-	 * @param array $data
-	 * @return \Innologi\Decosdata\Domain\Model\ItemBlob
-	 */
-	public function getByItemKey($itemKey, array $data = []) {
-		/* @var $itemBlob \Innologi\Decosdata\Domain\Model\ItemBlob */
-		$itemBlob = $this->repository->findOneByItemKey($itemKey);
-		if ($itemBlob === NULL) {
-			if (empty($data)) {
-				// set required parameters
-				$data['item_key'] = $itemKey;
-			}
-			$itemBlob = $this->create($data);
-		} elseif (!empty($data)) {
-			// would be useless if no additional $data was given, as itemKey is already set
-			$this->setProperties($itemBlob, $data);
-		}
-		return $itemBlob;
-	}
-
+    /**
+     * Retrieve ItemBlob Object from, in this order until successful:
+     * - repository, values replaced by optional data parameters
+     * - newly created by optional data parameters
+     *
+     * @param string $itemKey
+     * @return \Innologi\Decosdata\Domain\Model\ItemBlob
+     */
+    public function getByItemKey($itemKey, array $data = [])
+    {
+        /** @var \Innologi\Decosdata\Domain\Model\ItemBlob $itemBlob */
+        $itemBlob = $this->repository->findOneByItemKey($itemKey);
+        if ($itemBlob === null) {
+            if (empty($data)) {
+                // set required parameters
+                $data['item_key'] = $itemKey;
+            }
+            $itemBlob = $this->create($data);
+        } elseif (!empty($data)) {
+            // would be useless if no additional $data was given, as itemKey is already set
+            $this->setProperties($itemBlob, $data);
+        }
+        return $itemBlob;
+    }
 }

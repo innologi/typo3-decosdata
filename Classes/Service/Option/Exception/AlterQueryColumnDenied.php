@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,11 @@ namespace Innologi\Decosdata\Service\Option\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class AlterQueryColumnDenied extends OptionException {
-	// @TODO ___once you've finalized configurations, you should check if "column-level" is still correctly named
-	/**
-	 * @var string
-	 */
-	protected $message = 'Query Option Configuration Error: Applying %1$s on the column-level is not supported.';
-
+class AlterQueryColumnDenied extends OptionException
+{
+    // @TODO ___once you've finalized configurations, you should check if "column-level" is still correctly named
+    /**
+     * @var string
+     */
+    protected $message = 'Query Option Configuration Error: Applying %1$s on the column-level is not supported.';
 }

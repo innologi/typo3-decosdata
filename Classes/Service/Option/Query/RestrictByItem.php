@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,9 +25,10 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
-use Innologi\Decosdata\Service\Option\QueryOptionService;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
+use Innologi\Decosdata\Service\Option\QueryOptionService;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
+
 /**
  * RestrictByItem option
  *
@@ -35,30 +38,31 @@ use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class RestrictByItem extends OptionAbstract {
-	use Traits\Filters;
+class RestrictByItem extends OptionAbstract
+{
+    use Traits\Filters;
 
-	/**
-	 * Restricts items by item id
-	 *
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
-	 */
-	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
-		if (! (isset($args['id'][0]) || isset($args['parameter'][0])) ) {
-			throw new MissingArgument(1509374080, [self::class, 'id/parameter']);
-		}
-		$itemId = $args['id'] ?? $this->parameterService->getParameterValidated($args['parameter']);
+    /**
+     * Restricts items by item id
+     *
+     * {@inheritDoc}
+     * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
+     */
+    public function alterQueryRow(array $args, Query $query, QueryOptionService $service)
+    {
+        if (!(isset($args['id'][0]) || isset($args['parameter'][0]))) {
+            throw new MissingArgument(1509374080, [self::class, 'id/parameter']);
+        }
+        $itemId = $args['id'] ?? $this->parameterService->getParameterValidated($args['parameter']);
 
-		// @LOW so how do we solve a conflict with RestrictByParentItem here?
-		$alias = 'restrictBy';
-		$parameterKey = ':' . $alias;
-		$query->getContent('id')->getField('')
-			->getWhere()->addConstraint(
-				$alias,
-				$this->constraintFactory->createConstraintByValue('uid', 'it', '=', $parameterKey)
-			);
-		$query->addParameter($parameterKey, $itemId);
-	}
-
+        // @LOW so how do we solve a conflict with RestrictByParentItem here?
+        $alias = 'restrictBy';
+        $parameterKey = ':' . $alias;
+        $query->getContent('id')->getField('')
+            ->getWhere()->addConstraint(
+                $alias,
+                $this->constraintFactory->createConstraintByValue('uid', 'it', '=', $parameterKey),
+            );
+        $query->addParameter($parameterKey, $itemId);
+    }
 }

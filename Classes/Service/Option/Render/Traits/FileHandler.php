@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Render\Traits;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,9 +26,10 @@ namespace Innologi\Decosdata\Service\Option\Render\Traits;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
- /**
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
+/**
  * File Handler Trait
  *
  * Offers some basic file-related methods for use by RenderOptions.
@@ -35,89 +38,86 @@ use TYPO3\CMS\Core\Resource\ResourceFactory;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-trait FileHandler {
-	use MockFileHandler;
-	// @LOW should not inject what isn't necessarily used (check everywhere)
-	/**
-	 * @var ResourceFactory
-	 */
-	protected $resourceFactory;
+trait FileHandler
+{
+    use MockFileHandler;
+    // @LOW should not inject what isn't necessarily used (check everywhere)
+    /**
+     * @var ResourceFactory
+     */
+    protected $resourceFactory;
 
-	/**
-	 * @var integer
-	 */
-	protected $fileUid;
+    /**
+     * @var integer
+     */
+    protected $fileUid;
 
-	/**
-	 *
-	 * @param ResourceFactory $resourceFactory
-	 * @return void
-	 */
-	public function injectResourceFactory(ResourceFactory $resourceFactory)
-	{
-		$this->resourceFactory = $resourceFactory;
-	}
+    public function injectResourceFactory(ResourceFactory $resourceFactory)
+    {
+        $this->resourceFactory = $resourceFactory;
+    }
 
-	/**
-	 * Run all the file handler checks and return either a File object or NULL
-	 *
-	 * @param string $content
-	 * @return \TYPO3\CMS\Core\Resource\File|NULL
-	 */
-	protected function getFileObject($content) {
-		$file = NULL;
-		if ($this->isFileHandle($content)) {
-			$file = $this->getFileObjectByUid($this->fileUid);
-		} elseif ($this->isMockFileHandle($content)) {
-			$file = $this->getMockFileObjectByPath($this->mockPath);
-			$this->fileUid = 0;
-		}
-		return $file;
-	}
+    /**
+     * Run all the file handler checks and return either a File object or NULL
+     *
+     * @param string $content
+     * @return \TYPO3\CMS\Core\Resource\File|null
+     */
+    protected function getFileObject($content)
+    {
+        $file = null;
+        if ($this->isFileHandle($content)) {
+            $file = $this->getFileObjectByUid($this->fileUid);
+        } elseif ($this->isMockFileHandle($content)) {
+            $file = $this->getMockFileObjectByPath($this->mockPath);
+            $this->fileUid = 0;
+        }
+        return $file;
+    }
 
-	/**
-	 * Returns whether the argument is a file handle
-	 *
-	 * @param string $fileHandle
-	 * @return boolean
-	 */
-	protected function isFileHandle($fileHandle) {
-		if (str_starts_with($fileHandle, 'file:')) {
-			$parts = explode(':', $fileHandle, 2);
-			if (is_numeric($parts[1])) {
-				$this->fileUid = (int) $parts[1];
-				return TRUE;
-			}
-		}
-		return FALSE;
-	}
+    /**
+     * Returns whether the argument is a file handle
+     *
+     * @param string $fileHandle
+     * @return boolean
+     */
+    protected function isFileHandle($fileHandle)
+    {
+        if (str_starts_with($fileHandle, 'file:')) {
+            $parts = explode(':', $fileHandle, 2);
+            if (is_numeric($parts[1])) {
+                $this->fileUid = (int) $parts[1];
+                return true;
+            }
+        }
+        return false;
+    }
 
-	/**
-	 * Returns File Object, or NULL if it fails.
-	 *
-	 * @param integer $fileUid
-	 * @return \TYPO3\CMS\Core\Resource\File|NULL
-	 */
-	protected function getFileObjectByUid($fileUid) {
-		try {
-			return $this->resourceFactory->getFileObject($fileUid);
-		} catch (FileDoesNotExistException) {
-			// @TODO log this? or does it get logged internally already?
-		}
-		return NULL;
-	}
+    /**
+     * Returns File Object, or NULL if it fails.
+     *
+     * @param integer $fileUid
+     * @return \TYPO3\CMS\Core\Resource\File|null
+     */
+    protected function getFileObjectByUid($fileUid)
+    {
+        try {
+            return $this->resourceFactory->getFileObject($fileUid);
+        } catch (FileDoesNotExistException) {
+            // @TODO log this? or does it get logged internally already?
+        }
+        return null;
+    }
 
-	/**
-	 * Checks if a local directory exists. If it doesn't, it attempts to create it one
-	 * directory at a time.
-	 *
-	 * @param string $dirpath The path to the directory
-	 * @return void
-	 */
-	protected function createDirectoryIfNotExists($dirPath) {
-		if (is_dir($dirPath)) {
-			return;
-		}
-		GeneralUtility::mkdir_deep($dirPath);
-	}
+    /**
+     * Checks if a local directory exists. If it doesn't, it attempts to create it one
+     * directory at a time.
+     */
+    protected function createDirectoryIfNotExists($dirPath)
+    {
+        if (is_dir($dirPath)) {
+            return;
+        }
+        GeneralUtility::mkdir_deep($dirPath);
+    }
 }

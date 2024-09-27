@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\View\Item;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,22 +33,21 @@ namespace Innologi\Decosdata\View\Item;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MultiJson extends \TYPO3\CMS\Extbase\Mvc\View\JsonView {
+class MultiJson extends \TYPO3\CMS\Extbase\Mvc\View\JsonView
+{
+    /**
+     * @var array
+     */
+    protected $variablesToRender = ['contentSections'];
 
-	/**
-	 * @var array
-	 */
-	protected $variablesToRender = ['contentSections'];
-
-	/**
-	 * @var array
-	 */
-	protected $configuration = [
-		'contentSections' => [
-			'_descendAll' => [
-				'_only' => ['type', 'data', 'paging']
-			]
-		]
-	];
-
+    /**
+     * @var array
+     */
+    protected $configuration = [
+        'contentSections' => [
+            '_descendAll' => [
+                '_only' => ['type', 'data', 'paging'],
+            ],
+        ],
+    ];
 }

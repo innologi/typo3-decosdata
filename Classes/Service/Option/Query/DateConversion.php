@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,8 +25,9 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryField;
+
 /**
  * DateConversion option
  *
@@ -35,23 +38,23 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class DateConversion extends OptionAbstract {
-	// @TODO ___see if the mixed input argument still needs to be supported now that we can apply options per field
+class DateConversion extends OptionAbstract
+{
+    // @TODO ___see if the mixed input argument still needs to be supported now that we can apply options per field
 
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
-	 */
-	public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service) {
-		if (!isset($args['format'])) {
-			// @TODO ___throw exception.. or should it be optional?
-		}
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
+     */
+    public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service)
+    {
+        if (!isset($args['format'])) {
+            // @TODO ___throw exception.. or should it be optional?
+        }
 
-		$id = $queryField->getId() . 'dateconversion' . $service->getOptionIndex();
-		$parameterKey = ':' . $id;
-		$select = $queryField->getSelect();
-		$select->addWrap($id, 'DATE_FORMAT(' . $select->getWrapDivider() . ', ' . $parameterKey . ')');
-		$queryField->addParameter($parameterKey, $args['format']);
-	}
-
+        $id = $queryField->getId() . 'dateconversion' . $service->getOptionIndex();
+        $parameterKey = ':' . $id;
+        $select = $queryField->getSelect();
+        $select->addWrap($id, 'DATE_FORMAT(' . $select->getWrapDivider() . ', ' . $parameterKey . ')');
+        $queryField->addParameter($parameterKey, $args['format']);
+    }
 }

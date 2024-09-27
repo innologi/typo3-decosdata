@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,9 +25,10 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory;
+use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
+
 /**
  * Add Fields option
  *
@@ -35,63 +38,58 @@ use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class AddFields extends OptionAbstract {
+class AddFields extends OptionAbstract
+{
+    /**
+     * @var ConstraintFactory
+     */
+    protected $constraintFactory;
 
-	/**
-	 * @var ConstraintFactory
-	 */
-	protected $constraintFactory;
+    public function injectConstraintFactory(ConstraintFactory $constraintFactory)
+    {
+        $this->constraintFactory = $constraintFactory;
+    }
 
-	/**
-	 *
-	 * @param ConstraintFactory $constraintFactory
-	 * @return void
-	 */
-	public function injectConstraintFactory(ConstraintFactory $constraintFactory)
-	{
-		$this->constraintFactory = $constraintFactory;
-	}
+    /**
+     * Add (any) item field
+     *
+     * {@inheritDoc}
+     * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
+     */
+    public function alterQueryRow(array $args, Query $query, QueryOptionService $service)
+    {
+        if (!(isset($args['fields']) && is_array($args['fields']))) {
+            // @TODO throw exception
+        }
 
-	/**
-	 * Add (any) item field
-	 *
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
-	 */
-	public function alterQueryRow(array $args, Query $query, QueryOptionService $service) {
-		if ( !(isset($args['fields']) && is_array($args['fields'])) ) {
-			// @TODO throw exception
-		}
+        foreach ($args['fields'] as $field) {
+            if (!isset($field[0])) {
+                // @TODO throw exception
+            }
+            $tableAlias1 = 'field' . $field;
+            $tableAlias2 = $tableAlias1 . 'f';
+            $parameterKey = ':' . $tableAlias1;
 
-		foreach ($args['fields'] as $field) {
-			if (!isset($field[0])) {
-				// @TODO throw exception
-			}
-			$tableAlias1 = 'field' . $field;
-			$tableAlias2 = $tableAlias1 . 'f';
-			$parameterKey = ':' . $tableAlias1;
+            // @LOW should check if a field already exists
+            // @LOW should we check if it.uid can be linked? What happens if this option is used on a query grouped by content?
+            $queryField = $query->getContent($field)->getField('');
+            $queryField->getSelect()
+                ->setField('field_value')
+                ->setTableAlias($tableAlias1);
 
-			// @LOW should check if a field already exists
-			// @LOW should we check if it.uid can be linked? What happens if this option is used on a query grouped by content?
-			$queryField = $query->getContent($field)->getField('');
-			$queryField->getSelect()
-				->setField('field_value')
-				->setTableAlias($tableAlias1);
+            $queryField->getFrom(0, [
+                $tableAlias1 => 'tx_decosdata_domain_model_itemfield',
+                $tableAlias2 => 'tx_decosdata_domain_model_field',
+            ])->setJoinType('LEFT')
+            ->setConstraint(
+                $this->constraintFactory->createConstraintAnd([
+                    $this->constraintFactory->createConstraintByField('item', $tableAlias1, '=', 'uid', 'it'),
+                    $this->constraintFactory->createConstraintByField('field', $tableAlias1, '=', 'uid', $tableAlias2),
+                    $this->constraintFactory->createConstraintByValue('field_name', $tableAlias2, '=', $parameterKey),
+                ]),
+            );
 
-			$queryField->getFrom(0, [
-				$tableAlias1 => 'tx_decosdata_domain_model_itemfield',
-				$tableAlias2 => 'tx_decosdata_domain_model_field'
-			])->setJoinType('LEFT')
-			->setConstraint(
-				$this->constraintFactory->createConstraintAnd([
-					$this->constraintFactory->createConstraintByField('item', $tableAlias1, '=', 'uid', 'it'),
-					$this->constraintFactory->createConstraintByField('field', $tableAlias1, '=', 'uid', $tableAlias2),
-					$this->constraintFactory->createConstraintByValue('field_name', $tableAlias2, '=', $parameterKey)
-				])
-			);
-
-			$query->addParameter($parameterKey, $field);
-		}
-	}
-
+            $query->addParameter($parameterKey, $field);
+        }
+    }
 }

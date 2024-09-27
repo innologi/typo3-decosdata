@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\QueryBuilder\Query\Constraint;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -23,8 +25,9 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query\Constraint;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Constraint Container
  *
@@ -32,91 +35,92 @@ use TYPO3\CMS\Core\SingletonInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ConstraintFactory implements SingletonInterface {
+class ConstraintFactory implements SingletonInterface
+{
+    /**
+     * Creates ConstraintCollection object and returns it.
+     *
+     * @param string $logic
+     * @return ConstraintCollection
+     */
+    public function createConstraintCollection($logic, array $constraints = [])
+    {
+        return match ($logic) {
+            'AND' => $this->createConstraintAnd($constraints),
+            'OR' => $this->createConstraintOr($constraints),
+            default => GeneralUtility::makeInstance(
+                ConstraintCollection::class,
+                $logic,
+                $constraints,
+            ),
+        };
+    }
 
-	/**
-	 * Creates ConstraintCollection object and returns it.
-	 *
-	 * @param string $logic
-	 * @param array $constraints
-	 * @return ConstraintCollection
-	 */
-	public function createConstraintCollection($logic, array $constraints = []) {
-		return match ($logic) {
-			'AND' => $this->createConstraintAnd($constraints),
-			'OR' => $this->createConstraintOr($constraints),
-			default => GeneralUtility::makeInstance(
-				ConstraintCollection::class,
-				$logic,
-				$constraints
-			),
-		};
-	}
+    /**
+     * Creates ConstraintAnd Collection object and returns it.
+     *
+     * @return ConstraintAnd
+     */
+    public function createConstraintAnd(array $constraints = [])
+    {
+        return GeneralUtility::makeInstance(
+            ConstraintAnd::class,
+            $constraints,
+        );
+    }
 
-	/**
-	 * Creates ConstraintAnd Collection object and returns it.
-	 *
-	 * @param array $constraints
-	 * @return ConstraintAnd
-	 */
-	public function createConstraintAnd(array $constraints = []) {
-		return GeneralUtility::makeInstance(
-			ConstraintAnd::class,
-			$constraints
-		);
-	}
+    /**
+     * Creates ConstraintOr Collection object and returns it.
+     *
+     * @return ConstraintOr
+     */
+    public function createConstraintOr(array $constraints = [])
+    {
+        return GeneralUtility::makeInstance(
+            ConstraintOr::class,
+            $constraints,
+        );
+    }
 
-	/**
-	 * Creates ConstraintOr Collection object and returns it.
-	 *
-	 * @param array $constraints
-	 * @return ConstraintOr
-	 */
-	public function createConstraintOr(array $constraints = []) {
-		return GeneralUtility::makeInstance(
-			ConstraintOr::class,
-			$constraints
-		);
-	}
+    /**
+     * Creates ConstraintByField object and returns it.
+     *
+     * @param string $localField
+     * @param string $localAlias
+     * @param string $operator
+     * @param string $foreignField
+     * @param string $foreignAlias
+     * @return ConstraintByField
+     */
+    public function createConstraintByField($localField, $localAlias, $operator, $foreignField, $foreignAlias)
+    {
+        return GeneralUtility::makeInstance(
+            ConstraintByField::class,
+            $localField,
+            $localAlias,
+            $operator,
+            $foreignField,
+            $foreignAlias,
+        );
+    }
 
-	/**
-	 * Creates ConstraintByField object and returns it.
-	 *
-	 * @param string $localField
-	 * @param string $localAlias
-	 * @param string $operator
-	 * @param string $foreignField
-	 * @param string $foreignAlias
-	 * @return ConstraintByField
-	 */
-	public function createConstraintByField($localField, $localAlias, $operator, $foreignField, $foreignAlias) {
-		return GeneralUtility::makeInstance(
-			ConstraintByField::class,
-			$localField,
-			$localAlias,
-			$operator,
-			$foreignField,
-			$foreignAlias
-		);
-	}
-
-	/**
-	 * Creates ConstraintByValue object and returns it.
-	 *
-	 * @param string $field
-	 * @param string $alias
-	 * @param string $operator
-	 * @param mixed $value
-	 * @return ConstraintByValue
-	 */
-	public function createConstraintByValue($field, $alias, $operator, $value) {
-		return GeneralUtility::makeInstance(
-			ConstraintByValue::class,
-			$field,
-			$alias,
-			$operator,
-			$value
-		);
-	}
-
+    /**
+     * Creates ConstraintByValue object and returns it.
+     *
+     * @param string $field
+     * @param string $alias
+     * @param string $operator
+     * @param mixed $value
+     * @return ConstraintByValue
+     */
+    public function createConstraintByValue($field, $alias, $operator, $value)
+    {
+        return GeneralUtility::makeInstance(
+            ConstraintByValue::class,
+            $field,
+            $alias,
+            $operator,
+            $value,
+        );
+    }
 }

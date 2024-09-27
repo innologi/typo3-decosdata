@@ -1,4 +1,5 @@
 <?php
+
 namespace Innologi\Decosdata\Routing\Aspect;
 
 /**
@@ -47,39 +48,32 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class FlexiblePersistedAliasMapper extends PersistedAliasMapper
 {
-
     /**
-     *
      * @var string
      */
     protected $tableAlias;
 
     /**
-     *
      * @var string
      */
     protected $tableAliasPrefix = '';
 
     /**
-     *
      * @var array
      */
     protected $tableJoins = [];
 
     /**
-     *
      * @var array
      */
     protected $constraints = [];
 
     /**
-     *
      * @var string
      */
     protected $idFieldName;
 
     /**
-     *
      * @var array
      */
     protected $diacritics = [
@@ -293,11 +287,10 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
         'Ǽ',
         'ǽ',
         'Ǿ',
-        'ǿ'
+        'ǿ',
     ];
 
     /**
-     *
      * @var array
      */
     protected $diacriticReplacements = [
@@ -511,11 +504,10 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
         'AE',
         'ae',
         'O',
-        'o'
+        'o',
     ];
 
     /**
-     *
      * @var array
      */
     protected $transformRoute = [
@@ -524,7 +516,7 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
         'replacementChar' => null,
         'replacementMatch' => null,
         'dateTimeFormat' => null,
-        'maxLength' => null
+        'maxLength' => null,
     ];
 
     /**
@@ -542,22 +534,16 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
     protected $cacheResult = true;
 
     /**
-     *
      * @todo allow this table to be cleared by persistent db table flush tool
      * @var string
      */
     protected $cacheTable = 'tx_decosdata_routing_slug';
 
     /**
-     *
      * @var ConnectionPool
      */
     protected $connectionPool;
 
-    /**
-     *
-     * {@inheritdoc}
-     */
     public function __construct(array $settings)
     {
         $tableAlias = $settings['tableAlias'] ?? null;
@@ -567,24 +553,24 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
         $transformRoute = $settings['transformRoute'] ?? [];
         $cacheResult = $settings['cacheResult'] ?? true;
 
-        if ($tableAlias !== null && ! \is_string($tableAlias)) {
+        if ($tableAlias !== null && !\is_string($tableAlias)) {
             throw new \InvalidArgumentException('tableAlias must be string', 1564488228);
         }
-        if (! \is_array($tableJoins)) {
+        if (!\is_array($tableJoins)) {
             throw new \InvalidArgumentException('tableJoins must be array', 1564488674);
         }
-        if (! \is_array($constraints)) {
+        if (!\is_array($constraints)) {
             throw new \InvalidArgumentException('constraints must be array', 1564497390);
         }
-        if (! \is_string($idFieldName)) {
+        if (!\is_string($idFieldName)) {
             throw new \InvalidArgumentException('idFieldName must be string', 1564474975);
         }
-        if (! \is_array($transformRoute)) {
+        if (!\is_array($transformRoute)) {
             throw new \InvalidArgumentException('transformRoute must be array', 1564476648);
-        } elseif (! empty($transformRoute)) {
+        } elseif (!empty($transformRoute)) {
             $transformRoute = \array_merge($this->transformRoute, $transformRoute);
         }
-        if (! \is_bool($cacheResult)) {
+        if (!\is_bool($cacheResult)) {
             throw new \InvalidArgumentException('cacheResult must be boolean', 1564561108);
         }
 
@@ -599,35 +585,22 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
         parent::__construct($settings);
     }
 
-    /**
-     *
-     * {@inheritdoc}
-     */
     public function generate(string $value): ?string
     {
         return $this->cacheResult ? $this->getCachedSlug($value) : $this->generateRouteValue($value);
     }
 
-    /**
-     *
-     * {@inheritdoc}
-     */
     public function resolve(string $value): ?string
     {
         return $this->cacheResult ? $this->getCachedRouteVar($value) : $this->resolveRouteValue($value);
     }
 
-    /**
-     *
-     * @param string $value
-     * @return string|NULL
-     */
     protected function generateRouteValue(string $value): ?string
     {
         $result = $this->findByIdentifiers([
-            $this->tableAliasPrefix . $this->idFieldName => $value
+            $this->tableAliasPrefix . $this->idFieldName => $value,
         ]);
-        if (! isset($result[$this->routeFieldName][0])) {
+        if (!isset($result[$this->routeFieldName][0])) {
             return null;
         }
         $routeValue = $this->transformRouteValue($this->purgeRouteValuePrefix($result[$this->routeFieldName]));
@@ -637,16 +610,11 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
         return $routeValue;
     }
 
-    /**
-     *
-     * @param string $value
-     * @return string|NULL
-     */
     protected function resolveRouteValue(string $value): ?string
     {
         $value = $this->routeValuePrefix . $this->purgeRouteValuePrefix($value);
         $result = $this->findByIdentifiers([
-            $this->tableAliasPrefix . $this->routeFieldName => $value
+            $this->tableAliasPrefix . $this->routeFieldName => $value,
         ]);
         if (isset($result[$this->idFieldName])) {
             return (string) $result[$this->idFieldName];
@@ -654,35 +622,23 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
         return null;
     }
 
-    /**
-     *
-     * @param string $value
-     * @return string|NULL
-     */
     protected function getCachedSlug(string $value): ?string
     {
         $cache = $this->getCachedResult([
-            'routevar' => $value
+            'routevar' => $value,
         ]);
         return isset($cache['slug']) ? (string) $cache['slug'] : $this->generateRouteValue($value);
     }
 
-    /**
-     *
-     * @param string $value
-     * @return string|NULL
-     */
     protected function getCachedRouteVar(string $value): ?string
     {
         $cache = $this->getCachedResult([
-            'slug' => $value
+            'slug' => $value,
         ]);
         return isset($cache['routevar']) ? (string) $cache['routevar'] : $this->resolveRouteValue($value);
     }
 
     /**
-     *
-     * @param array $identifier
      * @return mixed
      */
     protected function getCachedResult(array $identifier)
@@ -690,21 +646,15 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
         return $this->getConnectionPool()
             ->getConnectionForTable($this->cacheTable)
             ->select([
-            '*'
-        ], $this->cacheTable, \array_merge([
-            // @TODO I'd prefer to include the pid as well, might be
-            // able to provide it through my own enhancer
-            'hash' => $this->generateCacheHash()
-        ], $identifier))
+                '*',
+            ], $this->cacheTable, \array_merge([
+                // @TODO I'd prefer to include the pid as well, might be
+                // able to provide it through my own enhancer
+                'hash' => $this->generateCacheHash(),
+            ], $identifier))
             ->fetch();
     }
 
-    /**
-     *
-     * @param string $originalValue
-     * @param string $resultValue
-     * @return void
-     */
     protected function storeCacheResult(string $originalValue, string $resultValue): void
     {
         /** @var \TYPO3\CMS\Core\Database\Connection $connection */
@@ -714,28 +664,19 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
             'slug' => $resultValue,
             'routevar' => $originalValue,
             'pid' => (int) $GLOBALS['TSFE']->id,
-            'tstamp' => (int) $GLOBALS['EXEC_TIME']
+            'tstamp' => (int) $GLOBALS['EXEC_TIME'],
         ]);
     }
 
-    /**
-     *
-     * @return array
-     */
     protected function buildPersistenceFieldNames(): array
     {
         return [
             $this->tableAliasPrefix . 'uid',
             $this->tableAliasPrefix . 'pid',
-            $this->tableAliasPrefix . $this->routeFieldName
+            $this->tableAliasPrefix . $this->routeFieldName,
         ];
     }
 
-    /**
-     *
-     * @param string|null $value
-     * @return string
-     */
     protected function transformRouteValue(?string $value): ?string
     {
         if (empty($this->transformRoute) || $value === null) {
@@ -764,29 +705,21 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
         return $value;
     }
 
-    /**
-     *
-     * @param string $value
-     * @return string
-     */
     protected function ensureUniqueValue(string &$value): string
     {
         $tempValue = $value;
         $counter = 0;
         do {
             $cache = $this->getCachedResult([
-                'slug' => $tempValue
+                'slug' => $tempValue,
             ]);
-        } while (isset($cache['routevar']) && ($tempValue = $value . '-' . ++ $counter));
+        } while (isset($cache['routevar']) && ($tempValue = $value . '-' . ++$counter));
         $value = $tempValue;
         return $value;
     }
 
     /**
      * Finds value by configurable routing/id fields.
-     *
-     * @param array $values
-     * @return array|NULL
      */
     protected function findByIdentifiers(array $values): ?array
     {
@@ -794,7 +727,7 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
         foreach ($values as $field => $value) {
             $constraints[] = [
                 'field' => $field,
-                'value' => $value
+                'value' => $value,
             ];
         }
         $queryBuilder = $this->createQueryBuilder();
@@ -807,7 +740,6 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
     }
 
     /**
-     * {@inheritDoc}
      * @see \TYPO3\CMS\Core\Routing\Aspect\PersistedAliasMapper::createQueryBuilder()
      */
     protected function createQueryBuilder(): QueryBuilder
@@ -816,7 +748,7 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
             ->getQueryBuilderForTable($this->tableName)
             ->from($this->tableName, $this->tableAlias);
 
-        if (! empty($this->tableJoins)) {
+        if (!empty($this->tableJoins)) {
             // @TODO error handling
             foreach ($this->tableJoins as $join) {
                 $connection = $queryBuilder->getConnection();
@@ -826,24 +758,18 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
                         'joinTable' => $connection->quoteIdentifier($join['joinTable']),
                         'joinAlias' => $connection->quoteIdentifier($join['joinAlias']),
                         'joinCondition' => $queryBuilder->expr()
-                            ->andX(...$this->createFieldConstraints($queryBuilder, $join['constraints']))
-                    ]
+                            ->andX(...$this->createFieldConstraints($queryBuilder, $join['constraints'])),
+                    ],
                 ], true);
             }
         }
-        if (! empty($this->constraints)) {
+        if (!empty($this->constraints)) {
             $queryBuilder->where(...$this->createFieldConstraints($queryBuilder, $this->constraints));
         }
 
         return $queryBuilder;
     }
 
-    /**
-     *
-     * @param QueryBuilder $queryBuilder
-     * @param array $constraintList
-     * @return array
-     */
     protected function createFieldConstraints(QueryBuilder $queryBuilder, array $constraintList): array
     {
         // @TODO error handling
@@ -860,17 +786,12 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
         return $constraints;
     }
 
-    /**
-     *
-     * @return string
-     */
     protected function generateCacheHash(): string
     {
         return \md5(\json_encode($this->settings));
     }
 
     /**
-     *
      * @return \TYPO3\CMS\Core\Database\ConnectionPool
      */
     protected function getConnectionPool()

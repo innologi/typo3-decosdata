@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,6 +26,7 @@ namespace Innologi\Decosdata\Service;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
+
 /**
  * Search Service
  *
@@ -33,138 +36,143 @@ use TYPO3\CMS\Core\SingletonInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class SearchService implements SingletonInterface {
-	/* comment from decospublisher, still relevant?
-	 *
-	 * @TODO if we build a query-cache we could create an eid script
-	 * which reads from it to speed up ajax results significantly, while maintaining a fallback
-	 * to the original context in case the query cache does not have a valid desired entry
-	 */
+class SearchService implements SingletonInterface
+{
+    /* comment from decospublisher, still relevant?
+     *
+     * @TODO if we build a query-cache we could create an eid script
+     * which reads from it to speed up ajax results significantly, while maintaining a fallback
+     * to the original context in case the query cache does not have a valid desired entry
+     */
 
-	/**
-	 * @var string
-	 */
-	protected $searchString;
+    /**
+     * @var string
+     */
+    protected $searchString;
 
-	/**
-	 * @var array
-	 */
-	protected $searchTerms = [];
+    /**
+     * @var array
+     */
+    protected $searchTerms = [];
 
-	/**
-	 * @var boolean
-	 */
-	protected $active = FALSE;
+    /**
+     * @var boolean
+     */
+    protected $active = false;
 
-	/**
-	 * @var array
-	 */
-	protected $characterMask = [' ', "\t", "\n", "\r", "\0", "\x0B"];
+    /**
+     * @var array
+     */
+    protected $characterMask = [' ', "\t", "\n", "\r", "\0", "\x0B"];
 
-	/**
-	 * Paginate a Query object
-	 *
-	 * @param array $configuration
-	 * @param \Innologi\Decosdata\Service\QueryBuilder\Query\Query $query
-	 * @return void
-	 */
-	public function enableSearch($searchString) {
-		$this->active = $this->validateSearchString($searchString);
-	}
+    /**
+     * Paginate a Query object
+     */
+    public function enableSearch($searchString)
+    {
+        $this->active = $this->validateSearchString($searchString);
+    }
 
-	/**
-	 * Sets QueryOptions to activate a search according to configuration.
-	 *
-	 * @param array $configuration
-	 * @param array $queryOptions
-	 * @return array
-	 */
-	public function configureSearch($configuration, $queryOptions) {
-		$matchAll = isset($configuration['matchAllSearchTerms']) && (bool)$configuration['matchAllSearchTerms'];
-		$orFilters = [];
+    /**
+     * Sets QueryOptions to activate a search according to configuration.
+     *
+     * @param array $configuration
+     * @param array $queryOptions
+     * @return array
+     */
+    public function configureSearch($configuration, $queryOptions)
+    {
+        $matchAll = isset($configuration['matchAllSearchTerms']) && (bool) $configuration['matchAllSearchTerms'];
+        $orFilters = [];
 
-		foreach ($this->searchTerms as $searchTerm) {
-			$filters = [];
-			// multiple sources: OR
-			foreach ($configuration['sources'] as $source) {
-				// @TODO search content fields?
-				// @TODO re-use already joined tables?
-				if (isset($source['field'])) {
-					$filters[] = [
-						'value' => '%' . $searchTerm . '%',
-						'operator' => 'LIKE',
-						'field' => $source['field']
-					];
-				}
-			}
+        foreach ($this->searchTerms as $searchTerm) {
+            $filters = [];
+            // multiple sources: OR
+            foreach ($configuration['sources'] as $source) {
+                // @TODO search content fields?
+                // @TODO re-use already joined tables?
+                if (isset($source['field'])) {
+                    $filters[] = [
+                        'value' => '%' . $searchTerm . '%',
+                        'operator' => 'LIKE',
+                        'field' => $source['field'],
+                    ];
+                }
+            }
 
-			if (!empty($filters)) {
-				if ($matchAll) {
-					// every search term will be enclosed in his own FilterItems call: AND
-					// note that due to multiple source fields (which is always OR), we don't do
-					// all searchTerms in a single FilterItems with matchAll arg
-					$queryOptions[] = [
-						'option' => 'FilterItems',
-						'args' => ['filters' => $filters]
-					];
-				} else {
-					// every search term will be enclosed in a single FilterItems call: OR
-					$orFilters = array_merge($orFilters, $filters);
-				}
-			}
-		}
+            if (!empty($filters)) {
+                if ($matchAll) {
+                    // every search term will be enclosed in his own FilterItems call: AND
+                    // note that due to multiple source fields (which is always OR), we don't do
+                    // all searchTerms in a single FilterItems with matchAll arg
+                    $queryOptions[] = [
+                        'option' => 'FilterItems',
+                        'args' => [
+                            'filters' => $filters,
+                        ],
+                    ];
+                } else {
+                    // every search term will be enclosed in a single FilterItems call: OR
+                    $orFilters = array_merge($orFilters, $filters);
+                }
+            }
+        }
 
-		if (!empty($orFilters)) {
-			$queryOptions[] = [
-				'option' => 'FilterItems',
-				'args' => ['filters' => $orFilters]
-			];
-		}
+        if (!empty($orFilters)) {
+            $queryOptions[] = [
+                'option' => 'FilterItems',
+                'args' => [
+                    'filters' => $orFilters,
+                ],
+            ];
+        }
 
-		return $queryOptions;
-	}
+        return $queryOptions;
+    }
 
-	/**
-	 * Confirms whether the service was successfully configured and active.
-	 *
-	 * @return boolean
-	 */
-	public function isActive() {
-		return $this->active;
-	}
+    /**
+     * Confirms whether the service was successfully configured and active.
+     *
+     * @return boolean
+     */
+    public function isActive()
+    {
+        return $this->active;
+    }
 
-	/**
-	 * Returns search string.
-	 *
-	 * @return string
-	 */
-	public function getSearchString() {
-		return $this->searchString;
-	}
+    /**
+     * Returns search string.
+     *
+     * @return string
+     */
+    public function getSearchString()
+    {
+        return $this->searchString;
+    }
 
-	/**
-	 * Validates search string
-	 *
-	 * Note that it does not guarantuee a safe string, so don't consider this a free pass for unparameterized queries.
-	 *
-	 * @param string $searchString
-	 * @return boolean
-	 */
-	protected function validateSearchString($searchString) {
-		$valid = FALSE;
-		$searchString = trim($searchString, join('', $this->characterMask));
-		if (isset($searchString[0])) {
-			$searchTerms = explode(' ', $searchString);
-			foreach ($searchTerms as $searchTerm) {
-				$searchTerm = str_replace($this->characterMask, '', $searchTerm);
-				if (isset($searchTerm[0])) {
-					$this->searchTerms[] = $searchTerm;
-					$valid = TRUE;
-				}
-			}
-		}
-		$this->searchString = join(' ', $this->searchTerms);
-		return $valid;
-	}
-
+    /**
+     * Validates search string
+     *
+     * Note that it does not guarantuee a safe string, so don't consider this a free pass for unparameterized queries.
+     *
+     * @param string $searchString
+     * @return boolean
+     */
+    protected function validateSearchString($searchString)
+    {
+        $valid = false;
+        $searchString = trim($searchString, join('', $this->characterMask));
+        if (isset($searchString[0])) {
+            $searchTerms = explode(' ', $searchString);
+            foreach ($searchTerms as $searchTerm) {
+                $searchTerm = str_replace($this->characterMask, '', $searchTerm);
+                if (isset($searchTerm[0])) {
+                    $this->searchTerms[] = $searchTerm;
+                    $valid = true;
+                }
+            }
+        }
+        $this->searchString = join(' ', $this->searchTerms);
+        return $valid;
+    }
 }

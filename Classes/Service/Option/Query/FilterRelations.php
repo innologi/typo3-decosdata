@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Option\Query;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -24,8 +26,9 @@ namespace Innologi\Decosdata\Service\Option\Query;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\Exception\MissingDependency;
-use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
 use Innologi\Decosdata\Service\Option\QueryOptionService;
+use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
+
 /**
  * FilterRelations option
  *
@@ -35,41 +38,41 @@ use Innologi\Decosdata\Service\Option\QueryOptionService;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class FilterRelations extends OptionAbstract {
-	use Traits\Filters;
+class FilterRelations extends OptionAbstract
+{
+    use Traits\Filters;
 
-	/**
-	 * {@inheritDoc}
-	 * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
-	 */
-	public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service) {
-		$this->doFiltersExist($args);
-		$id = 'relation' . $service->getIndex();
-		// note that we use the same id as any relation-type option, e.g. ParentInParent,
-		// so that we can influence said relation with constraints
-		$queryField = $queryContent->getParent()->getContent($id)->getField('');
+    /**
+     * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
+     */
+    public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service)
+    {
+        $this->doFiltersExist($args);
+        $id = 'relation' . $service->getIndex();
+        // note that we use the same id as any relation-type option, e.g. ParentInParent,
+        // so that we can influence said relation with constraints
+        $queryField = $queryContent->getParent()->getContent($id)->getField('');
 
-		$select = $queryField->getSelect();
-		$from = $queryField->getFrom('');
-		$tables = $from->getTables();
-		if (empty($tables)) {
-			// if join didn't already exist with any tables, this is a misconfiguration
-			throw new MissingDependency(1462201871, [self::class, 'No relation set']);
-		}
+        $select = $queryField->getSelect();
+        $from = $queryField->getFrom('');
+        $tables = $from->getTables();
+        if (empty($tables)) {
+            // if join didn't already exist with any tables, this is a misconfiguration
+            throw new MissingDependency(1462201871, [self::class, 'No relation set']);
+        }
 
-		$id .= 'filter';
-		$conditions = [];
-		foreach ($args['filters'] as $filter) {
-			$this->initializeFilter($filter, TRUE);
-			// identify the table by the field, so we don't create redundancy
-			$alias = $id . $filter['field'];
-			$conditions[] = $this->filterBy($queryField, $filter, $alias, '', $select->getTableAlias(), $select->getField());
-		}
+        $id .= 'filter';
+        $conditions = [];
+        foreach ($args['filters'] as $filter) {
+            $this->initializeFilter($filter, true);
+            // identify the table by the field, so we don't create redundancy
+            $alias = $id . $filter['field'];
+            $conditions[] = $this->filterBy($queryField, $filter, $alias, '', $select->getTableAlias(), $select->getField());
+        }
 
-		$from->addConstraint(
-			$id . $service->getOptionIndex(),
-			$this->processConditions($args, $conditions)
-		);
-	}
-
+        $from->addConstraint(
+            $id . $service->getOptionIndex(),
+            $this->processConditions($args, $conditions),
+        );
+    }
 }

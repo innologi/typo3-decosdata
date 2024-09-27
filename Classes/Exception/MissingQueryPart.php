@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class MissingQueryPart extends Exception {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Query Error: Missing query part(s) \'%1$s\' in %2$s';
-
+class MissingQueryPart extends Exception
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Query Error: Missing query part(s) \'%1$s\' in %2$s';
 }

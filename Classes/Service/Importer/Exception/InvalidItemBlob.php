@@ -1,5 +1,7 @@
 <?php
+
 namespace Innologi\Decosdata\Service\Importer\Exception;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -31,11 +33,10 @@ namespace Innologi\Decosdata\Service\Importer\Exception;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class InvalidItemBlob extends ItemParsingError {
-
-	/**
-	 * @var string
-	 */
-	protected $message = 'Could not parse itemblob \'%1$s\': %2$s';
-
+class InvalidItemBlob extends ItemParsingError
+{
+    /**
+     * @var string
+     */
+    protected $message = 'Could not parse itemblob \'%1$s\': %2$s';
 }
