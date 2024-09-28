@@ -80,10 +80,8 @@ class ImportStatusCommand extends Command
         $uidArray = $input->getArgument('uid-list');
 
         try {
-            /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
-            $objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
             /** @var \Innologi\Decosdata\Domain\Repository\ImportRepository $importRepository */
-            $importRepository = $objectManager->get(\Innologi\Decosdata\Domain\Repository\ImportRepository::class);
+            $importRepository = GeneralUtility::makeInstance(\Innologi\Decosdata\Domain\Repository\ImportRepository::class);
             $imports = empty($uidArray) ? $importRepository->findAllEverywhere() : $importRepository->findInUidEverywhere($uidArray);
 
             $sitePath = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/';
@@ -104,9 +102,12 @@ class ImportStatusCommand extends Command
                 $io->writeln($prefix . 'updatable: ' . $this->answers[(int) $canBeUpdated]);
                 $io->newLine();
             }
+
+            return 0;
         } catch (\Exception $e) {
             // @extensionScannerIgnoreLine false positive
             $io->error('[' . $e->getCode() . '] ' . $e->getMessage());
+            return 1;
         }
     }
 }

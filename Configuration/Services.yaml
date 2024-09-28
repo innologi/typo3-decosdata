@@ -1,0 +1,65 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Innologi\Decosdata\:
+    resource: '../Classes/*'
+    exclude:
+      - '../Classes/Domain/Model/*'
+      - '../Classes/Eid/*'
+      - '../Classes/Exception/*'
+      - '../Classes/Service/Option/Exception/*'
+      - '../Classes/QueryBuilder/Exception/*'
+      - '../Classes/Utility/*'
+
+  # register implementation classes
+  Innologi\Decosdata\Service\Database\QueryProviderInterface:
+    class: 'Innologi\Decosdata\Service\Database\MysqlQueryProvider'
+  Innologi\Decosdata\Service\Importer\StorageHandler\StorageHandlerInterface:
+    class: 'Innologi\Decosdata\Service\Importer\StorageHandler\ClassicStorageHandler'
+  Innologi\Decosdata\Service\Importer\Parser\ParserInterface:
+    class: 'Innologi\Decosdata\Service\Importer\Parser\OneFileStreamingParser'
+  
+  # register commands
+  Innologi\Decosdata\Command\MigrateCommand:
+    tags:
+      - name: 'console.command'
+        command: 'decosdata:migrate'
+        description: 'decospublisher => decosdata migration'
+        schedulable: false
+  Innologi\Decosdata\Command\ImportStatusCommand:
+    tags:
+      - name: 'console.command'
+        command: 'decosdata:import:status'
+        description: 'Show status of imports by uid'
+        schedulable: false
+  Innologi\Decosdata\Command\ImportRunCommand:
+    tags:
+      - name: 'console.command'
+        command: 'decosdata:import:run'
+        description: 'Process imports by uid'
+        schedulable: false
+
+  # public services
+  Innologi\Decosdata\Service\Paginate\PaginateService:
+    # these are created by factory but have DI expectations
+    public: true
+    shared: false
+
+  # vendor TYPO3AssetProvider DI config
+  Innologi\TYPO3AssetProvider\ProviderServiceInterface:
+    class: 'Innologi\TYPO3AssetProvider\ProviderService'
+
+  # vendor TYPO3FalApi DI config
+  Innologi\TYPO3FalApi\MockFileFactory:
+    public: true
+  Innologi\TYPO3FalApi\FileReferenceFactory:
+    public: true
+  Innologi\TYPO3FalApi\FileReferenceRepository:
+    public: true
+
+  # vendor TagBuilder DI config
+  Innologi\TagBuilder\TagFactory:
+    public: true

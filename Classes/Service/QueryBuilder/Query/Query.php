@@ -28,7 +28,6 @@ namespace Innologi\Decosdata\Service\QueryBuilder\Query;
 use Innologi\Decosdata\Service\Database\StatementFactory;
 use Innologi\Decosdata\Service\QueryBuilder\QueryConfigurator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 
 /**
  * Query object
@@ -42,19 +41,9 @@ use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 class Query extends QueryIterator implements QueryInterface
 {
     /**
-     * @var ObjectManagerInterface
-     */
-    protected $objectManager;
-
-    /**
      * @var array
      */
     protected $parameters = [];
-
-    public function injectObjectManager(ObjectManagerInterface $objectManager)
-    {
-        $this->objectManager = $objectManager;
-    }
 
     /**
      * @see \Innologi\Decosdata\Service\QueryBuilder\Query\QueryInterface::getParameters()
@@ -155,9 +144,9 @@ class Query extends QueryIterator implements QueryInterface
     public function createStatement()
     {
         /** @var \Innologi\Decosdata\Service\Database\StatementFactory $statementFactory */
-        $statementFactory = $this->objectManager->get(StatementFactory::class);
+        $statementFactory = GeneralUtility::makeInstance(StatementFactory::class);
         /** @var \Innologi\Decosdata\Service\QueryBuilder\QueryConfigurator $queryConfigurator */
-        $queryConfigurator = $this->objectManager->get(QueryConfigurator::class);
+        $queryConfigurator = GeneralUtility::makeInstance(QueryConfigurator::class);
 
         # @LOW _this is a temporary interface until the relevant FIX task in PaginateService is completed
         $statementFactory->setLimit($this->limit, $this->offset);

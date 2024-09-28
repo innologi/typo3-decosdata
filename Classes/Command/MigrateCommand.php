@@ -82,9 +82,11 @@ class MigrateCommand extends Command
             );
             // @extensionScannerIgnoreLine false positive
             $controller->main();
+            return 0;
         } catch (\Exception $e) {
             // @extensionScannerIgnoreLine false positive
             $io->error('[' . $e->getCode() . '] ' . $e->getMessage());
+            return 1;
         }
     }
 }

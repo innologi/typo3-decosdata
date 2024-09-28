@@ -2,6 +2,8 @@
 
 namespace Innologi\Decosdata\Service\Option;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -25,7 +27,6 @@ namespace Innologi\Decosdata\Service\Option;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 
 /**
  * Option Service Abstract
@@ -41,11 +42,6 @@ use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 abstract class OptionServiceAbstract
 {
     // @LOW ___singleton?
-    /**
-     * @var ObjectManagerInterface
-     */
-    protected $objectManager;
-
     /**
      * @var array
      */
@@ -65,11 +61,6 @@ abstract class OptionServiceAbstract
      * @var array
      */
     protected $optionVariables = [];
-
-    public function injectObjectManager(ObjectManagerInterface $objectManager)
-    {
-        $this->objectManager = $objectManager;
-    }
 
     public function __construct()
     {
@@ -200,11 +191,11 @@ abstract class OptionServiceAbstract
         if (!class_exists($className)) {
             throw new Exception\MissingOptionClass(1448552497, [$className]);
         }
-        $object = $this->objectManager->get($className);
+        $object = GeneralUtility::makeInstance($className);
         $interfaceClassName = $this->optionNamespace . '\\OptionInterface';
         if (!is_subclass_of($object, $interfaceClassName)) {
             throw new Exception\InvalidOptionClass(1449155186, [
-                // since $object was retrieved via objectManager, we're not sure if $object Class === $className
+                // since $object was retrieved via service container, we're not sure if $object Class === $className
                 $object::class, $interfaceClassName,
             ]);
         }

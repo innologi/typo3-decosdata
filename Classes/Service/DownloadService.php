@@ -27,7 +27,6 @@ namespace Innologi\Decosdata\Service;
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
  * Download Service
@@ -109,7 +108,7 @@ class DownloadService implements SingletonInterface
     protected function getUriBuilder()
     {
         if ($this->uriBuilder === null) {
-            $this->uriBuilder = GeneralUtility::makeInstance(ObjectManager::class)->get(
+            $this->uriBuilder = GeneralUtility::makeInstance(
                 \TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder::class,
             );
         }

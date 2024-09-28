@@ -27,7 +27,7 @@ namespace Innologi\Decosdata\Service\Paginate;
  ***************************************************************/
 use Innologi\Decosdata\Exception\NotInitialized;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Pagination Service Factory
@@ -42,19 +42,9 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
 class PaginateServiceFactory implements SingletonInterface
 {
     /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
-
-    /**
      * @var array
      */
     protected $instances = [];
-
-    public function injectObjectManager(ObjectManager $objectManager)
-    {
-        $this->objectManager = $objectManager;
-    }
 
     /**
      * Create / retrieve the PaginateService instance that is identified by its parameters
@@ -65,7 +55,11 @@ class PaginateServiceFactory implements SingletonInterface
     {
         $id = \substr(\md5(\json_encode($parameters)), 0, 8);
         if (!isset($this->instances[$id])) {
-            $this->instances[$id] = $this->objectManager->get(PaginateService::class, $id, $parameters);
+            /** @var PaginateService $paginateService */
+            $paginateService = GeneralUtility::makeInstance(PaginateService::class);
+            $paginateService->setId($id);
+            $paginateService->setSectionParameters($parameters);
+            $this->instances[$id] = $paginateService;
         }
         return $this->instances[$id];
     }

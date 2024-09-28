@@ -26,6 +26,7 @@ namespace Innologi\Decosdata\Service\Option\Render\Traits;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\TYPO3FalApi\MockFileFactory;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Mock File Handler Trait
@@ -49,9 +50,12 @@ trait MockFileHandler
      */
     protected $mockPath;
 
-    public function injectMockFileFactory(MockFileFactory $mockFileFactory)
+    public function getMockFileFactory(): MockFileFactory
     {
-        $this->mockFileFactory = $mockFileFactory;
+        if ($this->mockFileFactory === null) {
+            $this->mockFileFactory = GeneralUtility::makeInstance(MockFileFactory::class);
+        }
+        return $this->mockFileFactory;
     }
 
     /**
@@ -80,6 +84,6 @@ trait MockFileHandler
      */
     protected function getMockFileObjectByPath($filePath)
     {
-        return $this->mockFileFactory->getByFilePath($filePath);
+        return $this->getMockFileFactory()->getByFilePath($filePath);
     }
 }

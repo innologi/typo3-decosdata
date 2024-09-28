@@ -26,6 +26,7 @@ namespace Innologi\Decosdata\Mvc\Domain;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Exception\StaticUidInsertion;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Persistence\Repository;
 
@@ -123,7 +124,7 @@ abstract class RepositoryAbstract extends Repository
      */
     protected function getStoragePid()
     {
-        $frameworkConfiguration = $this->objectManager->get(
+        $frameworkConfiguration = GeneralUtility::makeInstance(
             ConfigurationManagerInterface::class,
         )->getConfiguration(
             ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK,

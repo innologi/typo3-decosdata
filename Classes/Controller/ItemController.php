@@ -114,6 +114,7 @@ class ItemController extends ActionController
      */
     protected function initializeAction()
     {
+        $this->typeProcessor->setRequest($this->request);
         $this->parameterService->initializeByRequest($this->request);
         $this->level = $this->parameterService->getParameterNormalized('level');
 
@@ -177,7 +178,7 @@ class ItemController extends ActionController
             }
 
             /** @var \Innologi\Decosdata\Service\SearchService $searchService */
-            $this->searchService = $this->objectManager->get(\Innologi\Decosdata\Service\SearchService::class);
+            $this->searchService = GeneralUtility::makeInstance(\Innologi\Decosdata\Service\SearchService::class);
             if (!$this->searchService->isActive()) {
                 $this->searchService->enableSearch(
                     $this->parameterService->getParameterRaw('search'),
@@ -367,15 +368,5 @@ class ItemController extends ActionController
         } else {
             $this->redirect(...$args);
         }
-    }
-
-    /**
-     * @see \TYPO3\CMS\Extbase\Mvc\Controller\ActionController::buildControllerContext()
-     */
-    protected function buildControllerContext()
-    {
-        $controllerContext = parent::buildControllerContext();
-        $this->typeProcessor->setControllerContext($controllerContext);
-        return $controllerContext;
     }
 }

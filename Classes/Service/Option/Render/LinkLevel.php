@@ -43,28 +43,16 @@ use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
  */
 class LinkLevel implements OptionInterface
 {
-    protected UriBuilder $uriBuilder;
-
-    /**
-     * @var ParameterService
-     */
-    protected $parameterService;
-
     // @LOW ___allow this to be set via configuration? TS? or maybe even args?
     /**
      * @var string
      */
     protected $defaultContent = 'link';
 
-    public function injectUriBuilder(UriBuilder $uriBuilder)
-    {
-        $this->uriBuilder = $uriBuilder;
-    }
-
-    public function injectParameterService(ParameterService $parameterService)
-    {
-        $this->parameterService = $parameterService;
-    }
+    public function __construct(
+        protected readonly UriBuilder $uriBuilder,
+        protected readonly ParameterService $parameterService,
+    ) {}
 
     /**
      * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()

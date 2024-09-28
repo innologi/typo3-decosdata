@@ -65,28 +65,6 @@ class ImageFeatures implements OptionInterface
     protected $markOriginal = '###IMAGE-FEATURE-ORIGINAL###';
 
     /**
-     * @var \Innologi\TYPO3AssetProvider\ProviderServiceInterface
-     */
-    protected $assetProviderService;
-
-    /**
-     * Returns AssetProviderService
-     *
-     * @return \Innologi\TYPO3AssetProvider\ProviderServiceInterface
-     */
-    protected function getAssetProviderService()
-    {
-        if ($this->assetProviderService === null) {
-            $this->assetProviderService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-                \TYPO3\CMS\Extbase\Object\ObjectManager::class,
-            )->get(
-                \Innologi\TYPO3AssetProvider\ProviderServiceInterface::class,
-            );
-        }
-        return $this->assetProviderService;
-    }
-
-    /**
      * @see \Innologi\Decosdata\Service\Option\Render\OptionInterface::alterContentValue()
      */
     public function alterContentValue(array $args, TagInterface $tag, RenderOptionService $service)

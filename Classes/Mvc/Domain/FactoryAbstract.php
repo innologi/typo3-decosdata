@@ -26,7 +26,6 @@ namespace Innologi\Decosdata\Mvc\Domain;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 
 /**
  * Factory Abstract
@@ -52,11 +51,6 @@ abstract class FactoryAbstract implements SingletonInterface
     protected $repository;
 
     /**
-     * @var ObjectManagerInterface
-     */
-    protected $objectManager;
-
-    /**
      * @var integer
      */
     protected $storagePid;
@@ -65,11 +59,6 @@ abstract class FactoryAbstract implements SingletonInterface
      * @var array
      */
     protected $objectCache = [];
-
-    public function injectObjectManager(ObjectManagerInterface $objectManager)
-    {
-        $this->objectManager = $objectManager;
-    }
 
     public function __construct()
     {
@@ -91,18 +80,10 @@ abstract class FactoryAbstract implements SingletonInterface
     public function create(array $data)
     {
         /** @var \TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject $object */
-        $object = $this->objectManager->get($this->objectType);
+        $object = new $this->objectType();
         $this->setProperties($object, $data);
         $this->setDefaultProperties($object, $data);
         return $object;
-    }
-
-    /**
-     * Sets properties of domain object
-     */
-    protected function setProperties(\TYPO3\CMS\Extbase\DomainObject\AbstractDomainObject $object, array $data)
-    {
-        // overrule this method for setting object properties
     }
 
     /**

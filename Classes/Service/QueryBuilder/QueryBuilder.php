@@ -31,7 +31,7 @@ use Innologi\Decosdata\Service\QueryBuilder\Query\Constraint\ConstraintFactory;
 use Innologi\Decosdata\Service\QueryBuilder\Query\Query;
 use Innologi\Decosdata\Service\QueryBuilder\Query\QueryContent;
 use Innologi\Decosdata\Service\SearchService;
-use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Query Builder
@@ -49,11 +49,6 @@ class QueryBuilder
     // @TODO ___add query cache
     // @TODO ___wrong option usage can cause exception to be thrown, which should be displayed nicely on frontend. So where should I catch them?
     // @LOW ___is there any upside to making this a singleton? Consider that many views probably use it twice (to produce a header part)
-
-    /**
-     * @var ObjectManagerInterface
-     */
-    protected $objectManager;
 
     /**
      * @var ConstraintFactory
@@ -79,11 +74,6 @@ class QueryBuilder
      * @var integer
      */
     protected $groupByContentPriority;
-
-    public function injectObjectManager(ObjectManagerInterface $objectManager)
-    {
-        $this->objectManager = $objectManager;
-    }
 
     public function injectConstraintFactory(ConstraintFactory $constraintFactory)
     {
@@ -117,7 +107,7 @@ class QueryBuilder
     public function buildListQuery(array &$configuration, array $import)
     {
         /** @var \Innologi\Decosdata\Service\QueryBuilder\Query\Query $query */
-        $query = $this->objectManager->get(Query::class);
+        $query = GeneralUtility::makeInstance(Query::class);
 
         // init query config
         $queryContent = $query->getContent('id');

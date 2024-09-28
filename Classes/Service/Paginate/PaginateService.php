@@ -30,9 +30,10 @@ use Innologi\Decosdata\Exception\PaginationError;
 use Innologi\Decosdata\Service\ParameterService;
 use Innologi\TagBuilder\TagFactory;
 use Innologi\TYPO3AssetProvider\ProviderServiceInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\Mvc\Request;
+use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 
 /**
  * Paginate Service
@@ -45,10 +46,7 @@ class PaginateService
 {
     // @LOW we should consider using an instance of this in the original paginateService as well
 
-    /**
-     * @var string
-     */
-    protected $id;
+    protected readonly string $id;
 
     /**
      * @var integer
@@ -96,32 +94,6 @@ class PaginateService
     protected $__initialized = false;
 
     /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
-
-    /**
-     * @var TagFactory
-     */
-    protected $tagFactory;
-
-    /**
-     * @var ParameterService
-     */
-    protected $parameterService;
-
-    // @LOW don't inject this one
-    /**
-     * @var ProviderServiceInterface
-     */
-    protected $assetProviderService;
-
-    /**
-     * @var ControllerContext
-     */
-    protected $controllerContext;
-
-    /**
      * @var ConfigurationManagerInterface
      */
     protected $configurationManager;
@@ -136,38 +108,25 @@ class PaginateService
      */
     protected $callbackArgs = [];
 
-    /**
-     * @var array
-     */
-    protected $sectionParameters = [];
+    protected array $sectionParameters = [];
 
-    public function injectObjectManager(ObjectManager $objectManager)
-    {
-        $this->objectManager = $objectManager;
-    }
+    protected Request $request;
 
-    public function injectTagFactory(TagFactory $tagFactory)
-    {
-        $this->tagFactory = $tagFactory;
-    }
+    public function __construct(
+        protected readonly UriBuilder $uriBuilder,
+        protected readonly ProviderServiceInterface $assetProviderService,
+        protected readonly ParameterService $parameterService,
+        protected readonly TagFactory $tagFactory,
+    ) {}
 
-    public function injectParameterService(ParameterService $parameterService)
-    {
-        $this->parameterService = $parameterService;
-    }
-
-    public function injectAssetProviderService(ProviderServiceInterface $assetProviderService)
-    {
-        $this->assetProviderService = $assetProviderService;
-    }
-
-    /**
-     * @param string $id
-     */
-    public function __construct($id, array $parameters)
+    public function setId(string $id): void
     {
         $this->id = $id;
-        $this->sectionParameters = $parameters;
+    }
+
+    public function setSectionParameters(array $sectionParameters): void
+    {
+        $this->sectionParameters = $sectionParameters;
     }
 
     /**
@@ -178,7 +137,7 @@ class PaginateService
     protected function getConfigurationManager()
     {
         if ($this->configurationManager === null) {
-            $this->configurationManager = $this->objectManager->get(ConfigurationManagerInterface::class);
+            $this->configurationManager = GeneralUtility::makeInstance(ConfigurationManagerInterface::class);
         }
         return $this->configurationManager;
     }
@@ -188,10 +147,11 @@ class PaginateService
      *
      * @return $this
      */
-    public function initialize(array $configuration, ControllerContext $controllerContext)
+    public function initialize(array $configuration, Request $request)
     {
-        $this->controllerContext = $controllerContext;
-        $this->parameterService->initializeByRequest($controllerContext->getRequest());
+        $this->request = $request;
+        $this->uriBuilder->setRequest($request);
+        $this->parameterService->initializeByRequest($request);
 
         // note that these are all not based on an actual total
         $this->pageLimit = (int) ($configuration['pageLimit'] ?? 100);
@@ -324,7 +284,7 @@ class PaginateService
      */
     protected function buildNextUri($xhr = false)
     {
-        $uriBuilder = $this->controllerContext->getUriBuilder()->reset()
+        $uriBuilder = $this->uriBuilder->reset()
             ->setAddQueryString(true);
 
         $arguments = [
@@ -334,7 +294,7 @@ class PaginateService
             [$arguments['section'], $arguments['item'], $arguments['content']] = $this->sectionParameters;
 
             // @TODO where to do this?
-            if ($this->controllerContext->getRequest()->getFormat() === 'html') {
+            if ($this->request->getFormat() === 'html') {
                 // provide assets as configured per feature
                 $this->assetProviderService->provideAssets('decosdata', 'Item', 'xhr');
             }
@@ -346,7 +306,7 @@ class PaginateService
         }
 
         return $uriBuilder->uriFor(
-            $xhr ? 'single' : $this->controllerContext->getRequest()->getControllerActionName(),
+            $xhr ? 'single' : $this->request->getControllerActionName(),
             $arguments,
         );
     }

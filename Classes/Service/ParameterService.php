@@ -78,8 +78,8 @@ class ParameterService implements SingletonInterface
         if ($this->__initialized !== true) {
             /** @var \TYPO3\CMS\Extbase\Service\ExtensionService $extensionService */
             $extensionService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-                \TYPO3\CMS\Extbase\Object\ObjectManager::class,
-            )->get(\TYPO3\CMS\Extbase\Service\ExtensionService::class);
+                \TYPO3\CMS\Extbase\Service\ExtensionService::class,
+            );
             $this->pluginNameSpace = $extensionService->getPluginNamespace(
                 $request->getControllerExtensionName(),
                 $request->getPluginName(),
@@ -103,8 +103,8 @@ class ParameterService implements SingletonInterface
         if ($this->__initialized !== true) {
             /** @var \TYPO3\CMS\Extbase\Service\ExtensionService $extensionService */
             $extensionService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-                \TYPO3\CMS\Extbase\Object\ObjectManager::class,
-            )->get(\TYPO3\CMS\Extbase\Service\ExtensionService::class);
+                \TYPO3\CMS\Extbase\Service\ExtensionService::class,
+            );
             $this->pluginNameSpace = $extensionService->getPluginNamespace($extensionName, $pluginName);
 
             $this->arguments = \TYPO3\CMS\Core\Utility\GeneralUtility::_GPmerged($this->pluginNamespace);

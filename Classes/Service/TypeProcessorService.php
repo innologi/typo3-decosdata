@@ -31,9 +31,10 @@ use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
 use Innologi\TYPO3AssetProvider\ProviderServiceInterface;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\Mvc\Request;
+use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 
 /**
  * Item controller
@@ -44,11 +45,6 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
  */
 class TypeProcessorService implements SingletonInterface
 {
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
-
     /**
      * @var ItemRepository
      */
@@ -80,19 +76,13 @@ class TypeProcessorService implements SingletonInterface
     protected $configurationManager;
 
     /**
-     * @var ControllerContext
-     */
-    protected $controllerContext;
-
-    /**
      * @var \Innologi\Decosdata\Service\Paginate\PaginateServiceFactory
      */
     protected $paginatorFactory;
 
-    public function injectObjectManager(ObjectManager $objectManager)
-    {
-        $this->objectManager = $objectManager;
-    }
+    protected Request $request;
+
+    protected UriBuilder $uriBuilder;
 
     public function injectItemRepository(ItemRepository $itemRepository)
     {
@@ -114,6 +104,11 @@ class TypeProcessorService implements SingletonInterface
         $this->assetProviderService = $assetProviderService;
     }
 
+    public function injectUriBuilder(UriBuilder $uriBuilder): void
+    {
+        $this->uriBuilder = $uriBuilder;
+    }
+
     /**
      * Returns Paginator Factory
      *
@@ -122,7 +117,7 @@ class TypeProcessorService implements SingletonInterface
     protected function getPaginatorFactory()
     {
         if ($this->paginatorFactory === null) {
-            $this->paginatorFactory = $this->objectManager->get(\Innologi\Decosdata\Service\Paginate\PaginateServiceFactory::class);
+            $this->paginatorFactory = GeneralUtility::makeInstance(\Innologi\Decosdata\Service\Paginate\PaginateServiceFactory::class);
         }
         return $this->paginatorFactory;
     }
@@ -131,7 +126,7 @@ class TypeProcessorService implements SingletonInterface
     public function getTypoScriptService()
     {
         if ($this->typoScriptService === null) {
-            $this->typoScriptService = $this->objectManager->get(\TYPO3\CMS\Core\TypoScript\TypoScriptService::class);
+            $this->typoScriptService = GeneralUtility::makeInstance(\TYPO3\CMS\Core\TypoScript\TypoScriptService::class);
         }
         return $this->typoScriptService;
     }
@@ -139,18 +134,19 @@ class TypeProcessorService implements SingletonInterface
     public function getConfigurationManager()
     {
         if ($this->configurationManager === null) {
-            $this->configurationManager = $this->objectManager->get(ConfigurationManagerInterface::class);
+            $this->configurationManager = GeneralUtility::makeInstance(ConfigurationManagerInterface::class);
         }
         return $this->configurationManager;
     }
 
     /**
-     * Sets controller context
+     * Sets Extbase request
      */
-    public function setControllerContext(ControllerContext $controllerContext)
+    public function setRequest(Request $request)
     {
-        $this->controllerContext = $controllerContext;
-        $this->optionService->setRequest($controllerContext->getRequest());
+        $this->request = $request;
+        $this->uriBuilder->setRequest($request);
+        $this->optionService->setRequest($request);
     }
 
 
@@ -292,7 +288,7 @@ class TypeProcessorService implements SingletonInterface
     public function processSearch(array &$configuration)
     {
         /** @var \Innologi\Decosdata\Service\SearchService $searchService */
-        $searchService = $this->objectManager->get(\Innologi\Decosdata\Service\SearchService::class);
+        $searchService = GeneralUtility::makeInstance(\Innologi\Decosdata\Service\SearchService::class);
         $data = [
             'search' => ($searchService->isActive() ? $searchService->getSearchString() : ''),
             'searchArguments' => [],
@@ -308,13 +304,13 @@ class TypeProcessorService implements SingletonInterface
             $settings = $this->getConfigurationManager()->getConfiguration(
                 ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
             );
-            $data['xhrUri'] = $this->controllerContext->getUriBuilder()->reset()
+            $data['xhrUri'] = $this->uriBuilder->reset()
                 ->setTargetPageType($settings['api']['type'])
                 ->uriFor('search', $data['searchArguments'] + [
                     'section' => $data['section'],
                 ]);
 
-            if ($this->controllerContext->getRequest()->getFormat() === 'html') {
+            if ($this->request->getFormat() === 'html') {
                 // provide assets as configured per feature
                 $this->assetProviderService->provideAssets('decosdata', 'Item', 'xhr');
             }
@@ -354,7 +350,7 @@ class TypeProcessorService implements SingletonInterface
                         ->get([$section, $item['id'], $index])
                         ->initialize(
                             $config['paginate'],
-                            $this->controllerContext,
+                            $this->request,
                         );
                 }
 
@@ -387,24 +383,24 @@ class TypeProcessorService implements SingletonInterface
                 'page' => $paging['more'],
                 'section' => $section,
             ];
-            if ($this->controllerContext->getRequest()->hasArgument('search')) {
-                $arguments['search'] = $this->controllerContext->getRequest()->getArgument('search');
+            if ($this->request->hasArgument('search')) {
+                $arguments['search'] = $this->request->getArgument('search');
             }
             $settings = $this->getConfigurationManager()->getConfiguration(
                 ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
             );
-            $paging['more'] = $this->controllerContext->getUriBuilder()->reset()
+            $paging['more'] = $this->uriBuilder->reset()
                 ->setAddQueryString(true)
                 ->setTargetPageType($settings['api']['type'])
                 ->uriFor(
                     // overrule current action on queryString in case of forward
-                    //$this->controllerContext->getRequest()->getControllerActionName(),
+                    //$this->request->getControllerActionName(),
                     // @LOW is there ever any reason this would not be ok?
                     'single',
                     $arguments,
                 );
 
-            if ($this->controllerContext->getRequest()->getFormat() === 'html') {
+            if ($this->request->getFormat() === 'html') {
                 // provide assets as configured per feature
                 $this->assetProviderService->provideAssets('decosdata', 'Item', 'xhr');
             }

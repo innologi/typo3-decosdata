@@ -99,18 +99,16 @@ class ImportRunCommand extends Command
                 'vendorName' => 'Innologi',
             ]);
 
-            /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
-            $objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
             /** @var \Innologi\Decosdata\Service\Importer\ImporterService $importerService */
-            $importerService = $objectManager->get(\Innologi\Decosdata\Service\Importer\ImporterService::class);
+            $importerService = GeneralUtility::makeInstance(\Innologi\Decosdata\Service\Importer\ImporterService::class);
             if ($traceLogEnabled) {
-                $importerService->setLogger($objectManager->get(SymfonyStyleLogger::class, $io));
+                $importerService->setLogger(GeneralUtility::makeInstance(SymfonyStyleLogger::class, $io));
             }
             $importerService->importUidSelection($uidArray, (bool) $input->getOption('force'));
 
             // persist any lingering data
             /** @var \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager $persistenceManager */
-            $persistenceManager = $objectManager->get(\TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager::class);
+            $persistenceManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager::class);
             $persistenceManager->persistAll();
 
             $errors = $importerService->getErrors();
@@ -122,6 +120,7 @@ class ImportRunCommand extends Command
             }
 
             $io->success('Imports processed');
+            return 0;
         } catch (\Exception $e) {
             $message = '';
             if ($e->getCode()) {
@@ -129,6 +128,7 @@ class ImportRunCommand extends Command
             }
             // @extensionScannerIgnoreLine false positive
             $io->error($message . $e->getMessage());
+            return 1;
         }
     }
 }

@@ -41,7 +41,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 trait FileHandler
 {
     use MockFileHandler;
-    // @LOW should not inject what isn't necessarily used (check everywhere)
+
     /**
      * @var ResourceFactory
      */
@@ -52,9 +52,12 @@ trait FileHandler
      */
     protected $fileUid;
 
-    public function injectResourceFactory(ResourceFactory $resourceFactory)
+    public function getResourceFactory(): ResourceFactory
     {
-        $this->resourceFactory = $resourceFactory;
+        if ($this->resourceFactory === null) {
+            $this->resourceFactory = GeneralUtility::makeInstance(ResourceFactory::class);
+        }
+        return $this->resourceFactory;
     }
 
     /**
@@ -102,7 +105,7 @@ trait FileHandler
     protected function getFileObjectByUid($fileUid)
     {
         try {
-            return $this->resourceFactory->getFileObject($fileUid);
+            return $this->getResourceFactory()->getFileObject($fileUid);
         } catch (FileDoesNotExistException) {
             // @TODO log this? or does it get logged internally already?
         }

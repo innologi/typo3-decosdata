@@ -28,7 +28,6 @@ namespace Innologi\Decosdata\Task;
 use Innologi\Decosdata\Domain\Repository\ImportRepository;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Scheduler\AbstractAdditionalFieldProvider;
 use TYPO3\CMS\Scheduler\Task\Enumeration\Action;
 
@@ -101,7 +100,7 @@ class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider
                 FlashMessage::ERROR,
             );
         } else {
-            $availableImports = GeneralUtility::makeInstance(ObjectManager::class)->get(ImportRepository::class)->findAllEverywhere();
+            $availableImports = GeneralUtility::makeInstance(ImportRepository::class)->findAllEverywhere();
             $validKeys = [];
             foreach ($availableImports as $import) {
                 $validKeys[] = $import->getUid();
@@ -141,7 +140,7 @@ class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider
     protected function getImportOptions(array $selectedImports = [])
     {
         $options = [];
-        $imports = GeneralUtility::makeInstance(ObjectManager::class)->get(ImportRepository::class)->findAllEverywhere();
+        $imports = GeneralUtility::makeInstance(ImportRepository::class)->findAllEverywhere();
         /** @var \Innologi\Decosdata\Domain\Model\Import $import */
         foreach ($imports as $import) {
             $selected = in_array($import->getUid(), $selectedImports) ? ' selected="selected"' : '';

@@ -44,8 +44,6 @@ class ext_update
     {
         /** @var \TYPO3\CMS\Core\Messaging\FlashMessageQueue $flashMessageQueue */
         $flashMessageQueue = GeneralUtility::makeInstance(
-            \TYPO3\CMS\Extbase\Object\ObjectManager::class,
-        )->get(
             \TYPO3\CMS\Core\Messaging\FlashMessageQueue::class,
             'extbase.flashmessages.tx_decosdata_extupdate',
         );
