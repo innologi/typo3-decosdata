@@ -71,6 +71,7 @@ class QueryContent extends QueryIterator implements QueryInterface
      */
     public function __construct($id, QueryInterface $parent)
     {
+        // @extensionScannerIgnoreLine false positive
         $this->id = $id;
         $this->parent = $parent;
         $this->orderBy = GeneralUtility::makeInstance(OrderBy::class);
@@ -106,6 +107,7 @@ class QueryContent extends QueryIterator implements QueryInterface
      */
     public function getField($subId)
     {
+        // @extensionScannerIgnoreLine false positive
         $id = $this->id . $subId;
         if (!isset($this->children[$id])) {
             $this->children[$id] = GeneralUtility::makeInstance(QueryField::class, $id, $this);
@@ -120,6 +122,7 @@ class QueryContent extends QueryIterator implements QueryInterface
      */
     public function getId()
     {
+        // @extensionScannerIgnoreLine false positive
         return $this->id;
     }
 

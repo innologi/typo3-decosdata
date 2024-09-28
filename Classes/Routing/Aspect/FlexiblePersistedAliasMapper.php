@@ -663,6 +663,7 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
             'hash' => $this->generateCacheHash(),
             'slug' => $resultValue,
             'routevar' => $originalValue,
+            // @extensionScannerIgnoreLine false positive
             'pid' => (int) $GLOBALS['TSFE']->id,
             'tstamp' => (int) $GLOBALS['EXEC_TIME'],
         ]);

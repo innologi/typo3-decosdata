@@ -77,6 +77,7 @@ class QueryField implements QueryInterface
      */
     public function __construct($id, QueryContent $parent)
     {
+        // @extensionScannerIgnoreLine false positive
         $this->id = $id;
         $this->parent = $parent;
         $this->select = GeneralUtility::makeInstance(Select::class);
@@ -172,6 +173,7 @@ class QueryField implements QueryInterface
      */
     public function getId()
     {
+        // @extensionScannerIgnoreLine false positive
         return $this->id;
     }
 

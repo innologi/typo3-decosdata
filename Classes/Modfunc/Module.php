@@ -96,6 +96,7 @@ class Module
         $this->view = $this->createView('InfoModule');
 
         $this->getLanguageService()->includeLLFile('EXT:decosdata/Resources/Private/Language/locallang_mod.xlf');
+        // @extensionScannerIgnoreLine false positive
         $this->getPageRenderer()->addInlineLanguageLabelFile('EXT:decosdata/Resources/Private/Language/locallang_mod.xlf');
     }
 
@@ -154,6 +155,7 @@ class Module
         $this->isAccessibleForCurrentUser = $this->getBackendUser()->isAdmin() && $this->getBackendUser()->workspace === 0;
         #}
 
+        // @extensionScannerIgnoreLine false positive
         $pageRenderer = $this->getPageRenderer();
         #$pageRenderer->addCssFile('EXT:decosdata/Resources/Public/Css/backend.css', 'stylesheet', 'screen');
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Decosdata/Module');

@@ -121,6 +121,7 @@ class PaginateService
 
     public function setId(string $id): void
     {
+        // @extensionScannerIgnoreLine false positive
         $this->id = $id;
     }
 
@@ -157,6 +158,7 @@ class PaginateService
         $this->pageLimit = (int) ($configuration['pageLimit'] ?? 100);
         $this->limit = (int) ($configuration['perPageLimit'] ?? 100);
         $this->total = $this->pageLimit * $this->limit;
+        // @extensionScannerIgnoreLine false positive
         $currentPage = $this->parameterService->getParameterNormalized('page' . $this->id);
         $this->page = $currentPage > $this->pageLimit ? $this->pageLimit : $currentPage;
         $this->offset = $this->limit * ($this->page - 1);
@@ -288,6 +290,7 @@ class PaginateService
             ->setAddQueryString(true);
 
         $arguments = [
+            // @extensionScannerIgnoreLine false positive
             'page' . $this->id => $this->page + 1,
         ];
         if ($xhr && $this->xhrEnabled) {
@@ -322,6 +325,7 @@ class PaginateService
             throw new NotInitialized(1530544297, [self::class]);
         }
         return [
+            // @extensionScannerIgnoreLine false positive
             'id' => $this->id,
             'pageLimit' => $this->pageLimit,
             'perPageLimit' => $this->limit,
