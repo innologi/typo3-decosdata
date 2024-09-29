@@ -40,16 +40,16 @@ class Import extends AbstractEntity
      * Title
      *
      * @var string
-     * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
      */
+    #[\TYPO3\CMS\Extbase\Annotation\Validate(['validator' => 'NotEmpty'])]
     protected $title;
 
     /**
      * File reference
      *
      * @var \TYPO3\CMS\Extbase\Domain\Model\FileReference
-     * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
      */
+    #[\TYPO3\CMS\Extbase\Annotation\Validate(['validator' => 'NotEmpty'])]
     protected $file;
 
     /**

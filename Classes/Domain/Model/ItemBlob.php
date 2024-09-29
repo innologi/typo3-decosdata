@@ -54,8 +54,8 @@ class ItemBlob extends AbstractEntity
      * File reference
      *
      * @var \TYPO3\CMS\Extbase\Domain\Model\FileReference
-     * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
      */
+    #[\TYPO3\CMS\Extbase\Annotation\Validate(['validator' => 'NotEmpty'])]
     protected $file;
 
     /**

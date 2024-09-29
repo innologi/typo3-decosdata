@@ -48,48 +48,48 @@ class Item extends AbstractEntity
      * Item Type
      *
      * @var \Innologi\Decosdata\Domain\Model\ItemType
-     * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
      */
+    #[\TYPO3\CMS\Extbase\Annotation\ORM\Lazy]
     protected $itemType;
 
     /**
      * Item Field
      *
      * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\ItemField>
-     * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
      */
+    #[\TYPO3\CMS\Extbase\Annotation\ORM\Lazy]
     protected $itemField;
 
     /**
      * Item Blob
      *
      * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\ItemBlob>
-     * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
      */
+    #[\TYPO3\CMS\Extbase\Annotation\ORM\Lazy]
     protected $itemBlob;
 
     /**
      * Import
      *
      * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Import>
-     * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
      */
+    #[\TYPO3\CMS\Extbase\Annotation\ORM\Lazy]
     protected $import;
 
     /**
      * Parent Item
      *
      * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Item>
-     * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
      */
+    #[\TYPO3\CMS\Extbase\Annotation\ORM\Lazy]
     protected $parentItem;
 
     /**
      * Child Item
      *
      * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\Innologi\Decosdata\Domain\Model\Item>
-     * @TYPO3\CMS\Extbase\Annotation\ORM\Lazy
      */
+    #[\TYPO3\CMS\Extbase\Annotation\ORM\Lazy]
     protected $childItem;
 
     /**

@@ -40,8 +40,8 @@ class Field extends AbstractValueObject
      * Field Name
      *
      * @var string
-     * @TYPO3\CMS\Extbase\Annotation\Validate("NotEmpty")
      */
+    #[\TYPO3\CMS\Extbase\Annotation\Validate(['validator' => 'NotEmpty'])]
     protected $fieldName;
 
     /**
