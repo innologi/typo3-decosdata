@@ -25,15 +25,19 @@ namespace Innologi\Decosdata\Controller;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+use Innologi\Decosdata\Exception\EarlyResponseThrowable;
 use Innologi\Decosdata\Service\BreadcrumbService;
 use Innologi\Decosdata\Service\ParameterService;
 use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
 use Innologi\Decosdata\Service\TypeProcessorService;
 use Innologi\Decosdata\View\Item\MultiJson;
 use Innologi\Decosdata\View\Item\SingleJson;
+use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Http\ForwardResponse;
+use TYPO3\CMS\Extbase\Mvc\RequestInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 
 /**
  * Item controller
@@ -174,7 +178,7 @@ class ItemController extends ActionController
             if ($contentObject->getUserObjectType() === \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::OBJECTTYPE_USER) {
                 $contentObject->convertToUserIntObject();
                 // will recreate the object, so we have to stop the request here
-                throw new StopActionException();
+                throw new EarlyResponseThrowable(new Response());
             }
 
             /** @var \Innologi\Decosdata\Service\SearchService $searchService */
@@ -212,7 +216,7 @@ class ItemController extends ActionController
     /**
      * Run multiple publish-configurations and/or custom TS elements as a single cohesive content element + overarching template.
      */
-    public function multiAction()
+    public function multiAction(): ResponseInterface
     {
         $this->view->assign('level', $this->level);
         $this->view->assign(
@@ -222,6 +226,7 @@ class ItemController extends ActionController
                 $this->import,
             ),
         );
+        return $this->htmlResponse();
     }
 
     /**
@@ -231,7 +236,7 @@ class ItemController extends ActionController
      * @param integer $item
      * @param integer $content
      */
-    public function singleAction($section, $item = null, $content = null)
+    public function singleAction($section, $item = null, $content = null): ResponseInterface
     {
         $data = null;
         $this->activeConfiguration = $this->activeConfiguration[$section] ?? [];
@@ -282,6 +287,7 @@ class ItemController extends ActionController
         $this->view->assign('level', $this->level);
         $this->view->assign('section', $data);
         $this->view->assign('sectionIndex', $section);
+        return $this->htmlResponse();
     }
 
     /**
@@ -292,7 +298,7 @@ class ItemController extends ActionController
      *
      * @param string $search
      */
-    public function searchAction($search)
+    public function searchAction($search): ResponseInterface
     {
         $arguments = [];
         $action = 'multi';
@@ -316,7 +322,7 @@ class ItemController extends ActionController
         }
 
         // redirect to default action
-        $this->redirectOrForward($action, null, null, $arguments);
+        return $this->redirectOrForward($action, null, null, $arguments);
     }
 
 
@@ -324,7 +330,7 @@ class ItemController extends ActionController
     /**
      * Show single item details per publication configuration.
      */
-    public function singleShowAction()
+    public function singleShowAction(): ResponseInterface
     {
         $this->view->assign('level', $this->level);
         $this->view->assign('configuration', $this->activeConfiguration);
@@ -335,12 +341,13 @@ class ItemController extends ActionController
                 $this->import,
             ),
         );
+        return $this->htmlResponse();
     }
 
     /**
      * List items per publication configuration.
      */
-    public function singleListAction()
+    public function singleListAction(): ResponseInterface
     {
         $this->view->assign('level', $this->level);
         $this->view->assign('configuration', $this->activeConfiguration);
@@ -351,6 +358,7 @@ class ItemController extends ActionController
                 $this->import,
             ),
         );
+        return $this->htmlResponse();
     }
 
     /**
@@ -359,14 +367,33 @@ class ItemController extends ActionController
      *
      * @see \TYPO3\CMS\Extbase\Mvc\Controller\ActionController::redirect()
      */
-    protected function redirectOrForward(...$args)
+    protected function redirectOrForward(...$args): ResponseInterface
     {
         if ($this->apiMode) {
             // @TODO why was it not compatible with redirects? I forgot if this is fixable,
             // but it's in the way of a solution to getting GET search results.
-            $this->forward($args[0], $args[1], $args[2], $args[3]);
+            $response = new ForwardResponse($args[0]);
+            if (\is_string($args[1])) {
+                $response = $response->withControllerName($args[1]);
+            }
+            if (\is_string($args[2])) {
+                $response = $response->withExtensionName($args[2]);
+            }
+            if (\is_array($args[3])) {
+                $response = $response->withArguments($args[3]);
+            }
+            return $response;
         } else {
-            $this->redirect(...$args);
+            return $this->redirect(...$args);
+        }
+    }
+
+    public function processRequest(RequestInterface $request): ResponseInterface
+    {
+        try {
+            return parent::processRequest($request);
+        } catch (EarlyResponseThrowable $t) {
+            return $t->getResponse();
         }
     }
 }
