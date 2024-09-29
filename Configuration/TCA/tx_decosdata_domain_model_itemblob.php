@@ -51,9 +51,7 @@ return [
             'exclude' => true,
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.starttime',
             'config' => [
-                'type' => 'input',
-                'renderType' => 'inputDateTime',
-                'eval' => 'datetime',
+                'type' => 'datetime',
                 'default' => 0,
                 'behaviour' => [
                     'allowLanguageSynchronization' => true,
@@ -64,9 +62,7 @@ return [
             'exclude' => true,
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.endtime',
             'config' => [
-                'type' => 'input',
-                'renderType' => 'inputDateTime',
-                'eval' => 'datetime',
+                'type' => 'datetime',
                 'default' => 0,
                 'range' => [
                     'upper' => mktime(0, 0, 0, 1, 1, 2038),
@@ -91,26 +87,23 @@ return [
             'exclude' => false,
             'label' => $ll . '.sequence',
             'config' => [
-                'type' => 'input',
+                'type' => 'number',
                 'size' => 40,
                 'max' => 32,
-                'eval' => 'required,int',
+                'eval' => 'required',
             ],
         ],
         'file' => [
             'exclude' => false,
             'label' => $ll . '.file',
-            'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig(
-                'file',
-                [
-                    'maxitems' => 1,
-                    'foreign_match_fields' => [
-                        'fieldname' => 'file',
-                        'tablenames' => $table,
-                        'table_local' => 'sys_file',
-                    ],
+            'config' => [
+                'type' => 'file',
+                'maxitems' => 1,
+                'foreign_match_fields' => [
+                    'fieldname' => 'file',
+                    'tablenames' => $table,
                 ],
-            ),
+            ],
         ],
         'item' => [
             'config' => [

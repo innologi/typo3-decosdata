@@ -49,13 +49,11 @@ return [
         'file' => [
             'exclude' => false,
             'label' => $ll . '.file',
-            'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig(
-                'file',
-                [
-                    'maxitems' => 1,
-                ],
-                'xml',
-            ),
+            'config' => [
+                'type' => 'file',
+                'allowed' => 'xml',
+                'maxitems' => 1,
+            ],
         ],
         'profile_key' => [
             'exclude' => false,
