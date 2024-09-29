@@ -20,6 +20,9 @@ return [
         ],
         'dividers2tabs' => 1,
         'default_sortby' => 'ORDER BY profile DESC, field ASC',
+        'security' => [
+            'ignorePageTypeRestriction' => true,
+        ],
         // only used in profile IRRE
         'hideTable' => true,
         'iconfile' => 'EXT:' . $extKey . '/Resources/Public/Icons/' . $table . '.gif',

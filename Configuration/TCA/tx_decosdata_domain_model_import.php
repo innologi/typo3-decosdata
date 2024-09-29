@@ -20,6 +20,9 @@ return [
         ],
         'dividers2tabs' => 1,
         'default_sortby' => 'ORDER BY title ASC',
+        'security' => [
+            'ignorePageTypeRestriction' => true,
+        ],
         // @TODO __replace icon
         'iconfile' => 'EXT:' . $extKey . '/Resources/Public/Icons/' . $table . '.gif',
     ],

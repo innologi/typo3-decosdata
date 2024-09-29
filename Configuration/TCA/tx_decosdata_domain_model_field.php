@@ -16,6 +16,9 @@ return [
         'enablecolumns' => [],
         'dividers2tabs' => 1,
         'default_sortby' => 'ORDER BY field_name ASC',
+        'security' => [
+            'ignorePageTypeRestriction' => true,
+        ],
         // @TODO __replace icon
         'iconfile' => 'EXT:' . $extKey . '/Resources/Public/Icons/' . $table . '.gif',
     ],

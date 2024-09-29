@@ -21,6 +21,9 @@ return [
         'dividers2tabs' => 1,
         'hideAtCopy' => true,
         'default_sortby' => 'ORDER BY uid DESC',
+        'security' => [
+            'ignorePageTypeRestriction' => true,
+        ],
         // @LOW __I'd like to be able to find item_field.field_value, but this does not seem possible right now
         // instead, we're expanding item_field.item with an edit wizard, see itemfield TCA
         'searchFields' => 'uid, item_field',

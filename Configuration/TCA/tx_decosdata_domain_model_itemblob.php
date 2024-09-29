@@ -25,6 +25,9 @@ return [
         'hideTable' => true,
         'hideAtCopy' => true,
         'default_sortby' => 'ORDER BY uid DESC',
+        'security' => [
+            'ignorePageTypeRestriction' => true,
+        ],
         // the table is non-searchable
         //'searchFields' => '',
         'iconfile' => 'EXT:' . $extKey . '/Resources/Public/Icons/' . $table . '.gif',

@@ -20,6 +20,9 @@ return [
         ],
         'dividers2tabs' => 1,
         'default_sortby' => 'ORDER BY item DESC, field ASC',
+        'security' => [
+            'ignorePageTypeRestriction' => true,
+        ],
         // only used in item IRRE
         'hideTable' => true,
         'hideAtCopy' => true,
