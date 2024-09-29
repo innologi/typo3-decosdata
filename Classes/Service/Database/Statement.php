@@ -94,7 +94,7 @@ class Statement extends PreparedStatement implements \Stringable
      * Similar issue with statement->affected_rows we noticed creating migration/importer, also only when step-debugging.
      * @see https://bugs.php.net/bug.php?id=67348
      */
-    public function free()
+    public function free(): void
     {
         $this->statement->close();
         unset($this->statement);

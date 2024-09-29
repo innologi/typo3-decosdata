@@ -114,57 +114,57 @@ class ExtbaseStorageHandler implements StorageHandlerInterface, SingletonInterfa
      */
     protected $defaultQuerySettings;
 
-    public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager)
+    public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager): void
     {
         $this->configurationManager = $configurationManager;
     }
 
-    public function injectPersistenceManager(PersistenceManager $persistenceManager)
+    public function injectPersistenceManager(PersistenceManager $persistenceManager): void
     {
         $this->persistenceManager = $persistenceManager;
     }
 
-    public function injectItemRepository(ItemRepository $itemRepository)
+    public function injectItemRepository(ItemRepository $itemRepository): void
     {
         $this->itemRepository = $itemRepository;
     }
 
-    public function injectItemFieldRepository(ItemFieldRepository $itemFieldRepository)
+    public function injectItemFieldRepository(ItemFieldRepository $itemFieldRepository): void
     {
         $this->itemFieldRepository = $itemFieldRepository;
     }
 
-    public function injectItemBlobRepository(ItemBlobRepository $itemBlobRepository)
+    public function injectItemBlobRepository(ItemBlobRepository $itemBlobRepository): void
     {
         $this->itemBlobRepository = $itemBlobRepository;
     }
 
-    public function injectItemFactory(ItemFactory $itemFactory)
+    public function injectItemFactory(ItemFactory $itemFactory): void
     {
         $this->itemFactory = $itemFactory;
     }
 
-    public function injectItemFieldFactory(ItemFieldFactory $itemFieldFactory)
+    public function injectItemFieldFactory(ItemFieldFactory $itemFieldFactory): void
     {
         $this->itemFieldFactory = $itemFieldFactory;
     }
 
-    public function injectItemBlobFactory(ItemBlobFactory $itemBlobFactory)
+    public function injectItemBlobFactory(ItemBlobFactory $itemBlobFactory): void
     {
         $this->itemBlobFactory = $itemBlobFactory;
     }
 
-    public function injectItemTypeFactory(ItemTypeFactory $itemTypeFactory)
+    public function injectItemTypeFactory(ItemTypeFactory $itemTypeFactory): void
     {
         $this->itemTypeFactory = $itemTypeFactory;
     }
 
-    public function injectFieldFactory(FieldFactory $fieldFactory)
+    public function injectFieldFactory(FieldFactory $fieldFactory): void
     {
         $this->fieldFactory = $fieldFactory;
     }
 
-    public function injectDefaultQuerySettings(QuerySettingsInterface $defaultQuerySettings)
+    public function injectDefaultQuerySettings(QuerySettingsInterface $defaultQuerySettings): void
     {
         $this->defaultQuerySettings = $defaultQuerySettings;
     }
@@ -177,7 +177,7 @@ class ExtbaseStorageHandler implements StorageHandlerInterface, SingletonInterfa
      *
      * @param integer $pid
      */
-    public function initialize($pid)
+    public function initialize($pid): void
     {
         $this->configureStoragePid($pid);
         $this->configureQuerySettings($pid);
@@ -273,7 +273,7 @@ class ExtbaseStorageHandler implements StorageHandlerInterface, SingletonInterfa
      *
      * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob
      */
-    public function pushItemBlob(array $data)
+    public function pushItemBlob(array $data): void
     {
         try {
             if (!(isset($data['filepath'][0]) && is_file($data['filepath']))) {
@@ -307,7 +307,7 @@ class ExtbaseStorageHandler implements StorageHandlerInterface, SingletonInterfa
     /**
      * Push an itemfield ready for commit.
      */
-    public function pushItemField(array $data)
+    public function pushItemField(array $data): void
     {
         /** @var \Innologi\Decosdata\Domain\Model\Item $parentItem */
         $parentItem = $data['item'];
@@ -343,7 +343,7 @@ class ExtbaseStorageHandler implements StorageHandlerInterface, SingletonInterfa
      * a call to persistAll() on destruct. Hence we have to call it manually, preferably
      * per import.
      */
-    public function commit()
+    public function commit(): void
     {
         // @TODO what if an import is huge? Why wait this long to persist and still allow huge memory consumption? Perhaps review the placement of commit()!
         $this->persistenceManager->persistAll();

@@ -47,6 +47,13 @@ services:
     # these are created by factory but have DI expectations
     public: true
     shared: false
+  # views need to be public because of how they are initialized by extbase
+  Innologi\Decosdata\View\Item\MultiJson:
+    public: true
+    shared: false
+  Innologi\Decosdata\View\Item\SingleJson:
+    public: true
+    shared: false
 
   # vendor TYPO3AssetProvider DI config
   Innologi\TYPO3AssetProvider\ProviderServiceInterface:

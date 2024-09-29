@@ -59,7 +59,7 @@ class QueryOptionService extends OptionServiceAbstract
      *
      * @param integer $fieldIndex
      */
-    public function processFieldOptions(array $options, QueryInterface $configuration, $fieldIndex)
+    public function processFieldOptions(array $options, QueryInterface $configuration, $fieldIndex): void
     {
         $previously = [$this->index, $this->optionIndex];
 
@@ -78,7 +78,7 @@ class QueryOptionService extends OptionServiceAbstract
      *
      * @param integer $columnIndex
      */
-    public function processColumnOptions(array $options, QueryInterface $configuration, $columnIndex)
+    public function processColumnOptions(array $options, QueryInterface $configuration, $columnIndex): void
     {
         $previously = [$this->index, $this->optionIndex];
 
@@ -95,7 +95,7 @@ class QueryOptionService extends OptionServiceAbstract
      * Processes an array of row-options by calling the contained alterQueryRow()
      * methods and passing the necessary arguments to it.
      */
-    public function processRowOptions(array $options, QueryInterface $configuration)
+    public function processRowOptions(array $options, QueryInterface $configuration): void
     {
         $previously = [$this->index, $this->optionIndex];
 

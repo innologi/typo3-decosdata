@@ -130,7 +130,7 @@ class Module
         $this->initialize();
 
         $this->count = $this->countRoutingSlugs();
-        $flush = GeneralUtility::_GP('flushRoutingSlugs');
+        $flush = $GLOBALS['TYPO3_REQUEST']->getParsedBody()['flushRoutingSlugs'] ?? null;
         if ($flush !== null) {
             $this->flushRoutingSlugs();
             $this->moduleTemplate->addFlashMessage(
@@ -206,7 +206,7 @@ class Module
                 ),
             )
             ->orderBy('uid')
-            ->execute();
+            ->executeQuery();
     }
 
     protected function countRoutingSlugs(): int

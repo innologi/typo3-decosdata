@@ -48,7 +48,7 @@ class FileDownloadObscured implements OptionInterface
      */
     protected $downloadService;
 
-    public function injectDownloadService(DownloadService $downloadService)
+    public function injectDownloadService(DownloadService $downloadService): void
     {
         $this->downloadService = $downloadService;
     }

@@ -77,17 +77,17 @@ class BreadcrumbService implements SingletonInterface
      */
     protected $active = false;
 
-    public function injectParameterService(ParameterService $parameterService)
+    public function injectParameterService(ParameterService $parameterService): void
     {
         $this->parameterService = $parameterService;
     }
 
-    public function injectItemRepository(ItemRepository $itemRepository)
+    public function injectItemRepository(ItemRepository $itemRepository): void
     {
         $this->itemRepository = $itemRepository;
     }
 
-    public function injectQueryBuilder(QueryBuilder $queryBuilder)
+    public function injectQueryBuilder(QueryBuilder $queryBuilder): void
     {
         $this->queryBuilder = $queryBuilder;
     }

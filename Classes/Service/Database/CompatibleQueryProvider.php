@@ -50,7 +50,7 @@ class CompatibleQueryProvider implements QueryProviderInterface, SingletonInterf
      */
     protected $databaseHelper;
 
-    public function injectDatabaseHelper(DatabaseHelper $databaseHelper)
+    public function injectDatabaseHelper(DatabaseHelper $databaseHelper): void
     {
         $this->databaseHelper = $databaseHelper;
     }

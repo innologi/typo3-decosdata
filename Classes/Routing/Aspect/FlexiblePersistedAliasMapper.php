@@ -27,6 +27,7 @@ namespace Innologi\Decosdata\Routing\Aspect;
  * This copyright notice MUST APPEAR in all copies of the script!
  * *************************************************************
  */
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Information\Typo3Version;
@@ -652,7 +653,7 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
                 // able to provide it through my own enhancer
                 'hash' => $this->generateCacheHash(),
             ], $identifier))
-            ->fetch();
+            ->fetchAssociative();
     }
 
     protected function storeCacheResult(string $originalValue, string $resultValue): void
@@ -665,7 +666,7 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
             'routevar' => $originalValue,
             // @extensionScannerIgnoreLine false positive
             'pid' => (int) $GLOBALS['TSFE']->id,
-            'tstamp' => (int) $GLOBALS['EXEC_TIME'],
+            'tstamp' => (int) GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp'),
         ]);
     }
 
@@ -759,7 +760,7 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
                         'joinTable' => $connection->quoteIdentifier($join['joinTable']),
                         'joinAlias' => $connection->quoteIdentifier($join['joinAlias']),
                         'joinCondition' => $queryBuilder->expr()
-                            ->andX(...$this->createFieldConstraints($queryBuilder, $join['constraints'])),
+                            ->and(...$this->createFieldConstraints($queryBuilder, $join['constraints'])),
                     ],
                 ], true);
             }

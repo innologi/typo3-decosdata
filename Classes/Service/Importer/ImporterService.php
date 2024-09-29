@@ -65,12 +65,12 @@ class ImporterService implements SingletonInterface, TraceLoggerAwareInterface
      */
     protected $sitePath;
 
-    public function injectImportRepository(ImportRepository $importRepository)
+    public function injectImportRepository(ImportRepository $importRepository): void
     {
         $this->importRepository = $importRepository;
     }
 
-    public function injectParser(ParserInterface $parser)
+    public function injectParser(ParserInterface $parser): void
     {
         $this->parser = $parser;
     }
@@ -78,7 +78,7 @@ class ImporterService implements SingletonInterface, TraceLoggerAwareInterface
     /**
      * Will process all available imports, regardless of page uid
      */
-    public function importAll($force = false)
+    public function importAll($force = false): void
     {
         $importCollection = $this->importRepository->findAllEverywhere();
         $this->importSelection($importCollection, $force);
@@ -87,7 +87,7 @@ class ImporterService implements SingletonInterface, TraceLoggerAwareInterface
     /**
      * Will process a selection of imports given as parameter as uid
      */
-    public function importUidSelection(array $uidArray, $force = false)
+    public function importUidSelection(array $uidArray, $force = false): void
     {
         if ($this->logger) {
             $this->logger->logTrace();
@@ -101,7 +101,7 @@ class ImporterService implements SingletonInterface, TraceLoggerAwareInterface
      *
      * @param \TYPO3\CMS\Extbase\Persistence\QueryResultInterface|array $importCollection
      */
-    public function importSelection($importCollection, $force = false)
+    public function importSelection($importCollection, $force = false): void
     {
         if ($this->logger) {
             $this->logger->logTrace();
@@ -123,7 +123,7 @@ class ImporterService implements SingletonInterface, TraceLoggerAwareInterface
      *
      * @throws
      */
-    public function importSingle(\Innologi\Decosdata\Domain\Model\Import $import, $force = false)
+    public function importSingle(\Innologi\Decosdata\Domain\Model\Import $import, $force = false): void
     {
         if ($this->logger) {
             $this->logger->logTrace();

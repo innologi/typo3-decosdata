@@ -68,7 +68,7 @@ class SearchService implements SingletonInterface
     /**
      * Paginate a Query object
      */
-    public function enableSearch($searchString)
+    public function enableSearch($searchString): void
     {
         $this->active = $this->validateSearchString($searchString);
     }

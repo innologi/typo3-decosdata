@@ -47,7 +47,7 @@ class ItemRepository extends RepositoryAbstract
         $query = $this->createQuery();
         /** @var \TYPO3\CMS\Extbase\Persistence\Generic\Query $query */
         return $query->statement(
-            $statement,
+            $statement->__toString(),
         )->execute(true);
     }
 

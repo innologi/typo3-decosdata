@@ -43,7 +43,7 @@ class FieldFactory extends FactoryAbstract
      */
     protected $repository;
 
-    public function injectRepository(FieldRepository $repository)
+    public function injectRepository(FieldRepository $repository): void
     {
         $this->repository = $repository;
     }

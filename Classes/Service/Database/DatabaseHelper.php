@@ -61,7 +61,7 @@ class DatabaseHelper implements SingletonInterface
      */
     protected $lastUpsertIsNewRecord = false;
 
-    public function injectQueryProvider(QueryProviderInterface $queryProvider)
+    public function injectQueryProvider(QueryProviderInterface $queryProvider): void
     {
         $this->queryProvider = $queryProvider;
     }
@@ -107,7 +107,7 @@ class DatabaseHelper implements SingletonInterface
      * @param integer $localUid
      * @param integer $foreignUid
      */
-    public function insertMmRelationIfNotExists($table, $localUid, $foreignUid)
+    public function insertMmRelationIfNotExists($table, $localUid, $foreignUid): void
     {
         if (!$this->doesMmMatchExist($table, $localUid, $foreignUid)) {
             $this->databaseConnection->exec_INSERTquery($table, [

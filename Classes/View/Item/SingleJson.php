@@ -54,7 +54,7 @@ class SingleJson extends \TYPO3\CMS\Extbase\Mvc\View\JsonView
      *
      * @param integer $contentFieldCount
      */
-    public function addContentFieldsToConfiguration($contentFieldCount)
+    public function addContentFieldsToConfiguration($contentFieldCount): void
     {
         $this->configuration['section']['data'] = [
             '_descendAll' => [

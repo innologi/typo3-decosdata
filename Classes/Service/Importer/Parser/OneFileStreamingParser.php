@@ -87,12 +87,12 @@ class OneFileStreamingParser implements ParserInterface, SingletonInterface, Tra
      */
     protected $sitePath;
 
-    public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager)
+    public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager): void
     {
         $this->configurationManager = $configurationManager;
     }
 
-    public function injectStorageHandler(StorageHandlerInterface $storageHandler)
+    public function injectStorageHandler(StorageHandlerInterface $storageHandler): void
     {
         $this->storageHandler = $storageHandler;
     }
@@ -100,7 +100,7 @@ class OneFileStreamingParser implements ParserInterface, SingletonInterface, Tra
     /**
      * Processes an import for parsing.
      */
-    public function processImport(\Innologi\Decosdata\Domain\Model\Import $import)
+    public function processImport(\Innologi\Decosdata\Domain\Model\Import $import): void
     {
         if ($this->logger) {
             $this->logger->logTrace();

@@ -49,7 +49,7 @@ class ImageFile implements OptionInterface
      */
     protected $imageService;
 
-    public function injectImageService(ImageService $imageService)
+    public function injectImageService(ImageService $imageService): void
     {
         $this->imageService = $imageService;
     }

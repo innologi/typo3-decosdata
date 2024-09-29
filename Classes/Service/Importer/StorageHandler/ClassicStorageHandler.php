@@ -33,6 +33,8 @@ use Innologi\TraceLogger\TraceLoggerAwareInterface;
 use Innologi\TYPO3FalApi\Exception\FileException;
 use Innologi\TYPO3FalApi\FileReferenceRepository;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Importer Storage Handler: Classic Edition
@@ -85,22 +87,23 @@ class ClassicStorageHandler implements StorageHandlerInterface, SingletonInterfa
      */
     protected $fieldCache = [];
 
-    public function injectDatabaseHelper(DatabaseHelper $databaseHelper)
+    public function injectDatabaseHelper(DatabaseHelper $databaseHelper): void
     {
         $this->databaseHelper = $databaseHelper;
     }
 
-    public function injectFileReferenceRepository(FileReferenceRepository $fileReferenceRepository)
+    public function injectFileReferenceRepository(FileReferenceRepository $fileReferenceRepository): void
     {
         $this->fileReferenceRepository = $fileReferenceRepository;
     }
 
     public function __construct()
     {
+        $requestTime = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp');
         $this->propertyDefaults = [
             'pid' => 1,
-            'crdate' => $GLOBALS['EXEC_TIME'],
-            'tstamp' => $GLOBALS['EXEC_TIME'],
+            'crdate' => $requestTime,
+            'tstamp' => $requestTime,
             'deleted' => 0,
             // leave enableFields alone, so that an import/update won't affect them
         ];
@@ -118,7 +121,7 @@ class ClassicStorageHandler implements StorageHandlerInterface, SingletonInterfa
      *
      * @param integer $pid
      */
-    public function initialize($pid)
+    public function initialize($pid): void
     {
         if ($this->logger && $this->logger->getLevel() > 1) {
             $this->logger->logTrace();
@@ -192,7 +195,7 @@ class ClassicStorageHandler implements StorageHandlerInterface, SingletonInterfa
      *
      * @throws \Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob
      */
-    public function pushItemBlob(array $data)
+    public function pushItemBlob(array $data): void
     {
         if ($this->logger && $this->logger->getLevel() > 1) {
             $this->logger->logTrace();
@@ -238,7 +241,7 @@ class ClassicStorageHandler implements StorageHandlerInterface, SingletonInterfa
     /**
      * Push an itemfield ready for commit.
      */
-    public function pushItemField(array $data)
+    public function pushItemField(array $data): void
     {
         if ($this->logger && $this->logger->getLevel() > 2) {
             $this->logger->logTrace();
@@ -291,7 +294,7 @@ class ClassicStorageHandler implements StorageHandlerInterface, SingletonInterfa
     /**
      * Commits all pushed data.
      */
-    public function commit()
+    public function commit(): void
     {
         // doesn't do anything in this implementation
     }

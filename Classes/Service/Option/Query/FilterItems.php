@@ -49,7 +49,7 @@ class FilterItems extends OptionAbstract
      * {@inheritDoc}
      * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
      */
-    public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service)
+    public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service): void
     {
         $this->doFiltersExist($args);
         $id = $queryField->getId() . 'filteritems' . $service->getOptionIndex();
@@ -90,7 +90,7 @@ class FilterItems extends OptionAbstract
      * {@inheritDoc}
      * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
      */
-    public function alterQueryRow(array $args, Query $query, QueryOptionService $service)
+    public function alterQueryRow(array $args, Query $query, QueryOptionService $service): void
     {
         $this->doFiltersExist($args);
         $id = 'filteritems';

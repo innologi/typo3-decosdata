@@ -43,7 +43,7 @@ class AddFallback extends OptionAbstract
     /**
      * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
      */
-    public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service)
+    public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service): void
     {
         if (!isset($args['value'])) {
             throw new MissingArgument(1528453416, [self::class, 'value']);

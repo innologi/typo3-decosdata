@@ -61,7 +61,7 @@ class PageBrowserViewHelper extends AbstractViewHelper
      */
     protected $pageLabelMap;
 
-    public function injectPaginateService(PaginateService $paginateService)
+    public function injectPaginateService(PaginateService $paginateService): void
     {
         $this->paginateService = $paginateService;
     }
@@ -69,7 +69,7 @@ class PageBrowserViewHelper extends AbstractViewHelper
     /**
      * Initialize arguments
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         $this->registerArgument('partial', 'string', 'Dedicated partial template override.', false, 'ViewHelpers/PageBrowser');
         $this->registerArgument('startScalingAtPageCount', 'integer', 'Scaling starts if this many pages are present. 0 disables scaling', false, '21');

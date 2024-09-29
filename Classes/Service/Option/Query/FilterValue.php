@@ -47,7 +47,7 @@ class FilterValue extends OptionAbstract
      * {@inheritDoc}
      * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryField()
      */
-    public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service)
+    public function alterQueryField(array $args, QueryField $queryField, QueryOptionService $service): void
     {
         $this->doFiltersExist($args);
         $id = $queryField->getId() . 'filteritems' . $service->getOptionIndex();

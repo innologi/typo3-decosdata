@@ -132,7 +132,7 @@ abstract class FactoryAbstract implements SingletonInterface
      *
      * @param integer $storagePid
      */
-    public function setStoragePid($storagePid)
+    public function setStoragePid($storagePid): void
     {
         $this->storagePid = $storagePid;
     }

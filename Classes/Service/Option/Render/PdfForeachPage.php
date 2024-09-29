@@ -56,7 +56,7 @@ class PdfForeachPage implements OptionInterface
      */
     protected $commandRunService;
 
-    public function injectCommandRunService(CommandRunService $commandRunService)
+    public function injectCommandRunService(CommandRunService $commandRunService): void
     {
         $this->commandRunService = $commandRunService;
     }

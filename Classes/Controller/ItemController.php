@@ -38,6 +38,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Http\ForwardResponse;
 use TYPO3\CMS\Extbase\Mvc\RequestInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Mvc\View\JsonView;
 
 /**
  * Item controller
@@ -93,22 +94,22 @@ class ItemController extends ActionController
      */
     protected $apiMode = false;
 
-    public function injectTypeProcessor(TypeProcessorService $typeProcessor)
+    public function injectTypeProcessor(TypeProcessorService $typeProcessor): void
     {
         $this->typeProcessor = $typeProcessor;
     }
 
-    public function injectQueryBuilder(QueryBuilder $queryBuilder)
+    public function injectQueryBuilder(QueryBuilder $queryBuilder): void
     {
         $this->queryBuilder = $queryBuilder;
     }
 
-    public function injectBreadcrumbService(BreadcrumbService $breadcrumbService)
+    public function injectBreadcrumbService(BreadcrumbService $breadcrumbService): void
     {
         $this->breadcrumbService = $breadcrumbService;
     }
 
-    public function injectParameterService(ParameterService $parameterService)
+    public function injectParameterService(ParameterService $parameterService): void
     {
         $this->parameterService = $parameterService;
     }
@@ -118,16 +119,16 @@ class ItemController extends ActionController
      */
     protected function initializeAction()
     {
-        $this->typeProcessor->setRequest($this->request);
         $this->parameterService->initializeByRequest($this->request);
         $this->level = $this->parameterService->getParameterNormalized('level');
 
         // detect and set apiMode defaults
-        $this->apiMode = (int) $GLOBALS['TSFE']->type === (int) $this->settings['api']['type'];
+        $this->apiMode = (int) $GLOBALS['TSFE']->getPageArguments()->getPageType() === (int) $this->settings['api']['type'];
         if ($this->apiMode && !$this->parameterService->hasParameter('format')) {
             // default API format
-            $this->request->setFormat($this->settings['api']['defaultFormat']);
+            $this->request = $this->request->withFormat($this->settings['api']['defaultFormat']);
         }
+        $this->typeProcessor->setRequest($this->request);
 
         // @LOW cache?
         // check override TS
@@ -173,8 +174,7 @@ class ItemController extends ActionController
             // @TODO also, can't we get rid of POST here? I remember how we got to using it, but let's face it: a search
             // request should be GET, or even a POST-redirect-GET, so we should find a way to do so consistently.
 
-            // @extensionScannerIgnoreLine false positive
-            $contentObject = $this->configurationManager->getContentObject();
+            $contentObject = $this->request->getAttribute('currentContentObject');
             if ($contentObject->getUserObjectType() === \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::OBJECTTYPE_USER) {
                 $contentObject->convertToUserIntObject();
                 // will recreate the object, so we have to stop the request here
@@ -226,7 +226,7 @@ class ItemController extends ActionController
                 $this->import,
             ),
         );
-        return $this->htmlResponse();
+        return $this->view instanceof JsonView ? $this->jsonResponse() : $this->htmlResponse();
     }
 
     /**
@@ -287,7 +287,7 @@ class ItemController extends ActionController
         $this->view->assign('level', $this->level);
         $this->view->assign('section', $data);
         $this->view->assign('sectionIndex', $section);
-        return $this->htmlResponse();
+        return $this->view instanceof JsonView ? $this->jsonResponse() : $this->htmlResponse();
     }
 
     /**
@@ -341,7 +341,7 @@ class ItemController extends ActionController
                 $this->import,
             ),
         );
-        return $this->htmlResponse();
+        return $this->view instanceof JsonView ? $this->jsonResponse() : $this->htmlResponse();
     }
 
     /**
@@ -358,7 +358,7 @@ class ItemController extends ActionController
                 $this->import,
             ),
         );
-        return $this->htmlResponse();
+        return $this->view instanceof JsonView ? $this->jsonResponse() : $this->htmlResponse();
     }
 
     /**

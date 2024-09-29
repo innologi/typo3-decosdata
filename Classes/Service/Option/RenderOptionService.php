@@ -85,7 +85,7 @@ class RenderOptionService extends OptionServiceAbstract
      */
     protected $sitePath;
 
-    public function injectTagFactory(TagFactory $tagFactory)
+    public function injectTagFactory(TagFactory $tagFactory): void
     {
         $this->tagFactory = $tagFactory;
     }
@@ -93,7 +93,7 @@ class RenderOptionService extends OptionServiceAbstract
     /**
      * Injects ConditionService and sets a reference to this RenderOptionService
      */
-    public function injectConditionService(\Innologi\Decosdata\Service\ConditionService $conditionService)
+    public function injectConditionService(\Innologi\Decosdata\Service\ConditionService $conditionService): void
     {
         $conditionService->setRenderOptionService($this);
         $this->conditionService = $conditionService;

@@ -112,7 +112,7 @@ class StatementFactory implements SingletonInterface
     # @LOW _this is a temporary interface until the relevant FIX task in PaginateService is completed
     protected $limit;
     protected $offset;
-    public function setLimit($limit = null, $offset = null)
+    public function setLimit($limit = null, $offset = null): void
     {
         $this->limit = $limit;
         $this->offset = $offset;

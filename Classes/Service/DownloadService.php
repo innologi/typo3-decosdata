@@ -171,10 +171,10 @@ class DownloadService implements SingletonInterface
      */
     public function validateRequest()
     {
-        $this->fileUid = (int) GeneralUtility::_GP('f');
-        $blobUid = (int) GeneralUtility::_GP('b');
-        $itemUid = (int) GeneralUtility::_GP('i');
-        $hash = (string) GeneralUtility::_GP('h');
+        $this->fileUid = (int) $_GET['f'] ?? null;
+        $blobUid = (int) $_GET['b'] ?? null;
+        $itemUid = (int) $_GET['i'] ?? null;
+        $hash = (string) $_GET['h'] ?? '';
 
         $this->validRequest = $this->getHashService()->validateHmac(
             $this->generateHashString($this->fileUid, $blobUid, $itemUid),
@@ -193,7 +193,7 @@ class DownloadService implements SingletonInterface
      *
      * @param boolean $noCache
      */
-    public function sendFile($noCache = false)
+    public function sendFile($noCache = false): void
     {
         if (!$this->validRequest) {
             throw new \Exception('The request was not validated', 1515683722);

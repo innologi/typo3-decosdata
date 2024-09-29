@@ -48,7 +48,7 @@ class ParentInParent extends OptionAbstract
      */
     protected $constraintFactory;
 
-    public function injectConstraintFactory(ConstraintFactory $constraintFactory)
+    public function injectConstraintFactory(ConstraintFactory $constraintFactory): void
     {
         $this->constraintFactory = $constraintFactory;
     }
@@ -56,7 +56,7 @@ class ParentInParent extends OptionAbstract
     /**
      * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
      */
-    public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service)
+    public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service): void
     {
         $query = $queryContent->getParent();
 

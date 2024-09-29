@@ -49,12 +49,12 @@ class ItemBlobFactory extends FactoryAbstract
      */
     protected $fileReferenceFactory;
 
-    public function injectRepository(ItemBlobRepository $repository)
+    public function injectRepository(ItemBlobRepository $repository): void
     {
         $this->repository = $repository;
     }
 
-    public function injectFileReferenceFactory(FileReferenceFactory $fileReferenceFactory)
+    public function injectFileReferenceFactory(FileReferenceFactory $fileReferenceFactory): void
     {
         $this->fileReferenceFactory = $fileReferenceFactory;
     }

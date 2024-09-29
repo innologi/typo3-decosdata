@@ -48,7 +48,7 @@ class RestrictByParentItem extends OptionAbstract
      * {@inheritDoc}
      * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
      */
-    public function alterQueryRow(array $args, Query $query, QueryOptionService $service)
+    public function alterQueryRow(array $args, Query $query, QueryOptionService $service): void
     {
         if (!(isset($args['id'][0]) || isset($args['parameter'][0]))) {
             throw new MissingArgument(1450794744, [self::class, 'id/parameter']);

@@ -45,10 +45,10 @@ class ItemFieldRepository extends RepositoryAbstract
     {
         $query = $this->createQuery();
         return $query->matching(
-            $query->logicalAnd([
+            $query->logicalAnd(
                 $query->equals('field', $field),
                 $query->equals('item', $item),
-            ]),
+            ),
         )->execute()->getFirst();
     }
 }

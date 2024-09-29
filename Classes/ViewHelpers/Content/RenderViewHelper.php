@@ -51,7 +51,7 @@ class RenderViewHelper extends AbstractViewHelper
      */
     protected $optionService;
 
-    public function injectOptionService(RenderOptionService $optionService)
+    public function injectOptionService(RenderOptionService $optionService): void
     {
         $this->optionService = $optionService;
     }
@@ -59,7 +59,7 @@ class RenderViewHelper extends AbstractViewHelper
     /**
      * Initialize arguments
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         $this->registerArgument('tag', 'string', 'Wraps content with optional tag.', false);
         $this->registerArgument('tagAttributes', 'array', 'Sets attributes to optional tag.', false, []);
@@ -71,7 +71,7 @@ class RenderViewHelper extends AbstractViewHelper
     /**
      * @see \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper::initialize()
      */
-    public function initialize()
+    public function initialize(): void
     {
         if ($this->renderingContext instanceof RenderingContextInterface) {
             $this->optionService->setRequest(

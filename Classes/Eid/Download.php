@@ -42,7 +42,7 @@ class Download
      *
      * @return string
      */
-    public function run()
+    public function run(): void
     {
         /** @var DownloadService $downloadService */
         $downloadService = GeneralUtility::makeInstance(DownloadService::class);

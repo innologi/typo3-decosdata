@@ -26,6 +26,7 @@ namespace Innologi\Decosdata\Mvc\Domain;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Exception\StaticUidInsertion;
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Persistence\Repository;
@@ -94,7 +95,7 @@ abstract class RepositoryAbstract extends Repository
      *
      * @throws \Innologi\Decosdata\Exception\StaticUidInsertion
      */
-    public function insertRecord(array &$data)
+    public function insertRecord(array &$data): void
     {
         if (isset($data['uid'])) {
             throw new StaticUidInsertion(1448550380, [
@@ -106,7 +107,7 @@ abstract class RepositoryAbstract extends Repository
             $data['pid'] = $this->getStoragePid();
         }
         // set initial time values
-        $data['crdate'] = $data['tstamp'] = $GLOBALS['EXEC_TIME'];
+        $data['crdate'] = $data['tstamp'] = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp');
         // insert
         $this->getDatabaseConnection()->exec_INSERTquery($this->getTableName(), $data);
         // @LOW ___what about SQL errors?

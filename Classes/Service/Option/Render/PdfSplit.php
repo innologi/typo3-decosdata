@@ -56,7 +56,7 @@ class PdfSplit implements OptionInterface
      */
     protected $commandRunService;
 
-    public function injectCommandRunService(CommandRunService $commandRunService)
+    public function injectCommandRunService(CommandRunService $commandRunService): void
     {
         $this->commandRunService = $commandRunService;
     }
@@ -123,7 +123,7 @@ class PdfSplit implements OptionInterface
         return $service->getTagFactory()->createTagContent($content);
     }
 
-    public function paginateIterate(array $args, RenderOptionService $service)
+    public function paginateIterate(array $args, RenderOptionService $service): void
     {
         // do nothing; pagination is based on \LimitIterator in $this->alterContentValue()
     }

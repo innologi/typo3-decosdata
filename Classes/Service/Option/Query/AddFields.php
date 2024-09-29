@@ -45,7 +45,7 @@ class AddFields extends OptionAbstract
      */
     protected $constraintFactory;
 
-    public function injectConstraintFactory(ConstraintFactory $constraintFactory)
+    public function injectConstraintFactory(ConstraintFactory $constraintFactory): void
     {
         $this->constraintFactory = $constraintFactory;
     }
@@ -56,7 +56,7 @@ class AddFields extends OptionAbstract
      * {@inheritDoc}
      * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryRow()
      */
-    public function alterQueryRow(array $args, Query $query, QueryOptionService $service)
+    public function alterQueryRow(array $args, Query $query, QueryOptionService $service): void
     {
         if (!(isset($args['fields']) && is_array($args['fields']))) {
             // @TODO throw exception

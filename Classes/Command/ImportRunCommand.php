@@ -33,6 +33,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
@@ -80,7 +81,7 @@ class ImportRunCommand extends Command
     /**
      * Executes the command
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Make sure the _cli_ user is loaded
         Bootstrap::initializeBackendAuthentication();
@@ -97,7 +98,7 @@ class ImportRunCommand extends Command
                 'pluginName' => 'Importer',
                 'extensionName' => $this->extensionName,
                 'vendorName' => 'Innologi',
-            ]);
+            ], new ServerRequest());
 
             /** @var \Innologi\Decosdata\Service\Importer\ImporterService $importerService */
             $importerService = GeneralUtility::makeInstance(\Innologi\Decosdata\Service\Importer\ImporterService::class);

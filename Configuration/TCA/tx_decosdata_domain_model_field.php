@@ -1,6 +1,6 @@
 <?php
 
-defined('TYPO3_MODE') or die();
+defined('TYPO3') or die();
 
 $extKey = 'decosdata';
 $table = 'tx_' . $extKey . '_domain_model_field';

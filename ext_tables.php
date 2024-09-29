@@ -1,6 +1,6 @@
 <?php
 
-defined('TYPO3_MODE') or die();
+defined('TYPO3') or die();
 
 $tablePrefix = 'tx_decosdata_domain_model_';
 $cshPathPrefix = 'EXT:decosdata/Resources/Private/Language/locallang_csh_';

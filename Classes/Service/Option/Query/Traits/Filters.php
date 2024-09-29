@@ -53,12 +53,12 @@ trait Filters
      */
     protected $constraintFactory;
 
-    public function injectParameterService(ParameterService $parameterService)
+    public function injectParameterService(ParameterService $parameterService): void
     {
         $this->parameterService = $parameterService;
     }
 
-    public function injectConstraintFactory(ConstraintFactory $constraintFactory)
+    public function injectConstraintFactory(ConstraintFactory $constraintFactory): void
     {
         $this->constraintFactory = $constraintFactory;
     }

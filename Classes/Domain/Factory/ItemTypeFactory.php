@@ -43,7 +43,7 @@ class ItemTypeFactory extends FactoryAbstract
      */
     protected $repository;
 
-    public function injectRepository(ItemTypeRepository $repository)
+    public function injectRepository(ItemTypeRepository $repository): void
     {
         $this->repository = $repository;
     }

@@ -75,22 +75,22 @@ class QueryBuilder
      */
     protected $groupByContentPriority;
 
-    public function injectConstraintFactory(ConstraintFactory $constraintFactory)
+    public function injectConstraintFactory(ConstraintFactory $constraintFactory): void
     {
         $this->constraintFactory = $constraintFactory;
     }
 
-    public function injectOptionService(QueryOptionService $optionService)
+    public function injectOptionService(QueryOptionService $optionService): void
     {
         $this->optionService = $optionService;
     }
 
-    public function injectPaginateService(PaginateService $paginateService)
+    public function injectPaginateService(PaginateService $paginateService): void
     {
         $this->paginateService = $paginateService;
     }
 
-    public function injectSearchService(SearchService $searchService)
+    public function injectSearchService(SearchService $searchService): void
     {
         $this->searchService = $searchService;
     }
@@ -214,7 +214,7 @@ class QueryBuilder
 
 
     // @TODO ___rename
-    public function addContentField($index, array $configuration, QueryContent $queryContent, $groupByContent = false)
+    public function addContentField($index, array $configuration, QueryContent $queryContent, $groupByContent = false): void
     {
         # @TODO ___remove this and below #s?
         #$names = [

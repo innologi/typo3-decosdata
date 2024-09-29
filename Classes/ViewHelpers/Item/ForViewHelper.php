@@ -57,7 +57,7 @@ class ForViewHelper extends AbstractViewHelper
     /**
      * Initialize arguments
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         $this->registerArgument('configuration', 'array', 'Configuration directives for rendering all content fields.', true);
         $this->registerArgument('item', 'array', 'Item array containing all its content fields.', true);

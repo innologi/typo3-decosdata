@@ -82,7 +82,7 @@ abstract class OptionServiceAbstract
      *
      * @param string $option
      */
-    public function setOptionVariables($option, array $vars = [])
+    public function setOptionVariables($option, array $vars = []): void
     {
         $this->optionVariables[$option] = $vars;
     }
@@ -92,7 +92,7 @@ abstract class OptionServiceAbstract
      *
      * @param string $option
      */
-    public function unsetOptionVariables($option)
+    public function unsetOptionVariables($option): void
     {
         unset($this->optionVariables[$option]);
     }

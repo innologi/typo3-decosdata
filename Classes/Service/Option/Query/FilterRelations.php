@@ -45,7 +45,7 @@ class FilterRelations extends OptionAbstract
     /**
      * @see \Innologi\Decosdata\Service\Option\Query\OptionInterface::alterQueryColumn()
      */
-    public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service)
+    public function alterQueryColumn(array $args, QueryContent $queryContent, QueryOptionService $service): void
     {
         $this->doFiltersExist($args);
         $id = 'relation' . $service->getIndex();

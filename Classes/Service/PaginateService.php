@@ -90,12 +90,12 @@ class PaginateService implements SingletonInterface
      */
     protected $active = false;
 
-    public function injectParameterService(ParameterService $parameterService)
+    public function injectParameterService(ParameterService $parameterService): void
     {
         $this->parameterService = $parameterService;
     }
 
-    public function injectConstraintFactory(ConstraintFactory $constraintFactory)
+    public function injectConstraintFactory(ConstraintFactory $constraintFactory): void
     {
         $this->constraintFactory = $constraintFactory;
     }
@@ -155,7 +155,7 @@ class PaginateService implements SingletonInterface
     /**
      * Paginate a Query object
      */
-    public function configurePagination(array &$configuration, Query $query)
+    public function configurePagination(array &$configuration, Query $query): void
     {
         $this->initializeConfiguration($configuration);
 

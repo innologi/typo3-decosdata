@@ -84,22 +84,22 @@ class TypeProcessorService implements SingletonInterface
 
     protected UriBuilder $uriBuilder;
 
-    public function injectItemRepository(ItemRepository $itemRepository)
+    public function injectItemRepository(ItemRepository $itemRepository): void
     {
         $this->itemRepository = $itemRepository;
     }
 
-    public function injectQueryBuilder(QueryBuilder $queryBuilder)
+    public function injectQueryBuilder(QueryBuilder $queryBuilder): void
     {
         $this->queryBuilder = $queryBuilder;
     }
 
-    public function injectOptionService(RenderOptionService $optionService)
+    public function injectOptionService(RenderOptionService $optionService): void
     {
         $this->optionService = $optionService;
     }
 
-    public function injectAssetProviderService(ProviderServiceInterface $assetProviderService)
+    public function injectAssetProviderService(ProviderServiceInterface $assetProviderService): void
     {
         $this->assetProviderService = $assetProviderService;
     }
@@ -142,7 +142,7 @@ class TypeProcessorService implements SingletonInterface
     /**
      * Sets Extbase request
      */
-    public function setRequest(Request $request)
+    public function setRequest(Request $request): void
     {
         $this->request = $request;
         $this->uriBuilder->setRequest($request);

@@ -64,12 +64,12 @@ class CrumbPathViewHelper extends AbstractViewHelper
      */
     protected $currentLevel;
 
-    public function injectBreadcrumbService(BreadcrumbService $breadcrumbService)
+    public function injectBreadcrumbService(BreadcrumbService $breadcrumbService): void
     {
         $this->breadcrumbService = $breadcrumbService;
     }
 
-    public function injectParameterService(ParameterService $parameterService)
+    public function injectParameterService(ParameterService $parameterService): void
     {
         $this->parameterService = $parameterService;
     }
@@ -77,7 +77,7 @@ class CrumbPathViewHelper extends AbstractViewHelper
     /**
      * Initialize arguments
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         $this->registerArgument('partial', 'string', 'Dedicated partial template override.', false, 'ViewHelpers/CrumbPath');
         $this->registerArgument('renderAbove', 'boolean', 'Renders crumbpath above content.', false, true);
