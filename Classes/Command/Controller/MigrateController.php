@@ -28,7 +28,7 @@ use Innologi\TYPO3ExtUpdate\ExtUpdateAbstract;
 use Innologi\TYPO3ExtUpdate\Service\Exception\FileException;
 use Innologi\TYPO3ExtUpdate\Service\Exception\NoData;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
-use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 
 /**
  * Migrate Controller
@@ -187,7 +187,7 @@ class MigrateController extends ExtUpdateAbstract
                                 $table,
                             ),
                             sprintf($this->lang['falMigrateFailTitle'], 'Import', $row['name']),
-                            FlashMessage::ERROR,
+                            ContextualFeedbackSeverity::ERROR,
                         );
                         $errorCount++;
                     }
@@ -203,7 +203,7 @@ class MigrateController extends ExtUpdateAbstract
             $this->addMessage(
                 sprintf($this->lang['falMigrateSuccess'], $table, $count),
                 '',
-                FlashMessage::OK,
+                ContextualFeedbackSeverity::OK,
             );
         }
 
@@ -284,7 +284,7 @@ class MigrateController extends ExtUpdateAbstract
                                 $advice,
                             ),
                             '',
-                            FlashMessage::ERROR,
+                            ContextualFeedbackSeverity::ERROR,
                         );
                         $errorCount++;
                     }
@@ -320,7 +320,7 @@ class MigrateController extends ExtUpdateAbstract
                     $count,
                 ),
                 '',
-                FlashMessage::OK,
+                ContextualFeedbackSeverity::OK,
             );
         }
 
@@ -373,7 +373,7 @@ class MigrateController extends ExtUpdateAbstract
             $this->addMessage(
                 sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
                 '',
-                FlashMessage::OK,
+                ContextualFeedbackSeverity::OK,
             );
         } catch (NoData) {
             // do nothing
@@ -434,7 +434,7 @@ class MigrateController extends ExtUpdateAbstract
                     $this->addMessage(
                         $e->getFormattedErrorMessage() . ' ' . $this->lang['falMigrateFail'] . ' ' . $this->lang['falMigrateFailDelete'],
                         sprintf($this->lang['falMigrateFailTitle'], 'Itemfield', 'id ' . $uid),
-                        FlashMessage::WARNING,
+                        ContextualFeedbackSeverity::WARNING,
                     );
                     $updateValues = [
                         'no_migrate' => 1,
@@ -459,7 +459,7 @@ class MigrateController extends ExtUpdateAbstract
             $this->addMessage(
                 sprintf($this->lang['falMigrateSuccess'], $table, $count),
                 '',
-                FlashMessage::OK,
+                ContextualFeedbackSeverity::OK,
             );
         }
 
@@ -518,7 +518,7 @@ class MigrateController extends ExtUpdateAbstract
             $this->addMessage(
                 sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
                 '',
-                FlashMessage::OK,
+                ContextualFeedbackSeverity::OK,
             );
         } catch (NoData) {
             // do nothing
@@ -694,7 +694,7 @@ class MigrateController extends ExtUpdateAbstract
         $this->addMessage(
             sprintf($this->lang['migrateSuccess'], $targetTable, $count),
             '',
-            FlashMessage::OK,
+            ContextualFeedbackSeverity::OK,
         );
 
         $this->finishState['blob'] = true;
@@ -751,7 +751,7 @@ class MigrateController extends ExtUpdateAbstract
             $this->addMessage(
                 sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
                 '',
-                FlashMessage::OK,
+                ContextualFeedbackSeverity::OK,
             );
         } catch (NoData) {
             // do nothing
@@ -790,7 +790,7 @@ class MigrateController extends ExtUpdateAbstract
             $this->addMessage(
                 sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
                 '',
-                FlashMessage::OK,
+                ContextualFeedbackSeverity::OK,
             );
         } catch (NoData) {
             // do nothing
@@ -831,7 +831,7 @@ class MigrateController extends ExtUpdateAbstract
             $this->addMessage(
                 sprintf($this->lang['migrateSuccess'], $sourceTable, $countRecords),
                 '',
-                FlashMessage::OK,
+                ContextualFeedbackSeverity::OK,
             );
         } catch (NoData) {
             // do nothing
@@ -878,7 +878,7 @@ class MigrateController extends ExtUpdateAbstract
                     '\'' . join('\', \'', $profiles) . '\'',
                 ),
                 sprintf($this->lang['migrateManualTitle'], 'profiles'),
-                FlashMessage::WARNING,
+                ContextualFeedbackSeverity::WARNING,
             );
         } else {
             $this->finishState['profiles'] = true;
@@ -921,7 +921,7 @@ class MigrateController extends ExtUpdateAbstract
                     join(', ', $plugins),
                 ),
                 sprintf($this->lang['migrateManualTitle'], 'plugins'),
-                FlashMessage::WARNING,
+                ContextualFeedbackSeverity::WARNING,
             );
         } else {
             $this->finishState['plugins'] = true;

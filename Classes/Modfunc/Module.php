@@ -33,8 +33,8 @@ use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 use TYPO3\CMS\Info\Controller\InfoModuleController;
@@ -136,7 +136,7 @@ class Module
             $this->moduleTemplate->addFlashMessage(
                 sprintf($this->getLanguageService()->getLL('routing.flush_success'), $this->count),
                 $this->getLanguageService()->getLL('routing.flush_success.title'),
-                FlashMessage::OK,
+                ContextualFeedbackSeverity::OK,
             );
             $this->count = 0;
         }
@@ -167,7 +167,7 @@ class Module
             $this->moduleTemplate->addFlashMessage(
                 $this->getLanguageService()->getLL('no.access'),
                 $this->getLanguageService()->getLL('no.access.title'),
-                FlashMessage::ERROR,
+                ContextualFeedbackSeverity::ERROR,
             );
             return '';
         }

@@ -26,7 +26,7 @@ namespace Innologi\Decosdata\Task;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Innologi\Decosdata\Domain\Repository\ImportRepository;
-use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\AbstractAdditionalFieldProvider;
 use TYPO3\CMS\Scheduler\Task\Enumeration\Action;
@@ -97,7 +97,7 @@ class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider
             // @extensionScannerIgnoreLine false positive
             $this->addMessage(
                 $GLOBALS['LANG']->sL($this->ll . 'task_importer.msg.noImportSelected'),
-                FlashMessage::ERROR,
+                ContextualFeedbackSeverity::ERROR,
             );
         } else {
             $availableImports = GeneralUtility::makeInstance(ImportRepository::class)->findAllEverywhere();
@@ -110,7 +110,7 @@ class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider
                 // @extensionScannerIgnoreLine false positive
                 $this->addMessage(
                     $GLOBALS['LANG']->sL($this->ll . 'task_importer.msg.invalidImportSelected'),
-                    FlashMessage::ERROR,
+                    ContextualFeedbackSeverity::ERROR,
                 );
             } else {
                 $valid = true;
