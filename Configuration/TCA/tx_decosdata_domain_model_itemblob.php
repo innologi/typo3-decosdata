@@ -80,7 +80,8 @@ return [
                 'type' => 'input',
                 'size' => 40,
                 'max' => 32,
-                'eval' => 'required,uniqueInPid,trim,nospace,alphanum,upper',
+                'eval' => 'uniqueInPid,trim,nospace,alphanum,upper',
+                'required' => true,
             ],
         ],
         'sequence' => [
@@ -90,7 +91,7 @@ return [
                 'type' => 'number',
                 'size' => 40,
                 'max' => 32,
-                'eval' => 'required',
+                'required' => true,
             ],
         ],
         'file' => [

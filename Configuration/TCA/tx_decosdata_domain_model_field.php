@@ -33,8 +33,9 @@ return [
             'config' => [
                 'type' => 'input',
                 'size' => 30,
-                'eval' => 'required,uniqueInPid,nospace,trim,alphanum_x,upper',
+                'eval' => 'uniqueInPid,nospace,trim,alphanum_x,upper',
                 'placeholder' => $ll . '.field_name.placeholder',
+                'required' => true,
             ],
         ],
 

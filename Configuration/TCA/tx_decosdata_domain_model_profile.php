@@ -43,7 +43,8 @@ return [
             'config' => [
                 'type' => 'input',
                 'size' => 40,
-                'eval' => 'required,uniqueInPid,trim',
+                'eval' => 'uniqueInPid,trim',
+                'required' => true,
             ],
         ],
         'file' => [
@@ -62,7 +63,8 @@ return [
                 'type' => 'input',
                 'size' => 40,
                 'max' => 32,
-                'eval' => 'required,uniqueInPid,trim,nospace,alphanum,upper',
+                'eval' => 'uniqueInPid,trim,nospace,alphanum,upper',
+                'required' => true,
             ],
         ],
         'profile_field' => [

@@ -71,7 +71,8 @@ return [
             'config' => [
                 'type' => 'input',
                 'size' => 40,
-                'eval' => 'required,uniqueInPid,trim',
+                'eval' => 'uniqueInPid,trim',
+                'required' => true,
             ],
         ],
         'file' => [
