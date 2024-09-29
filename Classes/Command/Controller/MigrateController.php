@@ -356,7 +356,6 @@ class MigrateController extends ExtUpdateAbstract
             'md5hash' => 'hash',
             'tstamp' => 'tstamp',
             'crdate' => 'crdate',
-            'cruser_id' => 'cruser_id',
             'deleted' => 'deleted',
             'hidden' => 'hidden',
             'starttime' => 'starttime',
@@ -500,7 +499,6 @@ class MigrateController extends ExtUpdateAbstract
             'itemfield' => 'item_field',
             'tstamp' => 'tstamp',
             'crdate' => 'crdate',
-            'cruser_id' => 'cruser_id',
             'deleted' => 'deleted',
             'hidden' => 'hidden',
             'starttime' => 'starttime',
@@ -550,7 +548,6 @@ class MigrateController extends ExtUpdateAbstract
             'item' => 'item',
             'tstamp' => 'tstamp',
             'crdate' => 'crdate',
-            'cruser_id' => 'cruser_id',
             'deleted' => 'deleted',
             'hidden' => 'hidden',
             'starttime' => 'starttime',
@@ -560,7 +557,7 @@ class MigrateController extends ExtUpdateAbstract
         // query to get all BLOB item records in correct order with all relevant properties attached
         $select = 'it.pid AS pid,it.itemkey AS item_key,itf1.fieldvalue AS sequence,
 			it.migrated_file AS file,it2.migrated_uid AS item,it.tstamp AS tstamp,
-			it.crdate AS crdate,it.cruser_id AS cruser_id,it.deleted AS deleted,
+			it.crdate AS crdate,it.deleted AS deleted,
 			it.hidden AS hidden,it.starttime AS starttime,it.endtime AS endtime,
 			it.uid AS uid,UNIX_TIMESTAMP(itf2.fieldvalue) AS docdate';
         $from = sprintf(
@@ -734,7 +731,6 @@ class MigrateController extends ExtUpdateAbstract
             'fieldvalue' => 'field_value',
             'tstamp' => 'tstamp',
             'crdate' => 'crdate',
-            'cruser_id' => 'cruser_id',
             'deleted' => 'deleted',
             'hidden' => 'hidden',
         ];

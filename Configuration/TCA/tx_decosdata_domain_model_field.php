@@ -12,7 +12,6 @@ return [
         'label' => 'field_name',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
-        'cruser_id' => 'cruser_id',
         'delete' => 'deleted',
         'enablecolumns' => [],
         'dividers2tabs' => 1,
