@@ -28,6 +28,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 use Innologi\Decosdata\Service\Option\Exception\MissingArgument;
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\TagBuilder\TagInterface;
+use TYPO3\CMS\Core\Utility\PathUtility;
 
 /**
  * Custom Image option
@@ -65,14 +66,15 @@ class CustomImage implements OptionInterface
             return $tag;
         }
 
-        if (!is_file($service->getSitePath() . $args['path'])) {
+        $path = PathUtility::getPublicResourceWebPath($args['path']);
+        if (!is_file($service->getSitePath() . $path)) {
             // @TODO ___throw exception instead?
             // if image does not exist, stop
             return $tag;
         }
 
         return $service->getTagFactory()->createTag('img', [
-            'src' => $args['path'],
+            'src' => $path,
         ]);
     }
 }

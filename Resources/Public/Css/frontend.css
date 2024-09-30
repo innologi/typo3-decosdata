@@ -194,7 +194,7 @@
 	z-index: 100;
 }
 .tx-decosdata .loader.active {
-	background-image: url('/typo3conf/ext/decosdata/Resources/Public/Image/spinner.svg');
+	background-image: url('../Image/spinner.svg');
 }
 
 
@@ -232,7 +232,7 @@
 	height: 100%;
 	left: 0;
 	top: 0;
-	background-image: url('/typo3conf/ext/decosdata/Resources/Public/Image/obfuscate.gif');
+	background-image: url('../Image/obfuscate.gif');
 	background-repeat: repeat;
 	background-position: left top;
 	/* IE */
