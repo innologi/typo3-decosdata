@@ -11,18 +11,16 @@
 		}
 	],
 	"require": {
-		"php": ">=8.0",
-		"typo3/cms-core": "^10.4 || ^11.0",
-		"typo3/cms-scheduler": "^10.4 || ^11.0",
-		"bmack/modern-template-building": "^1.0",
-		"innologi/tag-builder": "~0.1.1 || dev-develop",
-		"innologi/trace-logger": "~0.1.1 || dev-develop",
-		"innologi/typo3-fal-api": "~0.2.0 || dev-develop",
-		"innologi/typo3-ext-update": "~0.6.0 || dev-develop",
-		"innologi/typo3-asset-provider": "~0.4.0 || dev-develop"
-	},
-	"suggest": {
-		"friendsoftypo3/typo3db-legacy": "Required for TYPO3 >=9 support"
+		"php": ">=8.2",
+		"typo3/cms-core": "^12.4",
+		"typo3/cms-scheduler": "^12.4",
+		"bmack/modern-template-building": "dev-master#88864b6e82fa78c015a8ea0d18be490782a4f096",
+		"friendsoftypo3/typo3db-legacy": "~1.2.0",
+		"innologi/tag-builder": "~0.1.4",
+		"innologi/trace-logger": "~0.1.1",
+		"innologi/typo3-fal-api": "~1.0.0",
+		"innologi/typo3-ext-update": "~1.0.0",
+		"innologi/typo3-asset-provider": "~1.0.0"
 	},
 	"extra": {
 		"typo3/cms": {
