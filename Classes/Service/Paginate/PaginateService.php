@@ -110,6 +110,11 @@ class PaginateService
 
     protected array $sectionParameters = [];
 
+    protected array $xhrClasses = [
+        'container' => 'xhr-container',
+        'element' => 'xhr-element',
+    ];
+
     protected Request $request;
 
     public function __construct(
@@ -166,6 +171,8 @@ class PaginateService
         $this->xhrEnabled = isset($configuration['xhr']['enable']) && (bool) $configuration['xhr']['enable'];
         if ($this->xhrEnabled) {
             $this->xhrAutoload = isset($configuration['xhr']['autoload']) && (bool) $configuration['xhr']['autoload'];
+            $this->xhrClasses['container'] = $configuration['xhr']['classes']['container'] ?? 'xhr-container';
+            $this->xhrClasses['element'] = $configuration['xhr']['classes']['element'] ?? 'xhr-element';
         }
 
         $this->__initialized = true;
@@ -409,11 +416,11 @@ class PaginateService
     }
     protected function xhrElement($data)
     {
-        return $this->wrapInTag($data, 'span', 'xhr-element');
+        return $this->wrapInTag($data, 'span', $this->xhrClasses['element']);
     }
     protected function xhrContainer($data)
     {
-        return $this->wrapInTag($data, 'span', 'xhr-container');
+        return $this->wrapInTag($data, 'span', $this->xhrClasses['container']);
     }
     protected function wrapInTag($data, $element = 'span', $class = null)
     {
