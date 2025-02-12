@@ -126,7 +126,7 @@ class ForViewHelper extends AbstractViewHelper
                 ],
                 'xhrUri' => $paging['more'],
                 'xhrAutoload' => $paging['autoload'] ? 1 : 0,
-                'xhrTarget' => 'content',
+                'xhrTarget' => $paging['target'] ?? 'content',
                 'resultCount' => $paging['total'],
                 'includeXhrPagingResultCount' => $this->arguments['includeXhrPagingResultCount'],
                 'content' => $content,

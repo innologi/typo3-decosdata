@@ -113,6 +113,7 @@ class PaginateService
     protected array $xhrClasses = [
         'container' => 'xhr-container',
         'element' => 'xhr-element',
+        'target' => 'content',
     ];
 
     protected Request $request;
@@ -173,6 +174,7 @@ class PaginateService
             $this->xhrAutoload = isset($configuration['xhr']['autoload']) && (bool) $configuration['xhr']['autoload'];
             $this->xhrClasses['container'] = $configuration['xhr']['classes']['container'] ?? 'xhr-container';
             $this->xhrClasses['element'] = $configuration['xhr']['classes']['element'] ?? 'xhr-element';
+            $this->xhrClasses['target'] = $configuration['xhr']['classes']['target'] ?? 'content';
         }
 
         $this->__initialized = true;
@@ -340,6 +342,7 @@ class PaginateService
             'total' => $this->total,
             'xhr' => $this->xhrEnabled,
             'autoload' => $this->xhrAutoload,
+            'target' => $this->xhrClasses['target'],
             'more' => $this->hasNext() ? $this->buildNextUri($this->xhrEnabled) : false,
         ];
     }

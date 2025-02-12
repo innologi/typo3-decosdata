@@ -84,6 +84,7 @@ class PageBrowserViewHelper extends AbstractViewHelper
         // for now, this only has use for xhr
         $this->registerArgument('more', 'string', 'Either the next page number or an XHR URL', false, '');
         $this->registerArgument('autoload', 'boolean', 'Immediately autoload next results', false, false);
+        $this->registerArgument('xhrTarget', 'string', 'xhr target class', false, 'section');
     }
 
     /**
@@ -110,7 +111,7 @@ class PageBrowserViewHelper extends AbstractViewHelper
         if ($this->arguments['xhrEnabled']) {
             $configuration['xhrUri'] = $this->arguments['more'];
             $configuration['xhrAutoload'] = $this->arguments['autoload'] ? 1 : 0;
-            $configuration['xhrTarget'] = 'section';
+            $configuration['xhrTarget'] = $this->arguments['xhrTarget'];
             $configuration['nextPageArgs'] = [
                 'page' => $this->paginateService->getCurrentPage() + 1,
             ];
