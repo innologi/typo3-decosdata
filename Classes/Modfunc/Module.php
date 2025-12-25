@@ -87,6 +87,11 @@ class Module
      */
     protected $count = 0;
 
+    public function __construct(
+        protected readonly ConnectionPool $connectionPool,
+    ) {
+    }
+
 
     public function init(InfoModuleController $pObj): void
     {
@@ -194,7 +199,7 @@ class Module
      */
     protected function getRoutingSlugs(array $pageList): Statement
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilder = $this->connectionPool
             ->getQueryBuilderForTable('tx_decosdata_routing_slug');
         return $queryBuilder
             ->select('*')
@@ -211,14 +216,14 @@ class Module
 
     protected function countRoutingSlugs(): int
     {
-        return GeneralUtility::makeInstance(ConnectionPool::class)
+        return $this->connectionPool
             ->getConnectionForTable('tx_decosdata_routing_slug')
             ->count('*', 'tx_decosdata_routing_slug', []);
     }
 
     protected function flushRoutingSlugs(): int
     {
-        return GeneralUtility::makeInstance(ConnectionPool::class)
+        return $this->connectionPool
             ->getConnectionForTable('tx_decosdata_routing_slug')
             ->truncate('tx_decosdata_routing_slug');
     }
