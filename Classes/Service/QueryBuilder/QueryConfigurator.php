@@ -160,7 +160,9 @@ class QueryConfigurator implements SingletonInterface
                     $queryParts['WHERE'][] = $this->transformConstraint($where->getConstraint(), 'WHERE');
                 }
                 $orderBy = $queryField->getOrderBy();
+                // @extensionScannerIgnoreLine false positive
                 if ($orderBy->getPriority() !== null) {
+                    // @extensionScannerIgnoreLine false positive
                     $queryParts['ORDERBY'][$orderBy->getPriority()] = $this->transformOrderBy($orderBy);
                 }
             }
@@ -171,11 +173,15 @@ class QueryConfigurator implements SingletonInterface
             }
 
             $groupBy = $queryContent->getGroupBy();
+            // @extensionScannerIgnoreLine false positive
             if ($groupBy->getPriority() !== null) {
+                // @extensionScannerIgnoreLine false positive
                 $queryParts['GROUPBY'][$groupBy->getPriority()] = $id;
             }
             $orderBy = $queryContent->getOrderBy();
+            // @extensionScannerIgnoreLine false positive
             if ($orderBy->getPriority() !== null) {
+                // @extensionScannerIgnoreLine false positive
                 $queryParts['ORDERBY'][$orderBy->getPriority()] = $this->transformOrderBy($orderBy, $id);
             }
         }
@@ -394,6 +400,7 @@ class QueryConfigurator implements SingletonInterface
     protected function transformOrderBy(OrderBy $orderBy, $fieldSubstitute = null)
     {
         // @LOW _of course, this doesn't make sense since we don't get here if it is NULL.. except the outside check needs to be replaced by different logic
+        // @extensionScannerIgnoreLine false positive
         if ($orderBy->getPriority() === null) {
             throw new Exception\MissingConfigurationProperty(1448552721, [
                 'ORDERBY', 'priority', json_encode($orderBy),

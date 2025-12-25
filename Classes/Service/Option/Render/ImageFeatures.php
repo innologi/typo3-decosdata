@@ -147,9 +147,9 @@ class ImageFeatures implements OptionInterface
         $this->number++;
         $numberTag = $service->getTagFactory()->createTag(
             'span',
-            // @extensionScannerIgnoreLine VERY false positive
             [
                 'class' => 'image-number',
+                // @extensionScannerIgnoreLine VERY false positive
                 'data-number' => $this->number,
             ],
             // @extensionScannerIgnoreLine VERY false positive

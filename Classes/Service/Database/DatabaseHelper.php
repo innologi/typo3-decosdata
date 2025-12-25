@@ -131,6 +131,7 @@ class DatabaseHelper implements SingletonInterface
         foreach ($conditions as $property => $value) {
             $where[] = $property . '=' . $this->databaseConnection->fullQuoteStr($value, $table);
         }
+        // @extensionScannerIgnoreLine false positive
         return join(' ' . DatabaseConnection::AND_Constraint . ' ', $where);
     }
 
