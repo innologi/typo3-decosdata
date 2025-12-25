@@ -27,6 +27,7 @@ namespace Innologi\Decosdata\Service;
  ***************************************************************/
 use Innologi\Decosdata\Exception\MissingParameter;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 
 /**
  * Parameter Service
@@ -107,7 +108,10 @@ class ParameterService implements SingletonInterface
             );
             $this->pluginNameSpace = $extensionService->getPluginNamespace($extensionName, $pluginName);
 
-            $this->arguments = \TYPO3\CMS\Core\Utility\GeneralUtility::_GPmerged($this->pluginNamespace);
+            /** @var $request \Psr\Http\Message\ServerRequestInterface */
+            $request = $GLOBALS['TYPO3_REQUEST'];
+            $this->arguments = $request->getQueryParams()[$this->pluginNamespace];
+            ArrayUtility::mergeRecursiveWithOverrule($this->arguments, $request->getParsedBody()[$this->pluginNamespace]);
             $this->__initialized = true;
         }
         return $this;
