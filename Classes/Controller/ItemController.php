@@ -133,13 +133,13 @@ class ItemController extends ActionController
         // @LOW cache?
         // check override TS
         if (isset($this->settings['override']['publish'][0])) {
-            /** @var \TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser $tsParser */
-            $tsParser = GeneralUtility::makeInstance(\TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser::class);
-            $tsParser->parse($this->settings['override']['publish']);
+            /** @var \TYPO3\CMS\Core\TypoScript\TypoScriptStringFactory $tsFactory */
+            $tsParser = GeneralUtility::makeInstance(\TYPO3\CMS\Core\TypoScript\TypoScriptStringFactory::class);
+            $ast = $tsParser->parseFromStringWithIncludes('decosdata_publish_override', $this->settings['override']['publish']);
             // completely replace original publicationsettings
             $this->settings['publish'] = $this->typeProcessor
                 ->getTypoScriptService()
-                ->convertTypoScriptArrayToPlainArray($tsParser->setup);
+                ->convertTypoScriptArrayToPlainArray($ast->toArray());
         }
 
         // set imports, flexform override -> publish ts -> []
