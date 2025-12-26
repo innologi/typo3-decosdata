@@ -36,6 +36,10 @@ services:
         description: 'Process imports by uid'
         schedulable: false
 
+  # register backend module controllers
+  Innologi\Decosdata\Controller\RoutingSlugController:
+    tags: ['backend.controller']
+
   # public services
   Innologi\Decosdata\Service\Paginate\PaginateService:
     # these are created by factory but have DI expectations

@@ -1,38 +1,18 @@
 /**
  * Module: TYPO3/CMS/Decosdata/Module
  */
-define(['jquery'], function($) {
-  'use strict';
+import Notification from"@typo3/backend/notification.js";
+import RegularEvent from"@typo3/core/event/regular-event.js";
+var Selectors;
 
-  /**
-   *
-   * @type {{}}
-   * @exports TYPO3/CMS/Decosdata/Module
-   */
-  var Module = {};
+!function(t){t.actionButtonSelector=".t3js-update-button"}(Selectors||(Selectors={}));
 
-  /**
-   * Registers listeners
-   */
-  Module.initializeEvents = function() {
-    $('.t3js-update-button').on('click', function(event) {
-      var $element = $(this);
-      var name = $element.attr('name');
-      var warning = $element.data('warning-message');
-      var message = '';
-      if (name === 'flushRoutingSlugs') {
-        if (warning === undefined || confirm(warning)) {
-          message = $element.data('notification-message');
-          top.TYPO3.Notification.success(message);
-        } else {
-          event.preventDefault();
-          return false;
-        }
-      }
-    });
-  };
-
-  $(Module.initializeEvents);
-
-  return Module;
-});
+class Decosdata{
+    constructor(){this.initializeEvents()}
+    initializeEvents(){
+        new RegularEvent("click", (t, e) => {
+            Notification.success(e.dataset.notificationMessage||"Event triggered", "", 3)
+        }).delegateTo(document, Selectors.actionButtonSelector)
+    }
+}
+export default new Decosdata;

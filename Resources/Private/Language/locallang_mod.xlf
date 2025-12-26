@@ -5,19 +5,25 @@
     product-name="decosdata">
     <header />
     <body>
-      <trans-unit id="tab.routing">
-        <source>Routing</source>
+      <trans-unit id="mlang_labels_tablabel" resname="mlang_labels_tablabel">
+        <source>Decosdata</source>
       </trans-unit>
-      
+      <trans-unit id="mlang_labels_tabdescr" resname="mlang_labels_tabdescr">
+        <source>Decosdata maintenance</source>
+      </trans-unit>
+      <trans-unit id="mlang_tabs_tab" resname="mlang_tabs_tab">
+        <source>Decosdata</source>
+      </trans-unit>
+
       <trans-unit id="no_access">
-        <source>You do not have access to this functionality</source>
+       <source>You do not have access to this functionality</source>
       </trans-unit>
       <trans-unit id="no_access.title">
         <source>No access</source>
       </trans-unit>
       
       <trans-unit id="routing.title">
-        <source>Routing slugs</source>
+        <source>Decosdata routing slugs</source>
       </trans-unit>
       <trans-unit id="routing.details">
         <source>Decosdata can generate persistent(!) routing slugs per decos item field based on the publish plugin configuration and a routing config using its RoutingEnhancers. These generate once and never change, unless edited in this module. Note that this will potentially change your speaking paths for decosdata-generated views, if the data was changed!</source>
@@ -40,7 +46,7 @@
       <trans-unit id="routing.flush_success.title">
         <source>Success</source>
       </trans-unit>
-      
+
     </body>
   </file>
 </xliff>
