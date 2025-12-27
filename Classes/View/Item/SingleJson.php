@@ -35,15 +35,8 @@ namespace Innologi\Decosdata\View\Item;
  */
 class SingleJson extends \TYPO3\CMS\Extbase\Mvc\View\JsonView
 {
-    /**
-     * @var array
-     */
-    protected $variablesToRender = ['section'];
-
-    /**
-     * @var array
-     */
-    protected $configuration = [
+    protected array $variablesToRender = ['section'];
+    protected array $configuration = [
         'section' => [
             '_only' => ['type', 'data', 'paging'],
         ],

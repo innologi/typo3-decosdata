@@ -117,7 +117,7 @@ class ItemController extends ActionController
     /**
      * @see \TYPO3\CMS\Extbase\Mvc\Controller\ActionController::initializeAction()
      */
-    protected function initializeAction()
+    protected function initializeAction(): void
     {
         $this->parameterService->initializeByRequest($this->request);
         $this->level = $this->parameterService->getParameterNormalized('level');

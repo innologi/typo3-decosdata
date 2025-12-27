@@ -35,15 +35,8 @@ namespace Innologi\Decosdata\View\Item;
  */
 class MultiJson extends \TYPO3\CMS\Extbase\Mvc\View\JsonView
 {
-    /**
-     * @var array
-     */
-    protected $variablesToRender = ['contentSections'];
-
-    /**
-     * @var array
-     */
-    protected $configuration = [
+    protected array $variablesToRender = ['contentSections'];
+    protected array $configuration = [
         'contentSections' => [
             '_descendAll' => [
                 '_only' => ['type', 'data', 'paging'],
