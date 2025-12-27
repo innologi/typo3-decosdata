@@ -27,8 +27,6 @@ namespace Innologi\Decosdata\ViewHelpers;
  ***************************************************************/
 use Innologi\Decosdata\Service\RuntimeStorageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
-use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithRenderStatic;
 
 /**
  * Render ViewHelper
@@ -45,8 +43,6 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithRenderStatic;
  */
 class RenderViewHelper extends \TYPO3Fluid\Fluid\ViewHelpers\RenderViewHelper
 {
-    use CompileWithRenderStatic;
-
     /**
      * @var boolean
      */
@@ -55,32 +51,32 @@ class RenderViewHelper extends \TYPO3Fluid\Fluid\ViewHelpers\RenderViewHelper
     /**
      * @var \Innologi\Decosdata\Service\RuntimeStorageService
      */
-    protected static $storageService;
+    protected $storageService;
 
     /**
      * Get Storage Service
      *
      * @return \Innologi\Decosdata\Service\RuntimeStorageService
      */
-    protected static function getStorageService()
+    protected function getStorageService()
     {
-        if (self::$storageService === null) {
-            self::$storageService = GeneralUtility::makeInstance(RuntimeStorageService::class);
+        if ($this->storageService === null) {
+            $this->storageService = GeneralUtility::makeInstance(RuntimeStorageService::class);
         }
-        return self::$storageService;
+        return $this->storageService;
     }
 
     /**
      * @return mixed
      */
-    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
+    public function render()
     {
-        $id = 'RenderViewHelper-' . self::getStorageService()->generateHash($arguments);
-        if (self::getStorageService()->has($id)) {
-            $output = self::getStorageService()->get($id);
+        $id = 'RenderViewHelper-' . $this->getStorageService()->generateHash($this->arguments);
+        if ($this->getStorageService()->has($id)) {
+            $output = $this->getStorageService()->get($id);
         } else {
-            $output = parent::renderStatic($arguments, $renderChildrenClosure, $renderingContext);
-            self::getStorageService()->set($id, $output);
+            $output = parent::render();
+            $this->getStorageService()->set($id, $output);
         }
         return $output;
     }
