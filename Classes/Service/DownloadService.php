@@ -66,13 +66,14 @@ class DownloadService implements SingletonInterface
      */
     protected $salt = 'oiuJISF*(#J)#aF)J(Fg#JajO*!I#EW10GF$#*IJwFJLd635KIERGgfsjge43o8ui34wg4r';
 
+    protected string $secretSalt = 'R#yq~sySx2LbF~ZvLMT,t%qcpHP&YUWZSw~9u`%DcfJZVgVmpp-34&:-Q;^&dq#X';
     /**
      * @var string
      */
     protected $eID = 'tx_decosdata_download';
 
     /**
-     * @var \TYPO3\CMS\Extbase\Security\Cryptography\HashService
+     * @var \TYPO3\CMS\Core\Crypto\HashService
      */
     protected $hashService;
 
@@ -89,13 +90,13 @@ class DownloadService implements SingletonInterface
     /**
      * Returns HashService
      *
-     * @return \TYPO3\CMS\Extbase\Security\Cryptography\HashService
+     * @return \TYPO3\CMS\Core\Crypto\HashService
      */
     protected function getHashService()
     {
         if ($this->hashService === null) {
             $this->hashService = GeneralUtility::makeInstance(
-                \TYPO3\CMS\Extbase\Security\Cryptography\HashService::class,
+                \TYPO3\CMS\Core\Crypto\HashService::class,
             );
         }
         return $this->hashService;
@@ -143,8 +144,9 @@ class DownloadService implements SingletonInterface
                 'f' => $fileUid,
                 'b' => $blobUid,
                 'i' => $itemUid,
-                'h' => $this->getHashService()->generateHmac(
+                'h' => $this->getHashService()->hmac(
                     $this->generateHashString($fileUid, $blobUid, $itemUid),
+                    $this->secretSalt,
                 ),
             ])->buildFrontendUri();
     }
@@ -164,6 +166,7 @@ class DownloadService implements SingletonInterface
 
         $this->validRequest = $this->getHashService()->validateHmac(
             $this->generateHashString($this->fileUid, $blobUid, $itemUid),
+            $this->secretSalt,
             $hash,
         );
 
