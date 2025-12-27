@@ -37,6 +37,7 @@ use Innologi\Decosdata\Exception\MissingObjectProperty;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItem;
 use Innologi\Decosdata\Service\Importer\Exception\InvalidItemBlob;
 use Innologi\TYPO3FalApi\Exception\FileException;
+use Innologi\TraceLogger\TraceLoggerAwareInterface;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
@@ -57,8 +58,10 @@ use TYPO3\CMS\Extbase\Persistence\Generic\QuerySettingsInterface;
  * @author Frenck Lutke
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class ExtbaseStorageHandler implements StorageHandlerInterface, SingletonInterface
+class ExtbaseStorageHandler implements StorageHandlerInterface, SingletonInterface, TraceLoggerAwareInterface
 {
+    use \Innologi\TraceLogger\TraceLoggerAware;
+
     /**
      * @var ConfigurationManagerInterface
      */
@@ -179,6 +182,10 @@ class ExtbaseStorageHandler implements StorageHandlerInterface, SingletonInterfa
      */
     public function initialize($pid): void
     {
+        if ($this->logger && $this->logger->getLevel() > 1) {
+            $this->logger->logTrace();
+        }
+
         $this->configureStoragePid($pid);
         $this->configureQuerySettings($pid);
     }
@@ -241,6 +248,10 @@ class ExtbaseStorageHandler implements StorageHandlerInterface, SingletonInterfa
      */
     public function pushItem(array $data)
     {
+        if ($this->logger && $this->logger->getLevel() > 1) {
+            $this->logger->logTrace();
+        }
+
         try {
             /** @var \Innologi\Decosdata\Domain\Model\Item $parentItem */
             $parentItem = $data['parent_item'];
@@ -275,6 +286,10 @@ class ExtbaseStorageHandler implements StorageHandlerInterface, SingletonInterfa
      */
     public function pushItemBlob(array $data): void
     {
+        if ($this->logger && $this->logger->getLevel() > 1) {
+            $this->logger->logTrace();
+        }
+
         try {
             if (!(isset($data['filepath'][0]) && is_file($data['filepath']))) {
                 // filepath missing or not a file
@@ -309,6 +324,10 @@ class ExtbaseStorageHandler implements StorageHandlerInterface, SingletonInterfa
      */
     public function pushItemField(array $data): void
     {
+        if ($this->logger && $this->logger->getLevel() > 2) {
+            $this->logger->logTrace();
+        }
+
         /** @var \Innologi\Decosdata\Domain\Model\Item $parentItem */
         $parentItem = $data['item'];
         unset($data['item']);
@@ -345,6 +364,10 @@ class ExtbaseStorageHandler implements StorageHandlerInterface, SingletonInterfa
      */
     public function commit(): void
     {
+        if ($this->logger && $this->logger->getLevel() > 1) {
+            $this->logger->logTrace();
+        }
+
         // @TODO what if an import is huge? Why wait this long to persist and still allow huge memory consumption? Perhaps review the placement of commit()!
         $this->persistenceManager->persistAll();
     }
