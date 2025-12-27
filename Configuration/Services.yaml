@@ -23,12 +23,6 @@ services:
     class: 'Innologi\Decosdata\Service\Importer\Parser\OneFileStreamingParser'
   
   # register commands
-  Innologi\Decosdata\Command\MigrateCommand:
-    tags:
-      - name: 'console.command'
-        command: 'decosdata:migrate'
-        description: 'decospublisher => decosdata migration'
-        schedulable: false
   Innologi\Decosdata\Command\ImportStatusCommand:
     tags:
       - name: 'console.command'

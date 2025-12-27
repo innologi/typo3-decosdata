@@ -19,7 +19,6 @@
 		"innologi/tag-builder": "~0.1.4",
 		"innologi/trace-logger": "~0.1.1",
 		"innologi/typo3-fal-api": "~1.0.0",
-		"innologi/typo3-ext-update": "~1.0.0",
 		"innologi/typo3-asset-provider": "~1.0.0"
 	},
 	"extra": {
