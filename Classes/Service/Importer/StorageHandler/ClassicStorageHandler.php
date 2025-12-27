@@ -58,16 +58,6 @@ class ClassicStorageHandler implements StorageHandlerInterface, SingletonInterfa
     protected $databaseConnection;
 
     /**
-     * @var DatabaseHelper
-     */
-    protected $databaseHelper;
-
-    /**
-     * @var FileReferenceRepository
-     */
-    protected $fileReferenceRepository;
-
-    /**
      * @var array
      */
     protected $propertyDefaults = [];
@@ -87,19 +77,12 @@ class ClassicStorageHandler implements StorageHandlerInterface, SingletonInterfa
      */
     protected $fieldCache = [];
 
-    public function injectDatabaseHelper(DatabaseHelper $databaseHelper): void
-    {
-        $this->databaseHelper = $databaseHelper;
-    }
-
-    public function injectFileReferenceRepository(FileReferenceRepository $fileReferenceRepository): void
-    {
-        $this->fileReferenceRepository = $fileReferenceRepository;
-    }
-
-    public function __construct()
-    {
-        $requestTime = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp');
+    public function __construct(
+        protected readonly DatabaseHelper $databaseHelper,
+        protected readonly FileReferenceRepository $fileReferenceRepository,
+        Context $context,
+    ) {
+        $requestTime = $context->getPropertyFromAspect('date', 'timestamp');
         $this->propertyDefaults = [
             'pid' => 1,
             'crdate' => $requestTime,

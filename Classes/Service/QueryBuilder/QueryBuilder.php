@@ -51,48 +51,16 @@ class QueryBuilder
     // @LOW ___is there any upside to making this a singleton? Consider that many views probably use it twice (to produce a header part)
 
     /**
-     * @var ConstraintFactory
-     */
-    protected $constraintFactory;
-
-    /**
-     * @var QueryOptionService
-     */
-    protected $optionService;
-
-    /**
-     * @var PaginateService
-     */
-    protected $paginateService;
-
-    /**
-     * @var SearchService
-     */
-    protected $searchService;
-
-    /**
      * @var integer
      */
     protected $groupByContentPriority;
 
-    public function injectConstraintFactory(ConstraintFactory $constraintFactory): void
-    {
-        $this->constraintFactory = $constraintFactory;
-    }
-
-    public function injectOptionService(QueryOptionService $optionService): void
-    {
-        $this->optionService = $optionService;
-    }
-
-    public function injectPaginateService(PaginateService $paginateService): void
-    {
-        $this->paginateService = $paginateService;
-    }
-
-    public function injectSearchService(SearchService $searchService): void
-    {
-        $this->searchService = $searchService;
+    public function __construct(
+        protected readonly ConstraintFactory $constraintFactory,
+        protected readonly QueryOptionService $optionService,
+        protected readonly PaginateService $paginateService,
+        protected readonly SearchService $searchService,
+    ) {
     }
 
     // @TODO ___doc?

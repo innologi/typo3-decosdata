@@ -46,26 +46,6 @@ use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 class TypeProcessorService implements SingletonInterface
 {
     /**
-     * @var ItemRepository
-     */
-    protected $itemRepository;
-
-    /**
-     * @var QueryBuilder
-     */
-    protected $queryBuilder;
-
-    /**
-     * @var RenderOptionService
-     */
-    protected $optionService;
-    // @LOW don't inject this one
-    /**
-     * @var ProviderServiceInterface
-     */
-    protected $assetProviderService;
-
-    /**
      * @var \TYPO3\CMS\Core\TypoScript\TypoScriptService
      */
     protected $typoScriptService;
@@ -82,31 +62,13 @@ class TypeProcessorService implements SingletonInterface
 
     protected Request $request;
 
-    protected UriBuilder $uriBuilder;
-
-    public function injectItemRepository(ItemRepository $itemRepository): void
-    {
-        $this->itemRepository = $itemRepository;
-    }
-
-    public function injectQueryBuilder(QueryBuilder $queryBuilder): void
-    {
-        $this->queryBuilder = $queryBuilder;
-    }
-
-    public function injectOptionService(RenderOptionService $optionService): void
-    {
-        $this->optionService = $optionService;
-    }
-
-    public function injectAssetProviderService(ProviderServiceInterface $assetProviderService): void
-    {
-        $this->assetProviderService = $assetProviderService;
-    }
-
-    public function injectUriBuilder(UriBuilder $uriBuilder): void
-    {
-        $this->uriBuilder = $uriBuilder;
+    public function __construct(
+        protected readonly ItemRepository $itemRepository,
+        protected readonly QueryBuilder $queryBuilder,
+        protected readonly RenderOptionService $optionService,
+        protected readonly ProviderServiceInterface $assetProviderService,
+        protected readonly UriBuilder $uriBuilder,
+    ) {
     }
 
     /**

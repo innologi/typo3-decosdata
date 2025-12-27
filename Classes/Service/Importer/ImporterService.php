@@ -46,16 +46,6 @@ class ImporterService implements SingletonInterface, TraceLoggerAwareInterface
     use \Innologi\TraceLogger\TraceLoggerAware;
 
     /**
-     * @var ImportRepository
-     */
-    protected $importRepository;
-
-    /**
-     * @var ParserInterface
-     */
-    protected $parser;
-
-    /**
      * @var array
      */
     protected $errors = [];
@@ -65,14 +55,10 @@ class ImporterService implements SingletonInterface, TraceLoggerAwareInterface
      */
     protected $sitePath;
 
-    public function injectImportRepository(ImportRepository $importRepository): void
-    {
-        $this->importRepository = $importRepository;
-    }
-
-    public function injectParser(ParserInterface $parser): void
-    {
-        $this->parser = $parser;
+    public function __construct(
+        protected readonly ImportRepository $importRepository,
+        protected readonly ParserInterface $parser,
+    ) {
     }
 
     /**

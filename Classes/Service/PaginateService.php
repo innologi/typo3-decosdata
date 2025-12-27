@@ -51,16 +51,6 @@ class PaginateService implements SingletonInterface
     // @LOW _note all the MySQL keywords in yearly.. should be supplied by QueryProvider classes
 
     /**
-     * @var ParameterService
-     */
-    protected $parameterService;
-
-    /**
-     * @var ConstraintFactory
-     */
-    protected $constraintFactory;
-
-    /**
      * @var array
      */
     protected $supportedTypes = ['default', 'yearly'];
@@ -90,14 +80,10 @@ class PaginateService implements SingletonInterface
      */
     protected $active = false;
 
-    public function injectParameterService(ParameterService $parameterService): void
-    {
-        $this->parameterService = $parameterService;
-    }
-
-    public function injectConstraintFactory(ConstraintFactory $constraintFactory): void
-    {
-        $this->constraintFactory = $constraintFactory;
+    public function __construct(
+        protected readonly ParameterService $parameterService,
+        protected readonly ConstraintFactory $constraintFactory,
+    ) {
     }
 
     /**

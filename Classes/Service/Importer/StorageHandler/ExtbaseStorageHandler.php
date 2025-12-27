@@ -62,114 +62,19 @@ class ExtbaseStorageHandler implements StorageHandlerInterface, SingletonInterfa
 {
     use \Innologi\TraceLogger\TraceLoggerAware;
 
-    /**
-     * @var ConfigurationManagerInterface
-     */
-    protected $configurationManager;
-
-    /**
-     * @var PersistenceManager
-     */
-    protected $persistenceManager;
-
-    /**
-     * @var ItemRepository
-     */
-    protected $itemRepository;
-
-    /**
-     * @var ItemFieldRepository
-     */
-    protected $itemFieldRepository;
-
-    /**
-     * @var ItemBlobRepository
-     */
-    protected $itemBlobRepository;
-
-    /**
-     * @var ItemFactory
-     */
-    protected $itemFactory;
-
-    /**
-     * @var ItemFieldFactory
-     */
-    protected $itemFieldFactory;
-
-    /**
-     * @var ItemBlobFactory
-     */
-    protected $itemBlobFactory;
-
-    /**
-     * @var ItemTypeFactory
-     */
-    protected $itemTypeFactory;
-
-    /**
-     * @var FieldFactory
-     */
-    protected $fieldFactory;
-
-    /**
-     * @var QuerySettingsInterface
-     */
-    protected $defaultQuerySettings;
-
-    public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager): void
-    {
-        $this->configurationManager = $configurationManager;
-    }
-
-    public function injectPersistenceManager(PersistenceManager $persistenceManager): void
-    {
-        $this->persistenceManager = $persistenceManager;
-    }
-
-    public function injectItemRepository(ItemRepository $itemRepository): void
-    {
-        $this->itemRepository = $itemRepository;
-    }
-
-    public function injectItemFieldRepository(ItemFieldRepository $itemFieldRepository): void
-    {
-        $this->itemFieldRepository = $itemFieldRepository;
-    }
-
-    public function injectItemBlobRepository(ItemBlobRepository $itemBlobRepository): void
-    {
-        $this->itemBlobRepository = $itemBlobRepository;
-    }
-
-    public function injectItemFactory(ItemFactory $itemFactory): void
-    {
-        $this->itemFactory = $itemFactory;
-    }
-
-    public function injectItemFieldFactory(ItemFieldFactory $itemFieldFactory): void
-    {
-        $this->itemFieldFactory = $itemFieldFactory;
-    }
-
-    public function injectItemBlobFactory(ItemBlobFactory $itemBlobFactory): void
-    {
-        $this->itemBlobFactory = $itemBlobFactory;
-    }
-
-    public function injectItemTypeFactory(ItemTypeFactory $itemTypeFactory): void
-    {
-        $this->itemTypeFactory = $itemTypeFactory;
-    }
-
-    public function injectFieldFactory(FieldFactory $fieldFactory): void
-    {
-        $this->fieldFactory = $fieldFactory;
-    }
-
-    public function injectDefaultQuerySettings(QuerySettingsInterface $defaultQuerySettings): void
-    {
-        $this->defaultQuerySettings = $defaultQuerySettings;
+    public function __construct(
+        protected readonly ConfigurationManagerInterface $configurationManager,
+        protected readonly PersistenceManager $persistenceManager,
+        protected readonly ItemRepository $itemRepository,
+        protected readonly ItemFieldRepository $itemFieldRepository,
+        protected readonly ItemBlobRepository $itemBlobRepository,
+        protected readonly ItemFactory $itemFactory,
+        protected readonly ItemFieldFactory $itemFieldFactory,
+        protected readonly ItemBlobFactory $itemBlobFactory,
+        protected readonly ItemTypeFactory $itemTypeFactory,
+        protected readonly FieldFactory $fieldFactory,
+        protected readonly QuerySettingsInterface $defaultQuerySettings,
+    ) {
     }
 
     /**

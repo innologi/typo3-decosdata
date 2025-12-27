@@ -58,16 +58,6 @@ class OneFileStreamingParser implements ParserInterface, SingletonInterface, Tra
     use \Innologi\TraceLogger\TraceLoggerAware;
 
     /**
-     * @var ConfigurationManagerInterface
-     */
-    protected $configurationManager;
-
-    /**
-     * @var StorageHandlerInterface
-     */
-    protected $storageHandler;
-
-    /**
      * @var \Innologi\Decosdata\Domain\Model\Import
      */
     protected $importObject;
@@ -87,14 +77,10 @@ class OneFileStreamingParser implements ParserInterface, SingletonInterface, Tra
      */
     protected $sitePath;
 
-    public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager): void
-    {
-        $this->configurationManager = $configurationManager;
-    }
-
-    public function injectStorageHandler(StorageHandlerInterface $storageHandler): void
-    {
-        $this->storageHandler = $storageHandler;
+    public function __construct(
+        protected readonly ConfigurationManagerInterface $configurationManager,
+        protected readonly StorageHandlerInterface $storageHandler,
+    ) {
     }
 
     /**

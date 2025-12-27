@@ -48,21 +48,6 @@ class BreadcrumbService implements SingletonInterface
     // @LOW consider that the injects aren't always necessary, so you might want to work with getMethods instead
 
     /**
-     * @var ParameterService
-     */
-    protected $parameterService;
-
-    /**
-     * @var ItemRepository
-     */
-    protected $itemRepository;
-
-    /**
-     * @var QueryBuilder
-     */
-    protected $queryBuilder;
-
-    /**
      * @var integer
      */
     protected $currentLevel = 1;
@@ -77,19 +62,11 @@ class BreadcrumbService implements SingletonInterface
      */
     protected $active = false;
 
-    public function injectParameterService(ParameterService $parameterService): void
-    {
-        $this->parameterService = $parameterService;
-    }
-
-    public function injectItemRepository(ItemRepository $itemRepository): void
-    {
-        $this->itemRepository = $itemRepository;
-    }
-
-    public function injectQueryBuilder(QueryBuilder $queryBuilder): void
-    {
-        $this->queryBuilder = $queryBuilder;
+    public function __construct(
+        protected readonly ParameterService $parameterService,
+        protected readonly ItemRepository $itemRepository,
+        protected readonly QueryBuilder $queryBuilder,
+    ) {
     }
 
     /**
