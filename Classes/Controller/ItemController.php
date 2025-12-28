@@ -30,8 +30,6 @@ use Innologi\Decosdata\Service\BreadcrumbService;
 use Innologi\Decosdata\Service\ParameterService;
 use Innologi\Decosdata\Service\QueryBuilder\QueryBuilder;
 use Innologi\Decosdata\Service\TypeProcessorService;
-use Innologi\Decosdata\View\Item\MultiJson;
-use Innologi\Decosdata\View\Item\SingleJson;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -197,8 +195,7 @@ class ItemController extends ActionController
     protected function initializeMultiAction()
     {
         if ($this->request->getFormat() === 'json') {
-            // in TYPO3 v10, ViewResolver will only resolve whatever is the default view
-            $this->defaultViewObjectName = MultiJson::class;
+            $this->defaultViewObjectName = JsonView::class;
         }
     }
 
@@ -208,8 +205,7 @@ class ItemController extends ActionController
     protected function initializeSingleAction()
     {
         if ($this->request->getFormat() === 'json') {
-            // in TYPO3 v10, ViewResolver will only resolve whatever is the default view
-            $this->defaultViewObjectName = SingleJson::class;
+            $this->defaultViewObjectName = JsonView::class;
         }
     }
 
@@ -226,7 +222,18 @@ class ItemController extends ActionController
                 $this->import,
             ),
         );
-        return $this->view instanceof JsonView ? $this->jsonResponse() : $this->htmlResponse();
+        if ($this->view instanceof JsonView) {
+            $this->view->setVariablesToRender(['contentSections']);
+            $this->view->setConfiguration([
+                'contentSections' => [
+                    '_descendAll' => [
+                        '_only' => ['type', 'data', 'paging'],
+                    ],
+                ],
+            ]);
+            return $this->jsonResponse();
+        }
+        return $this->htmlResponse();
     }
 
     /**
@@ -240,6 +247,7 @@ class ItemController extends ActionController
     {
         $data = null;
         $this->activeConfiguration = $this->activeConfiguration[$section] ?? [];
+        $onlyContentFields = false;
 
         // @LOW maybe support non-xhr modes as well?
         // enable xhr mode on pagination as well
@@ -278,16 +286,35 @@ class ItemController extends ActionController
                     $section,
                 ),
             );
-            // we only really need the content fields, other query-added fields will only pad the JSON size
-            if ($this->view instanceof SingleJson) {
-                $this->view->addContentFieldsToConfiguration(\count($this->activeConfiguration['contentField']));
-            }
+            // if json, we only really need the content fields, other query-added fields will only pad the response size
+            $onlyContentFields = true;
         }
 
         $this->view->assign('level', $this->level);
         $this->view->assign('section', $data);
         $this->view->assign('sectionIndex', $section);
-        return $this->view instanceof JsonView ? $this->jsonResponse() : $this->htmlResponse();
+        if ($this->view instanceof JsonView) {
+            $viewConfig = [
+                'section' => [
+                    '_only' => ['type', 'data', 'paging'],
+                ],
+            ];
+            if ($onlyContentFields) {
+                $viewConfig['section']['data'] = [
+                    '_descendAll' => [
+                        '_only' => ['id'],
+                    ],
+                ];
+                $counter = \count($this->activeConfiguration['contentField']);
+                for ($i = 1; $i <= $counter; $i++) {
+                    $viewConfig['section']['data']['_descendAll']['_only'][] = 'content' . $i;
+                }
+            }
+            $this->view->setVariablesToRender(['section']);
+            $this->view->setConfiguration($viewConfig);
+            return $this->jsonResponse();
+        }
+        return $this->htmlResponse();
     }
 
     /**
