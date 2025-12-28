@@ -121,7 +121,7 @@ class ItemController extends ActionController
         $this->level = $this->parameterService->getParameterNormalized('level');
 
         // detect and set apiMode defaults
-        $this->apiMode = (int) $GLOBALS['TSFE']->getPageArguments()->getPageType() === (int) $this->settings['api']['type'];
+        $this->apiMode = (int) $this->request->getAttribute('routing')->getPageType() === (int) $this->settings['api']['type'];
         if ($this->apiMode && !$this->parameterService->hasParameter('format')) {
             // default API format
             $this->request = $this->request->withFormat($this->settings['api']['defaultFormat']);

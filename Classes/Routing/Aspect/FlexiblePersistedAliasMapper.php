@@ -665,8 +665,7 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
             'hash' => $this->generateCacheHash(),
             'slug' => $resultValue,
             'routevar' => $originalValue,
-            // @extensionScannerIgnoreLine false positive
-            'pid' => (int) $GLOBALS['TSFE']->id,
+            'pid' => (int) $GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.page.information')->getId(),
             'tstamp' => (int) GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp'),
         ]);
     }

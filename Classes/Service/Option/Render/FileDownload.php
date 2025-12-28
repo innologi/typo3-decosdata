@@ -27,8 +27,6 @@ namespace Innologi\Decosdata\Service\Option\Render;
  ***************************************************************/
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\TagBuilder\TagInterface;
-use TYPO3\CMS\Core\Information\Typo3Version;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * File Download option
@@ -57,12 +55,8 @@ class FileDownload implements OptionInterface
             return $tag;
         }
 
-        /** @var Typo3Version $typo3Version */
-        $typo3Version = GeneralUtility::makeInstance(Typo3Version::class);
-        $prefix = $typo3Version->getMajorVersion() > 10 ? '' : $GLOBALS['TSFE']->absRefPrefix;
-
         return $service->getTagFactory()->createTag('a', [
-            'href' => $prefix . $file->getPublicUrl(),
+            'href' => $file->getPublicUrl(),
             'title' => $file->getName(),
         ], $tag);
     }
