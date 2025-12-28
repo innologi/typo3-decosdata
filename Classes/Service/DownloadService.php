@@ -28,6 +28,7 @@ namespace Innologi\Decosdata\Service;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
+use TYPO3\CMS\Extbase\Mvc\RequestInterface;
 
 /**
  * Download Service
@@ -135,10 +136,11 @@ class DownloadService implements SingletonInterface
      * @param integer $itemUid
      * @return string
      */
-    public function getDownloadUrl($fileUid, $blobUid, $itemUid)
+    public function getDownloadUrl(RequestInterface $fromRequest, $fileUid, $blobUid, $itemUid)
     {
         return $this->uriBuilder
             ->reset()
+            ->setRequest($fromRequest)
             ->setArguments([
                 'eID' => $this->eID,
                 'f' => $fileUid,

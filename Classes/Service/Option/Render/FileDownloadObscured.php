@@ -74,7 +74,7 @@ class FileDownloadObscured implements OptionInterface
         }
 
         return $service->getTagFactory()->createTag('a', [
-            'href' => $this->downloadService->getDownloadUrl($this->fileUid, (int) $item[$id], $item['id']),
+            'href' => $this->downloadService->getDownloadUrl($service->getRequest(), $this->fileUid, (int) $item[$id], $item['id']),
             'title' => $file->getName(),
         ], $tag);
     }
