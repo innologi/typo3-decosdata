@@ -33,6 +33,7 @@ use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Routing\Aspect\PersistedAliasMapper;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Innologi\Decosdata\Exception\ConfigurationError;
 
 /**
  * Flexible Persisted Alias Mapper
@@ -751,18 +752,18 @@ class FlexiblePersistedAliasMapper extends PersistedAliasMapper
             ->from($this->tableName, $this->tableAlias);
 
         if (!empty($this->tableJoins)) {
-            // @TODO error handling
+            // @TODO more error handling
             foreach ($this->tableJoins as $join) {
-                $connection = $queryBuilder->getConnection();
-                $queryBuilder->add('join', [
-                    $connection->quoteIdentifier($join['fromAlias']) => [
-                        'joinType' => $join['joinType'] ?? 'inner',
-                        'joinTable' => $connection->quoteIdentifier($join['joinTable']),
-                        'joinAlias' => $connection->quoteIdentifier($join['joinAlias']),
-                        'joinCondition' => $queryBuilder->expr()
-                            ->and(...$this->createFieldConstraints($queryBuilder, $join['constraints'])),
-                    ],
-                ], true);
+                $joinMethod = \lcfirst(($join['joinType'] ?? '') . 'Join');
+                if (!\method_exists($queryBuilder, $joinMethod)) {
+                    throw new ConfigurationError(1766913590, 'JoinType `' . ($join['joinType'] ?? '') . '` is not a supported QueryBuilder JoinType.');
+                }
+                $queryBuilder->{$joinMethod}(
+                    fromAlias: $join['fromAlias'],
+                    join: $join['joinTable'],
+                    alias: $join['joinAlias'],
+                    condition: (string)$queryBuilder->expr()->and(...$this->createFieldConstraints($queryBuilder, $join['constraints'])),
+                );
             }
         }
         if (!empty($this->constraints)) {
