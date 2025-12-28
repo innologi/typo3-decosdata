@@ -30,6 +30,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Core\Bootstrap;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Scheduler\Task\AbstractTask;
+use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Http\ServerRequest;
 
 /**
@@ -61,12 +62,15 @@ class ImporterTask extends AbstractTask
      */
     public function execute()
     {
+        $GLOBALS['TYPO3_REQUEST'] = $request = (new ServerRequest())
+            ->withAttribute('applicationType', SystemEnvironmentBuilder::REQUESTTYPE_BE);
+
         $bootstrap = GeneralUtility::makeInstance(Bootstrap::class);
         $bootstrap->initialize([
             'pluginName' => 'Importer',
             'extensionName' => $this->extensionName,
             'vendorName' => 'Innologi',
-        ], new ServerRequest());
+        ], $request);
 
         /** @var \Innologi\Decosdata\Service\Importer\ImporterService $importerService */
         $importerService = GeneralUtility::makeInstance(\Innologi\Decosdata\Service\Importer\ImporterService::class);

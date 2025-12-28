@@ -33,6 +33,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
@@ -93,12 +94,15 @@ class ImportRunCommand extends Command
         $traceLogEnabled = (bool) $input->getOption('trace-log');
 
         try {
+            $GLOBALS['TYPO3_REQUEST'] = $request = (new ServerRequest())
+                ->withAttribute('applicationType', SystemEnvironmentBuilder::REQUESTTYPE_BE);
+
             $bootstrap = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Core\Bootstrap::class);
             $bootstrap->initialize([
                 'pluginName' => 'Importer',
                 'extensionName' => $this->extensionName,
                 'vendorName' => 'Innologi',
-            ], new ServerRequest());
+            ], $request);
 
             /** @var \Innologi\Decosdata\Service\Importer\ImporterService $importerService */
             $importerService = GeneralUtility::makeInstance(\Innologi\Decosdata\Service\Importer\ImporterService::class);
