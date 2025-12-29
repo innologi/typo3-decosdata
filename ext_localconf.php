@@ -15,6 +15,7 @@ $ll = 'LLL:EXT:decosdata/Resources/Private/Language/locallang_be.xlf:';
     [
         \Innologi\Decosdata\Controller\ItemController::class => 'search',
     ],
+    \TYPO3\CMS\Extbase\Utility\ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
 );
 
 // add scheduler tasks

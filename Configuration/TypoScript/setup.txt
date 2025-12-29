@@ -70,7 +70,7 @@ decosdata_api {
 			replace = 1
 		}
 	}
-	10 < tt_content.list.20.decosdata_publish
+	10 < tt_content.decosdata_publish.20
 }
 
 # CSS

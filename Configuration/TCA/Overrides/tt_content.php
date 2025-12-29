@@ -11,9 +11,8 @@ defined('TYPO3') or die();
 
 // add the flexform
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
-    'decosdata_publish',
+    '*',
     'FILE:EXT:decosdata/Configuration/FlexForms/flexform_publish.xml',
+    'decosdata_publish',
 );
-$GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist']['decosdata_publish'] = 'pi_flexform';
-// remove some unused fields
-$GLOBALS['TCA']['tt_content']['types']['list']['subtypes_excludelist']['decosdata_publish'] = 'pages,recursive';
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('tt_content', '--div--;Configuration,pi_flexform,', 'decosdata_publish', 'after:subheader');
