@@ -29,8 +29,7 @@ use Innologi\Decosdata\Domain\Repository\ImportRepository;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\AbstractAdditionalFieldProvider;
-use TYPO3\CMS\Scheduler\Task\Enumeration\Action;
-
+use TYPO3\CMS\Scheduler\SchedulerManagementAction;
 /**
  * Importer Additional Field Provider
  *
@@ -59,7 +58,7 @@ class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider
     {
         // set field value
         if (empty($taskInfo['selectedImports'])) {
-            if ($schedulerModule->getCurrentAction()->equals(Action::EDIT)) {
+            if ($schedulerModule->getCurrentAction() === SchedulerManagementAction::EDIT) {
                 // existing task, meaning there is a value
                 $taskInfo['selectedImports'] = $task->selectedImports;
             } else {
@@ -76,8 +75,6 @@ class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider
             $fieldId => [
                 'code' => $fieldHtml,
                 'label' => $this->ll . 'task_importer.field.selectImports',
-                'cshKey' => 'tx_decosdata_task_importer',
-                'cshLabel' => $fieldId,
             ],
         ];
         return $additionalFields;
@@ -93,7 +90,7 @@ class ImporterAdditionalFieldProvider extends AbstractAdditionalFieldProvider
     public function validateAdditionalFields(array &$submittedData, \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $schedulerModule)
     {
         $valid = false;
-        if (!is_array($submittedData['selectedImports'])) {
+        if (! (isset($submittedData['selectedImports']) && is_array($submittedData['selectedImports'])) ) {
             // @extensionScannerIgnoreLine false positive
             $this->addMessage(
                 $GLOBALS['LANG']->sL($this->ll . 'task_importer.msg.noImportSelected'),
