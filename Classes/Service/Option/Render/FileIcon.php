@@ -28,8 +28,8 @@ namespace Innologi\Decosdata\Service\Option\Render;
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\TagBuilder\TagContent;
 use Innologi\TagBuilder\TagInterface;
-use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -72,7 +72,7 @@ class FileIcon implements OptionInterface
         // if we want to make use of the internal API
         $content = $this->iconFactory->getIconForFileExtension(
             $file->getExtension(),
-            Icon::SIZE_SMALL,
+            IconSize::SMALL,
         )->getMarkup();
         if ($tag instanceof TagContent) {
             return $tag->reset()->setContent($content);

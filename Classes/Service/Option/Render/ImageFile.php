@@ -28,6 +28,7 @@ namespace Innologi\Decosdata\Service\Option\Render;
 use Innologi\Decosdata\Service\Option\RenderOptionService;
 use Innologi\TagBuilder\TagInterface;
 use TYPO3\CMS\Core\Resource\AbstractFile;
+use TYPO3\CMS\Core\Resource\FileType;
 use TYPO3\CMS\Extbase\Service\ImageService;
 
 /**
@@ -97,7 +98,7 @@ class ImageFile implements OptionInterface
     protected function isSupportedFile(AbstractFile $file)
     {
         return $file->exists() && (
-            $file->getType() === AbstractFile::FILETYPE_IMAGE || str_contains($file->getMimeType(), '/pdf')
+            $file->getType() === FileType::IMAGE->value || str_contains($file->getMimeType(), '/pdf')
         );
     }
 }

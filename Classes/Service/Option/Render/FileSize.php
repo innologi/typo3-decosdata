@@ -53,6 +53,7 @@ class FileSize implements OptionInterface
         }
 
         $content = GeneralUtility::formatSize(
+            // @extensionScannerIgnoreLine false positive
             $file->getSize(),
             // @TODO ___get default format from typoscript?
             // @LOW ___support formatting argument?
