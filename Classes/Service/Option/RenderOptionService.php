@@ -235,11 +235,9 @@ class RenderOptionService extends OptionServiceAbstract
      * Processes an array of render-options by calling the contained alterValue()
      * methods and passing the content reference and renderer object to it.
      *
-     * @param string $content
-     * $param string $index
      * @return \Innologi\TagBuilder\TagInterface
      */
-    public function processOptions(array $options, $content, $index, array $item, PaginateService $paginator = null)
+    public function processOptions(array $options, $content, $index, array $item, ?PaginateService $paginator = null)
     {
         // safeguard original values for recursion before overwrite
         $previously = [$this->item, $this->index, $this->originalContent, $this->paginator];

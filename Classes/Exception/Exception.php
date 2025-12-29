@@ -40,7 +40,7 @@ class Exception extends \Exception
      * @param array $messageArguments (optional)
      * @param string $message (optional)
      */
-    public function __construct($code = null, array $messageArguments = null, $message = null)
+    public function __construct($code = null, ?array $messageArguments = null, $message = null)
     {
         $this->code = $code;
         if ($message !== null) {
