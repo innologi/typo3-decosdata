@@ -12,14 +12,14 @@
 	],
 	"require": {
 		"php": ">=8.2",
-		"typo3/cms-core": "^12.4",
-		"typo3/cms-scheduler": "^12.4",
-		"bmack/modern-template-building": "dev-master#88864b6e82fa78c015a8ea0d18be490782a4f096",
-		"friendsoftypo3/typo3db-legacy": "~1.2.0",
+		"typo3/cms-core": "^13.4",
+		"typo3/cms-scheduler": "^13.4",
+		"bmack/modern-template-building": "dev-master#2fea36b3f4384884b31a98f997a7e326a4d06e50",
+		"friendsoftypo3/typo3db-legacy": "dev-main#3b392dcba06a0bd82a5ef657ad4d28b5b7929ec5",
 		"innologi/tag-builder": "~0.1.4",
 		"innologi/trace-logger": "~0.1.1",
-		"innologi/typo3-fal-api": "~1.0.0",
-		"innologi/typo3-asset-provider": "~1.0.0"
+		"innologi/typo3-fal-api": "^1.0",
+		"innologi/typo3-asset-provider": "^1.1"
 	},
 	"extra": {
 		"typo3/cms": {

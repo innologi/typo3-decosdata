@@ -18,16 +18,16 @@ $EM_CONF[$_EXTKEY] = [
     'author_email' => 'typo3@innologi.nl',
     'author_company' => 'www.innologi.nl',
     'state' => 'stable',
-    'version' => '2.0.2',
+    'version' => '3.0.0',
     'constraints' => [
         'depends' => [
-            'php' => '8.2.0-8.2.99',
-            'typo3' => '12.4.0-12.4.99',
+            'php' => '8.2.0-8.4.99',
+            'typo3' => '13.4.0-13.4.99',
         ],
         'conflicts' => [
         ],
         'suggests' => [
-            'scheduler' => '12.4.0',
+            'scheduler' => '13.4.0',
             'typo3db_legacy' => '1.2.0',
         ],
     ],
